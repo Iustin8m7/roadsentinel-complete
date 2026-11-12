@@ -1,0 +1,48 @@
+
+> roadsentinel-web@0.1.0 build
+> tsc -b && vite build --outDir ../docs/audits/runtime_verification/frontend-build
+
+vite v7.3.7 building client environment for production...
+transforming...
+✓ 2882 modules transformed.
+
+(!) outDir /home/justin7m8/Documents/roadsentinel-integration/docs/audits/runtime_verification/frontend-build is not inside project root and will not be emptied.
+Use --emptyOutDir to override.
+
+rendering chunks...
+computing gzip size...
+../docs/audits/runtime_verification/frontend-build/index.html                                                    0.71 kB │ gzip:   0.43 kB
+../docs/audits/runtime_verification/frontend-build/assets/space-grotesk-vietnamese-wght-normal-D0rl6rjA.woff2    6.71 kB
+../docs/audits/runtime_verification/frontend-build/assets/space-grotesk-latin-ext-wght-normal-D9tNdqV9.woff2    18.94 kB
+../docs/audits/runtime_verification/frontend-build/assets/space-grotesk-latin-wght-normal-BhU9QXUp.woff2        22.29 kB
+../docs/audits/runtime_verification/frontend-build/assets/IasiMap-CIGW-MKW.css                                  15.61 kB │ gzip:   6.46 kB
+../docs/audits/runtime_verification/frontend-build/assets/index-CCdGP_lZ.css                                    82.74 kB │ gzip:  15.60 kB
+../docs/audits/runtime_verification/frontend-build/assets/loader-circle-C_6CClbc.js                              0.20 kB │ gzip:   0.18 kB
+../docs/audits/runtime_verification/frontend-build/assets/lock-DO0_vH44.js                                       0.24 kB │ gzip:   0.21 kB
+../docs/audits/runtime_verification/frontend-build/assets/circle-check-BaUnK5yf.js                               0.24 kB │ gzip:   0.21 kB
+../docs/audits/runtime_verification/frontend-build/assets/circle-x-Da19JKTl.js                                   0.26 kB │ gzip:   0.21 kB
+../docs/audits/runtime_verification/frontend-build/assets/download-vnfnAmmn.js                                   0.27 kB │ gzip:   0.21 kB
+../docs/audits/runtime_verification/frontend-build/assets/radio-B5812GE9.js                                      0.41 kB │ gzip:   0.27 kB
+../docs/audits/runtime_verification/frontend-build/assets/trash-BteAIVQC.js                                      0.60 kB │ gzip:   0.34 kB
+../docs/audits/runtime_verification/frontend-build/assets/triangle-alert-1jJpfr-J.js                             0.69 kB │ gzip:   0.39 kB
+../docs/audits/runtime_verification/frontend-build/assets/BadgePanel-qUMHGduV.js                                 0.75 kB │ gzip:   0.43 kB
+../docs/audits/runtime_verification/frontend-build/assets/ClipModal-BsH3lyuO.js                                  1.51 kB │ gzip:   0.72 kB
+../docs/audits/runtime_verification/frontend-build/assets/TacticalMap-9jf8PfrG.js                                1.52 kB │ gzip:   0.80 kB
+../docs/audits/runtime_verification/frontend-build/assets/SettingsPage-CtiZUrUg.js                               1.74 kB │ gzip:   0.90 kB
+../docs/audits/runtime_verification/frontend-build/assets/SeverityBadge-Ct_aN524.js                              2.00 kB │ gzip:   0.92 kB
+../docs/audits/runtime_verification/frontend-build/assets/cases-BeH8BsE3.js                                      2.60 kB │ gzip:   1.23 kB
+../docs/audits/runtime_verification/frontend-build/assets/PatrolsPage-DBMUcGyH.js                                2.68 kB │ gzip:   1.16 kB
+../docs/audits/runtime_verification/frontend-build/assets/RulesPage-D1hoO22R.js                                  5.01 kB │ gzip:   1.97 kB
+../docs/audits/runtime_verification/frontend-build/assets/AuditPage-BsJzeLQR.js                                 10.70 kB │ gzip:   3.72 kB
+../docs/audits/runtime_verification/frontend-build/assets/DashboardPage-DLad5LTw.js                             10.95 kB │ gzip:   3.88 kB
+../docs/audits/runtime_verification/frontend-build/assets/EvidencePlayer-Bdy3onKl.js                            11.83 kB │ gzip:   4.41 kB
+../docs/audits/runtime_verification/frontend-build/assets/StatsPage-CVWoQ96r.js                                 11.90 kB │ gzip:   4.05 kB
+../docs/audits/runtime_verification/frontend-build/assets/ArchivePage-CECAcSYu.js                               12.18 kB │ gzip:   4.44 kB
+../docs/audits/runtime_verification/frontend-build/assets/format-DufTG5mi.js                                    12.22 kB │ gzip:   3.27 kB
+../docs/audits/runtime_verification/frontend-build/assets/VideoAnalysisPage-23bQ7vwv.js                         46.87 kB │ gzip:  13.85 kB
+../docs/audits/runtime_verification/frontend-build/assets/AlertDetailPage-BBBv8x-C.js                           52.70 kB │ gzip:  15.07 kB
+../docs/audits/runtime_verification/frontend-build/assets/CamerasPage-Df5Wxb74.js                               54.84 kB │ gzip:  17.50 kB
+../docs/audits/runtime_verification/frontend-build/assets/IasiMap-BKwwmlBv.js                                  156.67 kB │ gzip:  46.02 kB
+../docs/audits/runtime_verification/frontend-build/assets/LivePlayer-9mVqh6sU.js                               399.57 kB │ gzip: 123.92 kB
+../docs/audits/runtime_verification/frontend-build/assets/index-DbtCN7wD.js                                    425.95 kB │ gzip: 137.37 kB
+✓ built in 3.33s

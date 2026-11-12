@@ -1,0 +1,75 @@
+[
+  {
+    "name": "initdb",
+    "command": [
+      "/home/justin7m8/miniconda3/envs/rs-pg/bin/initdb",
+      "-D",
+      "/tmp/rsverify-0ow925wn/pg",
+      "-U",
+      "rsverify_root",
+      "-A",
+      "trust",
+      "--encoding=UTF8",
+      "--no-locale"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration",
+    "start": "2026-11-11T11:53:33.282835+00:00",
+    "end": "2026-11-11T11:53:34.348763+00:00",
+    "duration_s": 1.066,
+    "exit_code": 0
+  },
+  {
+    "name": "start",
+    "command": [
+      "/home/justin7m8/miniconda3/envs/rs-pg/bin/pg_ctl",
+      "-D",
+      "/tmp/rsverify-0ow925wn/pg",
+      "-l",
+      "/tmp/rsverify-0ow925wn/postgres.log",
+      "-o",
+      "-h 127.0.0.1 -p 35853 -k /tmp/rsverify-0ow925wn",
+      "start"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration",
+    "start": "2026-11-11T11:53:34.349084+00:00",
+    "end": "2026-11-11T11:53:34.463430+00:00",
+    "duration_s": 0.114,
+    "exit_code": 0
+  },
+  {
+    "name": "incremental",
+    "command": [
+      "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/bin/python",
+      "-m",
+      "pytest",
+      "tests/test_incremental_security.py",
+      "tests/test_contract_api.py",
+      "tests/test_contract_ingest.py",
+      "-o",
+      "addopts=",
+      "-q",
+      "-s"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration/backend",
+    "start": "2026-11-11T11:53:34.463758+00:00",
+    "end": "2026-11-11T11:53:55.323739+00:00",
+    "duration_s": 20.86,
+    "exit_code": 0
+  },
+  {
+    "name": "stop",
+    "command": [
+      "/home/justin7m8/miniconda3/envs/rs-pg/bin/pg_ctl",
+      "-D",
+      "/tmp/rsverify-0ow925wn/pg",
+      "stop",
+      "-m",
+      "fast"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration",
+    "start": "2026-11-11T11:53:55.326676+00:00",
+    "end": "2026-11-11T11:54:06.367149+00:00",
+    "duration_s": 11.04,
+    "exit_code": 0
+  }
+]

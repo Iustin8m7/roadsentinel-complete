@@ -1,0 +1,55 @@
+# Demo camera: Roboflow supervision sample clip (highway, 4K, 25 fps).
+# All pixel coordinates are in the source video's resolution (3840x2160).
+id: demo-highway
+name: "Autostradă – cameră demo (pod pietonal)"
+video: data/videos/vehicles.mp4
+# Wall-clock time the recording starts at, used for archive search.
+start_time: "2026-10-16T14:05:00"
+location: "Demo highway, gantry km 12"
+
+# Pixel -> metres calibration (4 road points and their real-world rectangle).
+# From Roboflow's speed-estimation tutorial for this clip: 25 m wide, 250 m long.
+calibration:
+  source: [[1252, 787], [2298, 803], [5039, 2159], [-550, 2159]]
+  target_width_m: 25
+  target_length_m: 250
+
+rules: [very_high_speed, hard_braking, tailgating, dangerous_lane_change, stopped_on_road, stopped_emergency_lane, probable_crash, wrong_way, congestion]  # demo
+
+# Ignore detections above this line: too far away, 1 px there is several metres.
+min_y: 900
+
+zones:
+  - id: carriageway_south
+    name: "Carosabil sens spre cameră"
+    kind: carriageway
+    direction: [0, 1]          # expected image-space motion (down = toward camera)
+    polygon: [[1320, 790], [1690, 790], [1780, 2160], [150, 2160]]
+  - id: carriageway_north
+    name: "Carosabil sens opus"
+    kind: carriageway
+    direction: [0, -1]
+    polygon: [[1840, 790], [2420, 795], [3840, 1790], [3840, 2160], [2850, 2160]]
+  - id: shoulder_south
+    name: "Bandă de urgență (sens spre cameră)"
+    kind: emergency_lane
+    polygon: [[1250, 790], [1320, 790], [150, 2160], [0, 2160], [0, 1730]]
+  - id: shoulder_north
+    name: "Bandă de urgență (sens opus)"
+    kind: emergency_lane
+    polygon: [[2290, 795], [2420, 795], [3840, 1790], [3840, 1560]]
+
+thresholds:
+  speed_limit_kmh: 110          # demo-tuned (was 130)
+  very_high_speed_kmh: 125      # demo-tuned (was 150)
+  stopped_speed_kmh: 5
+  stopped_seconds: 4
+  hard_brake_mps2: 3.0          # demo-tuned (was 4.5)
+  headway_seconds: 1.3          # demo-tuned (was 0.8)
+  headway_min_speed_kmh: 60
+  lane_change_m: 2.5            # demo-tuned
+  lane_change_window_s: 1.5
+  wrong_way_min_px: 120         # displacement against zone direction
+  congestion_vehicles: 12
+  congestion_avg_speed_kmh: 30
+  congestion_seconds: 5

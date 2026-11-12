@@ -1,0 +1,47 @@
+........................................................................ [ 33%]
+..........................F............................................. [ 67%]
+.....................................................................    [100%]
+=================================== FAILURES ===================================
+_______ test_pipeline_fails_loudly_when_the_configured_model_is_missing ________
+
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-164/test_pipeline_fails_loudly_whe0')
+
+    def test_pipeline_fails_loudly_when_the_configured_model_is_missing(tmp_path):
+        cfg = {"id": "cam", "model": str(tmp_path / "missing.pt")}
+        with pytest.raises(ModelError, match="missing"):
+            models.resolve_for_pipeline(cfg, env={})
+        assert models.resolve_for_pipeline(cfg, env={"RS_ALLOW_MODEL_FALLBACK": "1"})[0] == "models/yolox_s.onnx"
+>       assert models.resolve_for_pipeline(cfg, "my.pt", env={})[0] == "my.pt"          # --model wins
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_models.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cfg = {'id': 'cam', 'model': '/tmp/pytest-of-justin7m8/pytest-164/test_pipeline_fails_loudly_whe0/missing.pt'}
+override = 'my.pt', env = {}
+
+    def resolve_for_pipeline(cfg, override=None, env=None):
+        """Which weights a camera run uses: (path, model_id, sha256). `--model` wins; else the camera's
+        own model. A configured model that is missing is an ERROR (it used to fall back silently to the
+        stock weights, which the camera's thresholds were not tuned for); set RS_ALLOW_MODEL_FALLBACK=1
+        to accept the stock fallback explicitly."""
+        env = os.environ if env is None else env
+        if override:
+            if Path(override).suffix.lower() != ".onnx":
+>               raise ModelError("the supported inference runtime accepts ONNX weights; Ultralytics .pt is not enabled")
+E               roadsentinel.models.ModelError: the supported inference runtime accepts ONNX weights; Ultralytics .pt is not enabled
+
+roadsentinel/models.py:281: ModelError
+=============================== warnings summary ===============================
+.venv.integration/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/test_detector.py::test_supervision_bytetrack_keeps_ids_for_a_moving_detection
+  /home/justin7m8/Documents/roadsentinel-integration/roadsentinel/detector.py:209: FutureWarning: The `ByteTrack` was deprecated since v0.28.0. It will be removed in v0.31.0.
+    return sv.ByteTrack(frame_rate=max(1, round(frame_rate)))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_models.py::test_pipeline_fails_loudly_when_the_configured_model_is_missing
+1 failed, 212 passed, 2 warnings in 5.66s

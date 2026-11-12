@@ -1,0 +1,43 @@
+[
+  {
+    "file": "romania-boundary.geojson",
+    "features": 1,
+    "bytes": 26271,
+    "sha256": "d8a2799077740158f3af8672a1595dd4ecf3d4c6d1bdb909ca4fad40456cdc83",
+    "source_url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_0_countries.geojson",
+    "upstream_sha256": "239eec57ac17f100a11e2536cffc56752c318b50ae765b0918ff7aab4ce8f255",
+    "license": "Public domain",
+    "version": "Natural Earth 5.1.2"
+  },
+  {
+    "file": "romania-counties.geojson",
+    "features": 42,
+    "bytes": 177713,
+    "sha256": "41c2aaf8a676c1670b527ed529f58965cb72cca6537422aefa177fba4471da14",
+    "source_url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_1_states_provinces.geojson",
+    "upstream_sha256": "22d0e3ad85eb3e27f17cabf8ba2d50e554fbc27a87796ff891d958185da62fb5",
+    "license": "Public domain",
+    "version": "Natural Earth 5.1.2"
+  },
+  {
+    "file": "romania-places.geojson",
+    "features": 41,
+    "bytes": 7025,
+    "sha256": "a6a6b002db17b5bb4eb6461ef287cb2f088352df528c739aef4033de9352c6e3",
+    "source_url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_populated_places_simple.geojson",
+    "upstream_sha256": "fd3fa867a320cbd5c5b6bb5bc550afeec2939fb2cef688e508007282a55ac42f",
+    "license": "Public domain",
+    "version": "Natural Earth 5.1.2"
+  },
+  {
+    "file": "romania-roads.geojson",
+    "features": 425,
+    "bytes": 230674,
+    "sha256": "79caa7f5a7f8a87a4aad5347e275683cd2c59522fb38be79a8e6bcb0142aa27e",
+    "source_url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_roads.geojson",
+    "upstream_sha256": "66a0c7b438e92fd124822cc5921cfa11042f48c294ade5e0f03f2c6640fd0248",
+    "license": "Public domain",
+    "version": "Natural Earth 5.1.2",
+    "derivative": "Line segments within Romania overview extent including neighboring border corridors; not navigation grade"
+  }
+]

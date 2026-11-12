@@ -1,0 +1,329 @@
+E501 Line too long (126 > 100)
+   --> backend/app/api/offline_video.py:430:101
+    |
+428 |         json.dumps(config, sort_keys=True, separators=(",", ":")).encode()
+429 |     ).hexdigest()
+430 |     model_path = Path(os.environ.get("RS_YOLOX_MODEL_PATH", str(Path(__file__).resolve().parents[3] / "models/yolox_s.onnx")))
+    |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+431 |     model_path = model_path.resolve()
+432 |     if not model_path.is_file():
+    |
+
+E501 Line too long (126 > 100)
+  --> backend/app/services/offline_analysis.py:44:101
+   |
+42 | MAX_WORK_QUEUE = 4
+43 | PREVIEW_TTL_S = 120
+44 | MODEL_PATH = Path(os.environ.get("RS_YOLOX_MODEL_PATH", str(Path(__file__).resolve().parents[3] / "models" / "yolox_s.onnx")))
+   |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+45 | VEHICLE_CLASSES = {2, 3, 5, 7}  # COCO motor vehicles; exclude bicycle class 1
+   |
+
+E501 Line too long (104 > 100)
+   --> backend/app/services/offline_analysis.py:410:101
+    |
+408 | …                     history = track_history.setdefault(tid, deque())
+409 | …                     history.append((pos_s, center[0], center[1], sequence))
+410 | …                     while history and pos_s - history[0][0] > max(stationary_duration + 5, 900):
+    |                                                                                               ^^^^
+411 | …                         history.popleft()
+412 | …                     recent_motion = [p for p in history if pos_s - p[0] <= 5.0]
+    |
+
+E501 Line too long (115 > 100)
+   --> backend/app/services/offline_analysis.py:417:101
+    |
+415 | …                         recent_motion[-1][2] - recent_motion[0][2],
+416 | …                     ) > max(18.0, math.hypot(x2-x1, y2-y1) * 0.25):
+417 | …                         emitted_stops.discard(tid)  # re-arm after observed movement for a new stop episode
+    |                                                                                               ^^^^^^^^^^^^^^^
+418 | …                     if stationary_enabled and tid not in emitted_stops:
+419 | …                         recent = [p for p in history if pos_s - p[0] <= stationary_duration]
+    |
+
+E501 Line too long (117 > 100)
+   --> backend/app/services/offline_analysis.py:421:101
+    |
+419 | …                     recent = [p for p in history if pos_s - p[0] <= stationary_duration]
+420 | …                     need = max(4, math.ceil(stationary_duration * sample_fps * 0.65))
+421 | …                     if (len(recent) >= need and recent[-1][0] - recent[0][0] >= stationary_duration * 0.9
+    |                                                                                           ^^^^^^^^^^^^^^^^^
+422 | …                         and all(b[0] - a[0] <= max(2.5 / sample_fps, 2.0) for a, b in zip(recent, recent[1:]))):
+423 | …                         dx = max(p[1] for p in recent) - min(p[1] for p in recent)
+    |
+
+B905 `zip()` without an explicit `strict=` parameter
+   --> backend/app/services/offline_analysis.py:422:99
+    |
+420 | …                     need = max(4, math.ceil(stationary_duration * sample_fps * 0.65))
+421 | …                     if (len(recent) >= need and recent[-1][0] - recent[0][0] >= stationary_duration * 0.9
+422 | …                         and all(b[0] - a[0] <= max(2.5 / sample_fps, 2.0) for a, b in zip(recent, recent[1:]))):
+    |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^
+423 | …                         dx = max(p[1] for p in recent) - min(p[1] for p in recent)
+424 | …                         dy = max(p[2] for p in recent) - min(p[2] for p in recent)
+    |
+help: Add explicit value for parameter `strict=`
+    |
+421 |                                 if (len(recent) >= need and recent[-1][0] - recent[0][0] >= stationary_duration * 0.9
+    -                                     and all(b[0] - a[0] <= max(2.5 / sample_fps, 2.0) for a, b in zip(recent, recent[1:]))):
+422 +                                     and all(b[0] - a[0] <= max(2.5 / sample_fps, 2.0) for a, b in zip(recent, recent[1:], strict=False))):
+423 |                                     dx = max(p[1] for p in recent) - min(p[1] for p in recent)
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+RUF007 Prefer `itertools.pairwise()` over `zip()` when iterating over successive pairs
+   --> backend/app/services/offline_analysis.py:422:99
+    |
+420 | …                     need = max(4, math.ceil(stationary_duration * sample_fps * 0.65))
+421 | …                     if (len(recent) >= need and recent[-1][0] - recent[0][0] >= stationary_duration * 0.9
+422 | …                         and all(b[0] - a[0] <= max(2.5 / sample_fps, 2.0) for a, b in zip(recent, recent[1:]))):
+    |                                                                                         ^^^
+423 | …                         dx = max(p[1] for p in recent) - min(p[1] for p in recent)
+424 | …                         dy = max(p[2] for p in recent) - min(p[2] for p in recent)
+    |
+help: Replace `zip()` with `itertools.pairwise()`
+    |
+40  | )
+41  + import itertools
+42  |
+--------------------------------------------------------------------------------
+422 |                                 if (len(recent) >= need and recent[-1][0] - recent[0][0] >= stationary_duration * 0.9
+    -                                     and all(b[0] - a[0] <= max(2.5 / sample_fps, 2.0) for a, b in zip(recent, recent[1:]))):
+423 +                                     and all(b[0] - a[0] <= max(2.5 / sample_fps, 2.0) for a, b in itertools.pairwise(recent))):
+424 |                                     dx = max(p[1] for p in recent) - min(p[1] for p in recent)
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+E501 Line too long (124 > 100)
+   --> backend/app/services/offline_analysis.py:422:101
+    |
+420 | …                     need = max(4, math.ceil(stationary_duration * sample_fps * 0.65))
+421 | …                     if (len(recent) >= need and recent[-1][0] - recent[0][0] >= stationary_duration * 0.9
+422 | …                         and all(b[0] - a[0] <= max(2.5 / sample_fps, 2.0) for a, b in zip(recent, recent[1:]))):
+    |                                                                                           ^^^^^^^^^^^^^^^^^^^^^^^^
+423 | …                         dx = max(p[1] for p in recent) - min(p[1] for p in recent)
+424 | …                         dy = max(p[2] for p in recent) - min(p[2] for p in recent)
+    |
+
+E501 Line too long (104 > 100)
+   --> backend/app/services/offline_analysis.py:425:101
+    |
+423 | …                     dx = max(p[1] for p in recent) - min(p[1] for p in recent)
+424 | …                     dy = max(p[2] for p in recent) - min(p[2] for p in recent)
+425 | …                     if math.hypot(dx, dy) <= max(12.0, math.hypot(x2-x1, y2-y1) * 0.18):
+    |                                                                                       ^^^^
+426 | …                         event_candidates.append({
+427 | …                             "type": "possible_obstruction", "label": "Possible obstruction — human review",
+    |
+
+E501 Line too long (123 > 100)
+   --> backend/app/services/offline_analysis.py:427:101
+    |
+425 | …                     if math.hypot(dx, dy) <= max(12.0, math.hypot(x2-x1, y2-y1) * 0.18):
+426 | …                         event_candidates.append({
+427 | …                             "type": "possible_obstruction", "label": "Possible obstruction — human review",
+    |                                                                                       ^^^^^^^^^^^^^^^^^^^^^^^
+428 | …                             "pts_ms": int(recent[0][0] * 1000), "end_pts_ms": int(pos_s * 1000),
+429 | …                             "output_time_s": recent[0][3] / sample_fps, "track_id": tid,
+    |
+
+E501 Line too long (112 > 100)
+   --> backend/app/services/offline_analysis.py:428:101
+    |
+426 | …                     event_candidates.append({
+427 | …                         "type": "possible_obstruction", "label": "Possible obstruction — human review",
+428 | …                         "pts_ms": int(recent[0][0] * 1000), "end_pts_ms": int(pos_s * 1000),
+    |                                                                                   ^^^^^^^^^^^^
+429 | …                         "output_time_s": recent[0][3] / sample_fps, "track_id": tid,
+430 | …                         "class": cls_name, "confidence": round(float(score), 3),
+    |
+
+E501 Line too long (104 > 100)
+   --> backend/app/services/offline_analysis.py:429:101
+    |
+427 | …     "type": "possible_obstruction", "label": "Possible obstruction — human review",
+428 | …     "pts_ms": int(recent[0][0] * 1000), "end_pts_ms": int(pos_s * 1000),
+429 | …     "output_time_s": recent[0][3] / sample_fps, "track_id": tid,
+    |                                                               ^^^^
+430 | …     "class": cls_name, "confidence": round(float(score), 3),
+431 | …     "reason": f"Nearly stationary in confirmed monitored crop for {int(recent[-1][0]-recent[0][0])} s; image displacement {math.hyp…
+    |
+
+E501 Line too long (190 > 100)
+   --> backend/app/services/offline_analysis.py:431:101
+    |
+429 | …ple_fps, "track_id": tid,
+430 | …und(float(score), 3),
+431 | …nfirmed monitored crop for {int(recent[-1][0]-recent[0][0])} s; image displacement {math.hypot(dx,dy):.1f}px.",
+    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+432 | …tion; crop may include a signal queue or parking. Requires operator review.",
+433 | …
+    |
+
+E501 Line too long (156 > 100)
+   --> backend/app/services/offline_analysis.py:432:101
+    |
+430 | …         "class": cls_name, "confidence": round(float(score), 3),
+431 | …         "reason": f"Nearly stationary in confirmed monitored crop for {int(recent[-1][0]-recent[0][0])} s; image displacement {math…
+432 | …         "limitations": "Fixed-camera assumption; crop may include a signal queue or parking. Requires operator review.",
+    |                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+433 | …     })
+434 | …     emitted_stops.add(tid)
+    |
+
+E501 Line too long (112 > 100)
+   --> backend/app/services/offline_analysis.py:441:101
+    |
+439 | …                         and tid not in counted_tracks
+440 | …                         and len(history) >= 2
+441 | …                         and pos_s - previous_center_pts.get(tid, -1e9) <= max(2.5 / sample_fps, 2.0)
+    |                                                                                           ^^^^^^^^^^^^
+442 | …                         and _segment_intersection(old, center, *line)
+443 | …                     ):
+    |
+
+E501 Line too long (109 > 100)
+   --> backend/app/services/offline_analysis.py:452:101
+    |
+450 | …                     crossings_by_class[f"{cls_name}:{direction}"] += 1
+451 | …                     counted_tracks.add(tid)
+452 | …                     flow_events.append({"type": "line_crossing", "pts_ms": int(pos_s * 1000),
+    |                                                                                       ^^^^^^^^^
+453 | …                         "output_time_s": sequence / sample_fps, "track_id": tid,
+454 | …                         "class": cls_name, "direction": direction,
+    |
+
+E501 Line too long (112 > 100)
+   --> backend/app/services/offline_analysis.py:456:101
+    |
+454 | …                             "class": cls_name, "direction": direction,
+455 | …                             "confidence": round(float(score), 3),
+456 | …                             "reason": "ByteTrack center crossed the operator-drawn counting line."})
+    |                                                                                           ^^^^^^^^^^^^
+457 | …                     previous_centers[tid] = center
+458 | …                     previous_center_pts[tid] = pos_s
+    |
+
+E501 Line too long (106 > 100)
+   --> backend/app/services/offline_analysis.py:464:101
+    |
+462 | …         queue_samples.popleft()
+463 | …     occupancy = [len(ids) for _, ids, _ in queue_samples]
+464 | …     span = queue_samples[-1][0] - queue_samples[0][0] if len(queue_samples) > 1 else 0
+    |                                                                                   ^^^^^^
+465 | …     if len(occupancy) >= max(4, math.ceil(queue_duration * sample_fps * 0.65)) and span >= queue_duration * 0.9 and min(occupancy) …
+466 | …         event_candidates.append({"type": "traffic_queue", "label": "Traffic queue / congestion candidate",
+    |
+
+E501 Line too long (186 > 100)
+   --> backend/app/services/offline_analysis.py:465:101
+    |
+463 | …
+464 | …len(queue_samples) > 1 else 0
+465 | …* sample_fps * 0.65)) and span >= queue_duration * 0.9 and min(occupancy) >= queue_min and not queue_emitted:
+    |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+466 | … "label": "Traffic queue / congestion candidate",
+467 | …nd_pts_ms": int(pos_s * 1000),
+    |
+
+E501 Line too long (126 > 100)
+   --> backend/app/services/offline_analysis.py:466:101
+    |
+464 | …     span = queue_samples[-1][0] - queue_samples[0][0] if len(queue_samples) > 1 else 0
+465 | …     if len(occupancy) >= max(4, math.ceil(queue_duration * sample_fps * 0.65)) and span >= queue_duration * 0.9 and min(occupancy) …
+466 | …         event_candidates.append({"type": "traffic_queue", "label": "Traffic queue / congestion candidate",
+    |                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+467 | …             "pts_ms": int(queue_samples[0][0] * 1000), "end_pts_ms": int(pos_s * 1000),
+468 | …             "output_time_s": queue_samples[0][2] / sample_fps,
+    |
+
+E501 Line too long (107 > 100)
+   --> backend/app/services/offline_analysis.py:467:101
+    |
+465 | …     if len(occupancy) >= max(4, math.ceil(queue_duration * sample_fps * 0.65)) and span >= queue_duration * 0.9 and min(occupancy) …
+466 | …         event_candidates.append({"type": "traffic_queue", "label": "Traffic queue / congestion candidate",
+467 | …             "pts_ms": int(queue_samples[0][0] * 1000), "end_pts_ms": int(pos_s * 1000),
+    |                                                                                   ^^^^^^^
+468 | …             "output_time_s": queue_samples[0][2] / sample_fps,
+469 | …             "track_id": None, "class": "vehicles", "confidence": 0.65,
+    |
+
+E501 Line too long (173 > 100)
+   --> backend/app/services/offline_analysis.py:470:101
+    |
+468 | …sample_fps,
+469 | …"confidence": 0.65,
+470 | …d vehicles persisted in the crop for {int(span)} s; minimum simultaneous occupancy {min(occupancy)}.",
+    |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+471 | …ot prove congestion; fixed scene and operator crop required."})
+472 | …
+    |
+
+E501 Line too long (134 > 100)
+   --> backend/app/services/offline_analysis.py:471:101
+    |
+469 | …             "track_id": None, "class": "vehicles", "confidence": 0.65,
+470 | …             "reason": f"At least {queue_min} tracked vehicles persisted in the crop for {int(span)} s; minimum simultaneous occupan…
+471 | …             "limitations": "Vehicle presence does not prove congestion; fixed scene and operator crop required."})
+    |                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+472 | …         queue_emitted = True
+473 | …     if len(occupancy) < queue_min:
+    |
+
+E501 Line too long (101 > 100)
+   --> backend/app/services/offline_analysis.py:676:101
+    |
+674 |                 "candidate_events": event_candidates,
+675 |                 "event_rule_summary": {
+676 |                     "stationary": {"enabled": stationary_enabled, "threshold_s": stationary_duration,
+    |                                                                                                     ^
+677 |                         "count": sum(e["type"] == "possible_obstruction" for e in event_candidates),
+678 |                         "status": "evaluated" if stationary_enabled else "disabled"},
+    |
+
+E501 Line too long (111 > 100)
+   --> backend/app/services/offline_analysis.py:679:101
+    |
+677 |                         "count": sum(e["type"] == "possible_obstruction" for e in event_candidates),
+678 |                         "status": "evaluated" if stationary_enabled else "disabled"},
+679 |                     "queue": {"enabled": bool(rules.get("queue_enabled", True)), "threshold_s": queue_duration,
+    |                                                                                                     ^^^^^^^^^^^
+680 |                         "minimum_vehicles": queue_min,
+681 |                         "count": sum(e["type"] == "traffic_queue" for e in event_candidates),
+    |
+
+E501 Line too long (161 > 100)
+   --> backend/app/services/offline_analysis.py:682:101
+    |
+680 | …
+681 | … for e in event_candidates),
+682 | …se ("disabled" if not rules.get("queue_enabled", True) else "unsupported_sampling_below_1fps")},
+    |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+683 | …len(flow_events), "priority": "flow_analytics_only"},
+684 | …"Requires calibrated scene geometry and validated signal/source timing."},
+    |
+
+E501 Line too long (118 > 100)
+   --> backend/app/services/offline_analysis.py:683:101
+    |
+681 | …             "count": sum(e["type"] == "traffic_queue" for e in event_candidates),
+682 | …             "status": "evaluated" if queue_enabled else ("disabled" if not rules.get("queue_enabled", True) else "unsupported_sampl…
+683 | …         "crossing": {"enabled": bool(line), "count": len(flow_events), "priority": "flow_analytics_only"},
+    |                                                                                           ^^^^^^^^^^^^^^^^^^
+684 | …         "unsupported": {"speed_distance_ttc_signal": "Requires calibrated scene geometry and validated signal/source timing."},
+685 | …     },
+    |
+
+E501 Line too long (139 > 100)
+   --> backend/app/services/offline_analysis.py:684:101
+    |
+682 | …_enabled else ("disabled" if not rules.get("queue_enabled", True) else "unsupported_sampling_below_1fps")},
+683 | …, "count": len(flow_events), "priority": "flow_analytics_only"},
+684 | …c_signal": "Requires calibrated scene geometry and validated signal/source timing."},
+    |                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+685 | …
+686 | …validated_geometry"
+    |
+
+Found 33 errors (5 fixed, 28 remaining).
+2 unsafe fixes available with `--fix --unsafe-fixes`.

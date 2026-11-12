@@ -1,0 +1,170 @@
+diff --git a/frontend/src/components/IasiMap.tsx b/frontend/src/components/IasiMap.tsx
+index b39c73f..7f1a1da 100644
+--- a/frontend/src/components/IasiMap.tsx
++++ b/frontend/src/components/IasiMap.tsx
+@@ -12,7 +12,9 @@ import L from 'leaflet';
+ import 'leaflet/dist/leaflet.css';
+ import { Video } from 'lucide-react';
+ import {
++  DEMO_LEGEND,
+   IASI_MAP_CONFIG,
++  isDemoCamera,
+   type MapCamera,
+   type MapPatrol,
+   type MapAlert,
+@@ -184,6 +186,13 @@ export function IasiMap({
+ 
+       </div>
+ 
++      {/* Legend: most markers are stock footage placed on the map for illustration */}
++      {!bare && cameras.some((c) => isDemoCamera(c.id)) && (
++        <div className="absolute bottom-3 left-3 z-[1000] px-2.5 py-1 rounded-md bg-[#111821]/90 border border-[#FFC23D]/40 text-[11px] text-[#E6EDF3] shadow-lg" data-testid="map-demo-legend">
++          <span className="font-bold text-[#FFC23D]">DEMO</span> · {DEMO_LEGEND}
++        </div>
++      )}
++
+       {/* Leaflet Map Container */}
+       <MapContainer
+         center={bare ? [47.1625, 27.5885] : IASI_MAP_CONFIG.center}
+@@ -286,6 +295,9 @@ export function IasiMap({
+                   {/* Location & Details */}
+                   <div className="text-[11px] text-[#7D8A9B] mb-2.5">
+                     {camera.location}
++                    {isDemoCamera(camera.id) && (
++                      <div className="mt-1 text-[#FFC23D]">Filmare demonstrativă de arhivă, nu o cameră din Iași.</div>
++                    )}
+                   </div>
+ 
+                   <div className="flex items-center justify-between text-[11px] font-mono mb-3 bg-[#17202B] p-1.5 rounded border border-[#1E2A36]">
+diff --git a/frontend/src/components/TacticalMap.tsx b/frontend/src/components/TacticalMap.tsx
+index 6a6a3e9..36a9711 100644
+--- a/frontend/src/components/TacticalMap.tsx
++++ b/frontend/src/components/TacticalMap.tsx
+@@ -3,6 +3,7 @@ import { useDataStore } from '@/store/data';
+ import {
+   IASI_CAMERAS,
+   IASI_PATROLS,
++  iasiCameraName,
+   type MapCamera,
+   type MapAlert,
+   type Severity,
+@@ -52,7 +53,7 @@ export function TacticalMap({
+         ? storeCameras
+         : Object.entries(IASI_CAMERAS).map(([id, def]) => ({
+             id,
+-            name: def.name,
++            name: iasiCameraName(id) ?? def.name,
+             road: def.location,
+             status: 'online' as const,
+           }));
+diff --git a/frontend/src/lib/adapters.ts b/frontend/src/lib/adapters.ts
+index ef9a4d6..db5bfa3 100644
+--- a/frontend/src/lib/adapters.ts
++++ b/frontend/src/lib/adapters.ts
+@@ -1,6 +1,6 @@
+ import type { VehicleClass, Alert, AlertType, AuditEntry, Camera, Severity, VlmVerdict, ArchiveClip } from '@/types'
+ import { mediaUrl } from './api'
+-import { IASI_CAMERAS } from './iasi'
++import { IASI_CAMERAS, iasiCameraName } from './iasi'
+ 
+ export interface ApiAudit { id: number; event_id: number | null; actor: string; action: AuditEntry['action']; note: string | null; at: string; type?: string }
+ export interface ApiEvent {
+@@ -44,7 +44,7 @@ export const adaptCamera = (camera: ApiCamera): Camera => {
+   // A heartbeat proves the worker runs, not what it reads: LIVE needs a declared live source.
+   const live = heartbeat && LIVE_SOURCE_KINDS.has(camera.source_kind ?? '')
+   return {
+-    id: camera.id, name: IASI_CAMERAS[camera.id]?.name ?? camera.name, road: IASI_CAMERAS[camera.id]?.location ?? camera.location ?? '', direction: '',
++    id: camera.id, name: iasiCameraName(camera.id) ?? camera.name, road: IASI_CAMERAS[camera.id]?.location ?? camera.location ?? '', direction: '',
+     lat: camera.latitude ?? IASI_CAMERAS[camera.id]?.lat ?? NaN, lng: camera.longitude ?? IASI_CAMERAS[camera.id]?.lng ?? NaN, status: camera.is_active === false ? 'offline' : heartbeat || camera.video_url ? 'online' : 'degraded', fps: 0, calibrated: false, unit: '', videoUrl: mediaUrl(camera.video_url),
+     liveUrl: IASI_CAMERAS[camera.id]?.liveUrl, heartbeat, live,
+   }
+diff --git a/frontend/src/lib/iasi.test.ts b/frontend/src/lib/iasi.test.ts
+new file mode 100644
+index 0000000..7a25ecc
+--- /dev/null
++++ b/frontend/src/lib/iasi.test.ts
+@@ -0,0 +1,16 @@
++import { describe, expect, it } from 'vitest'
++import { IASI_CAMERAS, iasiCameraName, isDemoCamera } from './iasi'
++
++describe('stock footage marking', () => {
++  it('marks every mapped camera except the real public stream', () => {
++    for (const id of Object.keys(IASI_CAMERAS)) {
++      expect(isDemoCamera(id)).toBe(id !== 'iasi-piata-unirii')
++      expect(iasiCameraName(id)?.startsWith('DEMO · ')).toBe(id !== 'iasi-piata-unirii')
++    }
++  })
++  it('leaves cameras outside the map list alone (their names are real places)', () => {
++    expect(isDemoCamera('cam-7b2f1aea')).toBe(false)
++    expect(iasiCameraName('cam-7b2f1aea')).toBeUndefined()
++    expect(isDemoCamera('toString')).toBe(false)
++  })
++})
+diff --git a/frontend/src/lib/iasi.ts b/frontend/src/lib/iasi.ts
+index d1d5eb3..b2216b3 100644
+--- a/frontend/src/lib/iasi.ts
++++ b/frontend/src/lib/iasi.ts
+@@ -73,6 +73,15 @@ export const IASI_CAMERAS: Record<string, { name: string; location: string; lat:
+   },
+ };
+ 
++// Every mapped camera except the public Piața Unirii stream plays licensed stock footage filmed
++// elsewhere; it sits on the Iași map for illustration only, and the UI has to say so.
++export const REAL_STREAM_ID = 'iasi-piata-unirii';
++export const DEMO_LEGEND = 'Locații demonstrative; filmări de arhivă';
++export const isDemoCamera = (id: string) => id !== REAL_STREAM_ID && Object.hasOwn(IASI_CAMERAS, id);
++/** Display name of a mapped camera, marked DEMO for stock footage; undefined for other cameras. */
++export const iasiCameraName = (id: string): string | undefined =>
++  Object.hasOwn(IASI_CAMERAS, id) ? `${isDemoCamera(id) ? 'DEMO · ' : ''}${IASI_CAMERAS[id].name}` : undefined;
++
+ export const IASI_PATROLS: MapPatrol[] = [
+   { id: 'IS-21', callsign: 'IS-21-POL', lat: 47.1800, lng: 27.5680, status: 'available', area: 'Copou' },
+   { id: 'IS-14', callsign: 'IS-14-POL', lat: 47.1545, lng: 27.5900, status: 'busy',      area: 'Podu Roș' },
+diff --git a/frontend/src/pages/ArchivePage.tsx b/frontend/src/pages/ArchivePage.tsx
+index f8cc43c..9210f90 100644
+--- a/frontend/src/pages/ArchivePage.tsx
++++ b/frontend/src/pages/ArchivePage.tsx
+@@ -6,6 +6,7 @@ import { mediaUrl, USE_MOCKS } from "@/lib/api";
+ import { ALERT_TYPE, STATUS_LABEL } from "@/lib/constants";
+ import { archiveAssignees, archiveRequest, deleteSaved, errorMessage, listSaved, saveSearch, searchArchive, type ArchiveFilters, type ArchiveRun, type FilterChip, type Person, type SavedSearch, type TokenInterpretation } from "@/lib/cases";
+ import { RECLASSIFY } from "@/lib/demo";
++import { iasiCameraName } from "@/lib/iasi";
+ import type { ApiEvent } from "@/lib/adapters";
+ import { useDataStore } from "@/store/data";
+ import { ClipModal } from "@/components/ClipModal";
+@@ -35,8 +36,8 @@ const PRESETS: { label: string; q?: string; filters?: ArchiveFilters }[] = [
+   { label: "Frânări bruște", filters: { types: ["hard_braking"] } },
+   { label: "Accidente probabile", filters: { types: ["probable_crash"] } },
+   { label: "Camioane implicate", q: "camioane" },
+-  { label: "Pasaj Mihai Eminescu, noaptea", filters: { camera_id: "mx-bridge-night" } },
+-  { label: "Centura Iași", filters: { camera_id: "demo-highway" } },
++  { label: iasiCameraName("mx-bridge-night") ?? "mx-bridge-night", filters: { camera_id: "mx-bridge-night" } },
++  { label: iasiCameraName("demo-highway") ?? "demo-highway", filters: { camera_id: "demo-highway" } },
+ ];
+ 
+ function Chip({ t }: { t: TokenInterpretation }) {
+diff --git a/frontend/src/pages/CamerasPage.tsx b/frontend/src/pages/CamerasPage.tsx
+index c8b3c9e..9c4209a 100644
+--- a/frontend/src/pages/CamerasPage.tsx
++++ b/frontend/src/pages/CamerasPage.tsx
+@@ -10,6 +10,7 @@ import TacticalMap from "@/components/TacticalMap";
+ import { ClipModal, type ModalClip } from "@/components/ClipModal";
+ import { ALERT_TYPE } from "@/lib/constants";
+ import { LiveBadge, LivePlayer } from "@/components/LivePlayer";
++import { isDemoCamera } from "@/lib/iasi";
+ 
+ // MOCK: Supplementary telemetry, thumbnails, coordinates, and offline state
+ interface CameraExtended {
+@@ -211,6 +212,12 @@ export default function CamerasPage() {
+                           )}
+                         </div>
+ 
++                        {isDemoCamera(cam.id) && (
++                          <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/70 border border-amber-500/50 text-[10px] font-semibold text-amber-400" data-testid="demo-footage">
++                            Filmare demonstrativă
++                          </span>
++                        )}
++
+                         {/* Hover Overlay Action Buttons */}
+                         {isHovered && (
+                           <div className="absolute inset-0 bg-deep-void/70 backdrop-blur-sm flex items-center justify-center gap-2 p-3 transition-opacity">

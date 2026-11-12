@@ -1,0 +1,535 @@
+diff --git a/frontend/src/lib/demo.test.ts b/frontend/src/lib/demo.test.ts
+index 515a13e..35e240a 100644
+--- a/frontend/src/lib/demo.test.ts
++++ b/frontend/src/lib/demo.test.ts
+@@ -78,11 +78,11 @@ describe('pitch staging and rejected alerts', () => {
+   })
+   it('replays a confirmed alert as new, but never a rejected one', async () => {
+     const demo = await staged()
+-    expect(demo.curate(alert('99', 'confirmed', 'very_high_speed', '2026-11-01T10:00:00Z')).status).toBe('new')
+-    expect(demo.curate(alert('107', 'rejected', 'very_high_speed', '2026-11-01T10:00:00Z')).status).toBe('rejected')
++    expect(demo.curate(alert('210', 'confirmed', 'very_high_speed', '2026-11-01T10:00:00Z')).status).toBe('new')
++    expect(demo.curate(alert('195', 'rejected', 'very_high_speed', '2026-11-01T10:00:00Z')).status).toBe('rejected')
+     const decision = { id: '5', at: '', username: 'op', role: 'operator', action: 'rejected' } as const
+-    expect(demo.keepAudit({ ...decision, target: '107' })).toBe(true)
+-    expect(demo.keepAudit({ ...decision, target: '99' })).toBe(false)
++    expect(demo.keepAudit({ ...decision, target: '195' })).toBe(true)
++    expect(demo.keepAudit({ ...decision, target: '210' })).toBe(false)
+   })
+   it('shows the real age of an alert, never a staged one', async () => {
+     const demo = await staged()
+diff --git a/frontend/src/lib/demo.ts b/frontend/src/lib/demo.ts
+index c432d89..d9924e5 100644
+--- a/frontend/src/lib/demo.ts
++++ b/frontend/src/lib/demo.ts
+@@ -130,17 +130,19 @@ export function demoAgo(alert: Alert) {
+ // Every clip on the production demo tenant was reviewed on 2026-11-10 (frame rate measured,
+ // frames inspected). The demo cameras have guessed calibrations and the stock clips were
+ // processed several times, so most rows are duplicates of one moment or false positives.
++// The kept alerts come from the last run (194-228), whose clips outline each vehicle with
++// the detector's box; earlier runs drew the tracker's box, which trails the vehicle.
+ // Display-only: the backend keeps the original rows.
+ export const RECLASSIFY: Record<string, { type: Alert['type']; severity?: Alert['severity']; rule?: string }> = DEMO_CURATION ? {
+-  '107': { type: 'tailgating', severity: 'high', rule: 'Distanță prea mică față de vehiculul din față (autostradă)' },
+-  '99': { type: 'tailgating', severity: 'high', rule: 'Distanță prea mică față de vehiculul din față' },
++  '195': { type: 'tailgating', severity: 'high', rule: 'Distanță prea mică față de vehiculul din față (autostradă)' },
++  '210': { type: 'tailgating', severity: 'high', rule: 'Distanță prea mică față de vehiculul din față' },
+ } : {}
+ /** The alerts whose clip plays smoothly and shows what the alert says:
+- *  highway 107 (close following) and 121 (154 km/h); underpass 126 (queue);
+- *  night bridge 90 and 187 (speeding on a 50 km/h road) and 99 (close following). */
+-export const KEPT_IDS = new Set(['90', '99', '107', '121', '126', '187'])
++ *  highway 195 (close following) and 198 (154 km/h); underpass 199 (queue);
++ *  night bridge 202 and 205 (speeding on a 50 km/h road) and 210 (close following). */
++export const KEPT_IDS = new Set(['195', '198', '199', '202', '205', '210'])
+ /** Last alert number covered by that review. A later alert is shown until it is reviewed. */
+-export const REVIEWED_UP_TO = 193
++export const REVIEWED_UP_TO = 228
+ /** Hidden: repeats of a kept moment, the New York avenue clips (turns at a junction read as
+  *  lane changes, a bus at a red light read as a crash), speeds under the limit, and every
+  *  Piața Unirii clip (5 to 16 frames per second, trams read as crashes, speeds from a rough
+@@ -154,10 +156,10 @@ export function curate(alert: Alert): Alert {
+ }
+ 
+ // ---------------------------------------------------------------- confirm replay (MOCK)
+-// Alerts already decided in the backend, shown as new so the pitch can show a confirmation.
+-// The backend answers 409 (already decided); the decision is then kept in this tab only,
+-// so a page reload shows them as new again.
+-export const DEMO_UNDECIDED = new Set<string>(DEMO_CURATION ? ['99', '107'] : [])
++// Alerts shown as new on every page load, so the pitch can show a confirmation more than once.
++// The backend takes the first decision and answers 409 (already decided) to later ones; either
++// way the decision is kept in this tab only, so a page reload shows them as new again.
++export const DEMO_UNDECIDED = new Set<string>(DEMO_CURATION ? ['195', '210'] : [])
+ type LocalDecision = { status: 'confirmed' | 'rejected'; by: string; at: string; note?: string }
+ export const localDecisions = new Map<string, LocalDecision>()
+ 
+diff --git a/frontend/src/pages/LandingPage.css b/frontend/src/pages/LandingPage.css
+index 7bf317b..23c03c4 100644
+--- a/frontend/src/pages/LandingPage.css
++++ b/frontend/src/pages/LandingPage.css
+@@ -81,6 +81,21 @@
+   white-space: nowrap;
+ }
+ 
++/* On a phone the brand and the plate share one narrow line. */
++@media (max-width: 479px) {
++  .rs-landing-top {
++    gap: 12px;
++  }
++  .rs-landing-brand {
++    gap: 10px;
++    font-size: 19px;
++  }
++  .rs-landing-temp {
++    font-size: 13px;
++    padding: 8px 9px 6px;
++  }
++}
++
+ /* ---------------------------------------------------------------- hero */
+ .rs-landing-hero {
+   display: grid;
+@@ -91,8 +106,8 @@
+ }
+ .rs-landing-title {
+   font-weight: 800;
+-  font-size: clamp(2.25rem, 3.7vw, 3.5rem);
+-  line-height: 1.04;
++  font-size: clamp(2.5rem, 4.3vw, 4.25rem);
++  line-height: 1.02;
+   letter-spacing: -0.02em;
+   margin: 0;
+ }
+@@ -135,7 +150,9 @@
+   aspect-ratio: 16 / 9;
+   object-fit: cover;
+   background: var(--asfalt);
+-  border-radius: 6px;
++  border: 6px solid var(--hartie);
++  border-radius: 14px;
++  box-shadow: 0 0 0 2px var(--asfalt), 0 30px 50px -30px rgba(43, 47, 51, 0.6);
+ }
+ .rs-landing-caption {
+   margin-top: 12px;
+@@ -173,6 +190,12 @@
+ .rs-landing-ask {
+   font-weight: 700;
+ }
++.rs-landing-slip .rs-landing-stamp {
++  margin-top: 4px;
++  font-size: 15px;
++  font-weight: 700;
++  color: var(--banda);
++}
+ .rs-landing-choices {
+   display: flex;
+   flex-wrap: wrap;
+@@ -207,8 +230,8 @@
+     padding: 0 40px;
+   }
+   .rs-landing-hero {
+-    grid-template-columns: minmax(0, 11fr) minmax(0, 13fr);
+-    gap: 56px;
++    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
++    gap: 64px;
+     align-items: start;
+     padding-top: 36px;
+     padding-bottom: 96px;
+@@ -218,21 +241,96 @@
+   }
+   .rs-landing-slip {
+     position: absolute;
+-    left: -32px;
+-    bottom: -40px;
+-    width: 316px;
++    left: -40px;
++    bottom: -48px;
++    width: 328px;
+     margin-top: 0;
+   }
+   .rs-landing-caption {
+-    padding-left: 304px;
++    padding-left: 308px;
++  }
++}
++
++/* ---------------------------------------------------------------- three alerts from the app */
++.rs-landing-seen {
++  padding-top: 8px;
++  padding-bottom: 72px;
++}
++.rs-landing-seen h2 {
++  margin: 0;
++  font-size: 32px;
++  font-weight: 800;
++  line-height: 1.1;
++  letter-spacing: -0.015em;
++}
++.rs-landing-seen-note {
++  margin: 8px 0 0;
++  font-size: 17px;
++  color: var(--banda);
++}
++.rs-landing-shots {
++  display: grid;
++  grid-template-columns: minmax(0, 1fr);
++  gap: 32px;
++  margin-top: 28px;
++}
++.rs-landing-shot {
++  margin: 0;
++}
++.rs-landing-shot img {
++  display: block;
++  width: 100%;
++  height: auto;
++  aspect-ratio: 16 / 9;
++  object-fit: cover;
++  background: var(--asfalt);
++  border: 5px solid var(--hartie);
++  border-radius: 12px;
++  box-shadow: 0 0 0 2px var(--beton);
++}
++.rs-landing-shot h3 {
++  margin: 16px 0 0;
++  font-size: 22px;
++  font-weight: 800;
++  line-height: 1.2;
++}
++.rs-landing-shot p {
++  margin: 4px 0 0;
++  max-width: 24em;
++  font-size: 17px;
++  line-height: 1.45;
++  color: var(--banda);
++}
++@media (min-width: 900px) {
++  .rs-landing-shots {
++    grid-template-columns: repeat(3, minmax(0, 1fr));
++    gap: 28px;
+   }
+ }
+ 
+ /* ---------------------------------------------------------------- the road: four steps, in order */
++/* Asphalt with its two edge lines; the centre line runs between the kilometre stones. */
+ .rs-landing-road {
++  position: relative;
+   background: var(--asfalt);
+   color: #fff;
+-  padding: 56px 0 64px;
++  padding: 76px 0 84px;
++}
++.rs-landing-road::before,
++.rs-landing-road::after {
++  content: '';
++  position: absolute;
++  left: 0;
++  right: 0;
++  height: 5px;
++  background: #fff;
++  opacity: 0.9;
++}
++.rs-landing-road::before {
++  top: 18px;
++}
++.rs-landing-road::after {
++  bottom: 18px;
+ }
+ .rs-landing-road h2 {
+   margin: 0 0 36px;
+@@ -299,8 +397,13 @@
+   padding-top: 56px;
+   padding-bottom: 48px;
+ }
++.rs-landing-signpost {
++  display: block;
++  width: 64px;
++  height: 64px;
++}
+ .rs-landing-facts h2 {
+-  margin: 0;
++  margin: 18px 0 0;
+   font-size: 22px;
+   font-weight: 800;
+   line-height: 1.2;
+@@ -325,7 +428,29 @@
+   line-height: 1.5;
+   color: var(--banda);
+ }
+-.rs-landing-foot p {
++.rs-landing-again {
++  display: flex;
++  flex-wrap: wrap;
++  align-items: center;
++  justify-content: space-between;
++  gap: 16px 32px;
++  margin-bottom: 36px;
++  padding: 28px 32px;
++  background: var(--hartie);
++  border-radius: 14px;
++  box-shadow: 0 0 0 2px var(--beton);
++}
++.rs-landing-again p {
++  margin: 0;
++  font-size: 22px;
++  font-weight: 700;
++  line-height: 1.3;
++  color: var(--asfalt);
++}
++.rs-landing-again .rs-landing-sign {
++  margin-top: 0;
++}
++.rs-landing-foot > p {
+   margin: 0;
+   max-width: 62em;
+   padding-top: 20px;
+diff --git a/frontend/src/pages/LandingPage.tsx b/frontend/src/pages/LandingPage.tsx
+index 8660086..ba3befd 100644
+--- a/frontend/src/pages/LandingPage.tsx
++++ b/frontend/src/pages/LandingPage.tsx
+@@ -10,16 +10,42 @@ const STEPS = [
+   { title: 'Decizia dispecerului', text: 'Omul vede clipul și confirmă sau respinge alerta.' },
+ ]
+ 
+-const FACTS = [
++/** Three alerts a visitor finds in the app after signing in, each with a frame from its clip. */
++const SHOTS = [
+   {
++    img: '/landing/viteza.jpg',
++    alt: 'Pod rutier noaptea, văzut de sus; o mașină este încadrată cu portocaliu, cu viteza scrisă deasupra.',
++    title: 'Viteză foarte mare',
++    text: 'O mașină la aproximativ 115 km/h pe un pod unde limita este 50 km/h.',
++  },
++  {
++    img: '/landing/distanta.jpg',
++    alt: 'Două mașini pe aceeași bandă de autostradă, una imediat în spatele celeilalte, amândouă încadrate cu portocaliu.',
++    title: 'Distanță prea mică',
++    text: 'Două mașini una în spatele celeilalte, la peste 130 km/h.',
++  },
++  {
++    img: '/landing/ambuteiaj.jpg',
++    alt: 'Pasaj rutier cu trei benzi pline de mașini care abia înaintează, fiecare încadrată cu verde.',
++    title: 'Ambuteiaj',
++    text: 'O coloană care abia înaintează printr-un pasaj.',
++  },
++]
++
++type SignKind = 'warns' | 'must' | 'never'
++const FACTS: { sign: SignKind; title: string; text: string }[] = [
++  {
++    sign: 'warns',
+     title: 'Ce semnalează',
+     text: 'Viteză foarte mare, distanță prea mică între vehicule, ambuteiaj, vehicul oprit pe carosabil, mers pe contrasens, posibil accident.',
+   },
+   {
++    sign: 'must',
+     title: 'Cine decide',
+     text: 'Omul confirmă sau respinge fiecare alertă, după ce vede clipul. Sistemul doar semnalează.',
+   },
+   {
++    sign: 'never',
+     title: 'Viața privată',
+     text: 'Fără recunoaștere facială. Estomparea fețelor și a numerelor de înmatriculare există, dar nu este încă aplicată pe toate clipurile. Fiecare vizualizare rămâne în jurnal.',
+   },
+@@ -29,7 +55,7 @@ type Decision = 'confirmed' | 'rejected'
+ const OUTCOME: Record<Decision, { title: string; text: string }> = {
+   confirmed: {
+     title: 'Alertă confirmată',
+-    text: 'În aplicație, decizia rămâne în jurnal, cu numele dispecerului și ora.',
++    text: 'În aplicație, decizia rămâne în jurnal, cu numele dispecerului.',
+   },
+   rejected: {
+     title: 'Alertă respinsă',
+@@ -37,6 +63,38 @@ const OUTCOME: Record<Decision, { title: string; text: string }> = {
+   },
+ }
+ 
++/** A person, as road signs draw one: the same figure is required on one sign and crossed out on another. */
++const PERSON = 'M32 15a8 8 0 1 1 0 16a8 8 0 0 1 0-16zM16 49c0-9 7-15 16-15s16 6 16 15z'
++
++/** The three families of road signs: a warning, an obligation, a prohibition. */
++function Sign({ kind }: { kind: SignKind }) {
++  return (
++    <svg className="rs-landing-signpost" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
++      {kind === 'warns' && (
++        <>
++          <path d="M32 8L59 55H5z" fill="#fff" stroke="#c8102e" strokeWidth="6" strokeLinejoin="round" />
++          <path d="M29.5 24h5l-1 16h-3z" fill="#1c1e20" />
++          <circle cx="32" cy="46" r="2.8" fill="#1c1e20" />
++        </>
++      )}
++      {kind === 'must' && (
++        <>
++          <circle cx="32" cy="32" r="29" fill="#0a4da3" />
++          <circle cx="32" cy="32" r="26" fill="none" stroke="#fff" strokeWidth="1.5" />
++          <path d={PERSON} fill="#fff" />
++        </>
++      )}
++      {kind === 'never' && (
++        <>
++          <circle cx="32" cy="32" r="26" fill="#fff" stroke="#c8102e" strokeWidth="6" />
++          <path d={PERSON} fill="#1c1e20" />
++          <path d="M14 14L50 50" stroke="#c8102e" strokeWidth="6" />
++        </>
++      )}
++    </svg>
++  )
++}
++
+ /** County-road kilometre stone (white, blue cap) carrying the step number. */
+ function Stone({ n }: { n: number }) {
+   return (
+@@ -52,7 +110,9 @@ function Stone({ n }: { n: number }) {
+ 
+ /** Public first screen: what the product is, in plain words, before the login form. */
+ export default function LandingPage() {
+-  const [decision, setDecision] = useState<Decision | null>(null)
++  const [decision, setDecision] = useState<{ kind: Decision; at: string } | null>(null)
++  const decide = (kind: Decision) =>
++    setDecision({ kind, at: new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }) })
+   // Someone who asked for less motion gets the still frame and the player's own controls.
+   const [still] = useState(() => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false)
+ 
+@@ -89,13 +149,14 @@ export default function LandingPage() {
+               loop
+               muted
+               playsInline
+-              aria-label="Clip de exemplu: o autostradă văzută de sus; programul încadrează vehiculele, iar o mașină este marcată cu portocaliu."
++              aria-label="Clip de exemplu: o autostradă văzută de sus; programul încadrează vehiculele, iar o mașină albă este marcată cu portocaliu, cu viteza scrisă deasupra."
+             />
+-            <div className="rs-landing-slip" data-decision={decision ?? 'new'} data-testid="landing-alert" aria-live="polite">
++            <div className="rs-landing-slip" data-decision={decision?.kind ?? 'new'} data-testid="landing-alert" aria-live="polite">
+               {decision ? (
+                 <>
+-                  <h2>{OUTCOME[decision].title}</h2>
+-                  <p>{OUTCOME[decision].text}</p>
++                  <h2>{OUTCOME[decision.kind].title}</h2>
++                  <p className="rs-landing-stamp">Decizia dumneavoastră, ora {decision.at}</p>
++                  <p>{OUTCOME[decision.kind].text}</p>
+                   <div className="rs-landing-choices">
+                     <button type="button" className="rs-landing-choice" data-kind="quiet" onClick={() => setDecision(null)}>
+                       Mai încearcă o dată
+@@ -108,8 +169,8 @@ export default function LandingPage() {
+                   <p>Mașina marcată cu portocaliu circulă, după estimarea programului, cu aproximativ 150 km/h.</p>
+                   <p className="rs-landing-ask">Dumneavoastră decideți:</p>
+                   <div className="rs-landing-choices">
+-                    <button type="button" className="rs-landing-choice" onClick={() => setDecision('confirmed')}>Confirmă</button>
+-                    <button type="button" className="rs-landing-choice" data-kind="quiet" onClick={() => setDecision('rejected')}>Respinge</button>
++                    <button type="button" className="rs-landing-choice" onClick={() => decide('confirmed')}>Confirmă</button>
++                    <button type="button" className="rs-landing-choice" data-kind="quiet" onClick={() => decide('rejected')}>Respinge</button>
+                   </div>
+                 </>
+               )}
+@@ -120,6 +181,22 @@ export default function LandingPage() {
+           </figure>
+         </section>
+ 
++        <section className="rs-landing-wrap rs-landing-seen" aria-labelledby="landing-seen">
++          <h2 id="landing-seen">Trei alerte pe care le găsiți în aplicație</h2>
++          <p className="rs-landing-seen-note">Cadre din clipurile pe care le primește dispecerul. Filmări de stoc, din alte țări; vitezele sunt estimate din imagine.</p>
++          <div className="rs-landing-shots">
++            {SHOTS.map((shot) => (
++              <figure key={shot.title} className="rs-landing-shot">
++                <img src={shot.img} alt={shot.alt} loading="lazy" width="960" height="540" />
++                <figcaption>
++                  <h3>{shot.title}</h3>
++                  <p>{shot.text}</p>
++                </figcaption>
++              </figure>
++            ))}
++          </div>
++        </section>
++
+         <section className="rs-landing-road" aria-labelledby="landing-steps">
+           <div className="rs-landing-wrap">
+             <h2 id="landing-steps">De la cameră la decizie</h2>
+@@ -138,6 +215,7 @@ export default function LandingPage() {
+         <section className="rs-landing-wrap rs-landing-facts">
+           {FACTS.map((fact) => (
+             <div key={fact.title}>
++              <Sign kind={fact.sign} />
+               <h2>{fact.title}</h2>
+               <p>{fact.text}</p>
+             </div>
+@@ -146,6 +224,10 @@ export default function LandingPage() {
+       </main>
+ 
+       <footer className="rs-landing-wrap rs-landing-foot">
++        <div className="rs-landing-again">
++          <p>Alertele de mai sus vă așteaptă în aplicație, cu clipurile lor.</p>
++          <Link to="/login" className="rs-landing-sign">Intră în aplicație</Link>
++        </div>
+         <p>
+           <strong>Prototip demonstrativ.</strong>{' '}
+           Majoritatea filmărilor sunt imagini de stoc filmate în alte țări, așezate pe harta Iașului doar ca exemplu; un singur flux este real (Piața Unirii). Precizia detecției nu a fost încă măsurată.
+diff --git a/frontend/src/store/data.test.ts b/frontend/src/store/data.test.ts
+new file mode 100644
+index 0000000..9f7da6a
+--- /dev/null
++++ b/frontend/src/store/data.test.ts
+@@ -0,0 +1,26 @@
++import { afterEach, describe, expect, it, vi } from 'vitest'
++
++const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
++const event = (status: 'new' | 'confirmed') => ({
++  id: 195, camera_id: 'demo-highway', camera_name: null, location: null, type: 'very_high_speed', priority: 'high',
++  occurred_at: '2026-10-18T13:05:58', video_t: 1, track_id: 3, object_class: 'car', speed_kmh: 133.1, rule: '', details: {},
++  keyframe_url: null, clip_url: null, vlm_status: 'unavailable', vlm_text: null, status, action: null,
++  audit: status === 'confirmed' ? [{ id: 9, at: '2026-11-10T12:00:00Z', actor: 'admin', action: 'confirmed', note: null }] : [],
++})
++
++afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs() })
++
++describe('deciding a replayed alert', () => {
++  it('shows the decision when the backend accepts it, as it does when the backend already holds one', async () => {
++    vi.stubEnv('VITE_DEMO_CURATION', '1')
++    vi.resetModules()
++    vi.stubGlobal('document', { cookie: '__Secure-rs_csrf=t' })
++    vi.stubGlobal('location', { pathname: '/app', assign: vi.fn() })
++    vi.stubGlobal('fetch', vi.fn(async () => json(event('confirmed'))))
++    const { decide, upsertAlert, useDataStore } = await import('./data')
++    const { adaptEvent } = await import('@/lib/adapters')
++    upsertAlert(adaptEvent(event('new') as never))
++    await decide('195', 'confirm')
++    expect(useDataStore.getState().alerts.find((a) => a.id === '195')?.status).toBe('confirmed')
++  })
++})
+diff --git a/frontend/src/store/data.ts b/frontend/src/store/data.ts
+index 2fecba5..fa6c804 100644
+--- a/frontend/src/store/data.ts
++++ b/frontend/src/store/data.ts
+@@ -61,22 +61,23 @@ export async function loadDetail(id: string, viewed = false) {
+   return alert
+ }
+ export async function decide(id: string, decision: 'confirm' | 'reject', action?: string, note?: string) {
++  // Replayed alert: the decision is kept in the tab, whether the backend took it now or holds an earlier one.
++  const keepInTab = () => {
++    const at = new Date().toISOString()
++    const by = useAuthStore.getState().user?.username ?? 'operator'
++    const status = decision === 'confirm' ? 'confirmed' : 'rejected'
++    localDecisions.set(id, { status, by, at, note })
++    const current = realStore.getState().alerts.find((a) => a.id === id)
++    if (current) upsertAlert(current)
++    mergeAudit([{ id: `local-${id}-${Date.now()}`, at, username: by, role: 'operator', action: status, target: id, details: note }])
++  }
+   try {
+     const event = await post<ApiEvent>(`/api/events/${encodeURIComponent(id)}/decision`, { decision, action, note })
++    if (DEMO_UNDECIDED.has(id)) return keepInTab()
+     upsertAlert(adaptEvent(event))
+     if (event.audit) mergeAudit(event.audit.map(adaptAudit).filter(keepAudit))
+   } catch (error) {
+-    if (error instanceof ApiError && error.status === 409 && DEMO_UNDECIDED.has(id)) {
+-      // Replayed alert: the backend already holds a decision, so keep this one in the tab.
+-      const at = new Date().toISOString()
+-      const by = useAuthStore.getState().user?.username ?? 'operator'
+-      const status = decision === 'confirm' ? 'confirmed' : 'rejected'
+-      localDecisions.set(id, { status, by, at, note })
+-      const current = realStore.getState().alerts.find((a) => a.id === id)
+-      if (current) upsertAlert(current)
+-      mergeAudit([{ id: `local-${id}-${Date.now()}`, at, username: by, role: 'operator', action: status, target: id, details: note }])
+-      return
+-    }
++    if (error instanceof ApiError && error.status === 409 && DEMO_UNDECIDED.has(id)) return keepInTab()
+     if (error instanceof ApiError && error.status === 409) await loadDetail(id)
+     throw error
+   }

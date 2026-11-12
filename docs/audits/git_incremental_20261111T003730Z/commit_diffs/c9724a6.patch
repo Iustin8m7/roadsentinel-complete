@@ -1,0 +1,287 @@
+diff --git a/frontend/src/lib/alertSummary.test.ts b/frontend/src/lib/alertSummary.test.ts
+new file mode 100644
+index 0000000..a039238
+--- /dev/null
++++ b/frontend/src/lib/alertSummary.test.ts
+@@ -0,0 +1,113 @@
++import { describe, expect, it } from 'vitest'
++import type { AlertType } from '@/types'
++import { summarizeAlert, whenPhrase, type AlertSummaryInput } from './alertSummary'
++
++// Local-time dates keep the expected clock text independent of the machine's time zone.
++const NOW = new Date(2026, 10, 13, 15, 0)
++const iso = (d: number, h: number, m: number) => new Date(2026, 10, d, h, m).toISOString()
++const base: AlertSummaryInput = {
++  type: 'very_high_speed', cameraName: 'Pasaj Mihai Eminescu', at: iso(13, 14, 32),
++  objectClass: 'autoturism', status: 'new',
++}
++const what = (patch: Partial<AlertSummaryInput>) => summarizeAlert({ ...base, ...patch }, NOW).what
++const TAIL = ', la camera Pasaj Mihai Eminescu, azi la 14:32.'
++
++describe('summarizeAlert: what happened, per type', () => {
++  const cases: Record<AlertType, [Partial<AlertSummaryInput>, string]> = {
++    very_high_speed: [{ speedKmh: 116.4, limitKmh: 50 }, 'Sistemul a semnalat un autoturism care circula cu aproximativ 116 km/h pe un tronson cu limita de 50 km/h'],
++    high_speed: [{ speedKmh: 180, limitKmh: 130, objectClass: 'motocicleta' }, 'Sistemul a semnalat o motocicletă care circula cu aproximativ 180 km/h pe un tronson cu limita de 130 km/h'],
++    probable_crash: [{}, 'Sistemul a semnalat un autoturism care a frânat brusc și apoi s-a oprit pe carosabil, ceea ce poate însemna un accident'],
++    pedestrian_on_road: [{ objectClass: 'pieton' }, 'Sistemul a semnalat o persoană pe carosabil'],
++    pedestrian_highway: [{ objectClass: 'pieton' }, 'Sistemul a semnalat o persoană pe autostradă'],
++    wrong_way: [{ objectClass: 'camion' }, 'Sistemul a semnalat un camion care se deplasa pe contrasens'],
++    stopped_on_road: [{ objectClass: 'autobuz' }, 'Sistemul a semnalat un autobuz care staționa pe carosabil'],
++    stopped_emergency_lane: [{}, 'Sistemul a semnalat un autoturism care staționa pe banda de urgență'],
++    emergency_lane_stop: [{}, 'Sistemul a semnalat un autoturism care staționa pe banda de urgență'],
++    road_object: [{ objectClass: 'obiect' }, 'Sistemul a semnalat un obiect pe carosabil'],
++    near_miss: [{}, 'Sistemul a semnalat un autoturism care a trecut foarte aproape de un alt participant la trafic'],
++    hard_braking: [{ speedKmh: 80 }, 'Sistemul a semnalat un autoturism care a frânat brusc'],
++    tailgating: [{ speedKmh: 92 }, 'Sistemul a semnalat un autoturism care circula prea aproape de vehiculul din față, la aproximativ 92 km/h'],
++    dangerous_lane_change: [{}, 'Sistemul a semnalat un autoturism care a schimbat brusc banda, cu un alt vehicul foarte aproape'],
++    congestion: [{ objectClass: undefined, speedKmh: 11.6 }, 'Sistemul a semnalat trafic aglomerat, cu o viteză medie de aproximativ 12 km/h'],
++    road_conditions: [{}, 'Sistemul a semnalat condiții de drum care pot îngreuna circulația'],
++  }
++  for (const [type, [patch, expected]] of Object.entries(cases)) {
++    it(type, () => {
++      const summary = summarizeAlert({ ...base, ...patch, type }, NOW)
++      expect(summary.what).toBe(expected + TAIL)
++      expect(summary.why).toMatch(/^[A-ZĂÂÎȘȚ].+\.$/)
++      expect(summary.next).toContain('confirmă sau respinge')
++    })
++  }
++
++  it('reads the older type names like the current ones', () => {
++    expect(what({ type: 'excessive_speed', speedKmh: 116, limitKmh: 50 })).toBe(what({ speedKmh: 116, limitKmh: 50 }))
++    expect(what({ type: 'pedestrian_on_highway' })).toBe(what({ type: 'pedestrian_highway' }))
++  })
++})
++
++describe('summarizeAlert: missing or odd data', () => {
++  const clean = (text: string) => expect(text).not.toMatch(/undefined|NaN|null|,\s*,|\s{2}/)
++
++  it('speed without a limit', () => {
++    expect(what({ speedKmh: 116 })).toBe('Sistemul a semnalat un autoturism care circula cu aproximativ 116 km/h, peste pragul stabilit pentru această cameră' + TAIL)
++  })
++  it('no speed at all', () => {
++    for (const speedKmh of [undefined, null, Number.NaN, 0]) {
++      expect(what({ speedKmh, limitKmh: 50 })).toBe('Sistemul a semnalat un autoturism care circula cu o viteză peste pragul stabilit pentru această cameră' + TAIL)
++    }
++  })
++  it('drops a limit that is not below the estimated speed', () => {
++    expect(what({ speedKmh: 129, limitKmh: 130 })).not.toContain('limita')
++  })
++  it('tailgating and congestion without a speed print no unit', () => {
++    expect(what({ type: 'tailgating' })).toBe('Sistemul a semnalat un autoturism care circula prea aproape de vehiculul din față' + TAIL)
++    expect(what({ type: 'congestion', speedKmh: null })).toBe('Sistemul a semnalat trafic aglomerat' + TAIL)
++  })
++  it('unknown object class, camera and time', () => {
++    const summary = summarizeAlert({ type: 'wrong_way', status: 'new', at: 'not a date', cameraName: '  ' }, NOW)
++    expect(summary.what).toBe('Sistemul a semnalat un vehicul care se deplasa pe contrasens.')
++    Object.values(summary).forEach(clean)
++  })
++  it('unknown type falls back to its label and the rule text', () => {
++    const summary = summarizeAlert({ ...base, type: 'red_light', typeLabel: 'Trecere pe roșu', rule: 'Vehicul în intersecție pe roșu.' }, NOW)
++    expect(summary.what).toBe('Sistemul a semnalat un eveniment de tip „Trecere pe roșu”' + TAIL)
++    expect(summary.why).toBe('Regula care a declanșat alerta: Vehicul în intersecție pe roșu.')
++  })
++  it('unknown type with nothing else known', () => {
++    const summary = summarizeAlert({ type: '', status: 'new' }, NOW)
++    expect(summary.what).toBe('Sistemul a semnalat un eveniment rutier.')
++    expect(summary.why).toBe('S-a îndeplinit o regulă configurată pentru această cameră.')
++    expect(summarizeAlert({ type: 'red_light', status: 'new' }, NOW).what).toBe('Sistemul a semnalat un eveniment de tip „red light”.')
++    Object.values(summary).forEach(clean)
++  })
++})
++
++describe('summarizeAlert: next step', () => {
++  it('undecided alerts ask for a human decision', () => {
++    for (const status of ['new', 'in_review']) {
++      expect(summarizeAlert({ ...base, status }, NOW).next)
++        .toBe('Verifică clipul și confirmă sau respinge alerta. Sistemul nu trimite singur echipaje și nu dă amenzi; decizia este a omului.')
++    }
++  })
++  it('says who decided and when', () => {
++    expect(summarizeAlert({ ...base, status: 'confirmed', decidedBy: 'operator', decidedAt: iso(13, 14, 40) }, NOW).next)
++      .toBe('Alerta a fost confirmată de operator, azi la 14:40. Decizia a fost luată de un om și rămâne în jurnal. Sistemul nu trimite singur echipaje și nu dă amenzi.')
++    expect(summarizeAlert({ ...base, status: 'rejected', decidedBy: 'admin', decidedAt: iso(12, 9, 5) }, NOW).next)
++      .toMatch(/^Alerta a fost respinsă de admin, ieri la 09:05\./)
++  })
++  it('a decision without author or time stays a clean sentence', () => {
++    expect(summarizeAlert({ ...base, status: 'closed' }, NOW).next).toMatch(/^Dosarul alertei a fost închis\. /)
++    expect(summarizeAlert({ ...base, status: 'confirmed', decidedAt: 'x' }, NOW).next).toMatch(/^Alerta a fost confirmată\. /)
++  })
++})
++
++describe('whenPhrase', () => {
++  it('today, yesterday, older, invalid', () => {
++    expect(whenPhrase(iso(13, 0, 7), NOW)).toBe('azi la 00:07')
++    expect(whenPhrase(iso(12, 23, 59), NOW)).toBe('ieri la 23:59')
++    expect(whenPhrase(iso(2, 8, 30), NOW)).toBe('pe 02.11.2026 la 08:30')
++    expect(whenPhrase(undefined, NOW)).toBeNull()
++    expect(whenPhrase('', NOW)).toBeNull()
++  })
++})
+diff --git a/frontend/src/lib/alertSummary.ts b/frontend/src/lib/alertSummary.ts
+new file mode 100644
+index 0000000..641394a
+--- /dev/null
++++ b/frontend/src/lib/alertSummary.ts
+@@ -0,0 +1,162 @@
++// Plain-Romanian summary of an alert for the "Pe scurt" card: what happened, why the alarm
++// fired and what the dispatcher can do. Pure: everything comes in through the input.
++
++export interface AlertSummaryInput {
++  type: string
++  /** Label of the type, used only for a type this file does not know. */
++  typeLabel?: string
++  cameraName?: string
++  /** ISO timestamp of the event. */
++  at?: string
++  /** UI object class (autoturism, camion, autobuz, motocicleta, pieton, obiect). */
++  objectClass?: string
++  speedKmh?: number | null
++  limitKmh?: number | null
++  /** Technical rule text from the pipeline; quoted only for an unknown type. */
++  rule?: string
++  status: string
++  decidedBy?: string
++  decidedAt?: string
++}
++
++export interface AlertSummary {
++  what: string
++  why: string
++  next: string
++}
++
++const ALIASES: Record<string, string> = {
++  excessive_speed: 'very_high_speed',
++  high_speed: 'very_high_speed',
++  pedestrian_on_highway: 'pedestrian_highway',
++  emergency_lane_stop: 'stopped_emergency_lane',
++}
++
++// Accusative, indefinite: fits after "Sistemul a semnalat".
++const OBJECT: Record<string, string> = {
++  autoturism: 'un autoturism',
++  camion: 'un camion',
++  autobuz: 'un autobuz',
++  motocicleta: 'o motocicletă',
++}
++
++const kmh = (value?: number | null) =>
++  typeof value === 'number' && Number.isFinite(value) && value > 0 ? `${Math.round(value)} km/h` : null
++
++const sameDay = (a: Date, b: Date) =>
++  a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
++const two = (n: number) => String(n).padStart(2, '0')
++
++/** "azi la 14:32", "ieri la 14:32" or "pe 18.10.2026 la 14:32"; null for a missing or invalid date. */
++export function whenPhrase(iso: string | undefined, now: Date): string | null {
++  if (!iso) return null
++  const at = new Date(iso)
++  if (Number.isNaN(at.getTime())) return null
++  const time = `${two(at.getHours())}:${two(at.getMinutes())}`
++  if (sameDay(at, now)) return `azi la ${time}`
++  if (sameDay(at, new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1))) return `ieri la ${time}`
++  return `pe ${two(at.getDate())}.${two(at.getMonth() + 1)}.${at.getFullYear()} la ${time}`
++}
++
++interface Wording {
++  /** What the system flagged, without place and time. */
++  what: (vehicle: string, speed: string | null, limit: string | null) => string
++  why: string
++}
++
++const WORDING: Record<string, Wording> = {
++  very_high_speed: {
++    what: (v, speed, limit) =>
++      speed && limit ? `${v} care circula cu aproximativ ${speed} pe un tronson cu limita de ${limit}`
++        : speed ? `${v} care circula cu aproximativ ${speed}, peste pragul stabilit pentru această cameră`
++          : `${v} care circula cu o viteză peste pragul stabilit pentru această cameră`,
++    why: 'Viteza estimată a depășit pragul stabilit pentru această cameră.',
++  },
++  probable_crash: {
++    what: (v) => `${v} care a frânat brusc și apoi s-a oprit pe carosabil, ceea ce poate însemna un accident`,
++    why: 'O frânare bruscă urmată de o oprire completă pe carosabil seamănă cu un accident și trebuie verificată de un om.',
++  },
++  pedestrian_on_road: {
++    what: () => 'o persoană pe carosabil',
++    why: 'O persoană a fost detectată într-o zonă destinată vehiculelor.',
++  },
++  pedestrian_highway: {
++    what: () => 'o persoană pe autostradă',
++    why: 'O persoană a fost detectată pe autostradă, unde pietonii nu au voie.',
++  },
++  wrong_way: {
++    what: (v) => `${v} care se deplasa pe contrasens`,
++    why: 'Vehiculul s-a deplasat câteva secunde împotriva sensului de mers stabilit pentru această bandă.',
++  },
++  stopped_on_road: {
++    what: (v) => `${v} care staționa pe carosabil`,
++    why: 'Vehiculul a stat pe loc, pe carosabil, mai mult decât timpul stabilit pentru această cameră.',
++  },
++  stopped_emergency_lane: {
++    what: (v) => `${v} care staționa pe banda de urgență`,
++    why: 'Vehiculul a stat pe loc, pe banda de urgență, mai mult decât timpul stabilit pentru această cameră.',
++  },
++  road_object: {
++    what: () => 'un obiect pe carosabil',
++    why: 'Un obiect nemișcat a fost detectat pe partea carosabilă.',
++  },
++  near_miss: {
++    what: (v) => `${v} care a trecut foarte aproape de un alt participant la trafic`,
++    why: 'Doi participanți la trafic au ajuns la o distanță foarte mică unul de celălalt.',
++  },
++  hard_braking: {
++    what: (v) => `${v} care a frânat brusc`,
++    why: 'Viteza vehiculului a scăzut mult într-un timp foarte scurt.',
++  },
++  tailgating: {
++    what: (v, speed) => `${v} care circula prea aproape de vehiculul din față${speed ? `, la aproximativ ${speed}` : ''}`,
++    why: 'Distanța față de vehiculul din față a rămas sub pragul de siguranță stabilit pentru această cameră.',
++  },
++  dangerous_lane_change: {
++    what: (v) => `${v} care a schimbat brusc banda, cu un alt vehicul foarte aproape`,
++    why: 'Vehiculul s-a mutat rapid pe altă bandă în timp ce un alt vehicul se afla foarte aproape.',
++  },
++  congestion: {
++    what: (_v, speed) => `trafic aglomerat${speed ? `, cu o viteză medie de aproximativ ${speed}` : ''}`,
++    why: 'Multe vehicule au circulat încet pe aceeași porțiune de drum, mai mult timp decât pragul stabilit.',
++  },
++  road_conditions: {
++    what: () => 'condiții de drum care pot îngreuna circulația',
++    why: 'Imaginile indică vizibilitate redusă sau carosabil alunecos.',
++  },
++}
++
++const NO_AUTOMATION = 'Sistemul nu trimite singur echipaje și nu dă amenzi'
++
++export function summarizeAlert(input: AlertSummaryInput, now: Date = new Date()): AlertSummary {
++  const wording = WORDING[ALIASES[input.type] ?? input.type]
++  const vehicle = OBJECT[input.objectClass ?? ''] ?? 'un vehicul'
++  const speed = kmh(input.speedKmh)
++  const limitValue = kmh(input.limitKmh)
++  // A limit at or above the estimated speed would contradict the sentence; leave it out.
++  const limit = speed && limitValue && (input.speedKmh ?? 0) > (input.limitKmh ?? 0) ? limitValue : null
++
++  const label = (input.typeLabel || input.type || '').replace(/_/g, ' ').trim()
++  const subject = wording ? wording.what(vehicle, speed, limit)
++    : label ? `un eveniment de tip „${label}”` : 'un eveniment rutier'
++  const camera = input.cameraName?.trim()
++  const at = whenPhrase(input.at, now)
++  const what = `Sistemul a semnalat ${subject}${camera ? `, la camera ${camera}` : ''}${at ? `, ${at}` : ''}.`
++
++  const rule = input.rule?.trim()
++  const why = wording?.why
++    ?? (rule ? `Regula care a declanșat alerta: ${rule.replace(/\.$/, '')}.` : 'S-a îndeplinit o regulă configurată pentru această cameră.')
++
++  const decision = input.status === 'confirmed' ? 'Alerta a fost confirmată'
++    : input.status === 'rejected' ? 'Alerta a fost respinsă'
++      : input.status === 'closed' ? 'Dosarul alertei a fost închis' : null
++  if (!decision) {
++    return { what, why, next: `Verifică clipul și confirmă sau respinge alerta. ${NO_AUTOMATION}; decizia este a omului.` }
++  }
++  const by = input.decidedBy?.trim()
++  const decidedAt = whenPhrase(input.decidedAt, now)
++  return {
++    what, why,
++    next: `${decision}${by ? ` de ${by}` : ''}${decidedAt ? `, ${decidedAt}` : ''}. Decizia a fost luată de un om și rămâne în jurnal. ${NO_AUTOMATION}.`,
++  }
++}

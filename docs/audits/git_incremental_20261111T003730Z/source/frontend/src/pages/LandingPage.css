@@ -1,0 +1,461 @@
+/*
+ * Public first screen. It borrows from the road itself rather than from the dispatch console:
+ * road-paint white ground, asphalt text, the blue of Romanian information signs (and of the
+ * cap on county-road kilometre stones), the yellow of temporary signs, the amber the detector
+ * draws around a flagged vehicle. Type is Overpass, a descendant of the highway sign alphabet.
+ */
+@font-face {
+  font-family: 'Overpass';
+  src: url('/fonts/Overpass-LatinExt.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1E00-1E9F, U+20A0-20C0;
+}
+@font-face {
+  font-family: 'Overpass';
+  src: url('/fonts/Overpass-Latin.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+20AC, U+2122, U+2212;
+}
+
+.rs-landing {
+  --asfalt: #2b2f33;
+  --banda: #58616a;
+  --beton: #cfd5da;
+  --marcaj: #f3f5f6;
+  --hartie: #ffffff;
+  --indicator: #0a4da3;
+  --indicator-inchis: #083b7e;
+  --semnal: #f2a100;
+  --provizoriu: #ffd400;
+
+  height: 100%;
+  overflow-y: auto;
+  background: var(--marcaj);
+  color: var(--asfalt);
+  font-family: 'Overpass', ui-sans-serif, system-ui, sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+  user-select: text;
+}
+.rs-landing :focus-visible {
+  outline: 3px solid var(--semnal);
+  outline-offset: 3px;
+}
+.rs-landing-wrap {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ---------------------------------------------------------------- top bar */
+.rs-landing-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+.rs-landing-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: 0.01em;
+}
+/* A temporary-sign plate: the product is not finished, and the page says so in sign language. */
+.rs-landing-temp {
+  background: var(--provizoriu);
+  color: #1c1e20;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1;
+  padding: 9px 12px 7px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 2px #1c1e20;
+  white-space: nowrap;
+}
+
+/* On a phone the brand and the plate share one narrow line. */
+@media (max-width: 479px) {
+  .rs-landing-top {
+    gap: 12px;
+  }
+  .rs-landing-brand {
+    gap: 10px;
+    font-size: 19px;
+  }
+  .rs-landing-temp {
+    font-size: 13px;
+    padding: 8px 9px 6px;
+  }
+}
+
+/* ---------------------------------------------------------------- hero */
+.rs-landing-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 40px;
+  padding-top: 24px;
+  padding-bottom: 72px;
+}
+.rs-landing-title {
+  font-weight: 800;
+  font-size: clamp(2.5rem, 4.3vw, 4.25rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.rs-landing-title span {
+  display: block;
+}
+.rs-landing-lede {
+  margin: 24px 0 0;
+  max-width: 30em;
+  font-size: 20px;
+  line-height: 1.45;
+  color: var(--banda);
+}
+/* The way in is an information sign: blue plate, white keyline. */
+.rs-landing-sign {
+  display: inline-block;
+  margin-top: 32px;
+  padding: 16px 28px 13px;
+  background: var(--indicator);
+  color: #fff;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 3px var(--indicator), inset 0 0 0 5px #fff;
+  text-decoration: none;
+}
+.rs-landing-sign:hover {
+  background: var(--indicator-inchis);
+  box-shadow: inset 0 0 0 3px var(--indicator-inchis), inset 0 0 0 5px #fff;
+}
+
+.rs-landing-view {
+  position: relative;
+  margin: 0;
+}
+.rs-landing-clip {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: var(--asfalt);
+  border: 6px solid var(--hartie);
+  border-radius: 14px;
+  box-shadow: 0 0 0 2px var(--asfalt), 0 30px 50px -30px rgba(43, 47, 51, 0.6);
+}
+.rs-landing-caption {
+  margin-top: 12px;
+  font-size: 15px;
+  color: var(--banda);
+}
+
+/* The alert as the dispatcher gets it. The visitor makes the call. */
+.rs-landing-slip {
+  margin-top: 16px;
+  padding: 18px 20px 20px 24px;
+  background: var(--hartie);
+  border-left: 6px solid var(--semnal);
+  border-radius: 4px;
+  box-shadow: 0 18px 36px -18px rgba(43, 47, 51, 0.55);
+}
+.rs-landing-slip[data-decision='confirmed'] {
+  border-left-color: var(--indicator);
+}
+.rs-landing-slip[data-decision='rejected'] {
+  border-left-color: var(--banda);
+}
+.rs-landing-slip h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+.rs-landing-slip p {
+  margin: 8px 0 0;
+  font-size: 16px;
+  line-height: 1.4;
+}
+.rs-landing-ask {
+  font-weight: 700;
+}
+.rs-landing-slip .rs-landing-stamp {
+  margin-top: 4px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--banda);
+}
+.rs-landing-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+.rs-landing-choice {
+  padding: 11px 16px 9px;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  background: var(--asfalt);
+  border: 2px solid var(--asfalt);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.rs-landing-choice:hover {
+  background: #1c1e20;
+}
+.rs-landing-choice[data-kind='quiet'] {
+  color: var(--asfalt);
+  background: transparent;
+}
+.rs-landing-choice[data-kind='quiet']:hover {
+  background: var(--marcaj);
+}
+
+@media (min-width: 1024px) {
+  .rs-landing-wrap {
+    padding: 0 40px;
+  }
+  .rs-landing-hero {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 64px;
+    align-items: start;
+    padding-top: 36px;
+    padding-bottom: 96px;
+  }
+  .rs-landing-pitch {
+    padding-top: 20px;
+  }
+  .rs-landing-slip {
+    position: absolute;
+    left: -40px;
+    bottom: -48px;
+    width: 328px;
+    margin-top: 0;
+  }
+  .rs-landing-caption {
+    padding-left: 308px;
+  }
+}
+
+/* ---------------------------------------------------------------- three alerts from the app */
+.rs-landing-seen {
+  padding-top: 8px;
+  padding-bottom: 72px;
+}
+.rs-landing-seen h2 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+.rs-landing-seen-note {
+  margin: 8px 0 0;
+  font-size: 17px;
+  color: var(--banda);
+}
+.rs-landing-shots {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+  margin-top: 28px;
+}
+.rs-landing-shot {
+  margin: 0;
+}
+.rs-landing-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: var(--asfalt);
+  border: 5px solid var(--hartie);
+  border-radius: 12px;
+  box-shadow: 0 0 0 2px var(--beton);
+}
+.rs-landing-shot h3 {
+  margin: 16px 0 0;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+.rs-landing-shot p {
+  margin: 4px 0 0;
+  max-width: 24em;
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--banda);
+}
+@media (min-width: 900px) {
+  .rs-landing-shots {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px;
+  }
+}
+
+/* ---------------------------------------------------------------- the road: four steps, in order */
+/* Asphalt with its two edge lines; the centre line runs between the kilometre stones. */
+.rs-landing-road {
+  position: relative;
+  background: var(--asfalt);
+  color: #fff;
+  padding: 76px 0 84px;
+}
+.rs-landing-road::before,
+.rs-landing-road::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: #fff;
+  opacity: 0.9;
+}
+.rs-landing-road::before {
+  top: 18px;
+}
+.rs-landing-road::after {
+  bottom: 18px;
+}
+.rs-landing-road h2 {
+  margin: 0 0 36px;
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+.rs-landing-steps {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.rs-landing-stone {
+  display: block;
+  position: relative;
+  box-sizing: content-box;
+  width: 44px;
+  height: 56px;
+}
+.rs-landing-steps h3 {
+  margin: 16px 0 0;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.rs-landing-steps p {
+  margin: 6px 0 0;
+  max-width: 17em;
+  font-size: 17px;
+  line-height: 1.4;
+  color: var(--beton);
+}
+@media (min-width: 900px) {
+  .rs-landing-steps {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 32px;
+  }
+  /* Centre-line dashes from each stone to the next: five whole dashes, never a cut one. */
+  .rs-landing-steps li {
+    position: relative;
+  }
+  .rs-landing-steps li::before {
+    content: '';
+    position: absolute;
+    left: 62px;
+    right: -18px;
+    top: 36px;
+    height: 4px;
+    background: linear-gradient(90deg, #fff 58%, transparent 0) 0 0 / 20% 100% repeat-x;
+    opacity: 0.85;
+  }
+}
+
+/* ---------------------------------------------------------------- plain facts */
+.rs-landing-facts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+  padding-top: 56px;
+  padding-bottom: 48px;
+}
+.rs-landing-signpost {
+  display: block;
+  width: 64px;
+  height: 64px;
+}
+.rs-landing-facts h2 {
+  margin: 18px 0 0;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+.rs-landing-facts p {
+  margin: 8px 0 0;
+  max-width: 26em;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--banda);
+}
+@media (min-width: 900px) {
+  .rs-landing-facts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 48px;
+  }
+}
+
+.rs-landing-foot {
+  padding-bottom: 40px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--banda);
+}
+.rs-landing-again {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 32px;
+  margin-bottom: 36px;
+  padding: 28px 32px;
+  background: var(--hartie);
+  border-radius: 14px;
+  box-shadow: 0 0 0 2px var(--beton);
+}
+.rs-landing-again p {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--asfalt);
+}
+.rs-landing-again .rs-landing-sign {
+  margin-top: 0;
+}
+.rs-landing-foot > p {
+  margin: 0;
+  max-width: 62em;
+  padding-top: 20px;
+  border-top: 2px solid var(--beton);
+}
+.rs-landing-foot strong {
+  color: var(--asfalt);
+}

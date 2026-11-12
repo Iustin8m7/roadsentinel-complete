@@ -1,0 +1,310 @@
+[
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/A-auth-live-auditor.png",
+    "source": "runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/live-auditor.png",
+    "runtime": "A-auth",
+    "captured_utc": "2026-11-10T23:48:04.138299+00:00",
+    "sha256": "1664d6c0739eadaa1581e62b3893c4ac3968d90640f36f698d09f3714ae7533f"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/A-auth-live-operator.png",
+    "source": "runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/live-operator.png",
+    "runtime": "A-auth",
+    "captured_utc": "2026-11-10T23:48:07.040065+00:00",
+    "sha256": "8778fde2acab399a792af4339e2158652e0fe7b7dc734d5f22fd51e88237cb59"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/A-auth-live-patrol.png",
+    "source": "runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/live-patrol.png",
+    "runtime": "A-auth",
+    "captured_utc": "2026-11-10T23:48:00.890570+00:00",
+    "sha256": "612ab4aec257d237fe4de0917dc57834e0adf5851c58fec8c2e176dede1a2470"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/A-auth-live-tenant_admin.png",
+    "source": "runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/live-tenant_admin.png",
+    "runtime": "A-auth",
+    "captured_utc": "2026-11-10T23:47:57.942825+00:00",
+    "sha256": "feaf518928a2575a5d59c23e8856d187037669852d56b98ce625709e24090277"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/A-auth-login-auditor.png",
+    "source": "runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/login-auditor.png",
+    "runtime": "A-auth",
+    "captured_utc": "2026-11-10T23:48:03.057388+00:00",
+    "sha256": "07a31850a939957991dfd6fc61b14e2718e6117f6bcfcd2614c623a992b8e1e2"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/A-auth-login-operator.png",
+    "source": "runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/login-operator.png",
+    "runtime": "A-auth",
+    "captured_utc": "2026-11-10T23:48:05.852160+00:00",
+    "sha256": "25458d183e4c0b0459587e9a765dddea10c03eeb83c395247aabe7fb81a6275a"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/A-auth-login-patrol.png",
+    "source": "runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/login-patrol.png",
+    "runtime": "A-auth",
+    "captured_utc": "2026-11-10T23:47:59.780665+00:00",
+    "sha256": "07a31850a939957991dfd6fc61b14e2718e6117f6bcfcd2614c623a992b8e1e2"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/A-auth-login-tenant_admin.png",
+    "source": "runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/login-tenant_admin.png",
+    "runtime": "A-auth",
+    "captured_utc": "2026-11-10T23:47:56.771929+00:00",
+    "sha256": "915ed09163ed1aeaf7d2881e0fa7980a4f6930ad4311edacea07efcd31a324bb"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/A-auth-logout-auditor.png",
+    "source": "runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/logout-auditor.png",
+    "runtime": "A-auth",
+    "captured_utc": "2026-11-10T23:48:05.289205+00:00",
+    "sha256": "3426e80b41732120c6708bdc62da1389ef38694d7c794a4f298dee323cdcd210"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/A-auth-logout-operator.png",
+    "source": "runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/logout-operator.png",
+    "runtime": "A-auth",
+    "captured_utc": "2026-11-10T23:48:08.595942+00:00",
+    "sha256": "3426e80b41732120c6708bdc62da1389ef38694d7c794a4f298dee323cdcd210"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/A-auth-logout-patrol.png",
+    "source": "runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/logout-patrol.png",
+    "runtime": "A-auth",
+    "captured_utc": "2026-11-10T23:48:02.461437+00:00",
+    "sha256": "3426e80b41732120c6708bdc62da1389ef38694d7c794a4f298dee323cdcd210"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/A-auth-logout-tenant_admin.png",
+    "source": "runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/logout-tenant_admin.png",
+    "runtime": "A-auth",
+    "captured_utc": "2026-11-10T23:47:59.161718+00:00",
+    "sha256": "3426e80b41732120c6708bdc62da1389ef38694d7c794a4f298dee323cdcd210"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/A-auth-mfa-auditor.png",
+    "source": "runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/mfa-auditor.png",
+    "runtime": "A-auth",
+    "captured_utc": "2026-11-10T23:48:03.616342+00:00",
+    "sha256": "7543f0b4b10305d22b41ccc2238ffa1c4c3110c6461e5d4420c404ee1d29c488"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/A-auth-mfa-operator.png",
+    "source": "runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/mfa-operator.png",
+    "runtime": "A-auth",
+    "captured_utc": "2026-11-10T23:48:06.449112+00:00",
+    "sha256": "51f450870e19873dfa36f3d8a3a5167d721829488bd2e807d429fce85aecde3a"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/A-auth-mfa-patrol.png",
+    "source": "runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/mfa-patrol.png",
+    "runtime": "A-auth",
+    "captured_utc": "2026-11-10T23:48:00.339617+00:00",
+    "sha256": "be7d8d418df0140b575f0cf2ae5181375ad830fe2f40243ca65668fd27497929"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/A-auth-mfa-tenant_admin.png",
+    "source": "runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/mfa-tenant_admin.png",
+    "runtime": "A-auth",
+    "captured_utc": "2026-11-10T23:47:57.338878+00:00",
+    "sha256": "7e1bd2321c33ffd372bd0f35035303fdb8dbe7eb6e1b46ebca9d367ecc98b3d4"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-recorded-complete-create.png",
+    "source": "runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/complete-create.png",
+    "runtime": "B-recorded",
+    "captured_utc": "2026-11-10T23:27:16.708714+00:00",
+    "sha256": "d38e965aee05191afb17be3832de384356b1a664261f9c75cb3901cec05bde4a"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-recorded-complete-persist.png",
+    "source": "runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/complete-persist.png",
+    "runtime": "B-recorded",
+    "captured_utc": "2026-11-10T23:27:20.536716+00:00",
+    "sha256": "cbcb98adc43007f1f3c1bf6222af00541e436cb3d4d6b61c9017a09cd454d778"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-recorded-enrollment-qr-masked.png",
+    "source": "runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/enrollment-qr-masked.png",
+    "runtime": "B-recorded",
+    "captured_utc": "2026-11-10T23:26:25.921695+00:00",
+    "sha256": "feaf76febdff50918b1fcbe4619c6288545cf0bb595705fd4cdbc8daeee1d30e"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-recorded-enrollment-recovery-masked.png",
+    "source": "runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/enrollment-recovery-masked.png",
+    "runtime": "B-recorded",
+    "captured_utc": "2026-11-10T23:26:26.440695+00:00",
+    "sha256": "62524ef29acd188c792310604f06333d1a73ff0f38518705bce6d755bb746c61"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-recorded-export-awaiting-second-approval.png",
+    "source": "runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/export-awaiting-second-approval.png",
+    "runtime": "B-recorded",
+    "captured_utc": "2026-11-10T23:27:14.174714+00:00",
+    "sha256": "3b38dcaef5c91d2c0a7ab9cae2aaf2e65691e07d1cc9112116fea9580b47cea3"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-recorded-independent-approval.png",
+    "source": "runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/independent-approval.png",
+    "runtime": "B-recorded",
+    "captured_utc": "2026-11-10T23:27:15.394714+00:00",
+    "sha256": "ae57e3b50173558c37ad40b3d182baf14ecb45e42db31acb9de0b2dd3bed2a08"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-recorded-moving-annotated-result.png",
+    "source": "runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/moving-annotated-result.png",
+    "runtime": "B-recorded",
+    "captured_utc": "2026-11-10T23:26:58.691709+00:00",
+    "sha256": "a0b2f5c54c77f84b396e55c4e8daf80184433ae7c329409a0f2c932bd60422b2"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-recorded-moving-heatmap-counts.png",
+    "source": "runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/moving-heatmap-counts.png",
+    "runtime": "B-recorded",
+    "captured_utc": "2026-11-10T23:26:59.257709+00:00",
+    "sha256": "f40a68eae26d03d06129a1419b3d595f828d5ebf2348a105b5e8febfe3326830"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-recorded-moving-job-progress.png",
+    "source": "runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/moving-job-progress.png",
+    "runtime": "B-recorded",
+    "captured_utc": "2026-11-10T23:26:27.888696+00:00",
+    "sha256": "02e24989b82a304f13ad140d48181b18a6bc1506aa551e4d437887df1e9faee5"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-recorded-moving-upload.png",
+    "source": "runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/moving-upload.png",
+    "runtime": "B-recorded",
+    "captured_utc": "2026-11-10T23:26:27.345695+00:00",
+    "sha256": "906ec85026d4a64ae38d41f91926a9a86a1c90ce148d93eb421974a63bdb26ff"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-recorded-synthetic-candidates.png",
+    "source": "runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/synthetic-candidates.png",
+    "runtime": "B-recorded",
+    "captured_utc": "2026-11-10T23:27:09.910713+00:00",
+    "sha256": "4770600a831486db38719b9c4c16672f0617c16b72a40f5e944ca292625c3c50"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-recorded-synthetic-job-progress.png",
+    "source": "runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/synthetic-job-progress.png",
+    "runtime": "B-recorded",
+    "captured_utc": "2026-11-10T23:27:00.864710+00:00",
+    "sha256": "b475296d58ce4ad9e2a4ec903fb3c92403c03c3158e45b74bfbf4cf5c08e4449"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-recorded-synthetic-upload.png",
+    "source": "runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/synthetic-upload.png",
+    "runtime": "B-recorded",
+    "captured_utc": "2026-11-10T23:27:00.411710+00:00",
+    "sha256": "a964092e8fce9c5cb4291ce3b77863dd6518b104b450decc1d93fb398fc78b9f"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-camera-camera-approve-1.png",
+    "source": "runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-approve-1.png",
+    "runtime": "B-camera",
+    "captured_utc": "2026-11-10T23:41:43.597710+00:00",
+    "sha256": "e0a4bbac2f8572e4ab2334595876fe5476121d7801c26cb20c20259bebf1911a"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-camera-camera-approve-2.png",
+    "source": "runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-approve-2.png",
+    "runtime": "B-camera",
+    "captured_utc": "2026-11-10T23:42:07.212663+00:00",
+    "sha256": "2b6ed099cd71b9e317051f1bbc2ae859379cac7864d5289e0ab2bfd6e9a94904"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-camera-camera-disable-0.png",
+    "source": "runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-disable-0.png",
+    "runtime": "B-camera",
+    "captured_utc": "2026-11-10T23:44:31.739366+00:00",
+    "sha256": "224300dae449c726198578f41a057b61b90ab9f20e091bce251d43d9efe15309"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-camera-camera-draft-1-editor.png",
+    "source": "runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-draft-1-editor.png",
+    "runtime": "B-camera",
+    "captured_utc": "2026-11-10T23:41:40.070716+00:00",
+    "sha256": "a282de8195093a008e0d602b3686e649652866d42429d9ce41bd1fcf625115ee"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-camera-camera-draft-1.png",
+    "source": "runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-draft-1.png",
+    "runtime": "B-camera",
+    "captured_utc": "2026-11-10T23:41:40.465716+00:00",
+    "sha256": "4428b25cd580c269bb0c030290f2d59a16eb926ec5b2295c0682f8ea2912e678"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-camera-camera-draft-2-editor.png",
+    "source": "runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-draft-2-editor.png",
+    "runtime": "B-camera",
+    "captured_utc": "2026-11-10T23:42:02.955671+00:00",
+    "sha256": "76996945d168a65b0772c9fd86863aaccb77e4eaf636f737fcf4be6bc2573fea"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-camera-camera-draft-2.png",
+    "source": "runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-draft-2.png",
+    "runtime": "B-camera",
+    "captured_utc": "2026-11-10T23:42:03.804669+00:00",
+    "sha256": "2ec2718dd1b500b5a0579b2b1061665e4474b3815a737f51f898042c19c5a6fc"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-camera-camera-event-0.png",
+    "source": "runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-event-0.png",
+    "runtime": "B-camera",
+    "captured_utc": "2026-11-10T23:41:59.016679+00:00",
+    "sha256": "bf4a10859442a5f62a854443c3cae98a31dbd0a28a1d6d3e34b0cc3e6bb65b3d"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-camera-camera-health-1.png",
+    "source": "runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-health-1.png",
+    "runtime": "B-camera",
+    "captured_utc": "2026-11-10T23:42:21.111635+00:00",
+    "sha256": "f37095bf2dc5e3f37a41649ea81b3ea37886a6f6d60b8e60d44050802dd84e44"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-camera-camera-health-2.png",
+    "source": "runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-health-2.png",
+    "runtime": "B-camera",
+    "captured_utc": "2026-11-10T23:42:33.365610+00:00",
+    "sha256": "a3589bb9580a74734e792400423c7a873bc1eecbce7497e6c5aa1e29329a4976"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-camera-camera-preview-0.png",
+    "source": "runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-preview-0.png",
+    "runtime": "B-camera",
+    "captured_utc": "2026-11-10T23:41:54.860816+00:00",
+    "sha256": "7cb74c8017384213b49d4c07ea7098e8c71f31b8cd3f3d149227b184cd5a84a4"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-camera-camera-register-0-form.png",
+    "source": "runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-register-0-form.png",
+    "runtime": "B-camera",
+    "captured_utc": "2026-11-10T23:41:36.619723+00:00",
+    "sha256": "51230415310b858d7e7ac636e3cd1dbae298590a3a2833809332faab49e82f88"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-camera-camera-register-0.png",
+    "source": "runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-register-0.png",
+    "runtime": "B-camera",
+    "captured_utc": "2026-11-10T23:41:37.307722+00:00",
+    "sha256": "be29cea22fe34b568b8999c9b889f593202f92a0db7fed0f9d8be3a53ff095d6"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-camera-camera-rollback-1.png",
+    "source": "runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-rollback-1.png",
+    "runtime": "B-camera",
+    "captured_utc": "2026-11-10T23:44:21.871386+00:00",
+    "sha256": "c59323ef964be0a91f83e36c0699c8fec3dea04bea35279f923d8d40f45df0e3"
+  },
+  {
+    "file": "REAL_BROWSER_SCREENSHOTS/2026-11-11/B-camera-camera-start-0.png",
+    "source": "runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-start-0.png",
+    "runtime": "B-camera",
+    "captured_utc": "2026-11-10T23:44:25.625378+00:00",
+    "sha256": "0339f38d6a9e3cacbb5a37d7b93e266a0c3bcd07d6e48ec4ca25c4d85a0ef6e0"
+  }
+]

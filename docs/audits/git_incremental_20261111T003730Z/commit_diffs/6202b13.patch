@@ -1,0 +1,87 @@
+diff --git a/frontend/src/pages/AlertDetailPage.tsx b/frontend/src/pages/AlertDetailPage.tsx
+index d4e788b..02fefd3 100644
+--- a/frontend/src/pages/AlertDetailPage.tsx
++++ b/frontend/src/pages/AlertDetailPage.tsx
+@@ -8,7 +8,8 @@ import { ContextStrip, FollowupsPanel, LegalHoldPanel, RelatedPanel } from '@/co
+ import { useDataStore, decide, loadDetail, reportError, cameraById } from '@/store/data'
+ import { useCan } from '@/hooks'
+ import { useAuditStore } from '@/store/audit'
+-import { AUDIT_ACTION_LABEL } from '@/lib/constants'
++import { ALERT_TYPE, AUDIT_ACTION_LABEL } from '@/lib/constants'
++import { summarizeAlert } from '@/lib/alertSummary'
+ import { SeverityBadge } from '@/components/SeverityBadge'
+ import { StatusBadge } from '@/components/ui'
+ import { EvidencePlayer } from '@/components/EvidencePlayer'
+@@ -127,6 +128,12 @@ export default function AlertDetailPage() {
+   const prov = dossier?.provenance
+   const card = 'bg-[#111821] border border-[#1E2A36] rounded-md p-3.5'
+   const cardTitle = "font-sans font-bold text-xs uppercase tracking-wider text-[#7D8A9B] mb-2"
++  const summary = summarizeAlert({
++    type: alert.type, typeLabel: ALERT_TYPE[alert.type].label, cameraName: cam?.name, at: alert.createdAt,
++    objectClass: alert.metrics.vehicleClass, speedKmh: alert.metrics.speedKmh, limitKmh: alert.metrics.speedLimitKmh,
++    rule: alert.ruleSummary, status: alert.status, decidedBy: alert.decidedBy, decidedAt: alert.decidedAt,
++  })
++  const viewers = [...new Set(alert.viewedBy)]
+ 
+   return (
+     <div className="h-full flex flex-col p-4 gap-3 overflow-y-auto bg-[#0A0E14] text-[#E6EDF3]">
+@@ -171,8 +178,25 @@ export default function AlertDetailPage() {
+         </div>
+ 
+         {/* Human decision, context, history */}
+-        <div className="col-span-12 md:col-span-4 flex flex-col gap-3 min-h-0 overflow-hidden">
+-          <div className={card}>
++        <div className="col-span-12 md:col-span-4 flex flex-col gap-3 min-h-0 overflow-y-auto">
++          <section className={`${card} border-l-2 border-l-[#3DA5FF] shrink-0`} data-testid="plain-summary" aria-label="Pe scurt">
++            <div className={cardTitle}>Pe scurt</div>
++            <dl className="space-y-2 text-[13px] leading-snug">
++              {([['Ce s-a întâmplat', summary.what], ['De ce a sunat alarma', summary.why], ['Ce poate face dispecerul', summary.next]] as const).map(([label, text]) => (
++                <div key={label}>
++                  <dt className="text-[11px] font-semibold text-[#3DA5FF]">{label}</dt>
++                  <dd className="text-[#E6EDF3]">{text}</dd>
++                </div>
++              ))}
++            </dl>
++            {viewers.length > 0 && (
++              <p className="mt-2.5 pt-2 border-t border-[#1E2A36] text-[11px] text-[#7D8A9B]" data-testid="evidence-viewers">
++                Cine a văzut dovada: <span className="text-[#E6EDF3]">{viewers.join(', ')}</span>
++              </p>
++            )}
++          </section>
++
++          <div className={`${card} shrink-0`}>
+             <div className={`${cardTitle} flex items-center gap-1.5`}><UserCheck size={13} /> Verificare umană</div>
+             {decided ? (
+               <div className="text-xs">
+@@ -235,7 +259,7 @@ export default function AlertDetailPage() {
+             )}
+           </div>
+ 
+-          <div className={card}>
++          <div className={`${card} shrink-0`}>
+             <div className={cardTitle}>Context</div>
+             <dl className="grid grid-cols-3 gap-y-1.5 text-xs">
+               <dt className="text-[#7D8A9B]">Cameră</dt>
+@@ -259,11 +283,11 @@ export default function AlertDetailPage() {
+                 <>
+                   <dt className="text-[#7D8A9B]">Sursă</dt>
+                   <dd className="col-span-2" title={prov.source_basis} data-testid="source-kind">
+-                    {prov.source_kind === 'live' ? 'Flux live' : prov.source_kind === 'recorded_replay' ? 'Înregistrare redată (replay)' : 'Necunoscută (live sau replay nu este raportat)'}
++                    {prov.source_kind === 'live' ? 'Flux în direct' : prov.source_kind === 'recorded_replay' ? 'Înregistrare, nu flux în direct' : 'Necunoscută (nu se știe dacă este înregistrare sau flux în direct)'}
+                   </dd>
+                   <dt className="text-[#7D8A9B]">Model</dt>
+                   <dd className="col-span-2" data-testid="model-status">
+-                    {prov.model_status === 'recorded' ? `${prov.model_id ?? ''} ${prov.model_hash ? `· ${prov.model_hash.slice(0, 12)}` : ''}` : 'Neînregistrat · model nevalidat pentru acest caz'}
++                    {prov.model_status === 'recorded' ? `${prov.model_id ?? ''} ${prov.model_hash ? `· ${prov.model_hash.slice(0, 12)}` : ''}` : 'Model în evaluare, neverificat pe date etichetate de om'}
+                   </dd>
+                 </>
+               )}
+@@ -277,7 +301,7 @@ export default function AlertDetailPage() {
+           </div>
+ 
+           {dossier ? <HistoryPanel dossier={dossier} /> : (
+-          <div className={`${card} flex-1 min-h-0 overflow-hidden`}>
++          <div className={`${card} shrink-0`}>
+             <div className={cardTitle}>Istoric · audit</div>
+             <ol className="relative border-l border-[#1E2A36] ml-1.5 space-y-2">
+               {timeline.map((step, idx) => (

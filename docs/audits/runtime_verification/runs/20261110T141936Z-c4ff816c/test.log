@@ -1,0 +1,34 @@
+
+> roadsentinel-web@0.1.0 test
+> vitest run
+
+
+ RUN  v5.0.5 /home/justin7m8/Documents/roadsentinel-integration/frontend
+
+ ❯ src/lib/api.test.ts (12 tests | 1 failed) 53ms
+   × labels seeded demo data as synthetic instead of claiming redaction 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/api.test.ts > labels seeded demo data as synthetic instead of claiming redaction
+AssertionError: expected 'full' to be 'synthetic' // Object.is equality
+
+Expected: "synthetic"
+Received: "full"
+
+ ❯ src/lib/api.test.ts:108:95
+    106| })
+    107| it('labels seeded demo data as synthetic instead of claiming redaction…
+    108|   expect(adaptEvent({ ...event, redaction: 'full', details: { syntheti…
+       |                                                                                               ^
+    109|   expect(adaptEvent({ ...event, redaction: 'full', details: {} }).reda…
+    110| })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  1 failed | 23 passed (24)
+   Start at  16:19:37
+   Duration  2.18s (import 86%, transform 8%, tests 6%, worker 1%)
+

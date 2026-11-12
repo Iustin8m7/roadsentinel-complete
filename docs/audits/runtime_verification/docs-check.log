@@ -1,0 +1,13 @@
+.venv.integration/lib/python3.12/site-packages/onnxruntime/Privacy.md:14: broken link -> ../README.md#binaries
+.venv.integration/lib/python3.12/site-packages/onnxruntime/Privacy.md:14: broken link -> ../onnxruntime/core/platform/telemetry.h
+.venv.integration/lib/python3.12/site-packages/onnxruntime/Privacy.md:19: broken link -> ../README.md#api-documentation
+.venv.integration/lib/python3.12/site-packages/onnxruntime/Privacy.md:20: broken link -> ./C_API.md#telemetry
+docs/audits/POST_INTEGRATION_README_AUDIT_AFTER.md:38: broken link -> docs/RULES.md
+docs/audits/POST_INTEGRATION_README_AUDIT_AFTER.md:171: broken link -> docs/SECURITY.md
+docs/audits/POST_INTEGRATION_README_AUDIT_AFTER.md:171: broken link -> docs/THREAT_MODEL.md
+docs/audits/POST_INTEGRATION_README_AUDIT_AFTER.md:829: broken link -> SECURITY.md
+docs/audits/runtime_verification/README_AUDIT_AFTER_BEFORE_LOGIN_RECOVERY.md:31: broken link -> ../RULES.md
+docs/audits/runtime_verification/README_AUDIT_AFTER_BEFORE_LOGIN_RECOVERY.md:126: broken link -> ../SECURITY.md
+docs/audits/runtime_verification/README_AUDIT_AFTER_BEFORE_LOGIN_RECOVERY.md:126: broken link -> ../THREAT_MODEL.md
+docs/audits/runtime_verification/README_AUDIT_AFTER_BEFORE_LOGIN_RECOVERY.md:596: broken link -> ../SECURITY.md
+12 broken link(s) in 113 markdown files

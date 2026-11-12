@@ -1,0 +1,77 @@
+[
+  {
+    "name": "initdb",
+    "command": [
+      "/home/justin7m8/miniconda3/envs/rs-pg/bin/initdb",
+      "-D",
+      "/tmp/rsverify-0mil4kkg/pg",
+      "-U",
+      "rsverify_root",
+      "-A",
+      "trust",
+      "--encoding=UTF8",
+      "--no-locale"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration",
+    "start": "2026-11-10T13:05:56.617767+00:00",
+    "end": "2026-11-10T13:05:57.634549+00:00",
+    "duration_s": 1.017,
+    "exit_code": 0
+  },
+  {
+    "name": "start",
+    "command": [
+      "/home/justin7m8/miniconda3/envs/rs-pg/bin/pg_ctl",
+      "-D",
+      "/tmp/rsverify-0mil4kkg/pg",
+      "-l",
+      "/tmp/rsverify-0mil4kkg/postgres.log",
+      "-o",
+      "-h 127.0.0.1 -p 37651 -k /tmp/rsverify-0mil4kkg",
+      "start"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration",
+    "start": "2026-11-10T13:05:57.634801+00:00",
+    "end": "2026-11-10T13:05:57.749271+00:00",
+    "duration_s": 0.114,
+    "exit_code": 0
+  },
+  {
+    "name": "flows",
+    "command": [
+      "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/bin/python",
+      "-m",
+      "pytest",
+      "tests/test_lookup_ownership.py",
+      "tests/test_seed.py",
+      "tests/test_auth.py",
+      "tests/test_mission_vertical.py",
+      "tests/test_managed_live_runtime.py",
+      "-o",
+      "addopts=",
+      "-q",
+      "-s"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration/backend",
+    "start": "2026-11-10T13:05:57.749744+00:00",
+    "end": "2026-11-10T13:07:06.712072+00:00",
+    "duration_s": 68.962,
+    "exit_code": 0
+  },
+  {
+    "name": "stop",
+    "command": [
+      "/home/justin7m8/miniconda3/envs/rs-pg/bin/pg_ctl",
+      "-D",
+      "/tmp/rsverify-0mil4kkg/pg",
+      "stop",
+      "-m",
+      "fast"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration",
+    "start": "2026-11-10T13:07:06.713323+00:00",
+    "end": "2026-11-10T13:07:16.950166+00:00",
+    "duration_s": 10.237,
+    "exit_code": 0
+  }
+]

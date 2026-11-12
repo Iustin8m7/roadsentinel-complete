@@ -1,0 +1,857 @@
+diff --git a/frontend/src/App.tsx b/frontend/src/App.tsx
+index 2df012a..205484d 100644
+--- a/frontend/src/App.tsx
++++ b/frontend/src/App.tsx
+@@ -1,6 +1,7 @@
+ import { createBrowserRouter, Navigate, RouterProvider, useParams } from 'react-router'
+ import { GuestOnly, RequireAuth, RequirePermission } from '@/components/guards'
+ import AppLayout from '@/layouts/AppLayout'
++import LandingPage from '@/pages/LandingPage'
+ import LoginPage from '@/pages/LoginPage'
+ import DashboardPage from '@/pages/DashboardPage'
+ import AlertDetailPage from '@/pages/AlertDetailPage'
+@@ -20,7 +21,7 @@ const router = createBrowserRouter([
+     element: <GuestOnly />,
+     errorElement: <RouteErrorPage />,
+     children: [
+-      { path: '/', element: <Navigate to="/login" replace /> },
++      { path: '/', element: <LandingPage /> },
+       { path: '/login', element: <LoginPage /> },
+     ],
+   },
+diff --git a/frontend/src/components/ActivityReport.tsx b/frontend/src/components/ActivityReport.tsx
+new file mode 100644
+index 0000000..b89635c
+--- /dev/null
++++ b/frontend/src/components/ActivityReport.tsx
+@@ -0,0 +1,80 @@
++interface Row { label: string; count: number }
++
++export interface ActivityReportProps {
++  period: string
++  generatedAt: string
++  totals: Row[]
++  cameras: Row[]
++  types: Row[]
++  /** Alert count per hour of day, 24 entries. */
++  hours: number[]
++}
++
++const heading = 'text-[9pt] font-bold uppercase tracking-wider border-b border-black pb-1 mb-1.5'
++
++function CountTable({ title, rows }: { title: string; rows: Row[] }) {
++  return (
++    <div>
++      <h2 className={heading}>{title}</h2>
++      {rows.length === 0 ? <p className="text-[9pt]">Nicio alertă.</p> : (
++        <table className="w-full border-collapse text-[9pt]">
++          <tbody>
++            {rows.map((row) => (
++              <tr key={row.label} className="border-b border-neutral-300">
++                <td className="py-[3px] pr-2">{row.label}</td>
++                <td className="py-[3px] text-right font-mono font-semibold w-12">{row.count}</td>
++              </tr>
++            ))}
++          </tbody>
++        </table>
++      )}
++    </div>
++  )
++}
++
++/** One A4 page shown only in print (see the print block in index.css). */
++export function ActivityReport({ period, generatedAt, totals, cameras, types, hours }: ActivityReportProps) {
++  const maxHour = Math.max(1, ...hours)
++  return (
++    <section className="rs-print-report hidden print:block bg-white text-black font-sans text-[10pt] leading-snug">
++      <h1 className="text-[18pt] font-bold tracking-tight">RoadSentinel – raport de activitate</h1>
++      <p className="mt-1 text-[10pt]">Perioada acoperită de date: <strong>{period}</strong></p>
++      <p className="text-[8.5pt] text-neutral-600">Raport generat la {generatedAt}</p>
++
++      <div className="mt-4 grid grid-cols-4 gap-2">
++        {totals.map((total) => (
++          <div key={total.label} className="border border-neutral-400 rounded px-2.5 py-2">
++            <div className="text-[8pt] uppercase tracking-wider text-neutral-600">{total.label}</div>
++            <div className="text-[18pt] font-bold font-mono leading-tight">{total.count}</div>
++          </div>
++        ))}
++      </div>
++
++      <div className="mt-5 grid grid-cols-2 gap-6">
++        <CountTable title="Alerte pe cameră" rows={cameras} />
++        <CountTable title="Alerte pe tip" rows={types} />
++      </div>
++
++      <div className="mt-5">
++        <h2 className={heading}>Alerte pe oră (ora din zi, 00–23)</h2>
++        <div className="flex items-end gap-[3px] h-[30mm] mt-2">
++          {hours.map((count, hour) => (
++            <div key={hour} className="flex-1 h-full flex flex-col justify-end items-center">
++              <span className="text-[7pt] font-mono">{count || ''}</span>
++              <div className="w-full bg-neutral-700" style={{ height: `${(count / maxHour) * 80}%` }} />
++            </div>
++          ))}
++        </div>
++        <div className="flex gap-[3px] border-t border-black pt-0.5">
++          {hours.map((_, hour) => (
++            <span key={hour} className="flex-1 text-center text-[7pt] font-mono">{String(hour).padStart(2, '0')}</span>
++          ))}
++        </div>
++      </div>
++
++      <p className="mt-6 pt-2 border-t border-neutral-400 text-[8.5pt] text-neutral-700">
++        Date demonstrative dintr-un prototip. Nu reprezintă statistici oficiale de trafic.
++      </p>
++    </section>
++  )
++}
+diff --git a/frontend/src/index.css b/frontend/src/index.css
+index 5f95f60..e3fbfbb 100644
+--- a/frontend/src/index.css
++++ b/frontend/src/index.css
+@@ -431,3 +431,41 @@ html, body {
+ .rs-dark-tiles {
+   filter: invert(1) hue-rotate(195deg) brightness(0.78) contrast(0.95) saturate(0.35);
+ }
++
++/* Printable activity report (StatsPage -> components/ActivityReport). When the report is in the
++   page, print keeps only the report: everything under #root that is neither the report nor one
++   of its ancestors is removed, and the ancestors lose the app-shell sizing and dark backgrounds.
++   No AppLayout class name is involved, so the sidebar and header go whatever they are called. */
++@media print {
++  @page {
++    size: A4 portrait;
++    margin: 14mm;
++  }
++  html:has(.rs-print-report),
++  html:has(.rs-print-report) body,
++  html:has(.rs-print-report) #root {
++    height: auto !important;
++    overflow: visible !important;
++    background: #fff !important;
++    color: #000 !important;
++  }
++  #root:has(.rs-print-report) *:not(.rs-print-report):not(.rs-print-report *):not(:has(.rs-print-report)) {
++    display: none !important;
++  }
++  #root *:has(.rs-print-report) {
++    display: block !important;
++    position: static !important;
++    width: auto !important;
++    height: auto !important;
++    min-height: 0 !important;
++    overflow: visible !important;
++    margin: 0 !important;
++    padding: 0 !important;
++    border: 0 !important;
++    background: #fff !important;
++  }
++  .rs-print-report {
++    -webkit-print-color-adjust: exact;
++    print-color-adjust: exact;
++  }
++}
+diff --git a/frontend/src/lib/alertSummary.test.ts b/frontend/src/lib/alertSummary.test.ts
+new file mode 100644
+index 0000000..a039238
+--- /dev/null
++++ b/frontend/src/lib/alertSummary.test.ts
+@@ -0,0 +1,113 @@
++import { describe, expect, it } from 'vitest'
++import type { AlertType } from '@/types'
++import { summarizeAlert, whenPhrase, type AlertSummaryInput } from './alertSummary'
++
++// Local-time dates keep the expected clock text independent of the machine's time zone.
++const NOW = new Date(2026, 10, 13, 15, 0)
++const iso = (d: number, h: number, m: number) => new Date(2026, 10, d, h, m).toISOString()
++const base: AlertSummaryInput = {
++  type: 'very_high_speed', cameraName: 'Pasaj Mihai Eminescu', at: iso(13, 14, 32),
++  objectClass: 'autoturism', status: 'new',
++}
++const what = (patch: Partial<AlertSummaryInput>) => summarizeAlert({ ...base, ...patch }, NOW).what
++const TAIL = ', la camera Pasaj Mihai Eminescu, azi la 14:32.'
++
++describe('summarizeAlert: what happened, per type', () => {
++  const cases: Record<AlertType, [Partial<AlertSummaryInput>, string]> = {
++    very_high_speed: [{ speedKmh: 116.4, limitKmh: 50 }, 'Sistemul a semnalat un autoturism care circula cu aproximativ 116 km/h pe un tronson cu limita de 50 km/h'],
++    high_speed: [{ speedKmh: 180, limitKmh: 130, objectClass: 'motocicleta' }, 'Sistemul a semnalat o motocicletă care circula cu aproximativ 180 km/h pe un tronson cu limita de 130 km/h'],
++    probable_crash: [{}, 'Sistemul a semnalat un autoturism care a frânat brusc și apoi s-a oprit pe carosabil, ceea ce poate însemna un accident'],
++    pedestrian_on_road: [{ objectClass: 'pieton' }, 'Sistemul a semnalat o persoană pe carosabil'],
++    pedestrian_highway: [{ objectClass: 'pieton' }, 'Sistemul a semnalat o persoană pe autostradă'],
++    wrong_way: [{ objectClass: 'camion' }, 'Sistemul a semnalat un camion care se deplasa pe contrasens'],
++    stopped_on_road: [{ objectClass: 'autobuz' }, 'Sistemul a semnalat un autobuz care staționa pe carosabil'],
++    stopped_emergency_lane: [{}, 'Sistemul a semnalat un autoturism care staționa pe banda de urgență'],
++    emergency_lane_stop: [{}, 'Sistemul a semnalat un autoturism care staționa pe banda de urgență'],
++    road_object: [{ objectClass: 'obiect' }, 'Sistemul a semnalat un obiect pe carosabil'],
++    near_miss: [{}, 'Sistemul a semnalat un autoturism care a trecut foarte aproape de un alt participant la trafic'],
++    hard_braking: [{ speedKmh: 80 }, 'Sistemul a semnalat un autoturism care a frânat brusc'],
++    tailgating: [{ speedKmh: 92 }, 'Sistemul a semnalat un autoturism care circula prea aproape de vehiculul din față, la aproximativ 92 km/h'],
++    dangerous_lane_change: [{}, 'Sistemul a semnalat un autoturism care a schimbat brusc banda, cu un alt vehicul foarte aproape'],
++    congestion: [{ objectClass: undefined, speedKmh: 11.6 }, 'Sistemul a semnalat trafic aglomerat, cu o viteză medie de aproximativ 12 km/h'],
++    road_conditions: [{}, 'Sistemul a semnalat condiții de drum care pot îngreuna circulația'],
++  }
++  for (const [type, [patch, expected]] of Object.entries(cases)) {
++    it(type, () => {
++      const summary = summarizeAlert({ ...base, ...patch, type }, NOW)
++      expect(summary.what).toBe(expected + TAIL)
++      expect(summary.why).toMatch(/^[A-ZĂÂÎȘȚ].+\.$/)
++      expect(summary.next).toContain('confirmă sau respinge')
++    })
++  }
++
++  it('reads the older type names like the current ones', () => {
++    expect(what({ type: 'excessive_speed', speedKmh: 116, limitKmh: 50 })).toBe(what({ speedKmh: 116, limitKmh: 50 }))
++    expect(what({ type: 'pedestrian_on_highway' })).toBe(what({ type: 'pedestrian_highway' }))
++  })
++})
++
++describe('summarizeAlert: missing or odd data', () => {
++  const clean = (text: string) => expect(text).not.toMatch(/undefined|NaN|null|,\s*,|\s{2}/)
++
++  it('speed without a limit', () => {
++    expect(what({ speedKmh: 116 })).toBe('Sistemul a semnalat un autoturism care circula cu aproximativ 116 km/h, peste pragul stabilit pentru această cameră' + TAIL)
++  })
++  it('no speed at all', () => {
++    for (const speedKmh of [undefined, null, Number.NaN, 0]) {
++      expect(what({ speedKmh, limitKmh: 50 })).toBe('Sistemul a semnalat un autoturism care circula cu o viteză peste pragul stabilit pentru această cameră' + TAIL)
++    }
++  })
++  it('drops a limit that is not below the estimated speed', () => {
++    expect(what({ speedKmh: 129, limitKmh: 130 })).not.toContain('limita')
++  })
++  it('tailgating and congestion without a speed print no unit', () => {
++    expect(what({ type: 'tailgating' })).toBe('Sistemul a semnalat un autoturism care circula prea aproape de vehiculul din față' + TAIL)
++    expect(what({ type: 'congestion', speedKmh: null })).toBe('Sistemul a semnalat trafic aglomerat' + TAIL)
++  })
++  it('unknown object class, camera and time', () => {
++    const summary = summarizeAlert({ type: 'wrong_way', status: 'new', at: 'not a date', cameraName: '  ' }, NOW)
++    expect(summary.what).toBe('Sistemul a semnalat un vehicul care se deplasa pe contrasens.')
++    Object.values(summary).forEach(clean)
++  })
++  it('unknown type falls back to its label and the rule text', () => {
++    const summary = summarizeAlert({ ...base, type: 'red_light', typeLabel: 'Trecere pe roșu', rule: 'Vehicul în intersecție pe roșu.' }, NOW)
++    expect(summary.what).toBe('Sistemul a semnalat un eveniment de tip „Trecere pe roșu”' + TAIL)
++    expect(summary.why).toBe('Regula care a declanșat alerta: Vehicul în intersecție pe roșu.')
++  })
++  it('unknown type with nothing else known', () => {
++    const summary = summarizeAlert({ type: '', status: 'new' }, NOW)
++    expect(summary.what).toBe('Sistemul a semnalat un eveniment rutier.')
++    expect(summary.why).toBe('S-a îndeplinit o regulă configurată pentru această cameră.')
++    expect(summarizeAlert({ type: 'red_light', status: 'new' }, NOW).what).toBe('Sistemul a semnalat un eveniment de tip „red light”.')
++    Object.values(summary).forEach(clean)
++  })
++})
++
++describe('summarizeAlert: next step', () => {
++  it('undecided alerts ask for a human decision', () => {
++    for (const status of ['new', 'in_review']) {
++      expect(summarizeAlert({ ...base, status }, NOW).next)
++        .toBe('Verifică clipul și confirmă sau respinge alerta. Sistemul nu trimite singur echipaje și nu dă amenzi; decizia este a omului.')
++    }
++  })
++  it('says who decided and when', () => {
++    expect(summarizeAlert({ ...base, status: 'confirmed', decidedBy: 'operator', decidedAt: iso(13, 14, 40) }, NOW).next)
++      .toBe('Alerta a fost confirmată de operator, azi la 14:40. Decizia a fost luată de un om și rămâne în jurnal. Sistemul nu trimite singur echipaje și nu dă amenzi.')
++    expect(summarizeAlert({ ...base, status: 'rejected', decidedBy: 'admin', decidedAt: iso(12, 9, 5) }, NOW).next)
++      .toMatch(/^Alerta a fost respinsă de admin, ieri la 09:05\./)
++  })
++  it('a decision without author or time stays a clean sentence', () => {
++    expect(summarizeAlert({ ...base, status: 'closed' }, NOW).next).toMatch(/^Dosarul alertei a fost închis\. /)
++    expect(summarizeAlert({ ...base, status: 'confirmed', decidedAt: 'x' }, NOW).next).toMatch(/^Alerta a fost confirmată\. /)
++  })
++})
++
++describe('whenPhrase', () => {
++  it('today, yesterday, older, invalid', () => {
++    expect(whenPhrase(iso(13, 0, 7), NOW)).toBe('azi la 00:07')
++    expect(whenPhrase(iso(12, 23, 59), NOW)).toBe('ieri la 23:59')
++    expect(whenPhrase(iso(2, 8, 30), NOW)).toBe('pe 02.11.2026 la 08:30')
++    expect(whenPhrase(undefined, NOW)).toBeNull()
++    expect(whenPhrase('', NOW)).toBeNull()
++  })
++})
+diff --git a/frontend/src/lib/alertSummary.ts b/frontend/src/lib/alertSummary.ts
+new file mode 100644
+index 0000000..641394a
+--- /dev/null
++++ b/frontend/src/lib/alertSummary.ts
+@@ -0,0 +1,162 @@
++// Plain-Romanian summary of an alert for the "Pe scurt" card: what happened, why the alarm
++// fired and what the dispatcher can do. Pure: everything comes in through the input.
++
++export interface AlertSummaryInput {
++  type: string
++  /** Label of the type, used only for a type this file does not know. */
++  typeLabel?: string
++  cameraName?: string
++  /** ISO timestamp of the event. */
++  at?: string
++  /** UI object class (autoturism, camion, autobuz, motocicleta, pieton, obiect). */
++  objectClass?: string
++  speedKmh?: number | null
++  limitKmh?: number | null
++  /** Technical rule text from the pipeline; quoted only for an unknown type. */
++  rule?: string
++  status: string
++  decidedBy?: string
++  decidedAt?: string
++}
++
++export interface AlertSummary {
++  what: string
++  why: string
++  next: string
++}
++
++const ALIASES: Record<string, string> = {
++  excessive_speed: 'very_high_speed',
++  high_speed: 'very_high_speed',
++  pedestrian_on_highway: 'pedestrian_highway',
++  emergency_lane_stop: 'stopped_emergency_lane',
++}
++
++// Accusative, indefinite: fits after "Sistemul a semnalat".
++const OBJECT: Record<string, string> = {
++  autoturism: 'un autoturism',
++  camion: 'un camion',
++  autobuz: 'un autobuz',
++  motocicleta: 'o motocicletă',
++}
++
++const kmh = (value?: number | null) =>
++  typeof value === 'number' && Number.isFinite(value) && value > 0 ? `${Math.round(value)} km/h` : null
++
++const sameDay = (a: Date, b: Date) =>
++  a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
++const two = (n: number) => String(n).padStart(2, '0')
++
++/** "azi la 14:32", "ieri la 14:32" or "pe 18.10.2026 la 14:32"; null for a missing or invalid date. */
++export function whenPhrase(iso: string | undefined, now: Date): string | null {
++  if (!iso) return null
++  const at = new Date(iso)
++  if (Number.isNaN(at.getTime())) return null
++  const time = `${two(at.getHours())}:${two(at.getMinutes())}`
++  if (sameDay(at, now)) return `azi la ${time}`
++  if (sameDay(at, new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1))) return `ieri la ${time}`
++  return `pe ${two(at.getDate())}.${two(at.getMonth() + 1)}.${at.getFullYear()} la ${time}`
++}
++
++interface Wording {
++  /** What the system flagged, without place and time. */
++  what: (vehicle: string, speed: string | null, limit: string | null) => string
++  why: string
++}
++
++const WORDING: Record<string, Wording> = {
++  very_high_speed: {
++    what: (v, speed, limit) =>
++      speed && limit ? `${v} care circula cu aproximativ ${speed} pe un tronson cu limita de ${limit}`
++        : speed ? `${v} care circula cu aproximativ ${speed}, peste pragul stabilit pentru această cameră`
++          : `${v} care circula cu o viteză peste pragul stabilit pentru această cameră`,
++    why: 'Viteza estimată a depășit pragul stabilit pentru această cameră.',
++  },
++  probable_crash: {
++    what: (v) => `${v} care a frânat brusc și apoi s-a oprit pe carosabil, ceea ce poate însemna un accident`,
++    why: 'O frânare bruscă urmată de o oprire completă pe carosabil seamănă cu un accident și trebuie verificată de un om.',
++  },
++  pedestrian_on_road: {
++    what: () => 'o persoană pe carosabil',
++    why: 'O persoană a fost detectată într-o zonă destinată vehiculelor.',
++  },
++  pedestrian_highway: {
++    what: () => 'o persoană pe autostradă',
++    why: 'O persoană a fost detectată pe autostradă, unde pietonii nu au voie.',
++  },
++  wrong_way: {
++    what: (v) => `${v} care se deplasa pe contrasens`,
++    why: 'Vehiculul s-a deplasat câteva secunde împotriva sensului de mers stabilit pentru această bandă.',
++  },
++  stopped_on_road: {
++    what: (v) => `${v} care staționa pe carosabil`,
++    why: 'Vehiculul a stat pe loc, pe carosabil, mai mult decât timpul stabilit pentru această cameră.',
++  },
++  stopped_emergency_lane: {
++    what: (v) => `${v} care staționa pe banda de urgență`,
++    why: 'Vehiculul a stat pe loc, pe banda de urgență, mai mult decât timpul stabilit pentru această cameră.',
++  },
++  road_object: {
++    what: () => 'un obiect pe carosabil',
++    why: 'Un obiect nemișcat a fost detectat pe partea carosabilă.',
++  },
++  near_miss: {
++    what: (v) => `${v} care a trecut foarte aproape de un alt participant la trafic`,
++    why: 'Doi participanți la trafic au ajuns la o distanță foarte mică unul de celălalt.',
++  },
++  hard_braking: {
++    what: (v) => `${v} care a frânat brusc`,
++    why: 'Viteza vehiculului a scăzut mult într-un timp foarte scurt.',
++  },
++  tailgating: {
++    what: (v, speed) => `${v} care circula prea aproape de vehiculul din față${speed ? `, la aproximativ ${speed}` : ''}`,
++    why: 'Distanța față de vehiculul din față a rămas sub pragul de siguranță stabilit pentru această cameră.',
++  },
++  dangerous_lane_change: {
++    what: (v) => `${v} care a schimbat brusc banda, cu un alt vehicul foarte aproape`,
++    why: 'Vehiculul s-a mutat rapid pe altă bandă în timp ce un alt vehicul se afla foarte aproape.',
++  },
++  congestion: {
++    what: (_v, speed) => `trafic aglomerat${speed ? `, cu o viteză medie de aproximativ ${speed}` : ''}`,
++    why: 'Multe vehicule au circulat încet pe aceeași porțiune de drum, mai mult timp decât pragul stabilit.',
++  },
++  road_conditions: {
++    what: () => 'condiții de drum care pot îngreuna circulația',
++    why: 'Imaginile indică vizibilitate redusă sau carosabil alunecos.',
++  },
++}
++
++const NO_AUTOMATION = 'Sistemul nu trimite singur echipaje și nu dă amenzi'
++
++export function summarizeAlert(input: AlertSummaryInput, now: Date = new Date()): AlertSummary {
++  const wording = WORDING[ALIASES[input.type] ?? input.type]
++  const vehicle = OBJECT[input.objectClass ?? ''] ?? 'un vehicul'
++  const speed = kmh(input.speedKmh)
++  const limitValue = kmh(input.limitKmh)
++  // A limit at or above the estimated speed would contradict the sentence; leave it out.
++  const limit = speed && limitValue && (input.speedKmh ?? 0) > (input.limitKmh ?? 0) ? limitValue : null
++
++  const label = (input.typeLabel || input.type || '').replace(/_/g, ' ').trim()
++  const subject = wording ? wording.what(vehicle, speed, limit)
++    : label ? `un eveniment de tip „${label}”` : 'un eveniment rutier'
++  const camera = input.cameraName?.trim()
++  const at = whenPhrase(input.at, now)
++  const what = `Sistemul a semnalat ${subject}${camera ? `, la camera ${camera}` : ''}${at ? `, ${at}` : ''}.`
++
++  const rule = input.rule?.trim()
++  const why = wording?.why
++    ?? (rule ? `Regula care a declanșat alerta: ${rule.replace(/\.$/, '')}.` : 'S-a îndeplinit o regulă configurată pentru această cameră.')
++
++  const decision = input.status === 'confirmed' ? 'Alerta a fost confirmată'
++    : input.status === 'rejected' ? 'Alerta a fost respinsă'
++      : input.status === 'closed' ? 'Dosarul alertei a fost închis' : null
++  if (!decision) {
++    return { what, why, next: `Verifică clipul și confirmă sau respinge alerta. ${NO_AUTOMATION}; decizia este a omului.` }
++  }
++  const by = input.decidedBy?.trim()
++  const decidedAt = whenPhrase(input.decidedAt, now)
++  return {
++    what, why,
++    next: `${decision}${by ? ` de ${by}` : ''}${decidedAt ? `, ${decidedAt}` : ''}. Decizia a fost luată de un om și rămâne în jurnal. ${NO_AUTOMATION}.`,
++  }
++}
+diff --git a/frontend/src/pages/AlertDetailPage.tsx b/frontend/src/pages/AlertDetailPage.tsx
+index d4e788b..02fefd3 100644
+--- a/frontend/src/pages/AlertDetailPage.tsx
++++ b/frontend/src/pages/AlertDetailPage.tsx
+@@ -8,7 +8,8 @@ import { ContextStrip, FollowupsPanel, LegalHoldPanel, RelatedPanel } from '@/co
+ import { useDataStore, decide, loadDetail, reportError, cameraById } from '@/store/data'
+ import { useCan } from '@/hooks'
+ import { useAuditStore } from '@/store/audit'
+-import { AUDIT_ACTION_LABEL } from '@/lib/constants'
++import { ALERT_TYPE, AUDIT_ACTION_LABEL } from '@/lib/constants'
++import { summarizeAlert } from '@/lib/alertSummary'
+ import { SeverityBadge } from '@/components/SeverityBadge'
+ import { StatusBadge } from '@/components/ui'
+ import { EvidencePlayer } from '@/components/EvidencePlayer'
+@@ -127,6 +128,12 @@ export default function AlertDetailPage() {
+   const prov = dossier?.provenance
+   const card = 'bg-[#111821] border border-[#1E2A36] rounded-md p-3.5'
+   const cardTitle = "font-sans font-bold text-xs uppercase tracking-wider text-[#7D8A9B] mb-2"
++  const summary = summarizeAlert({
++    type: alert.type, typeLabel: ALERT_TYPE[alert.type].label, cameraName: cam?.name, at: alert.createdAt,
++    objectClass: alert.metrics.vehicleClass, speedKmh: alert.metrics.speedKmh, limitKmh: alert.metrics.speedLimitKmh,
++    rule: alert.ruleSummary, status: alert.status, decidedBy: alert.decidedBy, decidedAt: alert.decidedAt,
++  })
++  const viewers = [...new Set(alert.viewedBy)]
+ 
+   return (
+     <div className="h-full flex flex-col p-4 gap-3 overflow-y-auto bg-[#0A0E14] text-[#E6EDF3]">
+@@ -171,8 +178,25 @@ export default function AlertDetailPage() {
+         </div>
+ 
+         {/* Human decision, context, history */}
+-        <div className="col-span-12 md:col-span-4 flex flex-col gap-3 min-h-0 overflow-hidden">
+-          <div className={card}>
++        <div className="col-span-12 md:col-span-4 flex flex-col gap-3 min-h-0 overflow-y-auto">
++          <section className={`${card} border-l-2 border-l-[#3DA5FF] shrink-0`} data-testid="plain-summary" aria-label="Pe scurt">
++            <div className={cardTitle}>Pe scurt</div>
++            <dl className="space-y-2 text-[13px] leading-snug">
++              {([['Ce s-a întâmplat', summary.what], ['De ce a sunat alarma', summary.why], ['Ce poate face dispecerul', summary.next]] as const).map(([label, text]) => (
++                <div key={label}>
++                  <dt className="text-[11px] font-semibold text-[#3DA5FF]">{label}</dt>
++                  <dd className="text-[#E6EDF3]">{text}</dd>
++                </div>
++              ))}
++            </dl>
++            {viewers.length > 0 && (
++              <p className="mt-2.5 pt-2 border-t border-[#1E2A36] text-[11px] text-[#7D8A9B]" data-testid="evidence-viewers">
++                Cine a văzut dovada: <span className="text-[#E6EDF3]">{viewers.join(', ')}</span>
++              </p>
++            )}
++          </section>
++
++          <div className={`${card} shrink-0`}>
+             <div className={`${cardTitle} flex items-center gap-1.5`}><UserCheck size={13} /> Verificare umană</div>
+             {decided ? (
+               <div className="text-xs">
+@@ -235,7 +259,7 @@ export default function AlertDetailPage() {
+             )}
+           </div>
+ 
+-          <div className={card}>
++          <div className={`${card} shrink-0`}>
+             <div className={cardTitle}>Context</div>
+             <dl className="grid grid-cols-3 gap-y-1.5 text-xs">
+               <dt className="text-[#7D8A9B]">Cameră</dt>
+@@ -259,11 +283,11 @@ export default function AlertDetailPage() {
+                 <>
+                   <dt className="text-[#7D8A9B]">Sursă</dt>
+                   <dd className="col-span-2" title={prov.source_basis} data-testid="source-kind">
+-                    {prov.source_kind === 'live' ? 'Flux live' : prov.source_kind === 'recorded_replay' ? 'Înregistrare redată (replay)' : 'Necunoscută (live sau replay nu este raportat)'}
++                    {prov.source_kind === 'live' ? 'Flux în direct' : prov.source_kind === 'recorded_replay' ? 'Înregistrare, nu flux în direct' : 'Necunoscută (nu se știe dacă este înregistrare sau flux în direct)'}
+                   </dd>
+                   <dt className="text-[#7D8A9B]">Model</dt>
+                   <dd className="col-span-2" data-testid="model-status">
+-                    {prov.model_status === 'recorded' ? `${prov.model_id ?? ''} ${prov.model_hash ? `· ${prov.model_hash.slice(0, 12)}` : ''}` : 'Neînregistrat · model nevalidat pentru acest caz'}
++                    {prov.model_status === 'recorded' ? `${prov.model_id ?? ''} ${prov.model_hash ? `· ${prov.model_hash.slice(0, 12)}` : ''}` : 'Model în evaluare, neverificat pe date etichetate de om'}
+                   </dd>
+                 </>
+               )}
+@@ -277,7 +301,7 @@ export default function AlertDetailPage() {
+           </div>
+ 
+           {dossier ? <HistoryPanel dossier={dossier} /> : (
+-          <div className={`${card} flex-1 min-h-0 overflow-hidden`}>
++          <div className={`${card} shrink-0`}>
+             <div className={cardTitle}>Istoric · audit</div>
+             <ol className="relative border-l border-[#1E2A36] ml-1.5 space-y-2">
+               {timeline.map((step, idx) => (
+diff --git a/frontend/src/pages/LandingPage.tsx b/frontend/src/pages/LandingPage.tsx
+new file mode 100644
+index 0000000..8b947a2
+--- /dev/null
++++ b/frontend/src/pages/LandingPage.tsx
+@@ -0,0 +1,93 @@
++import { Link } from 'react-router'
++import { ArrowRight, BellRing, Cctv, ChevronRight, ScanSearch, UserCheck } from 'lucide-react'
++import { Logo } from '@/assets/brand/Logo'
++
++const POINTS = [
++  {
++    title: 'Ce este',
++    text: 'Camerele rutiere existente devin ochi care anunță dispecerul în câteva secunde atunci când pe drum apare un pericol.',
++  },
++  {
++    title: 'Cine decide',
++    text: 'Omul confirmă sau respinge fiecare alertă, după ce vede clipul; sistemul doar semnalează.',
++  },
++  {
++    title: 'Viața privată',
++    text: 'Fără recunoaștere facială; fețele și numerele de înmatriculare pot fi estompate, iar fiecare vizualizare rămâne în jurnal.',
++  },
++]
++
++const STEPS = [
++  { icon: Cctv, title: 'Cameră', text: 'O cameră rutieră existentă filmează drumul.' },
++  { icon: ScanSearch, title: 'Detecție automată', text: 'Programul urmărește vehiculele și observă situațiile periculoase.' },
++  { icon: BellRing, title: 'Alertă cu clip', text: 'Dispecerul primește alerta împreună cu un clip scurt.' },
++  { icon: UserCheck, title: 'Decizia dispecerului', text: 'Omul vede clipul și confirmă sau respinge alerta.' },
++]
++
++/** Public first screen: what the product is, in plain words, before the login form. */
++export default function LandingPage() {
++  return (
++    <div className="h-full overflow-y-auto bg-[#0A0E14] text-[#E6EDF3] font-sans select-text">
++      <div className="min-h-full max-w-6xl mx-auto px-6 lg:px-10 py-5 flex flex-col gap-5">
++        <header className="flex items-center justify-between gap-4 shrink-0">
++          <Logo variant="full" size={36} />
++          <span className="px-2.5 py-1 rounded border border-[#FFC23D]/50 text-[#FFC23D] font-mono text-[11px] uppercase tracking-wider">
++            Prototip demonstrativ
++          </span>
++        </header>
++
++        <main className="flex-1 flex flex-col justify-center gap-7">
++          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
++            <div className="lg:col-span-5">
++              <p className="font-mono text-xs uppercase tracking-widest text-[#7D8A9B] mb-3">Dispecerat rutier asistat de inteligență artificială</p>
++              <h1 className="text-4xl xl:text-5xl font-bold tracking-tight leading-[1.1]">
++                Camerele observă drumul. <span className="text-[#3DA5FF]">Omul decide.</span>
++              </h1>
++              <Link
++                to="/login"
++                className="mt-7 inline-flex items-center gap-2 px-6 py-3 rounded-md bg-[#3DA5FF] text-[#0A0E14] font-bold text-base tracking-wider uppercase hover:bg-[#2C94F0] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E6EDF3]"
++              >
++                Intră în aplicație <ArrowRight size={18} />
++              </Link>
++            </div>
++
++            <dl className="lg:col-span-7 flex flex-col gap-2.5">
++              {POINTS.map((point) => (
++                <div key={point.title} className="bg-[#111821] border border-[#1E2A36] border-l-2 border-l-[#3DA5FF] rounded-md px-4 py-3">
++                  <dt className="text-xs font-bold uppercase tracking-wider text-[#3DA5FF]">{point.title}</dt>
++                  <dd className="mt-1 text-[15px] leading-snug">{point.text}</dd>
++                </div>
++              ))}
++            </dl>
++          </div>
++
++          <section aria-labelledby="landing-steps">
++            <h2 id="landing-steps" className="font-bold text-xs uppercase tracking-wider text-[#7D8A9B] mb-2.5">Cum funcționează, în patru pași</h2>
++            <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
++              {STEPS.map((step, index) => (
++                <li key={step.title} className="relative bg-[#17202B] border border-[#1E2A36] rounded-md p-4">
++                  <div className="flex items-center gap-3">
++                    <span className="w-10 h-10 rounded-md bg-[#0A0E14] border border-[#1E2A36] flex items-center justify-center text-[#3DA5FF] shrink-0">
++                      <step.icon size={20} />
++                    </span>
++                    <span className="font-mono text-xs text-[#7D8A9B]">Pasul {index + 1}</span>
++                  </div>
++                  <div className="mt-3 font-bold text-base">{step.title}</div>
++                  <p className="mt-1 text-[13px] leading-snug text-[#7D8A9B]">{step.text}</p>
++                  {index < STEPS.length - 1 && (
++                    <ChevronRight size={22} aria-hidden="true" className="hidden lg:block absolute -right-[23px] top-1/2 -translate-y-1/2 text-[#3DA5FF]" />
++                  )}
++                </li>
++              ))}
++            </ol>
++          </section>
++        </main>
++
++        <footer className="shrink-0 border-t border-[#1E2A36] pt-3 text-[13px] text-[#7D8A9B]">
++          <span className="text-[#FFC23D] font-semibold">Prototip demonstrativ.</span>{' '}
++          Filmările sunt înregistrări de arhivă și fluxuri publice; precizia nu a fost încă măsurată pe date etichetate de om.
++        </footer>
++      </div>
++    </div>
++  )
++}
+diff --git a/frontend/src/pages/StatsPage.tsx b/frontend/src/pages/StatsPage.tsx
+index d220b9d..4ee3c57 100644
+--- a/frontend/src/pages/StatsPage.tsx
++++ b/frontend/src/pages/StatsPage.tsx
+@@ -1,8 +1,10 @@
+ import { useMemo } from "react";
+-import { Download, ArrowUpRight, ArrowDownRight } from "lucide-react";
++import { Download, Printer } from "lucide-react";
+ import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
+ import { useDataStore, cameraById } from "@/store/data";
+ import { ALERT_TYPE } from "@/lib/constants";
++import { fmtDateTime } from "@/lib/format";
++import { ActivityReport } from "@/components/ActivityReport";
+ 
+ const DAYS = ["Lun", "Mar", "Mie", "Joi", "Vin", "Sâm", "Dum"];
+ const HOURS = Array.from({ length: 24 }, (_, i) => i);
+@@ -14,9 +16,7 @@ export default function StatsPage() {
+     const total = alerts.length;
+     const confirmed = alerts.filter((a) => a.status === "confirmed" || a.status === "closed").length;
+     const rejected = alerts.filter((a) => a.status === "rejected").length;
+-    const decided = confirmed + rejected;
+-    const reaction = alerts.filter((a) => a.decidedAt).map((a) => (new Date(a.decidedAt!).getTime() - new Date(a.createdAt).getTime()) / 1000).filter((x) => x >= 0);
+-    const avg = reaction.length ? reaction.reduce((x, y) => x + y, 0) / reaction.length : null;
++    const pending = total - confirmed - rejected;
+     const sev = { critical: 0, high: 0, medium: 0, info: 0 } as Record<string, number>;
+     const byType: Record<string, number> = {};
+     const byCam: Record<string, { count: number; worst: number }> = {};
+@@ -30,27 +30,37 @@ export default function StatsPage() {
+       const d = new Date(a.createdAt);
+       heat[(d.getDay() + 6) % 7][d.getHours()]++;
+     }
+-    const pct = (n: number) => (total ? Math.round((n / total) * 100) : 0);
+     const gravity = [
+-      { name: "Critic", value: sev.critical, color: "#FF3B3B", label: `Critic (${pct(sev.critical)}%)` },
+-      { name: "Ridicat", value: sev.high, color: "#FF8A1F", label: `Ridicat (${pct(sev.high)}%)` },
+-      { name: "Mediu", value: sev.medium, color: "#FFC23D", label: `Mediu (${pct(sev.medium)}%)` },
+-      { name: "Info", value: sev.info, color: "#3DA5FF", label: `Info (${pct(sev.info)}%)` },
++      { name: "Critic", value: sev.critical, color: "#FF3B3B", label: `Critic · ${sev.critical}` },
++      { name: "Ridicat", value: sev.high, color: "#FF8A1F", label: `Ridicat · ${sev.high}` },
++      { name: "Mediu", value: sev.medium, color: "#FFC23D", label: `Mediu · ${sev.medium}` },
++      { name: "Info", value: sev.info, color: "#3DA5FF", label: `Info · ${sev.info}` },
+     ].filter((g) => g.value > 0);
+     const sevColor: Record<string, string> = { critical: "#FF3B3B", high: "#FF8A1F", medium: "#FFC23D", info: "#3DA5FF" };
+     const maxType = Math.max(1, ...Object.values(byType));
+-    const types = Object.entries(byType).sort((x, y) => y[1] - x[1]).slice(0, 6).map(([t, n]) => ({
++    const allTypes = Object.entries(byType).sort((x, y) => y[1] - x[1]).map(([t, n]) => ({
+       label: ALERT_TYPE[t as keyof typeof ALERT_TYPE]?.label ?? t, count: n, percentage: Math.round((n / maxType) * 100),
+       color: sevColor[ALERT_TYPE[t as keyof typeof ALERT_TYPE]?.severity ?? "info"],
+     }));
++    const types = allTypes.slice(0, 6);
+     const camColors = ["#3DA5FF", "#FFC23D", "#FF8A1F", "#FF3B3B"];
+     const cams = Object.entries(byCam).sort((x, y) => y[1].count - x[1].count).map(([id, v]) => ({
+-      camera: cameraById(id)?.name?.split(" – ")[0] ?? id, count: v.count, color: camColors[v.worst],
++      camera: cameraById(id)?.name?.split(" – ")[0] ?? id, fullName: cameraById(id)?.name ?? id, count: v.count, color: camColors[v.worst],
+     }));
+     const maxHeat = Math.max(1, ...heat.flat());
+-    return { total, confirmedPct: decided ? Math.round((confirmed / decided) * 100) : null, falsePct: decided ? Math.round((rejected / decided) * 100) : null, avg, gravity, types, cams, heat, maxHeat, decided };
++    const hours = HOURS.map((h) => heat.reduce((sum, day) => sum + day[h], 0));
++    const times = alerts.map((a) => new Date(a.createdAt).getTime()).filter((t) => Number.isFinite(t)).sort((x, y) => x - y);
++    const day = (t: number) => fmtDateTime(new Date(t).toISOString()).slice(0, 10);
++    const period = !times.length ? "nu există alerte în datele încărcate"
++      : day(times[0]) === day(times[times.length - 1]) ? day(times[0]) : `${day(times[0])} – ${day(times[times.length - 1])}`;
++    return { total, confirmed, rejected, pending, gravity, types, allTypes, cams, heat, maxHeat, hours, period };
+   }, [alerts]);
+-  const fmtAvg = (sec: number | null) => sec === null ? "—" : sec < 60 ? `${Math.round(sec)} s` : `${Math.floor(sec / 60)} min ${Math.round(sec % 60)} s`;
++  const totals = [
++    { label: "Total alerte", count: data.total, note: `din ${data.cams.length} camere` },
++    { label: "Alerte confirmate", count: data.confirmed, note: "decizia dispecerului" },
++    { label: "Alerte respinse", count: data.rejected, note: "decizia dispecerului" },
++    { label: "În așteptare", count: data.pending, note: "fără decizie încă" },
++  ];
+   const GRAVITY_DATA = data.gravity;
+   const ALERT_TYPES_DATA = data.types;
+   const CAMERAS_BAR_DATA = data.cams;
+@@ -59,11 +69,8 @@ export default function StatsPage() {
+   const handleExportCSV = () => {
+     const rows = [
+       ["Indicator", "Valoare"],
+-      ["Total alerte", String(data.total)],
+-      ["Alerte confirmate", data.confirmedPct === null ? "—" : `${data.confirmedPct}%`],
+-      ["Timp mediu reactie", fmtAvg(data.avg)],
+-      ["Alarme false", data.falsePct === null ? "—" : `${data.falsePct}%`],
+-      ...data.types.map((t) => [t.label, String(t.count)]),
++      ...totals.map((t) => [t.label, String(t.count)]),
++      ...data.allTypes.map((t) => [t.label, String(t.count)]),
+       ...data.cams.map((c) => [`Camera ${c.camera}`, String(c.count)]),
+     ];
+     const csvContent = "data:text/csv;charset=utf-8," + rows.map((r) => r.map((v) => `"${v}"`).join(",")).join("\n");
+@@ -96,76 +103,37 @@ export default function StatsPage() {
+         </div>
+ 
+         <div className="flex items-center gap-3">
++          <button
++            onClick={() => window.print()}
++            className="flex items-center gap-2 px-3.5 py-1.5 rounded-md bg-[#3DA5FF] hover:bg-[#2C94F0] text-xs text-[#0A0E14] font-bold transition-colors cursor-pointer"
++          >
++            <span>Tipărește raportul</span>
++            <Printer className="w-3.5 h-3.5" />
++          </button>
+           {/* Export Report button */}
+           <button
+             onClick={handleExportCSV}
+             className="flex items-center gap-2 px-3.5 py-1.5 rounded-md bg-elevation hover:bg-border text-xs text-text-primary border border-border transition-colors font-medium"
+           >
+-            <span>Exportă raport</span>
++            <span>Exportă CSV</span>
+             <Download className="w-3.5 h-3.5 text-text-secondary" />
+           </button>
+         </div>
+       </div>
+ 
+-      {/* Row 1: 4 Top KPI Cards */}
++      {/* Row 1: plain counts; no percentage that could read as an accuracy figure */}
+       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+-        {/* KPI 1: TOTAL ALERTE */}
+-        <div className="rounded-md bg-panel border border-border p-4 flex flex-col justify-between">
+-          <div className="flex items-center justify-between text-xs font-mono text-text-secondary uppercase">
+-            <span>TOTAL ALERTE</span>
+-            <ArrowUpRight className="w-4 h-4 text-accent" />
+-          </div>
+-          <div className="mt-2 flex items-baseline gap-2">
+-            <span className="font-heading text-4xl font-bold text-text-primary tracking-tight">
+-              {data.total.toLocaleString("ro-RO")}
+-            </span>
+-            <span className="text-[11px] font-mono text-text-secondary">
+-              din {data.cams.length} camere
+-            </span>
+-          </div>
+-        </div>
+-
+-        {/* KPI 2: ALERTĂ CONFIRMATE */}
+-        <div className="rounded-md bg-panel border border-border p-4 flex flex-col justify-between">
+-          <div className="flex items-center justify-between text-xs font-mono text-text-secondary uppercase">
+-            <span>ALERTĂ CONFIRMATE</span>
+-            <ArrowUpRight className="w-4 h-4 text-emerald-400" />
+-          </div>
+-          <div className="mt-2 flex items-baseline gap-3">
+-            <span className="font-heading text-4xl font-bold text-text-primary tracking-tight">
+-              {data.confirmedPct === null ? "—" : `${data.confirmedPct}%`}
+-            </span>
+-            <span className="text-[11px] font-mono text-text-secondary">
+-              din {data.decided} decise
+-            </span>
+-          </div>
+-        </div>
+-
+-        {/* KPI 3: TIMP MEDIU REACȚIE */}
+-        <div className="rounded-md bg-panel border border-border p-4 flex flex-col justify-between">
+-          <div className="flex items-center justify-between text-xs font-mono text-text-secondary uppercase">
+-            <span>TIMP MEDIU REACȚIE</span>
+-            <ArrowUpRight className="w-4 h-4 text-emerald-400" />
+-          </div>
+-          <div className="mt-2">
+-            <span className="font-heading text-4xl font-bold text-text-primary tracking-tight">
+-              {fmtAvg(data.avg)}
+-            </span>
+-          </div>
+-        </div>
+-
+-        {/* KPI 4: ALARME FALSE */}
+-        <div className="rounded-md bg-panel border border-border p-4 flex flex-col justify-between">
+-          <div className="flex items-center justify-between text-xs font-mono text-text-secondary uppercase">
+-            <span>ALARME FALSE</span>
+-            <ArrowDownRight className="w-4 h-4 text-emerald-400" />
+-          </div>
+-          <div className="mt-2">
+-            <span className="font-heading text-4xl font-bold text-text-primary tracking-tight">
+-              {data.falsePct === null ? "—" : `${data.falsePct}%`}
+-            </span>
++        {totals.map((kpi) => (
++          <div key={kpi.label} className="rounded-md bg-panel border border-border p-4 flex flex-col justify-between">
++            <div className="text-xs font-mono text-text-secondary uppercase">{kpi.label}</div>
++            <div className="mt-2 flex items-baseline gap-2">
++              <span className="font-heading text-4xl font-bold text-text-primary tracking-tight">
++                {kpi.count.toLocaleString("ro-RO")}
++              </span>
++              <span className="text-[11px] font-mono text-text-secondary">{kpi.note}</span>
++            </div>
+           </div>
+-        </div>
++        ))}
+       </div>
+ 
+       {/* Row 2: Middle Charts */}
+@@ -280,24 +248,16 @@ export default function StatsPage() {
+         <div className="rounded-md bg-panel border border-border p-4 flex flex-col justify-between overflow-x-auto">
+           <div className="flex items-center justify-between text-xs font-mono uppercase text-text-secondary font-semibold mb-2">
+             <span>Distribuție oră × zi</span>
+-            <span className="text-[10px] text-text-secondary">Inter 00–23</span>
++            <span className="text-[10px] text-text-secondary">Interval orar 00–23</span>
+           </div>
+ 
+           <div className="min-w-[500px]">
+             <div className="flex items-center pl-8 mb-1 gap-1">
+-              {HOURS.map((h) => {
+-                const isHighlight = h === 17 || h === 18;
+-                return (
+-                  <div
+-                    key={h}
+-                    className={`flex-1 text-center text-[9px] font-mono ${
+-                      isHighlight ? "text-amber-400 font-bold" : "text-text-secondary"
+-                    }`}
+-                  >
+-                    {h < 10 ? `0${h}` : h}
+-                  </div>
+-                );
+-              })}
++              {HOURS.map((h) => (
++                <div key={h} className="flex-1 text-center text-[9px] font-mono text-text-secondary">
++                  {h < 10 ? `0${h}` : h}
++                </div>
++              ))}
+             </div>
+ 
+             <div className="space-y-1">
+@@ -330,6 +290,15 @@ export default function StatsPage() {
+           </div>
+         </div>
+       </div>
++
++      <ActivityReport
++        period={data.period}
++        generatedAt={fmtDateTime(new Date().toISOString()).slice(0, 16)}
++        totals={totals}
++        cameras={data.cams.map((c) => ({ label: c.fullName, count: c.count }))}
++        types={data.allTypes}
++        hours={data.hours}
++      />
+     </div>
+   );
+ }

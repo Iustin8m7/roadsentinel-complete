@@ -1,0 +1,675 @@
+diff --git a/.gitignore b/.gitignore
+index c179ed6..2f373cc 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -8,6 +8,8 @@ node_modules/
+ __pycache__/
+ .venv/
+ *.mp4
++# the one clip the public landing page plays (stock footage, 250 KB)
++!frontend/public/landing/*.mp4
+ data/
+ runs/
+ wandb/
+diff --git a/frontend/src/layouts/AppLayout.tsx b/frontend/src/layouts/AppLayout.tsx
+index 169e1ed..81bde24 100644
+--- a/frontend/src/layouts/AppLayout.tsx
++++ b/frontend/src/layouts/AppLayout.tsx
+@@ -286,9 +286,6 @@ export default function AppLayout() {
+               </NavLink>
+             </div>
+           )}
+-          <span className="font-mono text-[10px] text-[#536070] font-medium tracking-widest">
+-            v2.4
+-          </span>
+         </div>
+       </aside>
+ 
+diff --git a/frontend/src/lib/demo.ts b/frontend/src/lib/demo.ts
+index 85fb554..c432d89 100644
+--- a/frontend/src/lib/demo.ts
++++ b/frontend/src/lib/demo.ts
+@@ -127,29 +127,27 @@ export function demoAgo(alert: Alert) {
+ }
+ 
+ // ---------------------------------------------------------------- manual curation (MOCK)
+-// Reviewed by hand on the clips, 2026-10-18. The demo cameras have guessed calibrations,
+-// so the pipeline labelled close following as speeding and produced false positives.
++// Every clip on the production demo tenant was reviewed on 2026-11-10 (frame rate measured,
++// frames inspected). The demo cameras have guessed calibrations and the stock clips were
++// processed several times, so most rows are duplicates of one moment or false positives.
+ // Display-only: the backend keeps the original rows.
+ export const RECLASSIFY: Record<string, { type: Alert['type']; severity?: Alert['severity']; rule?: string }> = DEMO_CURATION ? {
+   '107': { type: 'tailgating', severity: 'high', rule: 'Distanță prea mică față de vehiculul din față (autostradă)' },
+-  '96': { type: 'tailgating', severity: 'high', rule: 'Distanță prea mică față de vehiculul din față' },
+   '99': { type: 'tailgating', severity: 'high', rule: 'Distanță prea mică față de vehiculul din față' },
+-  '100': { type: 'tailgating', severity: 'high', rule: 'Distanță prea mică față de vehiculul din față' },
+ } : {}
+-/** False positives and duplicates of the same moment from earlier pipeline runs. */
+-export const HIDDEN_IDS = new Set<string>(DEMO_CURATION ? [
+-  // highway: duplicates of #107/#121 and 129–134 km/h under the 130 km/h limit
+-  '106', '108', '111', '122', '123', '124', '125', '127',
+-  // bridge at night: single cars at normal speed, tiny off-road boxes
+-  '89', '91', '92', '93', '94', '95', '97', '98',
+-  // avenue: food cart / pedestrian boxes, duplicate scenes, bus stopping at the light
+-  '102', '105', '109', '112', '119', '120', '104', '113', '115', '114', '116',
+-  // congestion duplicate
+-  '128',
+-  // evidence lost in earlier redeploys; each is a duplicate of a newer run
+-  '1', '2', '3', '4', '5', '6', '7', '8', '67', '68', '69', '70', '71', '72', '73', '74', '75', '76', '77', '78',
+-  '79', '80', '81', '82', '83', '84', '85', '86', '87', '88',
+-] : [])
++/** The alerts whose clip plays smoothly and shows what the alert says:
++ *  highway 107 (close following) and 121 (154 km/h); underpass 126 (queue);
++ *  night bridge 90 and 187 (speeding on a 50 km/h road) and 99 (close following). */
++export const KEPT_IDS = new Set(['90', '99', '107', '121', '126', '187'])
++/** Last alert number covered by that review. A later alert is shown until it is reviewed. */
++export const REVIEWED_UP_TO = 193
++/** Hidden: repeats of a kept moment, the New York avenue clips (turns at a junction read as
++ *  lane changes, a bus at a red light read as a crash), speeds under the limit, and every
++ *  Piața Unirii clip (5 to 16 frames per second, trams read as crashes, speeds from a rough
++ *  calibration). */
++export const HIDDEN_IDS = new Set<string>(DEMO_CURATION
++  ? Array.from({ length: REVIEWED_UP_TO }, (_, i) => String(i + 1)).filter((id) => !KEPT_IDS.has(id))
++  : [])
+ export function curate(alert: Alert): Alert {
+   const fix = RECLASSIFY[alert.id]
+   return replay(fix ? { ...alert, type: fix.type, severity: fix.severity ?? alert.severity, ruleId: fix.type, ruleSummary: fix.rule ?? alert.ruleSummary } : alert)
+@@ -159,7 +157,7 @@ export function curate(alert: Alert): Alert {
+ // Alerts already decided in the backend, shown as new so the pitch can show a confirmation.
+ // The backend answers 409 (already decided); the decision is then kept in this tab only,
+ // so a page reload shows them as new again.
+-export const DEMO_UNDECIDED = new Set<string>(DEMO_CURATION ? ['99', '107', '118'] : [])
++export const DEMO_UNDECIDED = new Set<string>(DEMO_CURATION ? ['99', '107'] : [])
+ type LocalDecision = { status: 'confirmed' | 'rejected'; by: string; at: string; note?: string }
+ export const localDecisions = new Map<string, LocalDecision>()
+ 
+diff --git a/frontend/src/pages/CamerasPage.tsx b/frontend/src/pages/CamerasPage.tsx
+index 4380d7b..84c9484 100644
+--- a/frontend/src/pages/CamerasPage.tsx
++++ b/frontend/src/pages/CamerasPage.tsx
+@@ -91,8 +91,6 @@ export default function CamerasPage() {
+     };
+   }), [realCameras, alerts]);
+ 
+-  const onlineCount = cameras.filter(c => c.status === "online").length;
+-  const offlineCount = cameras.length - onlineCount;
+ 
+   return (
+     <div className="flex flex-col h-full overflow-hidden p-6 gap-5 bg-deep-void">
+@@ -103,7 +101,7 @@ export default function CamerasPage() {
+             Camere de trafic
+           </h1>
+           <div className="flex items-center gap-3 text-xs text-text-secondary mt-1 font-mono">
+-            <span>{onlineCount} online · {offlineCount} fără semnal</span>
++            <span>{cameras.length} camere configurate</span>
+             <span className="flex items-center gap-1 text-emerald-400">
+               <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block shadow-[0_0_8px_#2ED47A]" />
+               online
+diff --git a/frontend/src/pages/LandingPage.css b/frontend/src/pages/LandingPage.css
+new file mode 100644
+index 0000000..d69baa3
+--- /dev/null
++++ b/frontend/src/pages/LandingPage.css
+@@ -0,0 +1,337 @@
++/*
++ * Public first screen. It borrows from the road itself rather than from the dispatch console:
++ * road-paint white ground, asphalt text, the blue of Romanian information signs (and of the
++ * cap on county-road kilometre stones), the yellow of temporary signs, the amber the detector
++ * draws around a flagged vehicle. Type is Overpass, a descendant of the highway sign alphabet.
++ */
++@font-face {
++  font-family: 'Overpass';
++  src: url('/fonts/Overpass-LatinExt.woff2') format('woff2');
++  font-weight: 100 900;
++  font-style: normal;
++  font-display: swap;
++  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1E00-1E9F, U+20A0-20C0;
++}
++@font-face {
++  font-family: 'Overpass';
++  src: url('/fonts/Overpass-Latin.woff2') format('woff2');
++  font-weight: 100 900;
++  font-style: normal;
++  font-display: swap;
++  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+20AC, U+2122, U+2212;
++}
++
++.rs-landing {
++  --asfalt: #2b2f33;
++  --banda: #58616a;
++  --beton: #cfd5da;
++  --marcaj: #f3f5f6;
++  --hartie: #ffffff;
++  --indicator: #0a4da3;
++  --indicator-inchis: #083b7e;
++  --semnal: #f2a100;
++  --provizoriu: #ffd400;
++
++  height: 100%;
++  overflow-y: auto;
++  background: var(--marcaj);
++  color: var(--asfalt);
++  font-family: 'Overpass', ui-sans-serif, system-ui, sans-serif;
++  font-size: 18px;
++  line-height: 1.5;
++  user-select: text;
++}
++.rs-landing :focus-visible {
++  outline: 3px solid var(--semnal);
++  outline-offset: 3px;
++}
++.rs-landing-wrap {
++  max-width: 1320px;
++  margin: 0 auto;
++  padding: 0 24px;
++}
++
++/* ---------------------------------------------------------------- top bar */
++.rs-landing-top {
++  display: flex;
++  align-items: center;
++  justify-content: space-between;
++  gap: 16px;
++  padding-top: 20px;
++  padding-bottom: 20px;
++}
++.rs-landing-brand {
++  display: flex;
++  align-items: center;
++  gap: 12px;
++  font-weight: 800;
++  font-size: 22px;
++  letter-spacing: 0.01em;
++}
++/* A temporary-sign plate: the product is not finished, and the page says so in sign language. */
++.rs-landing-temp {
++  background: var(--provizoriu);
++  color: #1c1e20;
++  font-weight: 700;
++  font-size: 15px;
++  line-height: 1;
++  padding: 9px 12px 7px;
++  border-radius: 4px;
++  box-shadow: inset 0 0 0 2px #1c1e20;
++  white-space: nowrap;
++}
++
++/* ---------------------------------------------------------------- hero */
++.rs-landing-hero {
++  display: grid;
++  grid-template-columns: minmax(0, 1fr);
++  gap: 40px;
++  padding-top: 24px;
++  padding-bottom: 72px;
++}
++.rs-landing-title {
++  font-weight: 800;
++  font-size: clamp(2.25rem, 3.7vw, 3.5rem);
++  line-height: 1.04;
++  letter-spacing: -0.02em;
++  margin: 0;
++}
++.rs-landing-title span {
++  display: block;
++}
++.rs-landing-lede {
++  margin: 24px 0 0;
++  max-width: 30em;
++  font-size: 20px;
++  line-height: 1.45;
++  color: var(--banda);
++}
++/* The way in is an information sign: blue plate, white keyline. */
++.rs-landing-sign {
++  display: inline-block;
++  margin-top: 32px;
++  padding: 16px 28px 13px;
++  background: var(--indicator);
++  color: #fff;
++  font-weight: 700;
++  font-size: 20px;
++  line-height: 1;
++  border-radius: 8px;
++  box-shadow: inset 0 0 0 3px var(--indicator), inset 0 0 0 5px #fff;
++  text-decoration: none;
++}
++.rs-landing-sign:hover {
++  background: var(--indicator-inchis);
++  box-shadow: inset 0 0 0 3px var(--indicator-inchis), inset 0 0 0 5px #fff;
++}
++
++.rs-landing-view {
++  position: relative;
++  margin: 0;
++}
++.rs-landing-clip {
++  display: block;
++  width: 100%;
++  aspect-ratio: 16 / 9;
++  object-fit: cover;
++  background: var(--asfalt);
++  border-radius: 6px;
++}
++.rs-landing-caption {
++  margin-top: 12px;
++  font-size: 15px;
++  color: var(--banda);
++}
++
++/* The alert as the dispatcher gets it. The visitor makes the call. */
++.rs-landing-slip {
++  margin-top: 16px;
++  padding: 18px 20px 20px 24px;
++  background: var(--hartie);
++  border-left: 6px solid var(--semnal);
++  border-radius: 4px;
++  box-shadow: 0 18px 36px -18px rgba(43, 47, 51, 0.55);
++}
++.rs-landing-slip[data-decision='confirmed'] {
++  border-left-color: var(--indicator);
++}
++.rs-landing-slip[data-decision='rejected'] {
++  border-left-color: var(--banda);
++}
++.rs-landing-slip h2 {
++  margin: 0;
++  font-size: 22px;
++  font-weight: 800;
++  line-height: 1.15;
++  letter-spacing: -0.01em;
++}
++.rs-landing-slip p {
++  margin: 8px 0 0;
++  font-size: 16px;
++  line-height: 1.4;
++}
++.rs-landing-ask {
++  font-weight: 700;
++}
++.rs-landing-choices {
++  display: flex;
++  flex-wrap: wrap;
++  gap: 10px;
++  margin-top: 12px;
++}
++.rs-landing-choice {
++  padding: 11px 16px 9px;
++  font: inherit;
++  font-size: 16px;
++  font-weight: 700;
++  line-height: 1;
++  color: #fff;
++  background: var(--asfalt);
++  border: 2px solid var(--asfalt);
++  border-radius: 4px;
++  cursor: pointer;
++}
++.rs-landing-choice:hover {
++  background: #1c1e20;
++}
++.rs-landing-choice[data-kind='quiet'] {
++  color: var(--asfalt);
++  background: transparent;
++}
++.rs-landing-choice[data-kind='quiet']:hover {
++  background: var(--marcaj);
++}
++
++@media (min-width: 1024px) {
++  .rs-landing-wrap {
++    padding: 0 40px;
++  }
++  .rs-landing-hero {
++    grid-template-columns: minmax(0, 11fr) minmax(0, 13fr);
++    gap: 56px;
++    align-items: start;
++    padding-top: 36px;
++    padding-bottom: 96px;
++  }
++  .rs-landing-pitch {
++    padding-top: 20px;
++  }
++  .rs-landing-slip {
++    position: absolute;
++    left: -32px;
++    bottom: -40px;
++    width: 316px;
++    margin-top: 0;
++  }
++  .rs-landing-caption {
++    padding-left: 304px;
++  }
++}
++
++/* ---------------------------------------------------------------- the road: four steps, in order */
++.rs-landing-road {
++  background: var(--asfalt);
++  color: #fff;
++  padding: 56px 0 64px;
++}
++.rs-landing-road h2 {
++  margin: 0 0 36px;
++  font-size: 32px;
++  font-weight: 800;
++  line-height: 1.1;
++  letter-spacing: -0.015em;
++}
++.rs-landing-steps {
++  position: relative;
++  display: grid;
++  grid-template-columns: minmax(0, 1fr);
++  gap: 32px;
++  margin: 0;
++  padding: 0;
++  list-style: none;
++}
++.rs-landing-stone {
++  display: block;
++  position: relative;
++  box-sizing: content-box;
++  width: 44px;
++  height: 56px;
++  padding-right: 16px;
++  background: var(--asfalt);
++  /* a gap in the dashes on the near side too */
++  box-shadow: -14px 0 0 var(--asfalt);
++}
++.rs-landing-steps h3 {
++  margin: 16px 0 0;
++  font-size: 22px;
++  font-weight: 700;
++  line-height: 1.2;
++}
++.rs-landing-steps p {
++  margin: 6px 0 0;
++  max-width: 17em;
++  font-size: 17px;
++  line-height: 1.4;
++  color: var(--beton);
++}
++@media (min-width: 900px) {
++  .rs-landing-steps {
++    grid-template-columns: repeat(4, minmax(0, 1fr));
++    gap: 32px;
++  }
++  /* Centre-line dashes running from the first stone to the last. */
++  .rs-landing-steps::before {
++    content: '';
++    position: absolute;
++    left: 0;
++    right: 0;
++    top: 36px;
++    height: 4px;
++    background: repeating-linear-gradient(90deg, #fff 0 34px, transparent 34px 60px);
++    opacity: 0.85;
++  }
++}
++
++/* ---------------------------------------------------------------- plain facts */
++.rs-landing-facts {
++  display: grid;
++  grid-template-columns: minmax(0, 1fr);
++  gap: 32px;
++  padding-top: 56px;
++  padding-bottom: 48px;
++}
++.rs-landing-facts h2 {
++  margin: 0;
++  font-size: 22px;
++  font-weight: 800;
++  line-height: 1.2;
++}
++.rs-landing-facts p {
++  margin: 8px 0 0;
++  max-width: 26em;
++  font-size: 17px;
++  line-height: 1.5;
++  color: var(--banda);
++}
++@media (min-width: 900px) {
++  .rs-landing-facts {
++    grid-template-columns: repeat(3, minmax(0, 1fr));
++    gap: 48px;
++  }
++}
++
++.rs-landing-foot {
++  padding-bottom: 40px;
++  font-size: 15px;
++  line-height: 1.5;
++  color: var(--banda);
++}
++.rs-landing-foot p {
++  margin: 0;
++  max-width: 62em;
++  padding-top: 20px;
++  border-top: 2px solid var(--beton);
++}
++.rs-landing-foot strong {
++  color: var(--asfalt);
++}
+diff --git a/frontend/src/pages/LandingPage.tsx b/frontend/src/pages/LandingPage.tsx
+index 00475de..8660086 100644
+--- a/frontend/src/pages/LandingPage.tsx
++++ b/frontend/src/pages/LandingPage.tsx
+@@ -1,15 +1,23 @@
++import { useState } from 'react'
+ import { Link } from 'react-router'
+-import { ArrowRight, BellRing, Cctv, ChevronRight, ScanSearch, UserCheck } from 'lucide-react'
+ import { Logo } from '@/assets/brand/Logo'
++import './LandingPage.css'
+ 
+-const POINTS = [
++const STEPS = [
++  { title: 'Cameră', text: 'O cameră rutieră existentă filmează drumul.' },
++  { title: 'Detecție automată', text: 'Programul urmărește vehiculele și observă situațiile periculoase.' },
++  { title: 'Alertă cu clip', text: 'Dispecerul primește alerta împreună cu un clip scurt.' },
++  { title: 'Decizia dispecerului', text: 'Omul vede clipul și confirmă sau respinge alerta.' },
++]
++
++const FACTS = [
+   {
+-    title: 'Ce este',
+-    text: 'Programul urmărește imaginile camerelor rutiere existente și îl anunță pe dispecer când pe drum pare să apară un pericol.',
++    title: 'Ce semnalează',
++    text: 'Viteză foarte mare, distanță prea mică între vehicule, ambuteiaj, vehicul oprit pe carosabil, mers pe contrasens, posibil accident.',
+   },
+   {
+     title: 'Cine decide',
+-    text: 'Omul confirmă sau respinge fiecare alertă, după ce vede clipul; sistemul doar semnalează.',
++    text: 'Omul confirmă sau respinge fiecare alertă, după ce vede clipul. Sistemul doar semnalează.',
+   },
+   {
+     title: 'Viața privată',
+@@ -17,77 +25,132 @@ const POINTS = [
+   },
+ ]
+ 
+-const STEPS = [
+-  { icon: Cctv, title: 'Cameră', text: 'O cameră rutieră existentă filmează drumul.' },
+-  { icon: ScanSearch, title: 'Detecție automată', text: 'Programul urmărește vehiculele și observă situațiile periculoase.' },
+-  { icon: BellRing, title: 'Alertă cu clip', text: 'Dispecerul primește alerta împreună cu un clip scurt.' },
+-  { icon: UserCheck, title: 'Decizia dispecerului', text: 'Omul vede clipul și confirmă sau respinge alerta.' },
+-]
++type Decision = 'confirmed' | 'rejected'
++const OUTCOME: Record<Decision, { title: string; text: string }> = {
++  confirmed: {
++    title: 'Alertă confirmată',
++    text: 'În aplicație, decizia rămâne în jurnal, cu numele dispecerului și ora.',
++  },
++  rejected: {
++    title: 'Alertă respinsă',
++    text: 'Sistemul doar semnalează. Ultimul cuvânt îl are omul, iar respingerea rămâne și ea în jurnal.',
++  },
++}
++
++/** County-road kilometre stone (white, blue cap) carrying the step number. */
++function Stone({ n }: { n: number }) {
++  return (
++    <span className="rs-landing-stone" aria-hidden="true">
++      <svg viewBox="0 0 44 56" width="44" height="56">
++        <path d="M4 56V20a18 18 0 0 1 36 0v36z" fill="#f3f5f6" />
++        <path d="M4 27v-7a18 18 0 0 1 36 0v7z" fill="#0a4da3" />
++        <text x="22" y="49" textAnchor="middle" fontSize="20" fontWeight="800" fill="#2b2f33">{n}</text>
++      </svg>
++    </span>
++  )
++}
+ 
+ /** Public first screen: what the product is, in plain words, before the login form. */
+ export default function LandingPage() {
+-  return (
+-    <div className="h-full overflow-y-auto bg-[#0A0E14] text-[#E6EDF3] font-sans select-text">
+-      <div className="min-h-full max-w-6xl mx-auto px-6 lg:px-10 py-5 flex flex-col gap-5">
+-        <header className="flex items-center justify-between gap-4 shrink-0">
+-          <Logo variant="full" size={36} />
+-          <span className="px-2.5 py-1 rounded border border-[#FFC23D]/50 text-[#FFC23D] font-mono text-[11px] uppercase tracking-wider">
+-            Prototip demonstrativ
+-          </span>
+-        </header>
++  const [decision, setDecision] = useState<Decision | null>(null)
++  // Someone who asked for less motion gets the still frame and the player's own controls.
++  const [still] = useState(() => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false)
+ 
+-        <main className="flex-1 flex flex-col justify-center gap-7">
+-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
+-            <div className="lg:col-span-5">
+-              <p className="font-mono text-xs uppercase tracking-widest text-[#7D8A9B] mb-3">Dispecerat rutier asistat de inteligență artificială</p>
+-              <h1 className="text-4xl xl:text-5xl font-bold tracking-tight leading-[1.1]">
+-                Camerele observă drumul. <span className="text-[#3DA5FF]">Omul decide.</span>
+-              </h1>
+-              <Link
+-                to="/login"
+-                className="mt-7 inline-flex items-center gap-2 px-6 py-3 rounded-md bg-[#3DA5FF] text-[#0A0E14] font-bold text-base tracking-wider uppercase hover:bg-[#2C94F0] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E6EDF3]"
+-              >
+-                Intră în aplicație <ArrowRight size={18} />
+-              </Link>
+-            </div>
++  return (
++    <div className="rs-landing">
++      <header className="rs-landing-wrap rs-landing-top">
++        <div className="rs-landing-brand">
++          <Logo size={38} />
++          RoadSentinel
++        </div>
++        <span className="rs-landing-temp">Prototip demonstrativ</span>
++      </header>
+ 
+-            <dl className="lg:col-span-7 flex flex-col gap-2.5">
+-              {POINTS.map((point) => (
+-                <div key={point.title} className="bg-[#111821] border border-[#1E2A36] border-l-2 border-l-[#3DA5FF] rounded-md px-4 py-3">
+-                  <dt className="text-xs font-bold uppercase tracking-wider text-[#3DA5FF]">{point.title}</dt>
+-                  <dd className="mt-1 text-[15px] leading-snug">{point.text}</dd>
+-                </div>
+-              ))}
+-            </dl>
++      <main>
++        <section className="rs-landing-wrap rs-landing-hero">
++          <div className="rs-landing-pitch">
++            <h1 className="rs-landing-title">
++              <span>Camerele observă drumul.</span>
++              <span>Omul decide.</span>
++            </h1>
++            <p className="rs-landing-lede">
++              RoadSentinel urmărește imaginile camerelor rutiere existente și îl anunță pe dispecer când pe drum pare să apară un pericol.
++            </p>
++            <Link to="/login" className="rs-landing-sign">Intră în aplicație</Link>
+           </div>
+ 
+-          <section aria-labelledby="landing-steps">
+-            <h2 id="landing-steps" className="font-bold text-xs uppercase tracking-wider text-[#7D8A9B] mb-2.5">Cum funcționează, în patru pași</h2>
+-            <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+-              {STEPS.map((step, index) => (
+-                <li key={step.title} className="relative bg-[#17202B] border border-[#1E2A36] rounded-md p-4">
+-                  <div className="flex items-center gap-3">
+-                    <span className="w-10 h-10 rounded-md bg-[#0A0E14] border border-[#1E2A36] flex items-center justify-center text-[#3DA5FF] shrink-0">
+-                      <step.icon size={20} />
+-                    </span>
+-                    <span className="font-mono text-xs text-[#7D8A9B]">Pasul {index + 1}</span>
++          <figure className="rs-landing-view">
++            <video
++              className="rs-landing-clip"
++              src="/landing/alerta-viteza.mp4"
++              poster="/landing/alerta-viteza.jpg"
++              autoPlay={!still}
++              controls={still}
++              loop
++              muted
++              playsInline
++              aria-label="Clip de exemplu: o autostradă văzută de sus; programul încadrează vehiculele, iar o mașină este marcată cu portocaliu."
++            />
++            <div className="rs-landing-slip" data-decision={decision ?? 'new'} data-testid="landing-alert" aria-live="polite">
++              {decision ? (
++                <>
++                  <h2>{OUTCOME[decision].title}</h2>
++                  <p>{OUTCOME[decision].text}</p>
++                  <div className="rs-landing-choices">
++                    <button type="button" className="rs-landing-choice" data-kind="quiet" onClick={() => setDecision(null)}>
++                      Mai încearcă o dată
++                    </button>
++                  </div>
++                </>
++              ) : (
++                <>
++                  <h2>Viteză foarte mare</h2>
++                  <p>Mașina marcată cu portocaliu circulă, după estimarea programului, cu aproximativ 150 km/h.</p>
++                  <p className="rs-landing-ask">Dumneavoastră decideți:</p>
++                  <div className="rs-landing-choices">
++                    <button type="button" className="rs-landing-choice" onClick={() => setDecision('confirmed')}>Confirmă</button>
++                    <button type="button" className="rs-landing-choice" data-kind="quiet" onClick={() => setDecision('rejected')}>Respinge</button>
+                   </div>
+-                  <div className="mt-3 font-bold text-base">{step.title}</div>
+-                  <p className="mt-1 text-[13px] leading-snug text-[#7D8A9B]">{step.text}</p>
+-                  {index < STEPS.length - 1 && (
+-                    <ChevronRight size={22} aria-hidden="true" className="hidden lg:block absolute -right-[23px] top-1/2 -translate-y-1/2 text-[#3DA5FF]" />
+-                  )}
++                </>
++              )}
++            </div>
++            <figcaption className="rs-landing-caption">
++              Exemplu dintr-o filmare de stoc, din altă țară. Viteza este estimată din imagine.
++            </figcaption>
++          </figure>
++        </section>
++
++        <section className="rs-landing-road" aria-labelledby="landing-steps">
++          <div className="rs-landing-wrap">
++            <h2 id="landing-steps">De la cameră la decizie</h2>
++            <ol className="rs-landing-steps">
++              {STEPS.map((step, index) => (
++                <li key={step.title}>
++                  <Stone n={index + 1} />
++                  <h3>{step.title}</h3>
++                  <p>{step.text}</p>
+                 </li>
+               ))}
+             </ol>
+-          </section>
+-        </main>
++          </div>
++        </section>
++
++        <section className="rs-landing-wrap rs-landing-facts">
++          {FACTS.map((fact) => (
++            <div key={fact.title}>
++              <h2>{fact.title}</h2>
++              <p>{fact.text}</p>
++            </div>
++          ))}
++        </section>
++      </main>
+ 
+-        <footer className="shrink-0 border-t border-[#1E2A36] pt-3 text-[13px] text-[#7D8A9B]">
+-          <span className="text-[#FFC23D] font-semibold">Prototip demonstrativ.</span>{' '}
++      <footer className="rs-landing-wrap rs-landing-foot">
++        <p>
++          <strong>Prototip demonstrativ.</strong>{' '}
+           Majoritatea filmărilor sunt imagini de stoc filmate în alte țări, așezate pe harta Iașului doar ca exemplu; un singur flux este real (Piața Unirii). Precizia detecției nu a fost încă măsurată.
+-        </footer>
+-      </div>
++        </p>
++      </footer>
+     </div>
+   )
+ }

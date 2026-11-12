@@ -1,0 +1,5 @@
+PASS existing integration: operator, MFA, dashboard/role destination, refresh, RBAC and logout
+PASS existing integration: tenant_admin, MFA, dashboard/role destination, refresh, RBAC and logout
+PASS existing integration: patrol, MFA, dashboard/role destination, refresh, RBAC and logout
+PASS existing integration: auditor, MFA, dashboard/role destination, refresh, RBAC and logout
+PASS existing integration: operator, MFA, dashboard/role destination, refresh, RBAC and logout

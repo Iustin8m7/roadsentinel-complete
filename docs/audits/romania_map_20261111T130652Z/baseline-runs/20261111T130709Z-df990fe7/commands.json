@@ -1,0 +1,44 @@
+[
+  {
+    "name": "test",
+    "command": [
+      "npm",
+      "run",
+      "test"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration/secure-pwa",
+    "start": "2026-11-11T13:07:09.481371+00:00",
+    "end": "2026-11-11T13:07:12.156710+00:00",
+    "duration_s": 2.675,
+    "exit_code": 0
+  },
+  {
+    "name": "lint",
+    "command": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration/secure-pwa",
+    "start": "2026-11-11T13:07:12.157056+00:00",
+    "end": "2026-11-11T13:07:16.881628+00:00",
+    "duration_s": 4.725,
+    "exit_code": 0
+  },
+  {
+    "name": "build",
+    "command": [
+      "npm",
+      "run",
+      "build",
+      "--",
+      "--outDir",
+      "/home/justin7m8/Documents/roadsentinel-integration/docs/audits/romania_map_20261111T130652Z/baseline-runs/20261111T130709Z-df990fe7/build"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration/secure-pwa",
+    "start": "2026-11-11T13:07:16.881931+00:00",
+    "end": "2026-11-11T13:07:20.655788+00:00",
+    "duration_s": 3.774,
+    "exit_code": 0
+  }
+]

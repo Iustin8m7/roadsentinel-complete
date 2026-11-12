@@ -1,0 +1,27 @@
+{
+  "identity": [
+    "rsint_20261110b",
+    "127.0.0.1",
+    55446,
+    "rsint_root_261110",
+    "7706309627307635180"
+  ],
+  "before_counts": {
+    "tenants": 3,
+    "users": 9,
+    "alerts": 0,
+    "evidence": 0,
+    "recordings": 1,
+    "location_revisions": 0
+  },
+  "created_at": "2026-11-11T23:45:20.514905+00:00",
+  "dump_sha256": "9fc1ed67b2e901d5499d167d701c765e9ca7578e60a62a0ae8d7e021638924af",
+  "evidence_sha256": {
+    "offline-analysis/1376c728-c374-4e2f-997d-0d831da4cd04/019cc696-4af1-440c-9fe9-4c735e3a892d/observations.rse": "8f9f8e5f57b922a87b089736db7c6985c76cc4a1b4564f948e93ffa26718e57e",
+    "offline-analysis/1376c728-c374-4e2f-997d-0d831da4cd04/019cc696-4af1-440c-9fe9-4c735e3a892d/output.rse": "1e43c0cb90f56adad466a40a4ff3b53747928472aebba3ea1c47e906aa888eec",
+    "offline-analysis/1376c728-c374-4e2f-997d-0d831da4cd04/12eea277-ce37-4a6e-9b8f-cac247c5e03a/source.rse": "70a88279f5dab6a15c4722066641fd779498fed40c4964e52399551c257bf977"
+  },
+  "rehearsal_database": "rsmission_rehearsal_89403b8be3",
+  "rehearsal_verified": true,
+  "live_upgraded": true
+}

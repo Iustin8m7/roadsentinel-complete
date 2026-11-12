@@ -1,0 +1,642 @@
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001, Initial schema: tenants, users, auth state, cameras, alerts, evidence, approvals, audit.
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 0002, Security layer: Row-Level Security, app-role grants, append-only audit log, auth lookups.
+INFO  [alembic.runtime.migration] Running upgrade 0002 -> 0003, Service accounts for signed pipeline ingestion; tighter grants on tenants.
+INFO  [alembic.runtime.migration] Running upgrade 0003 -> 0004, Fields of the API.md contract: camera slugs and timezones, public alert numbers, detection
+details, VLM verdicts, operator actions, and camera-level evidence (annotated recordings).
+INFO  [alembic.runtime.migration] Running upgrade 0004 -> 0005, Per-user MFA exemption (demo accounts): users.mfa_exempt, default false.
+INFO  [alembic.runtime.migration] Running upgrade 0005 -> 0006, Camera heartbeat: cameras.last_seen_at, set by the live pipeline.
+INFO  [alembic.runtime.migration] Running upgrade 0006 -> 0007, Evidence integrity: record whether a distinct original exists.
+INFO  [alembic.runtime.migration] Running upgrade 0007 -> 0008, New rule types, idempotent ingestion, camera rate status.
+INFO  [alembic.runtime.migration] Running upgrade 0008 -> 0009, Account recovery: four-eyes reset requests and single-use reset tokens.
+INFO  [alembic.runtime.migration] Running upgrade 0009 -> 0010, Retention: per-tenant policy per evidence kind, legal hold on alerts, purge marker on evidence.
+INFO  [alembic.runtime.migration] Running upgrade 0010 -> 0011, Patrol workflow status and first-view timestamp (for response-time statistics).
+INFO  [alembic.runtime.migration] Running upgrade 0011 -> 0012, Let the runtime role read alembic_version so /api/ready can tell whether the schema is migrated.
+INFO  [alembic.runtime.migration] Running upgrade 0012 -> 0013, User-owned saved archive searches with tenant RLS.
+INFO  [alembic.runtime.migration] Running upgrade 0013 -> 0014, Tenant-scoped offline recordings and durable analysis runs.
+INFO  [alembic.runtime.migration] Running upgrade 0014 -> 0015, Persist structured vehicle-observation artifact metadata.
+INFO  [alembic.runtime.migration] Running upgrade 0015 -> rsint_cam1, Camera control plane: lifecycle/source columns on cameras, processing grants, immutable
+config versions, worker status (lease) and a bounded health-event history.
+INFO  [alembic.runtime.migration] Running upgrade rsint_cam1 -> rsint_case1, Investigation workspace (Workstream B): case notes with append-only revisions, timeline
+bookmarks, evidence-package export jobs, user-owned saved archive filters; evidence gets
+``duration_s`` (from the MP4 header) and ``purged_at``/``purge_reason`` (explicit purge state).
+INFO  [alembic.runtime.migration] Running upgrade rsint_case1 -> rsint_run1, Camera runtime telemetry (Workstream D): bounded latency/memory/frozen-image metrics on the
+worker status row, a source identity fingerprint on cameras (what the backend registered) and on
+the worker status (what the lease holder reports it opened), and the per-camera, per-state
+failure-notification throttle marks.
+INFO  [alembic.runtime.migration] Running upgrade rsint_run1 -> rsint_case2, Investigation completion (Workstream B, lane E): explicit case links, structured follow-up
+items with an append-only history, manual legal holds; note revisions may carry the recorded
+detection box; export jobs count storage outages separately from attempts. The cross-tenant
+probe allow-list (``rs_resource_tenant``) is extended to every tenant table that the API looks
+up by id, including those of 0007, 0008 and this revision.
+INFO  [alembic.runtime.migration] Running upgrade rsint_case2 -> 0020, Require an RLS-bypassing owner for pre-tenant lookup functions.
+INFO  [alembic.runtime.migration] Running upgrade 0020 -> 0021, Align offline tenant indexes with ORM; additive only.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-7k1ihbws is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+Disposable test PostgreSQL identity: ('postgres', '127.0.0.1', 55479, 'postgres') target: rsmission_browser
+FWARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-7k1ihbws is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-7k1ihbws is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+F
+=================================== FAILURES ===================================
+__________ test_real_inference_recorded_candidate_to_encrypted_review __________
+
+world = World(platform=Unit(id=UUID('fbc75d0b-2656-4365-961d-38b0404356a0'), users={<Role.system_admin: 'system_admin'>: TUser...4-94f6d8866070'), 'evidence': UUID('e2c6fc14-9147-4853-bbdc-681bc06ead46'), 'plates': ['B00XYZ', 'B10XYZ', 'B20XYZ']}})
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-150/test_real_inference_recorded_c0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x770869967ec0>
+
+    @pytest.mark.skipif(
+        os.getenv("RS_MISSION_REAL") != "1", reason="explicit licensed fixture/model opt-in"
+    )
+    def test_real_inference_recorded_candidate_to_encrypted_review(world, tmp_path, monkeypatch):
+        from sqlalchemy import select
+    
+        from app.config import get_settings
+        from app.core.http import CSRF, cookie_name
+        from app.db import tenant_session
+        from app.main import create_app
+        from app.models import Alert, Evidence
+        from app.services.evidence import file_path
+    
+        cap = cv2.VideoCapture("/tmp/Street_traffic.webm")
+        ok, frame = cap.read()
+        cap.release()
+        assert ok
+        frame = cv2.resize(frame, (640, 360))
+        clip = tmp_path / "SYNTHETIC_TEST_frozen_licensed_frame.mp4"
+        writer = cv2.VideoWriter(str(clip), cv2.VideoWriter_fourcc(*"mp4v"), 5, (640, 360))
+        assert writer.isOpened()
+        for _ in range(180):
+            writer.write(frame)
+        writer.release()
+        with socket.socket() as sock:
+            sock.bind(("127.0.0.1", 0))
+            port = sock.getsockname()[1]
+        origin = f"http://127.0.0.1:{port}"
+        with socket.socket() as sock:
+            sock.bind(("127.0.0.1", 0))
+            ui_port = sock.getsockname()[1]
+        ui_origin = f"http://127.0.0.1:{ui_port}"
+        monkeypatch.setenv("RS_PUBLIC_ORIGIN", ui_origin)
+        monkeypatch.setenv("RS_COOKIE_SECURE", "false")
+        get_settings.cache_clear()
+        server = uvicorn.Server(
+            uvicorn.Config(create_app(), host="127.0.0.1", port=port, log_level="error")
+        )
+        thread = threading.Thread(target=server.run, daemon=True)
+        thread.start()
+        try:
+            deadline = time.monotonic() + 15
+            while not server.started and time.monotonic() < deadline:
+                time.sleep(0.05)
+            assert server.started
+            with httpx.Client(base_url=origin, timeout=60) as client:
+                client.get("/api/auth/csrf").raise_for_status()
+                client.headers.update(
+                    {"Origin": ui_origin, "X-CSRF-Token": client.cookies.get(cookie_name(CSRF))}
+                )
+                user = world.a.operator
+                r = client.post(
+                    "/api/auth/login", json={"email": user.email, "password": user.password}
+                )
+                assert r.status_code == 200, r.text
+                r = client.post("/api/auth/mfa/verify", json={"code": user.totp()})
+                assert r.status_code == 204, r.text
+                with clip.open("rb") as src:
+                    r = client.post("/api/recordings", files={"file": (clip.name, src, "video/mp4")})
+                assert r.status_code == 201, r.text
+                rid = r.json()["id"]
+                r = client.patch(
+                    f"/api/recordings/{rid}/crop",
+                    json={
+                        "x": 0,
+                        "y": 0,
+                        "width": 1,
+                        "height": 1,
+                        "confirmed": True,
+                        "expected_revision": 0,
+                    },
+                )
+                assert r.status_code == 200, r.text
+                r = client.post(
+                    f"/api/recordings/{rid}/analyses",
+                    json={
+                        "sample_fps": 2,
+                        "confidence": 0.3,
+                        "crop_revision": 1,
+                        "stationary_duration_s": 30,
+                        "queue_enabled": False,
+                    },
+                )
+                assert r.status_code == 202, r.text
+                run = r.json()["id"]
+                deadline = time.monotonic() + 180
+                while time.monotonic() < deadline:
+                    result = client.get(f"/api/analyses/{run}").json()
+                    if result["status"] not in ("queued", "running"):
+                        break
+                    time.sleep(0.5)
+                assert result["status"] == "completed", result
+                assert result["processed_frames"] >= 60
+                candidates = client.get(f"/api/recordings/{rid}/analyses/{run}/candidates")
+                assert candidates.status_code == 200, candidates.text
+                assert candidates.json()["candidates"], result["counts"]
+                path = f"/api/recordings/{rid}/analyses/{run}/candidates/0/promote"
+                r = client.post(
+                    path,
+                    json={
+                        "synthetic_test": True,
+                        "reason": "SYNTHETIC TEST: verify recorded-source review mechanics",
+                    },
+                )
+                assert r.status_code == 200, r.text
+                number = r.json()["id"]
+                assert (
+                    client.post(path, json={"reason": "Repeated test submission"}).json()["id"]
+                    == number
+                )
+                detail = client.get(f"/api/events/{number}")
+                assert detail.status_code == 200, detail.text
+                data = detail.json()
+                assert data["details"]["origin"] == "recorded_upload"
+                for key in ("keyframe_url", "clip_url"):
+                    response = client.get(data[key])
+                    assert response.status_code == 200, response.text[:200]
+                    assert len(response.content) > 200
+                r = client.post(
+                    f"/api/events/{number}/decision",
+                    json={"decision": "reject", "note": "Synthetic fixture; no real incident"},
+                )
+                assert r.status_code == 200, r.text
+                assert client.get(f"/api/events/{number}").json()["status"] == "rejected"
+                with tenant_session(world.a.id) as db:
+                    alert = db.scalar(select(Alert).where(Alert.number == number))
+                    media = db.scalars(select(Evidence).where(Evidence.alert_id == alert.id)).all()
+                    assert len(media) == 2
+                    assert all(
+                        file_path(e, "redacted").read_bytes()[:3] != b"\xff\xd8\xff" for e in media
+                    )
+                from app.models import Role
+                from tests.conftest import make_user
+    
+                browser_user = make_user(world.a.id, Role.operator, "browser@mission.local")
+>               root = Path(__file__).resolve().parents[2]
+                       ^^^^
+E               NameError: name 'Path' is not defined
+
+tests/test_mission_vertical.py:155: NameError
+------------------------------ Captured log call -------------------------------
+WARNING  app:main.py:63 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-7k1ihbws is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+________________ test_managed_replay_ack_preview_and_revocation ________________
+
+world = World(platform=Unit(id=UUID('155b1f07-db38-4c17-90d9-07f0acb0156b'), users={<Role.system_admin: 'system_admin'>: TUser...e-ecc38be2f69e'), 'evidence': UUID('f6737782-1721-4105-a371-8c5137f86d81'), 'plates': ['B00XYZ', 'B10XYZ', 'B20XYZ']}})
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-150/test_managed_replay_ack_previe0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7708b42376e0>
+login = <function login.<locals>._login at 0x7708b4264720>
+
+    @pytest.mark.skipif(os.getenv("RS_MISSION_REAL") != "1", reason="licensed model/media opt-in")
+    def test_managed_replay_ack_preview_and_revocation(world, tmp_path, monkeypatch, login):
+        from roadsentinel.replay import make_server
+    
+        from app.config import get_settings
+        from app.db import tenant_session
+        from app.main import create_app
+        from app.models import Camera, CameraConfigVersion, CameraSourceGrant, CameraWorkerStatus
+        from app.services import camera_config as cc
+        from app.services import camera_control as ctl
+        from app.services import ingest_auth
+        from app.services.keys import load_keyring
+    
+        root = Path(__file__).resolve().parents[2]
+        replay = make_server("/tmp/Street_traffic.webm", "127.0.0.1", free_port(), 10)
+        rt = threading.Thread(target=replay.serve_forever, daemon=True)
+        rt.start()
+        source = f"http://127.0.0.1:{replay.server_port}/stream.mjpg"
+        model = os.environ["RS_YOLOX_MODEL_PATH"]
+        digest = __import__("hashlib").sha256(Path(model).read_bytes()).hexdigest()
+        cfg = yaml.safe_load((root / "cameras/demo-highway.yaml").read_text())
+        config = dict(
+            schema_version=1,
+            reference_frame=dict(width=1920, height=1080),
+            calibration=None,
+            min_y=0,
+            zones=[
+                dict(
+                    id="scene",
+                    name="Synthetic scene geometry",
+                    kind="carriageway",
+                    direction=[0,1],
+                    polygon=[[0, 0], [1919, 0], [1919, 1079], [0, 1079]],
+                )
+            ],
+            rules=["pedestrian_on_road"],
+            thresholds=cfg["thresholds"],
+            acquisition=dict(
+                target_fps=10, reconnect_backoff_s=1, read_timeout_s=3, max_reconnect_attempts=20
+            ),
+            model=dict(id="override", sha256=digest),
+        )
+        assert cc.validate(config) == []
+        with tenant_session(world.a.id) as db:
+            camera = Camera(
+                tenant_id=world.a.id,
+                slug="mission-replay",
+                name="LOCAL RECORDED REPLAY",
+                location="Synthetic test geometry",
+                source_kind="recorded_replay",
+                source_display="replay://mission-fixture",
+                source_fingerprint=ctl.source_fingerprint("replay://mission-fixture"),
+                lifecycle_state="approved",
+                desired_enabled=True,
+            )
+            db.add(camera)
+            db.flush()
+            cid = camera.id
+            version = CameraConfigVersion(
+                tenant_id=world.a.id,
+                camera_id=cid,
+                revision=1,
+                schema_version=1,
+                config=config,
+                fingerprint=cc.fingerprint(config),
+                status="active",
+                reason="Test-only approved fixture",
+                created_by=world.a.admin.id,
+            )
+            db.add(version)
+            db.flush()
+            camera.active_config_id = version.id
+            db.add(
+                CameraSourceGrant(
+                    tenant_id=world.a.id,
+                    camera_id=cid,
+                    granting_party="Editor / Wikimedia Commons",
+                    basis="licence",
+                    basis_reference="CC BY 3.0 Street traffic.webm",
+                    purpose="Local replay integration test",
+                    valid_from=datetime.now(UTC) - timedelta(days=1),
+                    valid_until=datetime.now(UTC) + timedelta(days=1),
+                    capture_method="recorded_replay",
+                    max_analysis_fps=10,
+                    max_frame_height=1080,
+                    retention_days=1,
+                    media_scope="events_only",
+                    reviewed_by=world.a.admin.id,
+                )
+            )
+            account = ingest_auth.create_account(db, world.a.id, "mission-runtime", camera_ids=[cid])
+            key = ingest_auth.issue_key(db, load_keyring(db, world.a.id), account)
+            db.commit()
+        cfg.update(
+            id="mission-replay",
+            video=source,
+            enabled=True,
+            source_replay=True,
+            source_fps=10,
+            control_source_reference="replay://mission-fixture",
+            model=model,
+            source_consent=dict(
+                granted=True,
+                by="Editor / CC BY 3.0",
+                date="2026-11-10",
+                scope="Local test replay and inference",
+                evidence="https://commons.wikimedia.org/wiki/File:Street_traffic.webm",
+                licence="CC BY 3.0",
+            ),
+        )
+        profile = tmp_path / "managed.yaml"
+        profile.write_text(yaml.safe_dump(cfg))
+        port = free_port()
+        monkeypatch.setenv("RS_COOKIE_SECURE", "false")
+        get_settings.cache_clear()
+        server = uvicorn.Server(
+            uvicorn.Config(create_app(), host="127.0.0.1", port=port, log_level="error")
+        )
+        thread = threading.Thread(target=server.run, daemon=True)
+        thread.start()
+        proc = None
+        try:
+            deadline = time.monotonic() + 10
+            while not server.started and time.monotonic() < deadline:
+                time.sleep(0.05)
+            log = (tmp_path / "worker.log").open("w+")
+            proc = subprocess.Popen(
+                [
+                    sys.executable,
+                    "-m",
+                    "roadsentinel.pipeline",
+                    str(profile),
+                    "--model",
+                    model,
+                    "--live",
+                    "--no-wandb",
+                ],
+                cwd=root,
+                env={
+                    **os.environ,
+                    "RS_API_URL": f"http://127.0.0.1:{port}",
+                    "RS_INGEST_KEY_ID": key.key_id,
+                    "RS_INGEST_SECRET": key.secret,
+                },
+                stdout=log,
+                stderr=log,
+            )
+            deadline = time.monotonic() + 35
+            ack = False
+            operator = login(world.a.operator)
+            previews = []
+            while time.monotonic() < deadline and proc.poll() is None:
+                with tenant_session(world.a.id) as db:
+                    row = db.scalar(
+                        select(CameraWorkerStatus).where(CameraWorkerStatus.camera_id == cid)
+                    )
+                    ack = bool(row and row.applied_revision == 1 and row.health == "healthy")
+                response = operator.get(f"/api/cameras/{cid}/preview")
+                if response.status_code == 200:
+                    previews.append(__import__("hashlib").sha256(response.content).hexdigest())
+                if ack and len(set(previews)) >= 2:
+                    break
+                time.sleep(1)
+            log.flush()
+            log.seek(0)
+            assert ack, log.read()[-2000:]
+            assert len(set(previews)) >= 2
+            with tenant_session(world.a.id) as db:
+>               camera = db.get(Camera, cid)
+            ^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_managed_live_runtime.py:195: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1264: in wait
+    return self._wait(timeout=timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/home/justin7m8/Documents/roadsentinel/.ven...>
+timeout = 12
+
+    def _wait(self, timeout):
+        """Internal implementation of wait() on POSIX."""
+        if self.returncode is not None:
+            return self.returncode
+    
+        if timeout is not None:
+            endtime = _time() + timeout
+            # Enter a busy loop if we have a timeout.  This busy loop was
+            # cribbed from Lib/threading.py in Thread.wait() at r71065.
+            delay = 0.0005 # 500 us -> initial delay of 1 ms
+            while True:
+                if self._waitpid_lock.acquire(False):
+                    try:
+                        if self.returncode is not None:
+                            break  # Another thread waited.
+                        (pid, sts) = self._try_wait(os.WNOHANG)
+                        assert pid == self.pid or pid == 0
+                        if pid == self.pid:
+                            self._handle_exitstatus(sts)
+                            break
+                    finally:
+                        self._waitpid_lock.release()
+                remaining = self._remaining_time(endtime)
+                if remaining <= 0:
+>                   raise TimeoutExpired(self.args, timeout)
+E                   subprocess.TimeoutExpired: Command '['/home/justin7m8/Documents/roadsentinel/.venv/bin/python', '-m', 'roadsentinel.pipeline', '/tmp/pytest-of-justin7m8/pytest-150/test_managed_replay_ack_previe0/managed.yaml', '--model', '/home/justin7m8/Documents/roadsentinel/models/yolox_s.onnx', '--live', '--no-wandb']' timed out after 12 seconds
+
+/usr/lib/python3.12/subprocess.py:2045: TimeoutExpired
+
+During handling of the above exception, another exception occurred:
+
+world = World(platform=Unit(id=UUID('155b1f07-db38-4c17-90d9-07f0acb0156b'), users={<Role.system_admin: 'system_admin'>: TUser...e-ecc38be2f69e'), 'evidence': UUID('f6737782-1721-4105-a371-8c5137f86d81'), 'plates': ['B00XYZ', 'B10XYZ', 'B20XYZ']}})
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-150/test_managed_replay_ack_previe0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7708b42376e0>
+login = <function login.<locals>._login at 0x7708b4264720>
+
+    @pytest.mark.skipif(os.getenv("RS_MISSION_REAL") != "1", reason="licensed model/media opt-in")
+    def test_managed_replay_ack_preview_and_revocation(world, tmp_path, monkeypatch, login):
+        from roadsentinel.replay import make_server
+    
+        from app.config import get_settings
+        from app.db import tenant_session
+        from app.main import create_app
+        from app.models import Camera, CameraConfigVersion, CameraSourceGrant, CameraWorkerStatus
+        from app.services import camera_config as cc
+        from app.services import camera_control as ctl
+        from app.services import ingest_auth
+        from app.services.keys import load_keyring
+    
+        root = Path(__file__).resolve().parents[2]
+        replay = make_server("/tmp/Street_traffic.webm", "127.0.0.1", free_port(), 10)
+        rt = threading.Thread(target=replay.serve_forever, daemon=True)
+        rt.start()
+        source = f"http://127.0.0.1:{replay.server_port}/stream.mjpg"
+        model = os.environ["RS_YOLOX_MODEL_PATH"]
+        digest = __import__("hashlib").sha256(Path(model).read_bytes()).hexdigest()
+        cfg = yaml.safe_load((root / "cameras/demo-highway.yaml").read_text())
+        config = dict(
+            schema_version=1,
+            reference_frame=dict(width=1920, height=1080),
+            calibration=None,
+            min_y=0,
+            zones=[
+                dict(
+                    id="scene",
+                    name="Synthetic scene geometry",
+                    kind="carriageway",
+                    direction=[0,1],
+                    polygon=[[0, 0], [1919, 0], [1919, 1079], [0, 1079]],
+                )
+            ],
+            rules=["pedestrian_on_road"],
+            thresholds=cfg["thresholds"],
+            acquisition=dict(
+                target_fps=10, reconnect_backoff_s=1, read_timeout_s=3, max_reconnect_attempts=20
+            ),
+            model=dict(id="override", sha256=digest),
+        )
+        assert cc.validate(config) == []
+        with tenant_session(world.a.id) as db:
+            camera = Camera(
+                tenant_id=world.a.id,
+                slug="mission-replay",
+                name="LOCAL RECORDED REPLAY",
+                location="Synthetic test geometry",
+                source_kind="recorded_replay",
+                source_display="replay://mission-fixture",
+                source_fingerprint=ctl.source_fingerprint("replay://mission-fixture"),
+                lifecycle_state="approved",
+                desired_enabled=True,
+            )
+            db.add(camera)
+            db.flush()
+            cid = camera.id
+            version = CameraConfigVersion(
+                tenant_id=world.a.id,
+                camera_id=cid,
+                revision=1,
+                schema_version=1,
+                config=config,
+                fingerprint=cc.fingerprint(config),
+                status="active",
+                reason="Test-only approved fixture",
+                created_by=world.a.admin.id,
+            )
+            db.add(version)
+            db.flush()
+            camera.active_config_id = version.id
+            db.add(
+                CameraSourceGrant(
+                    tenant_id=world.a.id,
+                    camera_id=cid,
+                    granting_party="Editor / Wikimedia Commons",
+                    basis="licence",
+                    basis_reference="CC BY 3.0 Street traffic.webm",
+                    purpose="Local replay integration test",
+                    valid_from=datetime.now(UTC) - timedelta(days=1),
+                    valid_until=datetime.now(UTC) + timedelta(days=1),
+                    capture_method="recorded_replay",
+                    max_analysis_fps=10,
+                    max_frame_height=1080,
+                    retention_days=1,
+                    media_scope="events_only",
+                    reviewed_by=world.a.admin.id,
+                )
+            )
+            account = ingest_auth.create_account(db, world.a.id, "mission-runtime", camera_ids=[cid])
+            key = ingest_auth.issue_key(db, load_keyring(db, world.a.id), account)
+            db.commit()
+        cfg.update(
+            id="mission-replay",
+            video=source,
+            enabled=True,
+            source_replay=True,
+            source_fps=10,
+            control_source_reference="replay://mission-fixture",
+            model=model,
+            source_consent=dict(
+                granted=True,
+                by="Editor / CC BY 3.0",
+                date="2026-11-10",
+                scope="Local test replay and inference",
+                evidence="https://commons.wikimedia.org/wiki/File:Street_traffic.webm",
+                licence="CC BY 3.0",
+            ),
+        )
+        profile = tmp_path / "managed.yaml"
+        profile.write_text(yaml.safe_dump(cfg))
+        port = free_port()
+        monkeypatch.setenv("RS_COOKIE_SECURE", "false")
+        get_settings.cache_clear()
+        server = uvicorn.Server(
+            uvicorn.Config(create_app(), host="127.0.0.1", port=port, log_level="error")
+        )
+        thread = threading.Thread(target=server.run, daemon=True)
+        thread.start()
+        proc = None
+        try:
+            deadline = time.monotonic() + 10
+            while not server.started and time.monotonic() < deadline:
+                time.sleep(0.05)
+            log = (tmp_path / "worker.log").open("w+")
+            proc = subprocess.Popen(
+                [
+                    sys.executable,
+                    "-m",
+                    "roadsentinel.pipeline",
+                    str(profile),
+                    "--model",
+                    model,
+                    "--live",
+                    "--no-wandb",
+                ],
+                cwd=root,
+                env={
+                    **os.environ,
+                    "RS_API_URL": f"http://127.0.0.1:{port}",
+                    "RS_INGEST_KEY_ID": key.key_id,
+                    "RS_INGEST_SECRET": key.secret,
+                },
+                stdout=log,
+                stderr=log,
+            )
+            deadline = time.monotonic() + 35
+            ack = False
+            operator = login(world.a.operator)
+            previews = []
+            while time.monotonic() < deadline and proc.poll() is None:
+                with tenant_session(world.a.id) as db:
+                    row = db.scalar(
+                        select(CameraWorkerStatus).where(CameraWorkerStatus.camera_id == cid)
+                    )
+                    ack = bool(row and row.applied_revision == 1 and row.health == "healthy")
+                response = operator.get(f"/api/cameras/{cid}/preview")
+                if response.status_code == 200:
+                    previews.append(__import__("hashlib").sha256(response.content).hexdigest())
+                if ack and len(set(previews)) >= 2:
+                    break
+                time.sleep(1)
+            log.flush()
+            log.seek(0)
+            assert ack, log.read()[-2000:]
+            assert len(set(previews)) >= 2
+            with tenant_session(world.a.id) as db:
+                camera = db.get(Camera, cid)
+                camera.desired_enabled = False
+                db.commit()
+            proc.wait(timeout=12)
+            assert proc.returncode != 0  # supervisor may restart; restart cannot acquire after disable
+            print(
+                "LOCAL RECORDED REPLAY: actual YOLOX/ByteTrack -> managed lease + ACK revision 1 -> changing authenticated preview -> stop on disable"
+            )
+>       finally:
+                ^
+
+tests/test_managed_live_runtime.py:203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1264: in wait
+    return self._wait(timeout=timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/home/justin7m8/Documents/roadsentinel/.ven...>
+timeout = 10
+
+    def _wait(self, timeout):
+        """Internal implementation of wait() on POSIX."""
+        if self.returncode is not None:
+            return self.returncode
+    
+        if timeout is not None:
+            endtime = _time() + timeout
+            # Enter a busy loop if we have a timeout.  This busy loop was
+            # cribbed from Lib/threading.py in Thread.wait() at r71065.
+            delay = 0.0005 # 500 us -> initial delay of 1 ms
+            while True:
+                if self._waitpid_lock.acquire(False):
+                    try:
+                        if self.returncode is not None:
+                            break  # Another thread waited.
+                        (pid, sts) = self._try_wait(os.WNOHANG)
+                        assert pid == self.pid or pid == 0
+                        if pid == self.pid:
+                            self._handle_exitstatus(sts)
+                            break
+                    finally:
+                        self._waitpid_lock.release()
+                remaining = self._remaining_time(endtime)
+                if remaining <= 0:
+>                   raise TimeoutExpired(self.args, timeout)
+E                   subprocess.TimeoutExpired: Command '['/home/justin7m8/Documents/roadsentinel/.venv/bin/python', '-m', 'roadsentinel.pipeline', '/tmp/pytest-of-justin7m8/pytest-150/test_managed_replay_ack_previe0/managed.yaml', '--model', '/home/justin7m8/Documents/roadsentinel/models/yolox_s.onnx', '--live', '--no-wandb']' timed out after 10 seconds
+
+/usr/lib/python3.12/subprocess.py:2045: TimeoutExpired
+------------------------------ Captured log call -------------------------------
+WARNING  app:main.py:63 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-7k1ihbws is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNING  app:main.py:63 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-7k1ihbws is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+=============================== warnings summary ===============================
+tests/test_mission_vertical.py::test_real_inference_recorded_candidate_to_encrypted_review
+  /home/justin7m8/Documents/roadsentinel-integration/roadsentinel/detector.py:209: FutureWarning: The `ByteTrack` was deprecated since v0.28.0. It will be removed in v0.31.0.
+    return sv.ByteTrack(frame_rate=max(1, round(frame_rate)))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_mission_vertical.py::test_real_inference_recorded_candidate_to_encrypted_review
+FAILED tests/test_managed_live_runtime.py::test_managed_replay_ack_preview_and_revocation
+2 failed, 1 warning in 34.31s

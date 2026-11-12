@@ -1,0 +1,223 @@
+import { useState } from 'react'
+import { Link } from 'react-router'
+import { Logo } from '@/assets/brand/Logo'
+import './LandingPage.css'
+
+const STEPS = [
+  { title: 'Cameră', text: 'O cameră rutieră existentă filmează drumul.' },
+  { title: 'Detecție automată', text: 'Programul urmărește vehiculele și observă situațiile periculoase.' },
+  { title: 'Alertă cu clip', text: 'Dispecerul primește alerta împreună cu un clip scurt.' },
+  { title: 'Decizia dispecerului', text: 'Omul vede clipul și confirmă sau respinge alerta.' },
+]
+
+/** Three alerts a visitor finds in the app after signing in, each with a frame from its clip. */
+const SHOTS = [
+  {img:'/landing/viteza.jpg',alt:'Trafic în mișcare din filmarea licențiată, cu observații YOLOX.',title:'Observații ale modelului',text:'Chenare din detecții reale; nu sunt confirmări ale unei încălcări.'},
+  {img:'/landing/distanta.jpg',alt:'Vehicule urmărite în secvența demonstrativă.',title:'Urmărire temporară',text:'Identificatorii urmăririlor pot fi fragmentați; nu reprezintă identități persistente.'},
+  {img:'/landing/ambuteiaj.jpg',alt:'Cadru din aceeași filmare demonstrativă autorizată.',title:'Analiză pentru operator',text:'Geometria și regulile necesită configurare și verificare pe fiecare cameră.'},
+]
+
+type SignKind = 'warns' | 'must' | 'never'
+const FACTS: { sign: SignKind; title: string; text: string }[] = [
+  {
+    sign: 'warns',
+    title: 'Ce semnalează',
+    text: 'Viteză foarte mare, distanță prea mică între vehicule, ambuteiaj, vehicul oprit pe carosabil, mers pe contrasens, posibil accident.',
+  },
+  {
+    sign: 'must',
+    title: 'Cine decide',
+    text: 'Omul confirmă sau respinge fiecare alertă, după ce vede clipul. Sistemul doar semnalează.',
+  },
+  {
+    sign: 'never',
+    title: 'Viața privată',
+    text: 'Fără recunoaștere facială. Mascarea este euristică și nu garantează anonimizarea. Accesul la dovezile private necesită autentificare și este auditat.',
+  },
+]
+
+type Decision = 'confirmed' | 'rejected'
+const OUTCOME: Record<Decision, { title: string; text: string }> = {
+  confirmed: {
+    title: 'Alertă confirmată',
+    text: 'Aceasta este o simulare locală. În aplicația autentificată, deciziile reale sunt înregistrate în jurnal.',
+  },
+  rejected: {
+    title: 'Alertă respinsă',
+    text: 'Aceasta este o simulare locală, fără modificarea vreunui dosar. În aplicația autentificată, respingerea este înregistrată în jurnal.',
+  },
+}
+
+/** A person, as road signs draw one: the same figure is required on one sign and crossed out on another. */
+const PERSON = 'M32 15a8 8 0 1 1 0 16a8 8 0 0 1 0-16zM16 49c0-9 7-15 16-15s16 6 16 15z'
+
+/** The three families of road signs: a warning, an obligation, a prohibition. */
+function Sign({ kind }: { kind: SignKind }) {
+  return (
+    <svg className="rs-landing-signpost" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
+      {kind === 'warns' && (
+        <>
+          <path d="M32 8L59 55H5z" fill="#fff" stroke="#c8102e" strokeWidth="6" strokeLinejoin="round" />
+          <path d="M29.5 24h5l-1 16h-3z" fill="#1c1e20" />
+          <circle cx="32" cy="46" r="2.8" fill="#1c1e20" />
+        </>
+      )}
+      {kind === 'must' && (
+        <>
+          <circle cx="32" cy="32" r="29" fill="#0a4da3" />
+          <circle cx="32" cy="32" r="26" fill="none" stroke="#fff" strokeWidth="1.5" />
+          <path d={PERSON} fill="#fff" />
+        </>
+      )}
+      {kind === 'never' && (
+        <>
+          <circle cx="32" cy="32" r="26" fill="#fff" stroke="#c8102e" strokeWidth="6" />
+          <path d={PERSON} fill="#1c1e20" />
+          <path d="M14 14L50 50" stroke="#c8102e" strokeWidth="6" />
+        </>
+      )}
+    </svg>
+  )
+}
+
+/** County-road kilometre stone (white, blue cap) carrying the step number. */
+function Stone({ n }: { n: number }) {
+  return (
+    <span className="rs-landing-stone" aria-hidden="true">
+      <svg viewBox="0 0 44 56" width="44" height="56">
+        <path d="M4 56V20a18 18 0 0 1 36 0v36z" fill="#f3f5f6" />
+        <path d="M4 27v-7a18 18 0 0 1 36 0v7z" fill="#0a4da3" />
+        <text x="22" y="49" textAnchor="middle" fontSize="20" fontWeight="800" fill="#2b2f33">{n}</text>
+      </svg>
+    </span>
+  )
+}
+
+/** Public first screen: what the product is, in plain words, before the login form. */
+export default function LandingPage() {
+  const [decision, setDecision] = useState<{ kind: Decision; at: string } | null>(null)
+  const decide = (kind: Decision) =>
+    setDecision({ kind, at: new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }) })
+  // Someone who asked for less motion gets the still frame and the player's own controls.
+  const [still] = useState(() => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false)
+
+  return (
+    <div className="rs-landing">
+      <header className="rs-landing-wrap rs-landing-top">
+        <div className="rs-landing-brand">
+          <Logo size={38} />
+          RoadSentinel
+        </div>
+        <span className="rs-landing-temp">Prototip demonstrativ</span>
+      </header>
+
+      <main>
+        <section className="rs-landing-wrap rs-landing-hero">
+          <div className="rs-landing-pitch">
+            <h1 className="rs-landing-title">
+              <span>Camerele observă drumul.</span>
+              <span>Omul decide.</span>
+            </h1>
+            <p className="rs-landing-lede">
+              RoadSentinel analizează numai surse autorizate și propune situații pentru verificarea umană.
+            </p>
+            <Link to="/login" className="rs-landing-sign">Intră în aplicație</Link>
+          </div>
+
+          <figure className="rs-landing-view">
+            <video
+              className="rs-landing-clip"
+              src="/landing/alerta-viteza.mp4"
+              poster="/landing/alerta-viteza.jpg"
+              autoPlay={!still}
+              controls={still}
+              loop
+              muted
+              playsInline
+              aria-label="LOCAL RECORDED REPLAY: trafic licențiat, cu detecții YOLOX reale, fără măsurători de viteză."
+            />
+            <div className="rs-landing-slip" data-decision={decision?.kind ?? 'new'} data-testid="landing-alert" aria-live="polite">
+              {decision ? (
+                <>
+                  <h2>{OUTCOME[decision.kind].title}</h2>
+                  <p className="rs-landing-stamp">Decizia dumneavoastră, ora {decision.at}</p>
+                  <p>{OUTCOME[decision.kind].text}</p>
+                  <div className="rs-landing-choices">
+                    <button type="button" className="rs-landing-choice" data-kind="quiet" onClick={() => setDecision(null)}>
+                      Mai încearcă o dată
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h2>Exercițiu de verificare</h2>
+                  <p>Detecțiile sunt observații ale modelului. Butoanele de aici simulează o decizie și nu salvează un incident.</p>
+                  <p className="rs-landing-ask">Dumneavoastră decideți:</p>
+                  <div className="rs-landing-choices">
+                    <button type="button" className="rs-landing-choice" onClick={() => decide('confirmed')}>Confirmă</button>
+                    <button type="button" className="rs-landing-choice" data-kind="quiet" onClick={() => decide('rejected')}>Respinge</button>
+                  </div>
+                </>
+              )}
+            </div>
+            <figcaption className="rs-landing-caption">
+              LOCAL RECORDED REPLAY · Street traffic, Editor, Wikimedia Commons, CC BY 3.0. Detecții demonstrative; fără validare de incidente.
+            </figcaption>
+          </figure>
+        </section>
+
+        <section className="rs-landing-wrap rs-landing-seen" aria-labelledby="landing-seen">
+          <h2 id="landing-seen">Cum sunt pregătite observațiile pentru operator</h2>
+          <p className="rs-landing-seen-note">Cadre demonstrative din filmarea licențiată. Nu sunt alerte private și nu promit o precizie validată.</p>
+          <div className="rs-landing-shots">
+            {SHOTS.map((shot) => (
+              <figure key={shot.title} className="rs-landing-shot">
+                <img src={shot.img} alt={shot.alt} loading="lazy" width="960" height="540" />
+                <figcaption>
+                  <h3>{shot.title}</h3>
+                  <p>{shot.text}</p>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+
+        <section className="rs-landing-road" aria-labelledby="landing-steps">
+          <div className="rs-landing-wrap">
+            <h2 id="landing-steps">De la cameră la decizie</h2>
+            <ol className="rs-landing-steps">
+              {STEPS.map((step, index) => (
+                <li key={step.title}>
+                  <Stone n={index + 1} />
+                  <h3>{step.title}</h3>
+                  <p>{step.text}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        <section className="rs-landing-wrap rs-landing-facts">
+          {FACTS.map((fact) => (
+            <div key={fact.title}>
+              <Sign kind={fact.sign} />
+              <h2>{fact.title}</h2>
+              <p>{fact.text}</p>
+            </div>
+          ))}
+        </section>
+      </main>
+
+      <footer className="rs-landing-wrap rs-landing-foot">
+        <div className="rs-landing-again">
+          <p>Conectați-vă pentru a vedea numai datele unității dumneavoastră.</p>
+          <Link to="/login" className="rs-landing-sign">Intră în aplicație</Link>
+        </div>
+        <p>
+          <strong>Prototip demonstrativ.</strong>{' '}
+          Filmarea publică de aici este un replay licențiat, nu un flux extern live. Catalogul camerelor nu acordă drept de procesare. Precizia incidentelor nu este validată.
+        </p>
+      </footer>
+    </div>
+  )
+}

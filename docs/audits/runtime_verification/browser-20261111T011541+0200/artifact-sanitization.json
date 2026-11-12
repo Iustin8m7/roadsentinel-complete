@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-10T23:54:41.816271+00:00",
+  "public_files_redacted": [
+    "docs/audits/runtime_verification/runs/20261110T233240Z-dbfe2430/camera.log",
+    "docs/audits/runtime_verification/runs/20261110T233341Z-727fc5b1/camera.log",
+    "docs/audits/runtime_verification/runs/20261110T233713Z-1fcc6c30/camera.log",
+    "docs/audits/runtime_verification/runs/20261110T141707Z-b90aaa4d/camera.log"
+  ],
+  "native_secret_matches_remaining_in_generated_JS": [],
+  "screenshots": "QR/manual secret/recovery/OTP fields masked; representative enrollment/operator/replay screenshots visually inspected.",
+  "test_identity_repr": "password/TOTP hidden in future fixture repr;42 auth/lookup/seed regression tests pass."
+}

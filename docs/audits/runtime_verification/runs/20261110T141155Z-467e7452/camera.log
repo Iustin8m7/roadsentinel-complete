@@ -1,0 +1,60 @@
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001, Initial schema: tenants, users, auth state, cameras, alerts, evidence, approvals, audit.
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 0002, Security layer: Row-Level Security, app-role grants, append-only audit log, auth lookups.
+INFO  [alembic.runtime.migration] Running upgrade 0002 -> 0003, Service accounts for signed pipeline ingestion; tighter grants on tenants.
+INFO  [alembic.runtime.migration] Running upgrade 0003 -> 0004, Fields of the API.md contract: camera slugs and timezones, public alert numbers, detection
+details, VLM verdicts, operator actions, and camera-level evidence (annotated recordings).
+INFO  [alembic.runtime.migration] Running upgrade 0004 -> 0005, Per-user MFA exemption (demo accounts): users.mfa_exempt, default false.
+INFO  [alembic.runtime.migration] Running upgrade 0005 -> 0006, Camera heartbeat: cameras.last_seen_at, set by the live pipeline.
+INFO  [alembic.runtime.migration] Running upgrade 0006 -> 0007, Evidence integrity: record whether a distinct original exists.
+INFO  [alembic.runtime.migration] Running upgrade 0007 -> 0008, New rule types, idempotent ingestion, camera rate status.
+INFO  [alembic.runtime.migration] Running upgrade 0008 -> 0009, Account recovery: four-eyes reset requests and single-use reset tokens.
+INFO  [alembic.runtime.migration] Running upgrade 0009 -> 0010, Retention: per-tenant policy per evidence kind, legal hold on alerts, purge marker on evidence.
+INFO  [alembic.runtime.migration] Running upgrade 0010 -> 0011, Patrol workflow status and first-view timestamp (for response-time statistics).
+INFO  [alembic.runtime.migration] Running upgrade 0011 -> 0012, Let the runtime role read alembic_version so /api/ready can tell whether the schema is migrated.
+INFO  [alembic.runtime.migration] Running upgrade 0012 -> 0013, User-owned saved archive searches with tenant RLS.
+INFO  [alembic.runtime.migration] Running upgrade 0013 -> 0014, Tenant-scoped offline recordings and durable analysis runs.
+INFO  [alembic.runtime.migration] Running upgrade 0014 -> 0015, Persist structured vehicle-observation artifact metadata.
+INFO  [alembic.runtime.migration] Running upgrade 0015 -> rsint_cam1, Camera control plane: lifecycle/source columns on cameras, processing grants, immutable
+config versions, worker status (lease) and a bounded health-event history.
+INFO  [alembic.runtime.migration] Running upgrade rsint_cam1 -> rsint_case1, Investigation workspace (Workstream B): case notes with append-only revisions, timeline
+bookmarks, evidence-package export jobs, user-owned saved archive filters; evidence gets
+``duration_s`` (from the MP4 header) and ``purged_at``/``purge_reason`` (explicit purge state).
+INFO  [alembic.runtime.migration] Running upgrade rsint_case1 -> rsint_run1, Camera runtime telemetry (Workstream D): bounded latency/memory/frozen-image metrics on the
+worker status row, a source identity fingerprint on cameras (what the backend registered) and on
+the worker status (what the lease holder reports it opened), and the per-camera, per-state
+failure-notification throttle marks.
+INFO  [alembic.runtime.migration] Running upgrade rsint_run1 -> rsint_case2, Investigation completion (Workstream B, lane E): explicit case links, structured follow-up
+items with an append-only history, manual legal holds; note revisions may carry the recorded
+detection box; export jobs count storage outages separately from attempts. The cross-tenant
+probe allow-list (``rs_resource_tenant``) is extended to every tenant table that the API looks
+up by id, including those of 0007, 0008 and this revision.
+INFO  [alembic.runtime.migration] Running upgrade rsint_case2 -> 0020, Require an RLS-bypassing owner for pre-tenant lookup functions.
+INFO  [alembic.runtime.migration] Running upgrade 0020 -> 0021, Align offline tenant indexes with ORM; additive only.
+INFO  [alembic.runtime.migration] Running upgrade 0021 -> 0022, Identifier-only lookup functions get a dedicated NOLOGIN column-limited owner.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-6iqlwrqs is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-6iqlwrqs is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-6iqlwrqs is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-6iqlwrqs is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+Disposable test PostgreSQL identity: ('postgres', '127.0.0.1', 50287, 'rsverify_root') target: rsmission_verify_ec9dee8f8d
+PASS actual camera browser register
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-6iqlwrqs is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+PASS actual camera browser draft
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-6iqlwrqs is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+PASS actual camera browser approve
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-6iqlwrqs is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-6iqlwrqs is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+PASS duplicate real worker denied before source open
+PASS actual camera browser preview
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-6iqlwrqs is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+PASS actual camera browser draft
+PASS actual camera browser approve
+PASS actual configuration API: independent approval, revision 1 -> 2, old worker stopped, fresh lease + ACK revision 2
+PASS controlled source disconnect: reconnecting, stale preview expired, recovered actual frames
+Testing owned worker SIGKILL and real lease expiry; no policy/time shortcuts
+PASS actual worker SIGKILL -> stale/expired preview -> natural lease expiry -> fresh epoch/ACK/frames
+PASS independent re-enable -> new lease/ACK -> real processing -> final pause
+LOCAL RECORDED REPLAY: actual YOLOX/ByteTrack -> managed lease + ACK revision 1 -> changing authenticated preview -> stop on disable
+.
+1 passed in 153.21s (0:02:33)

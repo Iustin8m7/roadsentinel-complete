@@ -1,0 +1,14 @@
+# Secret scanning config: default rules plus a narrow allowlist of reviewed fixture files.
+# Do NOT allowlist whole directories: a real secret under tests/ must still be caught.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Reviewed files holding intentional dummy values"
+paths = [
+  '''^backend/tests/conftest\.py$''',
+  '''^backend/tests/test_cli_demo\.py$''',
+  '''^tests/test_api\.py$''',
+  '''^\.env\.example$''',
+  '''^frontend/\.env\.example$''',
+]

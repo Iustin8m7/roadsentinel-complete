@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Outer Shield -->
+  <path d="M50 4 L88 18 C88 58 72 82 50 96 C28 82 12 58 12 18 Z" fill="#1E2B4A" stroke="#F5B82E" stroke-width="3.5"/>
+  <path d="M50 10 L82 22 C82 54 68 76 50 88 C32 76 18 54 18 22 Z" fill="#233358" stroke="#2E4170" stroke-width="1.5"/>
+  <!-- 6-Point Star -->
+  <polygon points="50,22 55,36 69,32 61,44 71,55 57,55 50,69 43,55 29,55 39,44 31,32 45,36" fill="#F5B82E" stroke="#E9A21B" stroke-width="1.2"/>
+  <!-- Central Emblem Ring & Eye/Camera -->
+  <circle cx="50" cy="46" r="8" fill="#1E2B4A" stroke="#FFD36B" stroke-width="1.5"/>
+  <circle cx="50" cy="46" r="3.5" fill="#F5B82E"/>
+  <text x="50" y="80" font-family="'Oswald', sans-serif" font-size="9" font-weight="bold" fill="#F4F1E8" text-anchor="middle" letter-spacing="1">ROADSENTINEL</text>
+</svg>

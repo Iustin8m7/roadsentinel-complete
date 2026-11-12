@@ -1,0 +1,524 @@
+{
+  "utc": "2026-11-10T23:48:15.449625+00:00",
+  "runtime": "A existing integration",
+  "write_root": "/home/justin7m8/Documents/roadsentinel-integration",
+  "git_directory": false,
+  "processes": [
+    {
+      "pid": 2033731,
+      "cwd": "/home/justin7m8/Documents/roadsentinel-integration/backend",
+      "argv": [
+        "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/bin/python",
+        "-m",
+        "uvicorn",
+        "app.main:create_app",
+        "--factory",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8003",
+        "--no-access-log"
+      ],
+      "settings": {
+        "RS_API_ORIGIN": null,
+        "RS_PUBLIC_ORIGIN": "http://127.0.0.1:5175",
+        "RS_ENV": "development",
+        "RS_MFA_EXEMPTION_ENABLED": "false",
+        "RS_YOLOX_MODEL_PATH": "/home/justin7m8/Documents/roadsentinel/models/yolox_s.onnx"
+      },
+      "environment_names": [
+        "CLUTTER_DISABLE_MIPMAPPED_TEXT",
+        "CMAKE_PREFIX_PATH",
+        "CODEX_APPLY_PATCH_PRESERVE_LINE_ENDINGS",
+        "CODEX_CI",
+        "CODEX_PERMISSION_PROFILE",
+        "CODEX_SANDBOX_NETWORK_DISABLED",
+        "CODEX_SESSION_ID",
+        "CODEX_THREAD_ID",
+        "CODEX_TOOL_CALL_ID",
+        "CODEX_VERSION",
+        "COLORTERM",
+        "CONDA_DEFAULT_ENV",
+        "CONDA_EXE",
+        "CONDA_PREFIX",
+        "CONDA_PROMPT_MODIFIER",
+        "CONDA_PYTHON_EXE",
+        "CONDA_SHLVL",
+        "DBUS_SESSION_BUS_ADDRESS",
+        "DEBUGINFOD_URLS",
+        "DESKTOP_SESSION",
+        "DESKTOP_STARTUP_ID",
+        "DISPLAY",
+        "FIG_TERM",
+        "GDMSESSION",
+        "GH_PAGER",
+        "GIO_LAUNCHED_DESKTOP_FILE",
+        "GIO_LAUNCHED_DESKTOP_FILE_PID",
+        "GIT_PAGER",
+        "GJS_DEBUG_OUTPUT",
+        "GJS_DEBUG_TOPICS",
+        "GNOME_DESKTOP_SESSION_ID",
+        "GNOME_SHELL_SESSION_MODE",
+        "GPG_AGENT_INFO",
+        "GSM_SKIP_SSH_AGENT_WORKAROUND",
+        "GTK_MODULES",
+        "HOME",
+        "INTELLIJ_TERMINAL_COMMAND_BLOCKS_REWORKED",
+        "INVOCATION_ID",
+        "JAVA_HOME",
+        "JOURNAL_STREAM",
+        "LANG",
+        "LC_ALL",
+        "LC_CTYPE",
+        "LD_LIBRARY_PATH",
+        "LESSCLOSE",
+        "LESSOPEN",
+        "LOGNAME",
+        "LS_COLORS",
+        "MANAGERPID",
+        "MEMORY_PRESSURE_WATCH",
+        "MEMORY_PRESSURE_WRITE",
+        "NO_COLOR",
+        "NVM_BIN",
+        "NVM_CD_FLAGS",
+        "NVM_DIR",
+        "NVM_INC",
+        "PAGER",
+        "PATH",
+        "PKG_CONFIG_PATH",
+        "PROCESS_LAUNCHED_BY_CW",
+        "PROCESS_LAUNCHED_BY_Q",
+        "PWD",
+        "PYTHONDONTWRITEBYTECODE",
+        "PYTHONPATH",
+        "QT_ACCESSIBILITY",
+        "QT_IM_MODULE",
+        "RS_COOKIE_SECURE",
+        "RS_CORS_ORIGINS",
+        "RS_DATABASE_URL",
+        "RS_DEBUG",
+        "RS_ENV",
+        "RS_EVIDENCE_DIR",
+        "RS_JWT_SECRET",
+        "RS_MASTER_KEYS",
+        "RS_MASTER_KEY_CURRENT",
+        "RS_METRICS_TOKEN",
+        "RS_MFA_EXEMPTION_ENABLED",
+        "RS_PUBLIC_ORIGIN",
+        "RS_TRUST_PROXY",
+        "RS_URL_SIGNING_KEY",
+        "RS_YOLOX_MODEL_PATH",
+        "SESSION_MANAGER",
+        "SHELL",
+        "SHLVL",
+        "SNAP",
+        "SNAP_APP_DESKTOP_FILE",
+        "SNAP_APP_NAME",
+        "SNAP_ARCH",
+        "SNAP_COMMON",
+        "SNAP_CONTEXT",
+        "SNAP_COOKIE",
+        "SNAP_DATA",
+        "SNAP_EUID",
+        "SNAP_INSTANCE_KEY",
+        "SNAP_INSTANCE_NAME",
+        "SNAP_LIBRARY_PATH",
+        "SNAP_NAME",
+        "SNAP_REAL_HOME",
+        "SNAP_REEXEC",
+        "SNAP_REVISION",
+        "SNAP_UID",
+        "SNAP_USER_COMMON",
+        "SNAP_USER_DATA",
+        "SNAP_VERSION",
+        "SSH_AUTH_SOCK",
+        "SYSTEMD_EXEC_PID",
+        "TERM",
+        "TERMINAL_EMULATOR",
+        "TERM_SESSION_ID",
+        "USER",
+        "USERNAME",
+        "WINDOWPATH",
+        "XAUTHORITY",
+        "XDG_ACTIVATION_TOKEN",
+        "XDG_CONFIG_DIRS",
+        "XDG_CURRENT_DESKTOP",
+        "XDG_DATA_DIRS",
+        "XDG_MENU_PREFIX",
+        "XDG_RUNTIME_DIR",
+        "XDG_SESSION_CLASS",
+        "XDG_SESSION_DESKTOP",
+        "XDG_SESSION_TYPE",
+        "XMODIFIERS",
+        "_",
+        "_CE_CONDA",
+        "_CE_M",
+        "_CONDA_EXE",
+        "_CONDA_ROOT"
+      ]
+    },
+    {
+      "pid": 1671183,
+      "cwd": "/home/justin7m8/Documents/roadsentinel-integration/frontend",
+      "argv": [
+        "node",
+        "/home/justin7m8/Documents/roadsentinel-integration/frontend/node_modules/.bin/vite",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "5175",
+        "--strictPort"
+      ],
+      "settings": {
+        "RS_API_ORIGIN": "http://127.0.0.1:8003",
+        "RS_PUBLIC_ORIGIN": null,
+        "RS_ENV": null,
+        "RS_MFA_EXEMPTION_ENABLED": null,
+        "RS_YOLOX_MODEL_PATH": null
+      },
+      "environment_names": [
+        "CLUTTER_DISABLE_MIPMAPPED_TEXT",
+        "CMAKE_PREFIX_PATH",
+        "COLOR",
+        "COLORTERM",
+        "CONDA_DEFAULT_ENV",
+        "CONDA_EXE",
+        "CONDA_PREFIX",
+        "CONDA_PROMPT_MODIFIER",
+        "CONDA_PYTHON_EXE",
+        "CONDA_SHLVL",
+        "DBUS_SESSION_BUS_ADDRESS",
+        "DEBUGINFOD_URLS",
+        "DESKTOP_SESSION",
+        "DESKTOP_STARTUP_ID",
+        "DISPLAY",
+        "EDITOR",
+        "FIG_TERM",
+        "GDMSESSION",
+        "GIO_LAUNCHED_DESKTOP_FILE",
+        "GIO_LAUNCHED_DESKTOP_FILE_PID",
+        "GJS_DEBUG_OUTPUT",
+        "GJS_DEBUG_TOPICS",
+        "GNOME_DESKTOP_SESSION_ID",
+        "GNOME_SHELL_SESSION_MODE",
+        "GPG_AGENT_INFO",
+        "GSM_SKIP_SSH_AGENT_WORKAROUND",
+        "GTK_MODULES",
+        "HOME",
+        "INIT_CWD",
+        "INTELLIJ_TERMINAL_COMMAND_BLOCKS_REWORKED",
+        "INVOCATION_ID",
+        "JAVA_HOME",
+        "JOURNAL_STREAM",
+        "LANG",
+        "LD_LIBRARY_PATH",
+        "LESSCLOSE",
+        "LESSOPEN",
+        "LOGNAME",
+        "LS_COLORS",
+        "MANAGERPID",
+        "MEMORY_PRESSURE_WATCH",
+        "MEMORY_PRESSURE_WRITE",
+        "NODE",
+        "NVM_BIN",
+        "NVM_CD_FLAGS",
+        "NVM_DIR",
+        "NVM_INC",
+        "OLDPWD",
+        "PATH",
+        "PKG_CONFIG_PATH",
+        "PROCESS_LAUNCHED_BY_CW",
+        "PROCESS_LAUNCHED_BY_Q",
+        "PWD",
+        "QT_ACCESSIBILITY",
+        "QT_IM_MODULE",
+        "RS_API_ORIGIN",
+        "SESSION_MANAGER",
+        "SHELL",
+        "SHLVL",
+        "SNAP",
+        "SNAP_APP_DESKTOP_FILE",
+        "SNAP_APP_NAME",
+        "SNAP_ARCH",
+        "SNAP_COMMON",
+        "SNAP_CONTEXT",
+        "SNAP_COOKIE",
+        "SNAP_DATA",
+        "SNAP_EUID",
+        "SNAP_INSTANCE_KEY",
+        "SNAP_INSTANCE_NAME",
+        "SNAP_LIBRARY_PATH",
+        "SNAP_NAME",
+        "SNAP_REAL_HOME",
+        "SNAP_REEXEC",
+        "SNAP_REVISION",
+        "SNAP_UID",
+        "SNAP_USER_COMMON",
+        "SNAP_USER_DATA",
+        "SNAP_VERSION",
+        "SSH_AUTH_SOCK",
+        "SYSTEMD_EXEC_PID",
+        "TERM",
+        "TERMINAL_EMULATOR",
+        "TERM_SESSION_ID",
+        "USER",
+        "USERNAME",
+        "WINDOWPATH",
+        "XAUTHORITY",
+        "XDG_ACTIVATION_TOKEN",
+        "XDG_CONFIG_DIRS",
+        "XDG_CURRENT_DESKTOP",
+        "XDG_DATA_DIRS",
+        "XDG_MENU_PREFIX",
+        "XDG_RUNTIME_DIR",
+        "XDG_SESSION_CLASS",
+        "XDG_SESSION_DESKTOP",
+        "XDG_SESSION_TYPE",
+        "XMODIFIERS",
+        "_",
+        "_CE_CONDA",
+        "_CE_M",
+        "_CONDA_EXE",
+        "_CONDA_ROOT",
+        "npm_command",
+        "npm_config_cache",
+        "npm_config_global_prefix",
+        "npm_config_globalconfig",
+        "npm_config_init_module",
+        "npm_config_local_prefix",
+        "npm_config_node_gyp",
+        "npm_config_noproxy",
+        "npm_config_npm_version",
+        "npm_config_prefix",
+        "npm_config_user_agent",
+        "npm_config_userconfig",
+        "npm_execpath",
+        "npm_lifecycle_event",
+        "npm_lifecycle_script",
+        "npm_node_execpath",
+        "npm_package_json",
+        "npm_package_name",
+        "npm_package_version"
+      ]
+    }
+  ],
+  "http": [
+    {
+      "port": 8003,
+      "path": "/api/health/live",
+      "status": 200
+    },
+    {
+      "port": 8003,
+      "path": "/api/health/ready",
+      "status": 200
+    },
+    {
+      "port": 8003,
+      "path": "/api/auth/me",
+      "status": 401
+    },
+    {
+      "port": 8003,
+      "path": "/api/openapi.json",
+      "status": 200
+    },
+    {
+      "port": 5175,
+      "path": "/api/health/live",
+      "status": 200
+    },
+    {
+      "port": 5175,
+      "path": "/api/health/ready",
+      "status": 200
+    },
+    {
+      "port": 5175,
+      "path": "/api/auth/me",
+      "status": 401
+    },
+    {
+      "port": 5175,
+      "path": "/api/openapi.json",
+      "status": 200
+    }
+  ],
+  "database": {
+    "identity": [
+      "rsint_20261110b",
+      "127.0.0.1",
+      55446,
+      "rsint_app_261110b"
+    ],
+    "revision": "0022",
+    "rls_tables": [
+      [
+        "alerts",
+        true,
+        true
+      ],
+      [
+        "analysis_runs",
+        true,
+        true
+      ],
+      [
+        "approval_requests",
+        true,
+        true
+      ],
+      [
+        "audit_log",
+        true,
+        true
+      ],
+      [
+        "camera_config_versions",
+        true,
+        true
+      ],
+      [
+        "camera_health_events",
+        true,
+        true
+      ],
+      [
+        "camera_source_grants",
+        true,
+        true
+      ],
+      [
+        "camera_worker_status",
+        true,
+        true
+      ],
+      [
+        "cameras",
+        true,
+        true
+      ],
+      [
+        "case_bookmarks",
+        true,
+        true
+      ],
+      [
+        "case_followup_events",
+        true,
+        true
+      ],
+      [
+        "case_followups",
+        true,
+        true
+      ],
+      [
+        "case_legal_holds",
+        true,
+        true
+      ],
+      [
+        "case_links",
+        true,
+        true
+      ],
+      [
+        "case_note_revisions",
+        true,
+        true
+      ],
+      [
+        "case_notes",
+        true,
+        true
+      ],
+      [
+        "evidence",
+        true,
+        true
+      ],
+      [
+        "export_jobs",
+        true,
+        true
+      ],
+      [
+        "ingest_nonces",
+        true,
+        true
+      ],
+      [
+        "invitations",
+        true,
+        true
+      ],
+      [
+        "push_subscriptions",
+        true,
+        true
+      ],
+      [
+        "recordings",
+        true,
+        true
+      ],
+      [
+        "recovery_codes",
+        true,
+        true
+      ],
+      [
+        "refresh_tokens",
+        true,
+        true
+      ],
+      [
+        "retention_policies",
+        true,
+        true
+      ],
+      [
+        "saved_searches",
+        true,
+        true
+      ],
+      [
+        "service_accounts",
+        true,
+        true
+      ],
+      [
+        "service_keys",
+        true,
+        true
+      ],
+      [
+        "tenant_keys",
+        true,
+        true
+      ],
+      [
+        "tenants",
+        true,
+        true
+      ],
+      [
+        "user_sessions",
+        true,
+        true
+      ],
+      [
+        "users",
+        true,
+        true
+      ]
+    ],
+    "cross_tenant_user_count": 0,
+    "app_role": [
+      "rsint_app_261110b",
+      false,
+      false
+    ]
+  }
+}

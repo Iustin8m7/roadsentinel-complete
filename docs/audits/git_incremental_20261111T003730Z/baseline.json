@@ -1,0 +1,319 @@
+{
+  "utc": "20261111T003730Z",
+  "directory": "/home/justin7m8/Documents/roadsentinel-integration/docs/audits/git_incremental_20261111T003730Z",
+  "destination": "/home/justin7m8/Documents/roadsentinel-integration",
+  "base": "451beb99447dcce88f1bf7288195322689f368c4",
+  "target": "47e3e85aa687a24eb000df1ee57b810e587e5fd8",
+  "origin_main": "47e3e85aa687a24eb000df1ee57b810e587e5fd8",
+  "remote": "https://github.com/CristiMachine25/roadsentinel.git",
+  "commits": 33,
+  "files": [
+    {
+      "file": ".gitignore",
+      "target_sha256": "e4d93e6b406dc56bea73c77a0955accafdc6a10126b9a9aa8094e65a151d6581",
+      "snapshot_matches": true
+    },
+    {
+      "file": "backend/app/api/camera_control.py",
+      "target_sha256": "a49c1006513446fa52dfd77650a74d5ce313911b80fb72735f1fb7baf3a9ab95",
+      "snapshot_matches": true
+    },
+    {
+      "file": "backend/app/services/camera_config.py",
+      "target_sha256": "a65924dd2456e1da580624eab3581d4a14a193971a4afe528dfc459e1b5b8fc0",
+      "snapshot_matches": true
+    },
+    {
+      "file": "backend/tests/test_camera_control.py",
+      "target_sha256": "f38758dff93dbac7b936a0ac087f53b983ce274efbbc5e371eed6c2185f2ccb9",
+      "snapshot_matches": true
+    },
+    {
+      "file": "docs/implementation/G-ledger.md",
+      "target_sha256": "80233d7afe754e7a74e5d39574103b36e1515397241dc592b7ac3243031a6c1c",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/public/fonts/Overpass-LICENSE.txt",
+      "target_sha256": "948fc2278ccbc7e24c598095e3723d97b53666c02446b683e9cc6745e3760f6a",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/public/fonts/Overpass-Latin.woff2",
+      "target_sha256": "29217ef8adef5f6c059feb461bdb029348205fc233dc9b6ca8604b0d068ac086",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/public/fonts/Overpass-LatinExt.woff2",
+      "target_sha256": "0a1c9727f08b91252c19bd4ca36caf98162455f33c0adcac935606b5d8d11938",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/public/landing/alerta-viteza.jpg",
+      "target_sha256": "692e5dff617f30a86146615bfe4a5ce3dd34c89f4badc76314b83f25f3147506",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/public/landing/alerta-viteza.mp4",
+      "target_sha256": "5965edccff82bb2ebdbef6ebe7600f05e931d8fc1b0358994315b96d11997324",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/public/landing/ambuteiaj.jpg",
+      "target_sha256": "0990d0d7c40103aa93685eb3fe885c55f434a7c3b49ed2a81c95a12cb9430696",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/public/landing/distanta.jpg",
+      "target_sha256": "8fc229f386e869de2b8a66283568c165f883a47ea0c26a8ebfc79a833be15be4",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/public/landing/viteza.jpg",
+      "target_sha256": "9652d33faa07cd46a2dd40a311dbb95d485f78adffcebd6bf869a4f74c8691a4",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/scripts/e2e-camera-control.mjs",
+      "target_sha256": "ab6a87c4ccd01f70b777f62ba58d8195b173330eb2499170b3dcbb5169b21988",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/scripts/e2e-config-editor.mjs",
+      "target_sha256": "6f84ec3d93162ff3c8a1d215a02ab26e9300ca1afac33c707b83e557f4522f37",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/scripts/e2e-investigation.mjs",
+      "target_sha256": "bcf15e69a1e0cd9d8800989ba74a235847d4ebd65ad9910cd8b31931f42667b9",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/App.tsx",
+      "target_sha256": "446d0cf74febe3e73874dbce9ff25b2d087cbbbe377bd8afecdee2d137e4a0a3",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/components/ActivityReport.tsx",
+      "target_sha256": "cf11669561297036f705033d490ad89ae70ba199c992b6500d6b9e3d443f5dd0",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/components/AuditVerification.tsx",
+      "target_sha256": "091c949d04445e132d4a2025fc19d05af9bb2d5479a36c151aaba2bbdf72d770",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/components/CameraAuthorizationForms.tsx",
+      "target_sha256": "c402c5a06c7fd1347cb93be6b1a47959fdd63b79afeb9ff95b0ac892ac6c8db7",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/components/CameraControlPanel.tsx",
+      "target_sha256": "88cbe3b0acb97b71ca02e498ba4f30fb7de986ca8683f304f8d5343c2b06e662",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/components/CasePanels.tsx",
+      "target_sha256": "5604e36dc209f7cdbcaf99ae00d58c41b660281407949a4e6f9eed9307bc4b2a",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/components/CaseWorkspace.tsx",
+      "target_sha256": "9688a0dbbffa5a94417b62e8114150d749adac1c0fa3b934edc56897db7cf1a4",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/components/ConfigEditor.tsx",
+      "target_sha256": "ffabebf213da3f04846a40b35bf58516a719228c8e1f0c4e92b3be65bcb0a63d",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/components/EvidencePlayer.tsx",
+      "target_sha256": "38a20383d51167b95b8ebb4d9a960cab6bdeeb3d92b2ba72ef28e2dd430c7b04",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/components/IasiMap.tsx",
+      "target_sha256": "8fa2e141f67e9b56a132207ff17de7edc31455f05ad9b815fb92e2340c40cde1",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/components/TacticalMap.tsx",
+      "target_sha256": "14c1100635aa8bfbd8f631ff835a70ba93e235f5055f220f14dd7eba1a8e4257",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/hooks/index.ts",
+      "target_sha256": "17c01cf9d2e610b97fbb31201169f92df533ee064a4a0d708b2e0fbd0b49e24e",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/index.css",
+      "target_sha256": "3f7d4d86afcb68a754ca42cbb511cd2cf18e2de0d4d0452a1e7690c5091c8789",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/layouts/AppLayout.tsx",
+      "target_sha256": "5a2206eeccab3259cfbd8c52224bd8937fb4fa0a0ef062194d8e80c97c6c8452",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/lib/adapters.ts",
+      "target_sha256": "f0cb0d2f91eb4781636604f2efafbf0c21acbb5bdacbd74b16f9146507768e2a",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/lib/alertSummary.test.ts",
+      "target_sha256": "7389abea86986e59dcb8498c7d68d46496f6aa44bbe395dff544ab63b23dc7e9",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/lib/alertSummary.ts",
+      "target_sha256": "ff19895b41386a34c70ab895da0dc14b3d02bba60b83d4c3796ed46066607245",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/lib/cameraConfig.test.ts",
+      "target_sha256": "6a66cce1f2e9fd579de82217150f9ea628356073a0d6341bd2b52d3e730c7b6c",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/lib/cameraConfig.ts",
+      "target_sha256": "ca634dbd1e250f8f70fe1bbea3ed03f16e2a1f4fe3aedce6845bf7b5e73340bc",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/lib/cameraControl.test.ts",
+      "target_sha256": "bc385d19f4831eda9e6f91e4d8ef0775babbb1cf65b03f961d58cac67321976a",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/lib/cameraControl.ts",
+      "target_sha256": "5752f74a4ab08df3782beaa6ecf3fd526d689d4ad841a1498cbebfde18d6d6f4",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/lib/cases.test.ts",
+      "target_sha256": "86251c5fa1b973cd0580c39e761ce5a565a86668aa57d08966230061ac854716",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/lib/cases.ts",
+      "target_sha256": "b8948a53489af1f88ac085e67259e02eb32a9267a00d8a07d04ddbea1a74c7df",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/lib/constants.ts",
+      "target_sha256": "17d48f3f4353d80991b6734ee7f6b9db565598e246c30a337c0a022d171da747",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/lib/demo.test.ts",
+      "target_sha256": "0ce20b266d187e8d4384caa25479a5c3e531d47d51b74e9790231d26ef1ad822",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/lib/demo.ts",
+      "target_sha256": "08c3a4bd830e6d33f58bfffecf3437905d6bddc76191b85f255700102045e2c9",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/lib/iasi.test.ts",
+      "target_sha256": "8f3d4f674cc44e8ffb54bbc76e125230c59fd605886662bfc4de606903ccab82",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/lib/iasi.ts",
+      "target_sha256": "9198a993df2d73640a2c32db437bac3e85433237056da00cb7010e30e0d5b94e",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/pages/AlertDetailPage.tsx",
+      "target_sha256": "04c1d0d2dc5356c89f56243bdc0e8ff1fe9704ba3ad930a1de1381c4771bd221",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/pages/ArchivePage.tsx",
+      "target_sha256": "8bac012d038be98017c444b9e52cf917df31e45d76edbb7214d3492bf745ec46",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/pages/AuditPage.tsx",
+      "target_sha256": "632a44edd2cb1654b8a9af1ffcf3a7205cc6d825b62a42ee4b041c2bee9e2754",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/pages/CamerasPage.tsx",
+      "target_sha256": "ab40b55a2ee09badb18c6affed14850fdf1369f56e6a4b0de38edbb5e831575d",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/pages/DashboardPage.tsx",
+      "target_sha256": "0406cd00f087d0b803f99b8c854216c040411a7607e1fc5c050f3395f6898577",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/pages/LandingPage.css",
+      "target_sha256": "9799ea4175a2fdcce079180ae9026331e1863fb57e52557fdb98a5db130092f0",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/pages/LandingPage.tsx",
+      "target_sha256": "4577b58243f9049ab1d7be2f51be7cc720fcf36763425167db59da80046940f2",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/pages/LoginPage.tsx",
+      "target_sha256": "b6695980760d833ad9c5841399b5befc79cec591f9d9e388464118d73bc01ba4",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/pages/SettingsPage.tsx",
+      "target_sha256": "4c677b4d9bebbe8db909cc6f93878b8f5ac014b71ebee069830945d7c3333d0c",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/pages/StatsPage.tsx",
+      "target_sha256": "1912315a19629b800fefc39c2b73350222d52bb91c4d35bf8916f19403bad690",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/store/data.test.ts",
+      "target_sha256": "b42a975bbb6c388f3ecfc699bbd050259543ca1ee05412e71c0f3b0ece26eb79",
+      "snapshot_matches": true
+    },
+    {
+      "file": "frontend/src/store/data.ts",
+      "target_sha256": "88aa627d0c61b3b6b4d168608124fc2f527a2f5eecbe1ae250af85a296c02a41",
+      "snapshot_matches": true
+    },
+    {
+      "file": "roadsentinel/pipeline.py",
+      "target_sha256": "0ce420a0ef4b251336c7adc1baef637853354b33271eb40837b73b2d1e414382",
+      "snapshot_matches": true
+    },
+    {
+      "file": "scripts/e2e/run_camera_control_e2e.sh",
+      "target_sha256": "6a80fd8fbd0608b6d0e05cbbe6c29b8fcd9b5f0bce054f990cb1f1a278c69db1",
+      "snapshot_matches": true
+    },
+    {
+      "file": "scripts/e2e/worker_once.py",
+      "target_sha256": "22e3adf70065e889ac0b8204e56e9e4cfe970281020123161243efc90b03f193",
+      "snapshot_matches": true
+    },
+    {
+      "file": "tests/test_pipeline_boxes.py",
+      "target_sha256": "1bfdd1772497713398f20eb458ae29e3385ad9465d3b00c899b50a254fc28e3c",
+      "snapshot_matches": true
+    }
+  ],
+  "source_snapshot_matches_all_delta": true,
+  "baseline_files": 514,
+  "protected_classes": [
+    "all original databases/worktrees/secrets/media/models",
+    "existing integration credentials/authenticators/evidence/database",
+    "historical test artifacts"
+  ]
+}

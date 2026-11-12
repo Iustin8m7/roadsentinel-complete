@@ -1,0 +1,310 @@
+[
+  {
+    "sha": "47e3e85aa687a24eb000df1ee57b810e587e5fd8",
+    "parents": [
+      "a4ac2437a8639224958686520050cbe8b56ab1d4",
+      "6073e1a424ce2414f0c5947ce4c54890db06ab48"
+    ],
+    "subject": "Merge pull request #43 from CristiMachine25/feat/camera-config-editor",
+    "name_status": "M\tbackend/app/api/camera_control.py\nM\tbackend/app/services/camera_config.py\nM\tbackend/tests/test_camera_control.py\nA\tdocs/implementation/G-ledger.md\nM\tfrontend/scripts/e2e-camera-control.mjs\nA\tfrontend/scripts/e2e-config-editor.mjs\nA\tfrontend/src/components/CameraAuthorizationForms.tsx\nM\tfrontend/src/components/CameraControlPanel.tsx\nA\tfrontend/src/components/ConfigEditor.tsx\nA\tfrontend/src/lib/cameraConfig.test.ts\nA\tfrontend/src/lib/cameraConfig.ts\nM\tfrontend/src/lib/cameraControl.test.ts\nM\tfrontend/src/lib/cameraControl.ts\nM\tfrontend/src/pages/CamerasPage.tsx\nM\tscripts/e2e/run_camera_control_e2e.sh\nA\tscripts/e2e/worker_once.py\n",
+    "review_patch_sha256": "1db7da6b2a93d17dae1fd8871d847fa8f6379a471145dd82bb87c421674ae633"
+  },
+  {
+    "sha": "6073e1a424ce2414f0c5947ce4c54890db06ab48",
+    "parents": [
+      "a4ac2437a8639224958686520050cbe8b56ab1d4"
+    ],
+    "subject": "feat: visual camera configuration editor and onboarding from the UI",
+    "name_status": "M\tbackend/app/api/camera_control.py\nM\tbackend/app/services/camera_config.py\nM\tbackend/tests/test_camera_control.py\nA\tdocs/implementation/G-ledger.md\nM\tfrontend/scripts/e2e-camera-control.mjs\nA\tfrontend/scripts/e2e-config-editor.mjs\nA\tfrontend/src/components/CameraAuthorizationForms.tsx\nM\tfrontend/src/components/CameraControlPanel.tsx\nA\tfrontend/src/components/ConfigEditor.tsx\nA\tfrontend/src/lib/cameraConfig.test.ts\nA\tfrontend/src/lib/cameraConfig.ts\nM\tfrontend/src/lib/cameraControl.test.ts\nM\tfrontend/src/lib/cameraControl.ts\nM\tfrontend/src/pages/CamerasPage.tsx\nM\tscripts/e2e/run_camera_control_e2e.sh\nA\tscripts/e2e/worker_once.py\n",
+    "review_patch_sha256": "1db7da6b2a93d17dae1fd8871d847fa8f6379a471145dd82bb87c421674ae633"
+  },
+  {
+    "sha": "a4ac2437a8639224958686520050cbe8b56ab1d4",
+    "parents": [
+      "ed23601e114b903db4414a5d2240397d07049cfa",
+      "edaa7b7919f64b77eeec18ad8f8d45e97fb4d170"
+    ],
+    "subject": "Merge pull request #42 from CristiMachine25/feat/camera-recordings",
+    "name_status": "M\tfrontend/src/pages/CamerasPage.tsx\n",
+    "review_patch_sha256": "25bfffe6a6f6a0bdb42716bb5d709487e4b605fb06c0a54ba02bfd2d1cf1c666"
+  },
+  {
+    "sha": "edaa7b7919f64b77eeec18ad8f8d45e97fb4d170",
+    "parents": [
+      "ed23601e114b903db4414a5d2240397d07049cfa"
+    ],
+    "subject": "feat(web): play a camera's recording from its tile",
+    "name_status": "M\tfrontend/src/pages/CamerasPage.tsx\n",
+    "review_patch_sha256": "25bfffe6a6f6a0bdb42716bb5d709487e4b605fb06c0a54ba02bfd2d1cf1c666"
+  },
+  {
+    "sha": "ed23601e114b903db4414a5d2240397d07049cfa",
+    "parents": [
+      "b11968bdcd230d3226bdf89011eec894af36560c",
+      "6ff49e33b2288c2b54e875596e7d54656fa47043"
+    ],
+    "subject": "Merge pull request #41 from CristiMachine25/feat/demo-clips-landing",
+    "name_status": "M\tfrontend/public/landing/alerta-viteza.jpg\nM\tfrontend/public/landing/alerta-viteza.mp4\nA\tfrontend/public/landing/ambuteiaj.jpg\nA\tfrontend/public/landing/distanta.jpg\nA\tfrontend/public/landing/viteza.jpg\nM\tfrontend/src/lib/demo.test.ts\nM\tfrontend/src/lib/demo.ts\nM\tfrontend/src/pages/LandingPage.css\nM\tfrontend/src/pages/LandingPage.tsx\nA\tfrontend/src/store/data.test.ts\nM\tfrontend/src/store/data.ts\n",
+    "review_patch_sha256": "7a5e873b8b5faf40b97eea884a77910cad495bf996fd54714ead8066d5d0fe28"
+  },
+  {
+    "sha": "6ff49e33b2288c2b54e875596e7d54656fa47043",
+    "parents": [
+      "b11968bdcd230d3226bdf89011eec894af36560c"
+    ],
+    "subject": "feat(web): show the re-rendered alerts and a fuller landing page",
+    "name_status": "M\tfrontend/public/landing/alerta-viteza.jpg\nM\tfrontend/public/landing/alerta-viteza.mp4\nA\tfrontend/public/landing/ambuteiaj.jpg\nA\tfrontend/public/landing/distanta.jpg\nA\tfrontend/public/landing/viteza.jpg\nM\tfrontend/src/lib/demo.test.ts\nM\tfrontend/src/lib/demo.ts\nM\tfrontend/src/pages/LandingPage.css\nM\tfrontend/src/pages/LandingPage.tsx\nA\tfrontend/src/store/data.test.ts\nM\tfrontend/src/store/data.ts\n",
+    "review_patch_sha256": "7a5e873b8b5faf40b97eea884a77910cad495bf996fd54714ead8066d5d0fe28"
+  },
+  {
+    "sha": "b11968bdcd230d3226bdf89011eec894af36560c",
+    "parents": [
+      "76e883c128c580cace8a811563f5d848f05fc053",
+      "1723871a665f8c4d5bb48ad564565f87f44aad9e"
+    ],
+    "subject": "Merge pull request #40 from CristiMachine25/fix/detection-boxes",
+    "name_status": "M\troadsentinel/pipeline.py\nA\ttests/test_pipeline_boxes.py\n",
+    "review_patch_sha256": "84082abb9fdb0f8e35550b2695d7581f69da36ca56c9373147ae881902aa558d"
+  },
+  {
+    "sha": "1723871a665f8c4d5bb48ad564565f87f44aad9e",
+    "parents": [
+      "76e883c128c580cace8a811563f5d848f05fc053"
+    ],
+    "subject": "fix(pipeline): outline vehicles with the detector's box, not the tracker's",
+    "name_status": "M\troadsentinel/pipeline.py\nA\ttests/test_pipeline_boxes.py\n",
+    "review_patch_sha256": "84082abb9fdb0f8e35550b2695d7581f69da36ca56c9373147ae881902aa558d"
+  },
+  {
+    "sha": "76e883c128c580cace8a811563f5d848f05fc053",
+    "parents": [
+      "903e9822cb3f848309e34c3dd76649c31049a8b2",
+      "82c571adad51c68595bcbee7dd34b885d267a84f"
+    ],
+    "subject": "Merge pull request #39 from CristiMachine25/fix/clip-speed",
+    "name_status": "M\tfrontend/src/components/EvidencePlayer.tsx\n",
+    "review_patch_sha256": "83ef11910544ef1991ec8354d5ebb202937e020c3d60cbcadbf604309c4d13ab"
+  },
+  {
+    "sha": "82c571adad51c68595bcbee7dd34b885d267a84f",
+    "parents": [
+      "903e9822cb3f848309e34c3dd76649c31049a8b2"
+    ],
+    "subject": "fix(web): evidence clips open at real speed",
+    "name_status": "M\tfrontend/src/components/EvidencePlayer.tsx\n",
+    "review_patch_sha256": "83ef11910544ef1991ec8354d5ebb202937e020c3d60cbcadbf604309c4d13ab"
+  },
+  {
+    "sha": "903e9822cb3f848309e34c3dd76649c31049a8b2",
+    "parents": [
+      "2445e35fcecb5d9d5ff8179585f893ed6d03f7af",
+      "77afda155dac1a8cdda1244fa55b99822c76204a"
+    ],
+    "subject": "Merge pull request #38 from CristiMachine25/fix/landing-dashes",
+    "name_status": "M\tfrontend/src/pages/LandingPage.css\n",
+    "review_patch_sha256": "b1a2496e5a2dc6c7111d6af7ab7179b2eb8c66c8cccd84ce0c106b71a64bdbf7"
+  },
+  {
+    "sha": "77afda155dac1a8cdda1244fa55b99822c76204a",
+    "parents": [
+      "2445e35fcecb5d9d5ff8179585f893ed6d03f7af"
+    ],
+    "subject": "fix(web): landing step dashes are whole between the stones",
+    "name_status": "M\tfrontend/src/pages/LandingPage.css\n",
+    "review_patch_sha256": "b1a2496e5a2dc6c7111d6af7ab7179b2eb8c66c8cccd84ce0c106b71a64bdbf7"
+  },
+  {
+    "sha": "2445e35fcecb5d9d5ff8179585f893ed6d03f7af",
+    "parents": [
+      "1a5da6e79cb915da54f54389093188a099e9f262",
+      "cde65c4ec953160ed881852c76199866106791b6"
+    ],
+    "subject": "Merge pull request #37 from CristiMachine25/feat/demo-ready",
+    "name_status": "M\t.gitignore\nA\tfrontend/public/fonts/Overpass-LICENSE.txt\nA\tfrontend/public/fonts/Overpass-Latin.woff2\nA\tfrontend/public/fonts/Overpass-LatinExt.woff2\nA\tfrontend/public/landing/alerta-viteza.jpg\nA\tfrontend/public/landing/alerta-viteza.mp4\nM\tfrontend/src/layouts/AppLayout.tsx\nM\tfrontend/src/lib/demo.ts\nM\tfrontend/src/pages/CamerasPage.tsx\nA\tfrontend/src/pages/LandingPage.css\nM\tfrontend/src/pages/LandingPage.tsx\n",
+    "review_patch_sha256": "10c9f547461cfd0e4092a306c2e43b895d76b2c6bc40b34dc2c23c78c3888047"
+  },
+  {
+    "sha": "cde65c4ec953160ed881852c76199866106791b6",
+    "parents": [
+      "1a5da6e79cb915da54f54389093188a099e9f262"
+    ],
+    "subject": "feat(web): reviewed alert list and a new landing page for Demo Day",
+    "name_status": "M\t.gitignore\nA\tfrontend/public/fonts/Overpass-LICENSE.txt\nA\tfrontend/public/fonts/Overpass-Latin.woff2\nA\tfrontend/public/fonts/Overpass-LatinExt.woff2\nA\tfrontend/public/landing/alerta-viteza.jpg\nA\tfrontend/public/landing/alerta-viteza.mp4\nM\tfrontend/src/layouts/AppLayout.tsx\nM\tfrontend/src/lib/demo.ts\nM\tfrontend/src/pages/CamerasPage.tsx\nA\tfrontend/src/pages/LandingPage.css\nM\tfrontend/src/pages/LandingPage.tsx\n",
+    "review_patch_sha256": "10c9f547461cfd0e4092a306c2e43b895d76b2c6bc40b34dc2c23c78c3888047"
+  },
+  {
+    "sha": "1a5da6e79cb915da54f54389093188a099e9f262",
+    "parents": [
+      "451beb99447dcce88f1bf7288195322689f368c4",
+      "3bda3356cc8596b7b8e84bd04f530fecffe87a87"
+    ],
+    "subject": "Merge pull request #36 from CristiMachine25/feat/demo-day",
+    "name_status": "M\tfrontend/scripts/e2e-investigation.mjs\nM\tfrontend/src/App.tsx\nA\tfrontend/src/components/ActivityReport.tsx\nM\tfrontend/src/components/AuditVerification.tsx\nM\tfrontend/src/components/CasePanels.tsx\nM\tfrontend/src/components/CaseWorkspace.tsx\nM\tfrontend/src/components/IasiMap.tsx\nM\tfrontend/src/components/TacticalMap.tsx\nM\tfrontend/src/hooks/index.ts\nM\tfrontend/src/index.css\nM\tfrontend/src/layouts/AppLayout.tsx\nM\tfrontend/src/lib/adapters.ts\nA\tfrontend/src/lib/alertSummary.test.ts\nA\tfrontend/src/lib/alertSummary.ts\nM\tfrontend/src/lib/cases.test.ts\nM\tfrontend/src/lib/cases.ts\nM\tfrontend/src/lib/constants.ts\nA\tfrontend/src/lib/demo.test.ts\nM\tfrontend/src/lib/demo.ts\nA\tfrontend/src/lib/iasi.test.ts\nM\tfrontend/src/lib/iasi.ts\nM\tfrontend/src/pages/AlertDetailPage.tsx\nM\tfrontend/src/pages/ArchivePage.tsx\nM\tfrontend/src/pages/AuditPage.tsx\nM\tfrontend/src/pages/CamerasPage.tsx\nM\tfrontend/src/pages/DashboardPage.tsx\nA\tfrontend/src/pages/LandingPage.tsx\nM\tfrontend/src/pages/LoginPage.tsx\nM\tfrontend/src/pages/SettingsPage.tsx\nM\tfrontend/src/pages/StatsPage.tsx\n",
+    "review_patch_sha256": "97fe8c8ca3aed5ef96b31cfc1778b27b97f708c5334d3e65b98454cd8c1e3cac"
+  },
+  {
+    "sha": "3bda3356cc8596b7b8e84bd04f530fecffe87a87",
+    "parents": [
+      "52f8f8e715e8099f9915aeb99b178f2e252292e0"
+    ],
+    "subject": "fix(ui): review findings on wording, honesty and clip loading",
+    "name_status": "M\tfrontend/scripts/e2e-investigation.mjs\nM\tfrontend/src/components/CasePanels.tsx\nM\tfrontend/src/components/CaseWorkspace.tsx\nM\tfrontend/src/hooks/index.ts\nM\tfrontend/src/index.css\nM\tfrontend/src/layouts/AppLayout.tsx\nM\tfrontend/src/lib/alertSummary.test.ts\nM\tfrontend/src/lib/alertSummary.ts\nM\tfrontend/src/lib/demo.test.ts\nM\tfrontend/src/lib/demo.ts\nM\tfrontend/src/pages/AlertDetailPage.tsx\nM\tfrontend/src/pages/DashboardPage.tsx\nM\tfrontend/src/pages/LandingPage.tsx\n",
+    "review_patch_sha256": "90e160b4806ff132e4b00b613e7f41a450e5c6b60a1a5df03988e562332ffbe3"
+  },
+  {
+    "sha": "52f8f8e715e8099f9915aeb99b178f2e252292e0",
+    "parents": [
+      "5d635242d78368bf405857855be0f071156fd1b8",
+      "451beb99447dcce88f1bf7288195322689f368c4"
+    ],
+    "subject": "Merge remote-tracking branch 'origin/main' into feat/demo-day",
+    "name_status": "",
+    "review_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "sha": "5d635242d78368bf405857855be0f071156fd1b8",
+    "parents": [
+      "1c3c300beeadbdf6507fb76ffbce509c2f87e357"
+    ],
+    "subject": "fix(ui): case panels respect demo curation, confirm destructive actions, speak Romanian",
+    "name_status": "M\tfrontend/scripts/e2e-investigation.mjs\nM\tfrontend/src/components/AuditVerification.tsx\nM\tfrontend/src/components/CasePanels.tsx\nM\tfrontend/src/lib/cases.test.ts\nM\tfrontend/src/lib/cases.ts\nM\tfrontend/src/pages/SettingsPage.tsx\n",
+    "review_patch_sha256": "805416ee3356e31029f3abce814051468ffada5b4ce96a88d854837ab4a16e19"
+  },
+  {
+    "sha": "1c3c300beeadbdf6507fb76ffbce509c2f87e357",
+    "parents": [
+      "fb4dd47208576a7104ab9ad9fdb1f2bb3ab8116f",
+      "2c0b10f759a70a6d76553ae7517e9ad507d91ea5"
+    ],
+    "subject": "Merge branch 'release/runtime-casework-observability' into feat/demo-day",
+    "name_status": "M\tAPI.md\nM\tHANDOFF.md\nM\tbackend/app/services/casework.py\nM\tbackend/app/services/package_verify.py\nM\tbackend/tests/test_casework.py\nM\tbackend/tests/test_exports.py\nM\tdocs/RUNBOOK.md\n",
+    "review_patch_sha256": "8d8518de7b371835fa10adc64f35352350fd243293e6a31204891b73f74206e4"
+  },
+  {
+    "sha": "fb4dd47208576a7104ab9ad9fdb1f2bb3ab8116f",
+    "parents": [
+      "deef106816ea5861f1f3bc1d9c757285cc0e73e3",
+      "24ce431aa8096129ce2b3c600ca07abcc0311b9d"
+    ],
+    "subject": "Merge branch 'feat/demo-day-story' into feat/demo-day",
+    "name_status": "M\tfrontend/src/App.tsx\nA\tfrontend/src/components/ActivityReport.tsx\nM\tfrontend/src/index.css\nA\tfrontend/src/lib/alertSummary.test.ts\nA\tfrontend/src/lib/alertSummary.ts\nM\tfrontend/src/pages/AlertDetailPage.tsx\nA\tfrontend/src/pages/LandingPage.tsx\nM\tfrontend/src/pages/StatsPage.tsx\n",
+    "review_patch_sha256": "0523902d69ffda47244fafb0ed5a0547ceff9e83dd0f4964d7da100dc06794e2"
+  },
+  {
+    "sha": "deef106816ea5861f1f3bc1d9c757285cc0e73e3",
+    "parents": [
+      "dfdc396a4846cdff53baea9cd0aad5421796a084"
+    ],
+    "subject": "fix(ui): dead controls are removed and developer wording is plain Romanian",
+    "name_status": "M\tfrontend/src/components/AuditVerification.tsx\nM\tfrontend/src/components/CaseWorkspace.tsx\nM\tfrontend/src/layouts/AppLayout.tsx\nM\tfrontend/src/lib/adapters.ts\nM\tfrontend/src/lib/constants.ts\nM\tfrontend/src/pages/ArchivePage.tsx\nM\tfrontend/src/pages/AuditPage.tsx\nM\tfrontend/src/pages/CamerasPage.tsx\n",
+    "review_patch_sha256": "72c5be60aa354084fb23b724c5a78d6916de2dbaa5755643d4da6ac725bbc3a4"
+  },
+  {
+    "sha": "24ce431aa8096129ce2b3c600ca07abcc0311b9d",
+    "parents": [
+      "667c0c6dea0a9bec92ca8050bdb5891cd956a8e6"
+    ],
+    "subject": "feat(ui): honest statistics counts and a one-page printable activity report",
+    "name_status": "A\tfrontend/src/components/ActivityReport.tsx\nM\tfrontend/src/index.css\nM\tfrontend/src/pages/StatsPage.tsx\n",
+    "review_patch_sha256": "6715d7d9d7361f9ecb1fe59b0829d3625086b1efa4adfd6ff0626c0ad187d97f"
+  },
+  {
+    "sha": "dfdc396a4846cdff53baea9cd0aad5421796a084",
+    "parents": [
+      "40c836833ef8eac14c924a7696359390d01082f5"
+    ],
+    "subject": "fix(ui): failed actions and failed loading show a dismissible error banner",
+    "name_status": "M\tfrontend/src/layouts/AppLayout.tsx\n",
+    "review_patch_sha256": "0ee9381155deb5ac942d098f8dd097e4befc3fb1ea6beb8fdf19ffb5745bb5fc"
+  },
+  {
+    "sha": "40c836833ef8eac14c924a7696359390d01082f5",
+    "parents": [
+      "f8d9b5167898e93eb84f78ba12fa49018dfde31e"
+    ],
+    "subject": "fix(cameras): a tile without an image shows a placeholder, not a broken picture",
+    "name_status": "M\tfrontend/src/pages/CamerasPage.tsx\n",
+    "review_patch_sha256": "87c3ce8dacdecc50ff8e9c10f41d7dcc3243266c5afa0551174e09db3f394bef"
+  },
+  {
+    "sha": "667c0c6dea0a9bec92ca8050bdb5891cd956a8e6",
+    "parents": [
+      "6202b136da74ea7b17d82dbb6c21248f228e30a7"
+    ],
+    "subject": "feat(ui): public landing page explaining the product in plain words",
+    "name_status": "M\tfrontend/src/App.tsx\nA\tfrontend/src/pages/LandingPage.tsx\n",
+    "review_patch_sha256": "4eaf391f801059c2e5fbcdf3dc0141c9f41d382047ad59f41f7af658844fc9fb"
+  },
+  {
+    "sha": "f8d9b5167898e93eb84f78ba12fa49018dfde31e",
+    "parents": [
+      "0e0752defa339886f62ce53545dd0d8933585efe"
+    ],
+    "subject": "fix(queue): rejected alerts are never replayed as new or placed first",
+    "name_status": "M\tfrontend/src/lib/demo.test.ts\nM\tfrontend/src/lib/demo.ts\nM\tfrontend/src/pages/DashboardPage.tsx\n",
+    "review_patch_sha256": "6573cfb03febdb3e35af21232c105bfe413cf4468feb5fec5f34fd0cf5ed6abe"
+  },
+  {
+    "sha": "6202b136da74ea7b17d82dbb6c21248f228e30a7",
+    "parents": [
+      "c9724a6c5d9da48f8021f64dc409a118dc1c2cba"
+    ],
+    "subject": "feat(ui): plain-language summary on the alert page",
+    "name_status": "M\tfrontend/src/pages/AlertDetailPage.tsx\n",
+    "review_patch_sha256": "e680998518354a8d6ccde860ab8512928451822727da691b8de06e5e94582a50"
+  },
+  {
+    "sha": "0e0752defa339886f62ce53545dd0d8933585efe",
+    "parents": [
+      "7f0e6322bb127aafe8a049fb4bc3bdc13bb8c423"
+    ],
+    "subject": "fix(dashboard): invented patrols are gone and the KPIs show loaded data",
+    "name_status": "M\tfrontend/src/components/IasiMap.tsx\nM\tfrontend/src/components/TacticalMap.tsx\nM\tfrontend/src/lib/iasi.ts\nM\tfrontend/src/pages/DashboardPage.tsx\n",
+    "review_patch_sha256": "a7f3aedb632aa3dab4dd07f2be9016865ff4da84358da164e87f1b6e5e34ecd4"
+  },
+  {
+    "sha": "7f0e6322bb127aafe8a049fb4bc3bdc13bb8c423",
+    "parents": [
+      "6df9a71c7aac237b0cef45c3cd437eb44c7c0a4b"
+    ],
+    "subject": "fix(case): a blur statement appears only for fully redacted evidence",
+    "name_status": "M\tfrontend/src/components/CaseWorkspace.tsx\n",
+    "review_patch_sha256": "39270d6d4b4b677663dc0858e43e036f27e10db8c40f5915957bdbe3e3b61419"
+  },
+  {
+    "sha": "c9724a6c5d9da48f8021f64dc409a118dc1c2cba",
+    "parents": [
+      "6bde506492313503945ea858b9794d5684a2b5af"
+    ],
+    "subject": "feat(ui): plain-language alert summary builder with tests",
+    "name_status": "A\tfrontend/src/lib/alertSummary.test.ts\nA\tfrontend/src/lib/alertSummary.ts\n",
+    "review_patch_sha256": "2c2238267eba1f0055984dc8a3431332252731a7a62f7833962454c6af263d25"
+  },
+  {
+    "sha": "6df9a71c7aac237b0cef45c3cd437eb44c7c0a4b",
+    "parents": [
+      "ab897e438fd80bf1b7396b54a8a0d6c3288b99cd"
+    ],
+    "subject": "fix(ui): stock footage is marked as demonstration material",
+    "name_status": "M\tfrontend/src/components/IasiMap.tsx\nM\tfrontend/src/components/TacticalMap.tsx\nM\tfrontend/src/lib/adapters.ts\nA\tfrontend/src/lib/iasi.test.ts\nM\tfrontend/src/lib/iasi.ts\nM\tfrontend/src/pages/ArchivePage.tsx\nM\tfrontend/src/pages/CamerasPage.tsx\n",
+    "review_patch_sha256": "6561fe5a9f6a7b6902fa51b2296b70787e8dbbca6651e91e7c3d74a694743e80"
+  },
+  {
+    "sha": "ab897e438fd80bf1b7396b54a8a0d6c3288b99cd",
+    "parents": [
+      "547a17897cac623062cac18486112f38850f2c2b"
+    ],
+    "subject": "fix(login): the subtitle states what the product is and the dead checkbox is gone",
+    "name_status": "M\tfrontend/src/pages/LoginPage.tsx\n",
+    "review_patch_sha256": "ef12bb1c91a80d6b90ef5c74d38b1b5e1c81065473438f4d13b43cd584c929e5"
+  },
+  {
+    "sha": "547a17897cac623062cac18486112f38850f2c2b",
+    "parents": [
+      "6bde506492313503945ea858b9794d5684a2b5af"
+    ],
+    "subject": "fix(ui): the preload overlay no longer blocks the app",
+    "name_status": "M\tfrontend/src/layouts/AppLayout.tsx\nA\tfrontend/src/lib/demo.test.ts\nM\tfrontend/src/lib/demo.ts\n",
+    "review_patch_sha256": "a5e8c63548a1c0f30574673be2de1e2a975e5e143be327c53e19dc49aee7a87f"
+  }
+]

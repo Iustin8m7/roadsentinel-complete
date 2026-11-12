@@ -1,0 +1,103 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "name": "Centura Iași – DN28", "category": "ring_road" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [27.6850, 47.1150],
+          [27.6680, 47.1230],
+          [27.6551, 47.1305],
+          [27.6320, 47.1390],
+          [27.6050, 47.1420],
+          [27.5800, 47.1380],
+          [27.5520, 47.1290],
+          [27.5300, 47.1200]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Șoseaua Păcurari", "category": "artery" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [27.5180, 47.1850],
+          [27.5400, 47.1780],
+          [27.5620, 47.1710],
+          [27.5710, 47.1675],
+          [27.5770, 47.1658]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Bulevardul Carol I (Copou)", "category": "artery" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [27.5580, 47.1950],
+          [27.5650, 47.1830],
+          [27.5719, 47.1712],
+          [27.5770, 47.1658]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Bulevardul Independenței", "category": "artery" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [27.5770, 47.1658],
+          [27.5793, 47.1662],
+          [27.5880, 47.1645],
+          [27.5990, 47.1610]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Bulevardul Ștefan cel Mare și Sfânt", "category": "artery" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [27.5770, 47.1658],
+          [27.5822, 47.1647],
+          [27.5865, 47.1605],
+          [27.5872, 47.1570]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Bulevardul Nicolae Iorga", "category": "artery" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [27.5710, 47.1565],
+          [27.5800, 47.1550],
+          [27.5893, 47.1540],
+          [27.6020, 47.1515],
+          [27.6150, 47.1480]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Bulevardul Socola", "category": "artery" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [27.5893, 47.1540],
+          [27.5960, 47.1480],
+          [27.6030, 47.1400],
+          [27.6110, 47.1320],
+          [27.6250, 47.1210]
+        ]
+      }
+    }
+  ]
+}

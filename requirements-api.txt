@@ -1,0 +1,13 @@
+# API server only (what runs in production). The video pipeline needs requirements.txt.
+fastapi>=0.115
+uvicorn[standard]
+python-multipart
+itsdangerous
+pydantic>=2
+sqlalchemy>=2
+psycopg[binary]>=3
+boto3
+pyyaml
+numpy
+httpx
+anthropic

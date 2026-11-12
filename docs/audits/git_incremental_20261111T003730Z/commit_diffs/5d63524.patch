@@ -1,0 +1,232 @@
+diff --git a/frontend/scripts/e2e-investigation.mjs b/frontend/scripts/e2e-investigation.mjs
+index 5c47350..9e74f95 100644
+--- a/frontend/scripts/e2e-investigation.mjs
++++ b/frontend/scripts/e2e-investigation.mjs
+@@ -76,7 +76,7 @@ try {
+   await op.getByTestId('case-workspace').waitFor()
+   assert.equal(await op.getByTestId('evidence-clip').getByTestId('storage-state').innerText(), 'Disponibilă')
+   assert.match(await op.getByTestId('source-kind').innerText(), /Necunoscută/)
+-  assert.match(await op.getByTestId('model-status').innerText(), /nevalidat/)
++  assert.match(await op.getByTestId('model-status').innerText(), /neverificat/)
+   assert.match(await op.getByTestId('speed').innerText(), /necalibrată/)
+   step('case opened from the archive: evidence available, source/model/speed shown honestly')
+ 
+diff --git a/frontend/src/components/AuditVerification.tsx b/frontend/src/components/AuditVerification.tsx
+index a601062..6a30b39 100644
+--- a/frontend/src/components/AuditVerification.tsx
++++ b/frontend/src/components/AuditVerification.tsx
+@@ -20,12 +20,17 @@ const INTEGRITY: Record<IntegrityState, { label: string; cls: string }> = {
+ const KIND: Record<string, string> = { keyframe: 'Cadru cheie', clip: 'Clip', camera_video: 'Înregistrare cameră' }
+ const fail = (e: unknown) => e instanceof ApiError && e.status === 403 ? 'Acces refuzat: verificarea este rezervată rolurilor de audit.' : errorMessage(e)
+ 
++const CHAIN_REASON: Record<string, string> = {
++  'prev_hash mismatch': 'legătura cu intrarea anterioară nu corespunde',
++  'entry_hash mismatch': 'conținutul intrării a fost modificat',
++}
++
+ function ChainResult({ r }: { r: AuditVerify }) {
+   if (r.ok && r.checked === 0) return <p className="text-amber-400" data-testid="chain-state">Lanț gol: nu există încă intrări de audit pentru această unitate.</p>
+   if (r.ok) return <p className="text-emerald-400" data-testid="chain-state">Lanț intact: {r.checked} intrări verificate.</p>
+   return (
+     <p className="text-rose-400 font-semibold" data-testid="chain-state">
+-      Lanț rupt la intrarea #{r.first_broken_seq} ({r.reason}). Au fost parcurse {r.checked} intrări; ce urmează nu poate fi considerat intact.
++      Lanț rupt la intrarea #{r.first_broken_seq} ({CHAIN_REASON[r.reason ?? ''] ?? r.reason}). Au fost parcurse {r.checked} intrări; ce urmează nu poate fi considerat intact.
+     </p>
+   )
+ }
+diff --git a/frontend/src/components/CasePanels.tsx b/frontend/src/components/CasePanels.tsx
+index 9668b65..fafa3c1 100644
+--- a/frontend/src/components/CasePanels.tsx
++++ b/frontend/src/components/CasePanels.tsx
+@@ -6,9 +6,11 @@ import { CheckCircle2, FileCheck2, GitBranch, ListTodo, Loader2, Scale, Trash2,
+ import { ApiError } from '@/lib/api'
+ import {
+   addFollowup, addLink, errorMessage, followupAssignees, MAX_VERIFY_BYTES, placeHold, releaseHold, removeLink,
+-  updateFollowup, verifyPackage,
++  updateFollowup, verifyErrorRo, verifyPackage,
+   type CaseDossier, type ContextEvent, type Followup, type FollowupStatus, type PackageVerifyResult, type Person,
+ } from '@/lib/cases'
++import { HIDDEN_IDS } from '@/lib/demo'
++import { HIDDEN_TYPES } from '@/store/data'
+ 
+ const card = 'bg-[#111821] border border-[#1E2A36] rounded-md p-3.5'
+ const title = 'font-sans font-bold text-xs uppercase tracking-wider text-[#7D8A9B] mb-2 flex items-center gap-1.5'
+@@ -25,6 +27,9 @@ function Status({ error }: { error: string | null }) {
+   return error ? <p role="alert" className="text-[11px] text-[#FF3B3B] mt-1.5">{error}</p> : null
+ }
+ 
++// Alerts hidden everywhere else in the demo (lib/demo.ts) stay hidden in these panels too.
++const shownCase = (c: { number: number; type: string }) => !HIDDEN_TYPES.has(c.type) && !HIDDEN_IDS.has(String(c.number))
++
+ interface PanelProps { number: string; dossier: CaseDossier; reload: () => Promise<void> }
+ 
+ // --------------------------------------------------------------------------- legal hold
+@@ -34,10 +39,12 @@ export function LegalHoldPanel({ number, dossier, reload }: PanelProps) {
+   const [reason, setReason] = useState('')
+   const [busy, setBusy] = useState(false)
+   const [error, setError] = useState<string | null>(null)
++  const [armed, setArmed] = useState(false)
+   if (!state) return null
+   const active = state.active
+   const submit = async () => {
+-    setBusy(true); setError(null)
++    if (active && !armed) { setArmed(true); return }  // releasing a hold takes a second, explicit click
++    setArmed(false); setBusy(true); setError(null)
+     try { await (active ? releaseHold(number, reason.trim()) : placeHold(number, reason.trim())); setReason(''); await reload() }
+     catch (e) { setError(denied(e)) } finally { setBusy(false) }
+   }
+@@ -52,11 +59,11 @@ export function LegalHoldPanel({ number, dossier, reload }: PanelProps) {
+       <p className="text-[10px] text-[#536070] mb-2">{state.effect}</p>
+       {state.can_manage ? (
+         <form onSubmit={(e) => { e.preventDefault(); void submit() }} className="space-y-1.5" aria-label={active ? 'Ridicare reținere' : 'Plasare reținere'}>
+-          <input value={reason} maxLength={500} onChange={(e) => setReason(e.target.value)} className={input}
++          <input value={reason} maxLength={500} onChange={(e) => { setReason(e.target.value); setArmed(false) }} className={input}
+             placeholder={active ? 'Motivul ridicării (minimum 10 caractere)' : 'Temeiul reținerii (minimum 10 caractere)'}
+             aria-label={active ? 'Motivul ridicării reținerii' : 'Temeiul reținerii legale'} />
+           <button type="submit" disabled={busy || reason.trim().length < 10} className={active ? ghost : primary}>
+-            {active ? 'Ridică reținerea' : 'Plasează reținerea'}
++            {active ? (armed ? 'Confirmă ridicarea reținerii' : 'Ridică reținerea') : 'Plasează reținerea'}
+           </button>
+         </form>
+       ) : <p className="text-[11px] text-[#7D8A9B]">Doar un administrator al unității poate plasa sau ridica reținerea.</p>}
+@@ -78,7 +85,7 @@ export function LegalHoldPanel({ number, dossier, reload }: PanelProps) {
+ // --------------------------------------------------------------------------- related cases
+ 
+ export function RelatedPanel({ number, dossier, reload }: PanelProps) {
+-  const related = dossier.related ?? []
++  const related = (dossier.related ?? []).filter(shownCase)
+   const [other, setOther] = useState('')
+   const [reason, setReason] = useState('')
+   const [busy, setBusy] = useState(false)
+@@ -88,8 +95,10 @@ export function RelatedPanel({ number, dossier, reload }: PanelProps) {
+     try { await addLink(number, Number(other), reason.trim()); setOther(''); setReason(''); await reload() }
+     catch (e) { setError(denied(e)) } finally { setBusy(false) }
+   }
++  const [confirming, setConfirming] = useState<string | null>(null)
+   const remove = async (id: string) => {
+-    setError(null)
++    if (confirming !== id) { setConfirming(id); return }  // first click only asks
++    setConfirming(null); setError(null)
+     try { await removeLink(number, id); await reload() } catch (e) { setError(denied(e)) }
+   }
+   return (
+@@ -110,7 +119,7 @@ export function RelatedPanel({ number, dossier, reload }: PanelProps) {
+                     {why.label}{why.reason ? ` — „${why.reason}”` : ''}{why.created_by ? ` · ${why.created_by}` : ''}
+                   </span>
+                   {why.can_remove && why.link_id && (
+-                    <button type="button" onClick={() => void remove(why.link_id!)} className="text-[#7D8A9B] hover:text-[#FF3B3B] cursor-pointer" aria-label={`Elimină legătura cu cazul #${r.number}`}><Trash2 size={12} /></button>
++                    <button type="button" onClick={() => void remove(why.link_id!)} className="text-[#7D8A9B] hover:text-[#FF3B3B] cursor-pointer" aria-label={confirming === why.link_id ? `Confirmă eliminarea legăturii cu cazul #${r.number}` : `Elimină legătura cu cazul #${r.number}`}>{confirming === why.link_id ? <span className="text-[#FF3B3B] font-semibold">Confirmă eliminarea</span> : <Trash2 size={12} />}</button>
+                   )}
+                 </li>
+               ))}
+@@ -143,7 +152,7 @@ const fmtDelta = (s: number) => {
+ export function ContextStrip({ dossier }: { dossier: CaseDossier }) {
+   const ctx = dossier.context
+   if (!ctx) return null
+-  const events: ContextEvent[] = [...ctx.before, ...ctx.after]
++  const events: ContextEvent[] = [...ctx.before, ...ctx.after].filter(shownCase)
+   const pos = (d: number) => `${50 + (d / ctx.window_s) * 50}%`
+   return (
+     <section className={card} aria-labelledby="ctx-title" data-testid="timeline-context">
+@@ -301,7 +310,7 @@ export function VerifyPackageForm() {
+   const run = async () => {
+     if (!file) return
+     setResult(null); setError(null)
+-    if (file.size > MAX_VERIFY_BYTES) { setError('Fișierul depășește dimensiunea maximă a unui pachet.'); return }
++    if (file.size > MAX_VERIFY_BYTES) { setError('Pachetul depășește 60 MB. Verificați-l pe calculator cu: python -m app.cli verify-package <fișier>.'); return }
+     setBusy(true)
+     try { setResult(await verifyPackage(file, digest.trim() || undefined)) }
+     catch (e) { setError(e instanceof ApiError && e.status === 429 ? 'Prea multe verificări; reîncercați peste câteva minute.' : errorMessage(e)) }
+@@ -320,7 +329,7 @@ export function VerifyPackageForm() {
+           <div className="font-semibold">{result.ok ? `Integritate confirmată: ${result.files_checked} fișiere verificate.` : 'Verificarea a eșuat.'}</div>
+           {result.manifest_sha256 && <div className="text-[#7D8A9B] break-all">Manifest SHA-256: <code>{result.manifest_sha256}</code></div>}
+           {result.server_record && <div className="text-[#7D8A9B]">Corespunde exportului {result.server_record.export_id.slice(0, 8)} al cazului #{result.server_record.event_id}.</div>}
+-          {result.errors.length > 0 && <ul className="list-disc ml-4">{result.errors.map((e) => <li key={e} className="break-all">{e}</li>)}</ul>}
++          {result.errors.length > 0 && <ul className="list-disc ml-4">{result.errors.map((e, i) => <li key={`${i}-${e}`} className="break-all">{verifyErrorRo(e)}</li>)}</ul>}
+           <div className="text-[10px] text-[#536070] mt-1">{result.note}</div>
+         </div>
+       )}
+diff --git a/frontend/src/lib/cases.test.ts b/frontend/src/lib/cases.test.ts
+index 13276f1..a01ae52 100644
+--- a/frontend/src/lib/cases.test.ts
++++ b/frontend/src/lib/cases.test.ts
+@@ -1,6 +1,6 @@
+ import { afterEach, describe, expect, it, vi } from 'vitest'
+ import { DEMO_CURATION, HIDDEN_IDS } from './demo'
+-import { archiveBody, archiveRequest, fmtOffset, newIdempotencyKey, saveSearch, searchArchive, updateFollowup, verifyPackage, type ArchiveRun } from './cases'
++import { archiveBody, archiveRequest, fmtOffset, newIdempotencyKey, saveSearch, searchArchive, updateFollowup, verifyErrorRo, verifyPackage, type ArchiveRun } from './cases'
+ 
+ afterEach(() => vi.unstubAllGlobals())
+ 
+@@ -86,3 +86,13 @@ describe('investigation completion client', () => {
+     expect(request.headers.get('Content-Type')).toBe('application/json')
+   })
+ })
++
++describe('verifyErrorRo', () => {
++  it('translates known verifier errors and keeps the file name', () => {
++    expect(verifyErrorRo('sha256 mismatch: evidence/a.mp4')).toBe('Conținut modificat (amprenta nu corespunde): evidence/a.mp4')
++    expect(verifyErrorRo('not a readable zip file: BadZipFile')).toBe('Fișierul nu este o arhivă ZIP care poate fi citită.')
++  })
++  it('shows an unknown error as received', () => {
++    expect(verifyErrorRo('something new')).toBe('something new')
++  })
++})
+diff --git a/frontend/src/lib/cases.ts b/frontend/src/lib/cases.ts
+index 83ef68d..9d31e7f 100644
+--- a/frontend/src/lib/cases.ts
++++ b/frontend/src/lib/cases.ts
+@@ -120,7 +120,35 @@ export const verifyPackage = (file: Blob, expectedSha256?: string) =>
+   api<PackageVerifyResult>(`/api/exports/verify${expectedSha256 ? `?manifest_sha256=${enc(expectedSha256)}` : ''}`, {
+     method: 'POST', body: file, headers: { 'Content-Type': 'application/zip' },
+   })
+-export const MAX_VERIFY_BYTES = 528 * 1024 * 1024
++// The web gateway refuses request bodies over 64 MB; larger packages are verified with the CLI.
++export const MAX_VERIFY_BYTES = 60 * 1024 * 1024
++
++const VERIFY_ERRORS: [string, string][] = [
++  ['sha256 mismatch: ', 'Conținut modificat (amprenta nu corespunde): '],
++  ['size mismatch: ', 'Dimensiune diferită față de manifest: '],
++  ['listed file missing: ', 'Fișier din manifest care lipsește din pachet: '],
++  ['file not listed in manifest: ', 'Fișier care nu apare în manifest: '],
++  ['file listed more than once: ', 'Fișier trecut de mai multe ori în manifest: '],
++  ['unsafe entry name: ', 'Nume de fișier nepermis: '],
++  ['not a readable zip file', 'Fișierul nu este o arhivă ZIP care poate fi citită.'],
++  ['unreadable zip content', 'Conținutul arhivei nu poate fi citit (date corupte sau arhivă protejată).'],
++  ['manifest digest differs', 'Amprenta manifestului diferă de cea oficială introdusă.'],
++  ['manifest.json missing', 'Pachetul nu conține manifestul (manifest.json).'],
++  ['manifest.json is not', 'Manifestul nu are forma așteptată.'],
++  ['manifest has an invalid file path', 'Manifestul conține o cale de fișier nevalidă.'],
++  ['manifest lists no files', 'Manifestul nu enumeră niciun fișier.'],
++  ['unknown manifest schema', 'Manifestul are un format necunoscut.'],
++  ['duplicate entry names', 'Arhiva conține două fișiere cu același nume.'],
++  ['too many entries', 'Arhiva conține prea multe fișiere.'],
++  ['declared uncompressed size', 'Pachetul depășește dimensiunea maximă care poate fi verificată aici.'],
++]
++/** Romanian text for a verifier error; an unknown one is shown as received. */
++export function verifyErrorRo(error: string): string {
++  for (const [prefix, text] of VERIFY_ERRORS) {
++    if (error.startsWith(prefix)) return text.endsWith(': ') ? text + error.slice(prefix.length) : text
++  }
++  return error
++}
+ 
+ export const listExports = (n: string) => api<ExportJob[]>(`/api/events/${enc(n)}/exports`)
+ export const requestExport = (n: string, body: { justification: string; case_reference: string; include_original: boolean; idempotency_key: string }) =>
+diff --git a/frontend/src/pages/SettingsPage.tsx b/frontend/src/pages/SettingsPage.tsx
+index 8f9519f..f23a2a3 100644
+--- a/frontend/src/pages/SettingsPage.tsx
++++ b/frontend/src/pages/SettingsPage.tsx
+@@ -35,10 +35,10 @@ export default function SettingsPage() {
+         contentClassName="space-y-3"
+       >
+         <div className="p-3.5 rounded-md bg-elevation/70 border border-border text-xs text-text-secondary space-y-2">
+-          <p className="font-semibold text-text-primary">Garanții arhitecturale de conformitate:</p>
++          <p className="font-semibold text-text-primary">Principii de proiectare:</p>
+           <ul className="space-y-1.5 list-disc pl-4 text-[11px]">
+             <li>Fără recunoaștere facială și fără urmărirea biometrică a persoanelor.</li>
+-            <li>Directiva UE 2016/680 privind protecția datelor în domeniul aplicării legii.</li>
++            <li>Acces pe roluri și aprobare de către a doua persoană pentru exporturi.</li>
+             <li>Decizia finală aparține exclusiv operatorului uman atestat.</li>
+             <li>Jurnal de audit criptografic nemodificabil pentru toate deciziile.</li>
+           </ul>

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RoadSentinel – Dispecerat</title>
+<link rel="stylesheet" href="/app.css">
+</head>
+<body>
+<header>
+  <div class="brand">RoadSentinel <span>dispecerat</span></div>
+  <form class="search" id="search" role="search">
+    <input id="q" type="search" aria-label="Caută în arhivă"
+           placeholder="Caută în arhivă: „camioane oprite pe acostament ieri între 14 și 18”">
+    <button type="submit">Caută</button>
+  </form>
+  <div class="operator"><span class="live-dot" id="live-dot" title="Actualizări în timp real"></span><span id="who"></span>
+    <button type="button" id="logout" hidden>Ieșire</button></div>
+</header>
+
+<p class="alert-bar" id="error" role="alert" hidden></p>
+<main>
+  <section class="queue" aria-label="Alerte">
+    <div class="queue-head">
+      <h2 id="queue-title">Alerte</h2>
+      <small id="queue-count"></small>
+    </div>
+    <div id="understood"></div>
+    <ul class="alerts" id="alerts"></ul>
+  </section>
+
+  <section class="evidence" id="evidence" aria-live="polite">
+    <p class="empty">Selectează o alertă din listă ca să vezi dosarul: clipul, cadrul cheie, regula care a declanșat-o și verificarea modelului vizual.</p>
+  </section>
+
+  <aside class="side">
+    <div>
+      <h2>Camere</h2>
+      <div class="cam-pick" id="cams"></div>
+      <video id="live" muted autoplay loop playsinline></video>
+    </div>
+    <div>
+      <h2>Rezumat</h2>
+      <div class="stats" id="stats"></div>
+      <p class="label" id="vlm-state"></p>
+    </div>
+    <div>
+      <h2>Jurnal de audit</h2>
+      <ol class="audit" id="audit"></ol>
+    </div>
+  </aside>
+</main>
+
+<dialog id="login">
+  <form id="login-form" method="dialog">
+    <h2>RoadSentinel</h2>
+    <p>Intră în dispecerat. Deciziile tale apar în jurnalul de audit cu numele de mai jos.</p>
+    <div id="password-step"><label>E-mail / operator <input id="login-name" autocomplete="username" required></label>
+    <label>Parolă <input id="login-pass" type="password" autocomplete="current-password"></label></div>
+    <label id="mfa-step" hidden>Cod de autentificare <input id="login-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" disabled></label>
+    <p id="enrollment" hidden>Contul necesită configurarea autentificării în doi pași. Finalizează înrolarea în <a href="/login">pagina securizată de autentificare</a>, apoi revino aici.</p>
+    <button id="login-reset" type="button" hidden>Înapoi la parolă</button>
+    <p class="error" id="login-error" role="alert"></p>
+    <button class="primary" id="login-submit" type="submit">Intră</button>
+  </form>
+</dialog>
+
+<script src="/app.js" defer></script>
+</body>
+</html>

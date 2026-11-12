@@ -1,0 +1,35 @@
+{
+  "probe_date": "2026-11-07",
+  "scope": "local host capability check; no third-party stream accessed",
+  "camera_nodes": [],
+  "v4l2_ctl_available": false,
+  "ffmpeg_executable_available": false,
+  "uvc_profile": "cameras/local-uvc.yaml",
+  "source": "device:0",
+  "model": "models/yolox_s.onnx",
+  "worker": {
+    "start_state": "STARTING",
+    "final_state": "ERROR",
+    "child_exit_code": 1,
+    "log_file": "/tmp/roadsentinel-camera-workers/d12ccfae9285cbcbd492287a.log",
+    "error": "camera device /dev/video0 is missing",
+    "frames_captured": 0,
+    "source_fps": null,
+    "processing_fps": null,
+    "detections": null,
+    "byte_track_ids": null,
+    "preview_uploaded": false
+  },
+  "onnxruntime": {
+    "version": "1.23.2",
+    "available_providers": ["AzureExecutionProvider", "CPUExecutionProvider"],
+    "cuda_execution_provider_available": false
+  },
+  "nvidia_smi": "failed: could not communicate with NVIDIA driver",
+  "postgres_read_only_probes": {
+    "127.0.0.1:55438": "unavailable",
+    "127.0.0.1:55439": "unavailable",
+    "127.0.0.1:5432": "unavailable"
+  },
+  "classification": "NO PHYSICAL LIVE CAPTURE; no inference or live telemetry claimed"
+}

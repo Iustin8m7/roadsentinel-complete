@@ -1,0 +1,49 @@
+
+> roadsentinel-web@0.1.0 build
+> tsc -b && vite build --outDir /home/justin7m8/Documents/roadsentinel-integration/docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build
+
+vite v7.3.7 building client environment for production...
+transforming...
+✓ 2889 modules transformed.
+
+(!) outDir /home/justin7m8/Documents/roadsentinel-integration/docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build is not inside project root and will not be emptied.
+Use --emptyOutDir to override.
+
+rendering chunks...
+computing gzip size...
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/index.html                                                    0.71 kB │ gzip:   0.43 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/space-grotesk-vietnamese-wght-normal-D0rl6rjA.woff2    6.71 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/space-grotesk-latin-ext-wght-normal-D9tNdqV9.woff2    18.94 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/space-grotesk-latin-wght-normal-BhU9QXUp.woff2        22.29 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/IasiMap-CIGW-MKW.css                                  15.61 kB │ gzip:   6.46 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/index-Dr1BDHnW.css                                    92.45 kB │ gzip:  17.84 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/loader-circle-C254KxfI.js                              0.20 kB │ gzip:   0.19 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/lock-CNY5PVtF.js                                       0.24 kB │ gzip:   0.21 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/circle-check-DptoYN4i.js                               0.24 kB │ gzip:   0.21 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/circle-x-Bt2Rs1hu.js                                   0.26 kB │ gzip:   0.21 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/bookmark-Cgnpp6dc.js                                   0.26 kB │ gzip:   0.22 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/download-w5Unlr6l.js                                   0.27 kB │ gzip:   0.22 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/trash--oZAhPlP.js                                      0.38 kB │ gzip:   0.25 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/radio-YzwprSQS.js                                      0.41 kB │ gzip:   0.27 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/triangle-alert-CwomvDo7.js                             0.69 kB │ gzip:   0.39 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/BadgePanel-Gcy1aJeh.js                                 0.75 kB │ gzip:   0.43 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/TacticalMap-BMdG9bpl.js                                1.51 kB │ gzip:   0.80 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/ClipModal-CSC7YOcB.js                                  1.51 kB │ gzip:   0.73 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/SettingsPage-BbwyETgW.js                               1.74 kB │ gzip:   0.90 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/SeverityBadge-CanehBQk.js                              2.00 kB │ gzip:   0.92 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/PatrolsPage-gRFCkCTR.js                                2.68 kB │ gzip:   1.16 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/cases-CawIR3U4.js                                      4.04 kB │ gzip:   1.86 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/RulesPage-B3IWCBsc.js                                  5.01 kB │ gzip:   1.96 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/DashboardPage-Da6S8dqE.js                             10.92 kB │ gzip:   3.87 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/AuditPage-KB9JH7yB.js                                 11.12 kB │ gzip:   3.88 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/EvidencePlayer-C-RjmC1S.js                            12.04 kB │ gzip:   4.50 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/ArchivePage-CuLmNCHC.js                               12.21 kB │ gzip:   4.46 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/format-DjybwqCj.js                                    12.22 kB │ gzip:   3.27 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/StatsPage-BiOo8YPG.js                                 15.79 kB │ gzip:   5.25 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/VideoAnalysisPage-D74Vcr1u.js                         47.12 kB │ gzip:  13.93 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/AlertDetailPage-7CBQS7vp.js                           58.70 kB │ gzip:  17.33 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/CamerasPage-CB66t1Mz.js                              109.17 kB │ gzip:  33.62 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/IasiMap-IqGzRmlV.js                                  156.73 kB │ gzip:  46.05 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/LivePlayer-CBnKuuiW.js                               399.57 kB │ gzip: 123.92 kB
+../docs/audits/git_incremental_20261111T003730Z/runs/20261111T005339Z-368018da/build/assets/index-Ct7IALJR.js                                    434.35 kB │ gzip: 140.02 kB
+✓ built in 3.16s

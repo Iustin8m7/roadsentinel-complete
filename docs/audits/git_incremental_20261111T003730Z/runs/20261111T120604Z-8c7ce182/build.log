@@ -1,0 +1,10 @@
+
+> roadsentinel-web@0.1.0 build
+> tsc -b && vite build --outDir /home/justin7m8/Documents/roadsentinel-integration/docs/audits/git_incremental_20261111T003730Z/runs/20261111T120604Z-8c7ce182/build
+
+src/pages/ArchivePage.tsx(113,33): error TS2345: Argument of type 'ApiEvent[] | ApiHit[]' is not assignable to parameter of type 'ApiHit[]'.
+  Type 'ApiEvent[]' is not assignable to type 'ApiHit[]'.
+    Type 'ApiEvent' is not assignable to type 'ApiHit'.
+      Types of property 'location' are incompatible.
+        Type 'string | null' is not assignable to type 'string | undefined'.
+          Type 'null' is not assignable to type 'string | undefined'.

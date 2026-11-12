@@ -1,0 +1,40 @@
+{
+  "input": "Licensed Street_traffic.webm",
+  "model": "YOLOX-S COCO ONNX",
+  "provider": "CPUExecutionProvider",
+  "samples": 2,
+  "duration_s": 1.166,
+  "person_detections": [
+    {
+      "frame_index": 1000,
+      "pts_seconds": 33.333,
+      "boxes": [
+        [
+          1150.3585205078125,
+          574.2979736328125,
+          1318.1619873046875,
+          921.4132690429688
+        ],
+        [
+          1628.7586669921875,
+          726.6282958984375,
+          1863.01318359375,
+          1077.2401123046875
+        ],
+        [
+          622.9195556640625,
+          445.4010314941406,
+          660.4075927734375,
+          530.3104858398438
+        ]
+      ],
+      "confidence": [
+        0.9082133173942566,
+        0.899325966835022,
+        0.38491982221603394
+      ]
+    }
+  ],
+  "ground_truth": "Not annotated; detections are model output only",
+  "timestamp_note": "Actual decoder POS_MSEC after seek; declared1000fps is not reliable source cadence"
+}

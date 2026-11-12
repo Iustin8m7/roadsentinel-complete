@@ -1,0 +1,4 @@
+initdb exit 0 log /home/justin7m8/Documents/roadsentinel-integration/docs/audits/runtime_verification/runs/20261110T140905Z-10b95100/initdb.log
+start exit 0 log /home/justin7m8/Documents/roadsentinel-integration/docs/audits/runtime_verification/runs/20261110T140905Z-10b95100/start.log
+flows exit 0 log /home/justin7m8/Documents/roadsentinel-integration/docs/audits/runtime_verification/runs/20261110T140905Z-10b95100/flows.log
+stop exit 0 log /home/justin7m8/Documents/roadsentinel-integration/docs/audits/runtime_verification/runs/20261110T140905Z-10b95100/stop.log

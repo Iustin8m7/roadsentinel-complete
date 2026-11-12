@@ -1,0 +1,25 @@
+{
+  "models": [
+    {
+      "id": "stock-yolox-s",
+      "file": "models/yolox_s.onnx",
+      "sha256": "c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063",
+      "status": "candidate",
+      "base_model": "Megvii YOLOX-S COCO ONNX",
+      "training_data": "COCO (upstream model-zoo artifact; sample-level evaluation not performed)",
+      "trained_on": "2021-07",
+      "installed_at": "2026-11-06T05:54:00+0200",
+      "framework": {
+        "runtime": "onnxruntime 1.23.2 CPUExecutionProvider",
+        "tracker": "supervision 0.30.7 ByteTrack",
+        "format": "ONNX"
+      },
+      "classes": ["person", "bicycle", "car", "motorcycle", "bus", "truck"],
+      "cameras": ["*"],
+      "active_cameras": [],
+      "metrics": null,
+      "notes": "Official Megvii release artifact; Apache-2.0 YOLOX repository. Not evaluated or activated. Source: https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_s.onnx"
+    }
+  ],
+  "schema_version": 1
+}

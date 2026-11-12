@@ -1,0 +1,58 @@
+diff --git a/frontend/src/pages/CamerasPage.tsx b/frontend/src/pages/CamerasPage.tsx
+index 9c4209a..9084012 100644
+--- a/frontend/src/pages/CamerasPage.tsx
++++ b/frontend/src/pages/CamerasPage.tsx
+@@ -1,6 +1,6 @@
+ import { useState, useMemo, useEffect } from "react";
+ import { Link } from "react-router";
+-import { Grid, Map as MapIcon, AlertTriangle, Eye, History, Radio, X, SlidersHorizontal } from "lucide-react";
++import { Grid, Map as MapIcon, AlertTriangle, Eye, History, Radio, Video, X, SlidersHorizontal } from "lucide-react";
+ import { useDataStore } from "@/store/data";
+ import { useAuthStore } from "@/store/auth";
+ import { USE_MOCKS } from "@/lib/api";
+@@ -29,6 +29,29 @@ interface CameraExtended {
+   live?: boolean;
+ }
+ 
++/** Latest key frame, then the bundled still; a neutral placeholder when neither loads. */
++function CameraThumb({ cam }: { cam: CameraExtended }) {
++  const [failed, setFailed] = useState<string[]>([]);
++  const src = [cam.image_url, `/cams/${cam.id}.jpg`].find((u) => u && !failed.includes(u));
++  if (!src) {
++    return (
++      <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 px-3 text-center bg-elevation text-text-secondary" data-testid="camera-placeholder">
++        <Video className="w-7 h-7" aria-hidden />
++        <span className="text-[11px] font-semibold text-text-primary line-clamp-2">{cam.name}</span>
++        <span className="text-[10px]">Fără imagine disponibilă</span>
++      </div>
++    );
++  }
++  return (
++    <img
++      src={src}
++      alt={cam.name}
++      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
++      onError={() => setFailed((f) => [...f, src])}
++    />
++  );
++}
++
+ export default function CamerasPage() {
+   const realCameras = useDataStore((st) => st.cameras);
+   const alerts = useDataStore((st) => st.alerts);
+@@ -170,14 +193,7 @@ export default function CamerasPage() {
+                         {cam.heartbeat && cam.live_url ? (
+                           <LivePlayer src={cam.live_url} className="w-full h-full" />
+                         ) : (
+-                          <img
+-                            src={cam.image_url || `/cams/${cam.id}.jpg`}
+-                            alt={cam.name}
+-                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+-                            onError={(e) => {
+-                              const img = e.currentTarget as HTMLImageElement; if (!img.src.endsWith(`/cams/${cam.id}.jpg`)) img.src = `/cams/${cam.id}.jpg`;
+-                            }}
+-                          />
++                          <CameraThumb cam={cam} />
+                         )}
+ 
+                         {/* Top-left status badge: server-computed state when the control plane knows

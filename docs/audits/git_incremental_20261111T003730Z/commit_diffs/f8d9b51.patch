@@ -1,0 +1,115 @@
+diff --git a/frontend/src/lib/demo.test.ts b/frontend/src/lib/demo.test.ts
+index 6201a82..1be5886 100644
+--- a/frontend/src/lib/demo.test.ts
++++ b/frontend/src/lib/demo.test.ts
+@@ -1,4 +1,5 @@
+ import { afterEach, describe, expect, it, vi } from 'vitest'
++import type { Alert } from '@/types'
+ import { PRELOAD_FIRST, preloadClips, preloadReady } from './demo'
+ 
+ describe('preloadReady (post-login overlay)', () => {
+@@ -53,3 +54,42 @@ describe('preloadClips', () => {
+     expect(progress.at(-1)).toEqual([5, 5])
+   })
+ })
++
++describe('pitch staging and rejected alerts', () => {
++  afterEach(() => { vi.unstubAllEnvs(); vi.resetModules() })
++  const alert = (id: string, status: Alert['status'], type: Alert['type'], createdAt: string) =>
++    ({ id, status, type, createdAt, severity: 'critical', ruleSummary: '' }) as Alert
++  const staged = async () => {
++    vi.stubEnv('VITE_DEMO_CURATION', '1')
++    vi.resetModules()
++    return import('./demo')
++  }
++
++  it('puts rejected alerts after every other alert, with or without staging', async () => {
++    const list = [
++      alert('200', 'rejected', 'probable_crash', '2026-11-09T10:00:00Z'),
++      alert('201', 'new', 'congestion', '2026-11-01T10:00:00Z'),
++      alert('202', 'confirmed', 'tailgating', '2026-11-02T10:00:00Z'),
++    ]
++    const plain = await import('./demo')
++    expect([...list].sort(plain.demoSort).map((a) => a.id)).toEqual(['202', '201', '200'])
++    const demo = await staged()
++    expect([...list].sort(demo.demoSort).map((a) => a.id)).toEqual(['202', '201', '200'])
++  })
++  it('replays a confirmed alert as new, but never a rejected one', async () => {
++    const demo = await staged()
++    expect(demo.curate(alert('99', 'confirmed', 'very_high_speed', '2026-11-01T10:00:00Z')).status).toBe('new')
++    expect(demo.curate(alert('107', 'rejected', 'very_high_speed', '2026-11-01T10:00:00Z')).status).toBe('rejected')
++    const decision = { id: '5', at: '', username: 'op', role: 'operator', action: 'rejected' } as const
++    expect(demo.keepAudit({ ...decision, target: '107' })).toBe(true)
++    expect(demo.keepAudit({ ...decision, target: '99' })).toBe(false)
++  })
++  it('gives a rejected alert its real age, not a staged one', async () => {
++    const demo = await staged()
++    const rejected = alert('300', 'rejected', 'congestion', '2020-01-01T10:00:00Z')
++    const fresh = alert('301', 'new', 'congestion', '2020-01-01T10:00:00Z')
++    demo.assignDemoTimes([fresh, rejected])
++    expect(demo.demoAgo(fresh)).toMatch(/^acum \d+ s$/)
++    expect(demo.demoAgo(rejected)).not.toMatch(/ s$/)
++  })
++})
+diff --git a/frontend/src/lib/demo.ts b/frontend/src/lib/demo.ts
+index 05cc1e2..8d65729 100644
+--- a/frontend/src/lib/demo.ts
++++ b/frontend/src/lib/demo.ts
+@@ -102,7 +102,10 @@ const DEMO_RANK: Record<string, number> = {
+   probable_crash: 0, wrong_way: 1, tailgating: 2, dangerous_lane_change: 3, hard_braking: 4,
+   stopped_on_road: 5, stopped_emergency_lane: 6, very_high_speed: 7, congestion: 8,
+ }
++// A rejected alert never leads the queue, whatever its type or age.
++const rejectedLast = (a: Alert) => Number(a.status === 'rejected')
+ export const demoSort = (a: Alert, b: Alert) =>
++  rejectedLast(a) - rejectedLast(b) ||
+   (DEMO_CURATION ? (DEMO_RANK[a.type] ?? 6) - (DEMO_RANK[b.type] ?? 6) : 0) ||
+   b.createdAt.localeCompare(a.createdAt)
+ 
+@@ -114,7 +117,8 @@ const ageFor = (i: number) => Math.round(4 + i * 23 + i * i * 6) // s: 4s, 33s,
+ export function assignDemoTimes(queue: Alert[]) {
+   if (!DEMO_CURATION) return
+   const now = Date.now()
+-  queue.forEach((a, i) => { if (!fakeCreated.has(a.id)) fakeCreated.set(a.id, now - ageFor(i) * 1000) })
++  // Rejected alerts keep their real age: a fresh "acum 4 s" would present them as new.
++  queue.filter((a) => a.status !== 'rejected').forEach((a, i) => { if (!fakeCreated.has(a.id)) fakeCreated.set(a.id, now - ageFor(i) * 1000) })
+ }
+ export function demoAgo(alert: Alert) {
+   const at = fakeCreated.get(alert.id) ?? new Date(alert.createdAt).getTime()
+@@ -160,13 +164,15 @@ export const DEMO_UNDECIDED = new Set<string>(DEMO_CURATION ? ['99', '107', '118
+ type LocalDecision = { status: 'confirmed' | 'rejected'; by: string; at: string; note?: string }
+ export const localDecisions = new Map<string, LocalDecision>()
+ 
++const reallyRejected = new Set<string>()
+ function replay(alert: Alert): Alert {
+   if (!DEMO_UNDECIDED.has(alert.id)) return alert
+   const d = localDecisions.get(alert.id)
+-  return d
+-    ? { ...alert, status: d.status, decidedBy: d.by, decidedAt: d.at, decisionNote: d.note }
+-    : { ...alert, status: 'new', decidedBy: undefined, decidedAt: undefined, decisionNote: undefined }
++  if (d) return { ...alert, status: d.status, decidedBy: d.by, decidedAt: d.at, decisionNote: d.note }
++  // An alert the operator really rejected is never replayed as new; it keeps its history too.
++  if (alert.status === 'rejected') { reallyRejected.add(alert.id); return alert }
++  return { ...alert, status: 'new', decidedBy: undefined, decidedAt: undefined, decisionNote: undefined }
+ }
+ /** Hides the backend's earlier decision on replayed alerts from the history. */
+ export const keepAudit = (e: AuditEntry) =>
+-  !(e.target && DEMO_UNDECIDED.has(e.target) && !e.id.startsWith('local-') && ['confirmed', 'rejected'].includes(e.action))
++  !(e.target && DEMO_UNDECIDED.has(e.target) && !reallyRejected.has(e.target) && !e.id.startsWith('local-') && ['confirmed', 'rejected'].includes(e.action))
+diff --git a/frontend/src/pages/DashboardPage.tsx b/frontend/src/pages/DashboardPage.tsx
+index 18acebf..f0c2c0a 100644
+--- a/frontend/src/pages/DashboardPage.tsx
++++ b/frontend/src/pages/DashboardPage.tsx
+@@ -55,10 +55,8 @@ export default function DashboardPage() {
+           <div className="font-sans text-3xl font-bold text-[#E6EDF3] leading-none mt-1">{stats.confirmed}</div>
+         </div>
+         <div className={kpi}>
+-          <div className="text-xs text-[#7D8A9B] font-medium">Rată alarme false</div>
+-          <div className="font-sans text-3xl font-bold text-[#E6EDF3] leading-none mt-1">
+-            {stats.falseAlarmRate ? `${Math.round(stats.falseAlarmRate * 100)}%` : '—'}
+-          </div>
++          <div className="text-xs text-[#7D8A9B] font-medium">Decizii luate de operator</div>
++          <div className="font-sans text-3xl font-bold text-[#E6EDF3] leading-none mt-1">{stats.confirmed + stats.rejected}</div>
+         </div>
+       </div>
+ 

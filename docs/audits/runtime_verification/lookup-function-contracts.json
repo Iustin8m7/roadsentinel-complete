@@ -1,0 +1,89 @@
+{
+  "functions": [
+    [
+      "rs_auth_find_invitation_tenant(text)",
+      "rsint_app_261110b__lookup",
+      true,
+      [
+        "search_path=public, pg_temp"
+      ],
+      "{rsint_app_261110b__lookup=X/rsint_app_261110b__lookup,rsint_app_261110b=X/rsint_app_261110b__lookup}",
+      "CREATE OR REPLACE FUNCTION public.rs_auth_find_invitation_tenant(p_hash text)\n RETURNS uuid\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public', 'pg_temp'\nAS $function$\n            SELECT i.tenant_id FROM invitations i\n            WHERE i.token_hash = p_hash AND i.used_at IS NULL AND i.revoked_at IS NULL\n              AND i.expires_at > now()\n        $function$\n"
+    ],
+    [
+      "rs_auth_find_refresh_tenant(text)",
+      "rsint_app_261110b__lookup",
+      true,
+      [
+        "search_path=public, pg_temp"
+      ],
+      "{rsint_app_261110b__lookup=X/rsint_app_261110b__lookup,rsint_app_261110b=X/rsint_app_261110b__lookup}",
+      "CREATE OR REPLACE FUNCTION public.rs_auth_find_refresh_tenant(p_hash text)\n RETURNS uuid\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public', 'pg_temp'\nAS $function$ SELECT r.tenant_id FROM refresh_tokens r WHERE r.token_hash = p_hash $function$\n"
+    ],
+    [
+      "rs_auth_find_user(text)",
+      "rsint_app_261110b__lookup",
+      true,
+      [
+        "search_path=public, pg_temp"
+      ],
+      "{rsint_app_261110b__lookup=X/rsint_app_261110b__lookup,rsint_app_261110b=X/rsint_app_261110b__lookup}",
+      "CREATE OR REPLACE FUNCTION public.rs_auth_find_user(p_email text)\n RETURNS TABLE(user_id uuid, tenant_id uuid)\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public', 'pg_temp'\nAS $function$ SELECT u.id, u.tenant_id FROM users u WHERE u.email = lower(p_email) $function$\n"
+    ],
+    [
+      "rs_platform_tenant()",
+      "rsint_app_261110b__lookup",
+      true,
+      [
+        "search_path=public, pg_temp"
+      ],
+      "{rsint_app_261110b__lookup=X/rsint_app_261110b__lookup,rsint_app_261110b=X/rsint_app_261110b__lookup}",
+      "CREATE OR REPLACE FUNCTION public.rs_platform_tenant()\n RETURNS uuid\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public', 'pg_temp'\nAS $function$ SELECT t.id FROM tenants t WHERE t.is_platform ORDER BY t.created_at LIMIT 1 $function$\n"
+    ],
+    [
+      "rs_resource_tenant(text,uuid)",
+      "rsint_app_261110b__lookup",
+      true,
+      [
+        "search_path=public, pg_temp"
+      ],
+      "{rsint_app_261110b__lookup=X/rsint_app_261110b__lookup,rsint_app_261110b=X/rsint_app_261110b__lookup}",
+      "CREATE OR REPLACE FUNCTION public.rs_resource_tenant(p_table text, p_id uuid)\n RETURNS uuid\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\n SET search_path TO 'public', 'pg_temp'\nAS $function$\n        DECLARE result uuid;\n        BEGIN\n            IF p_table NOT IN ('users', 'cameras', 'alerts', 'evidence', 'approval_requests', 'user_sessions', 'invitations', 'service_accounts', 'camera_source_grants', 'camera_config_versions', 'camera_worker_status', 'camera_health_events', 'case_notes', 'case_note_revisions', 'case_bookmarks', 'export_jobs', 'saved_searches', 'case_links', 'case_followups', 'case_followup_events', 'case_legal_holds') THEN\n                RAISE EXCEPTION 'table not allowed';\n            END IF;\n            EXECUTE format('SELECT tenant_id FROM %I WHERE id = $1', p_table)\n                INTO result USING p_id;\n            RETURN result;\n        END $function$\n"
+    ],
+    [
+      "rs_tenant_id_by_slug(text)",
+      "rsint_app_261110b__lookup",
+      true,
+      [
+        "search_path=public, pg_temp"
+      ],
+      "{rsint_app_261110b__lookup=X/rsint_app_261110b__lookup,rsint_app_261110b=X/rsint_app_261110b__lookup}",
+      "CREATE OR REPLACE FUNCTION public.rs_tenant_id_by_slug(p_slug text)\n RETURNS uuid\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public', 'pg_temp'\nAS $function$ SELECT t.id FROM tenants t WHERE t.slug = p_slug $function$\n"
+    ]
+  ],
+  "tenant_user_policies": [
+    [
+      "public",
+      "tenants",
+      "tenant_isolation",
+      [
+        "public"
+      ],
+      "ALL",
+      "(id = rs_current_tenant())",
+      "(id = rs_current_tenant())"
+    ],
+    [
+      "public",
+      "users",
+      "tenant_isolation",
+      [
+        "public"
+      ],
+      "ALL",
+      "(tenant_id = rs_current_tenant())",
+      "(tenant_id = rs_current_tenant())"
+    ]
+  ],
+  "memberships": 0
+}

@@ -1,0 +1,20 @@
+{
+  "source": "https://commons.wikimedia.org/wiki/File:Street_traffic.webm",
+  "author": "Editor",
+  "license": "CC BY 3.0",
+  "source_sha256": "e5facb24baf755f0c1193999d823e99f6032661ad2bdef5cc28cc1cbbfde03e2",
+  "moving": "30 seconds, 300 frames, 10 FPS, real moving traffic; no accuracy labels",
+  "synthetic": "36 seconds, 180 repeated frames; SYNTHETIC TEST, never a real incident",
+  "outputs": [
+    {
+      "name": "LICENSED_MOVING_TRAFFIC.mp4",
+      "sha256": "1868cd03d0c15288457d51344783ce9471ebec7e6789a2c1a9782cc7ec628c12",
+      "bytes": 13049613
+    },
+    {
+      "name": "SYNTHETIC_TEST_frozen_licensed_frame.mp4",
+      "sha256": "7b057fbed874bdce52c6df7ba29e4ad55a50237d4a809a40ea9fef95e83ddeea",
+      "bytes": 1171837
+    }
+  ]
+}

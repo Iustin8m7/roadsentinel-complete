@@ -1,0 +1,1220 @@
+E701 Multiple statements on one line (colon)
+  --> backend/alembic/versions/0023_incident_geolocation.py:48:54
+   |
+46 |     op.create_check_constraint("geo_source_choice","incident_geo_sources","num_nonnulls(recording_id,camera_location_id)<=1")
+47 |     role=make_url(os.environ["RS_DATABASE_URL"]).username
+48 |     if not role or not role.replace('_','').isalnum():raise ValueError('Invalid app role')
+   |                                                      ^
+49 |     quoted=bind.dialect.identifier_preparer.quote(role)
+50 |     for table in ("location_revisions","incident_geo_sources"):
+   |
+
+E501 Line too long (144 > 100)
+  --> backend/app/api/incident_map.py:21:101
+   |
+20 | …
+21 | …}:{principal.tenant_id}:{principal.user_id}',Limit(120 if operation=='read' else 30,60))
+   |                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+22 | …limit',headers={'Retry-After':str(wait)})
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/api/incident_map.py:22:19
+   |
+20 | def bounded(principal,operation):
+21 |     allowed,wait=get_rate_limiter().hit(f'map:{operation}:{principal.tenant_id}:{principal.user_id}',Limit(120 if operation=='read' el…
+22 |     if not allowed:raise HTTPException(429,'Map request limit',headers={'Retry-After':str(wait)})
+   |                   ^
+
+E501 Line too long (103 > 100)
+  --> backend/app/api/incident_map.py:46:101
+   |
+44 | def cameras(principal: Principal=Depends(require(Permission.location_edit))):
+45 |     bounded(principal,'read')
+46 |     # Current approved position is an explicit picker choice, not inherited from legacy numeric fields.
+   |                                                                                                     ^^^
+47 |     rows=principal.db.execute(select(Camera,LocationRevision).join(LocationRevision,LocationRevision.config_version_id==Camera.active_…
+48 |     return [dict(camera_id=str(cam.id),name=cam.name,source_kind=cam.source_kind,is_active=cam.is_active,location=geolocation.out(loc)…
+   |
+
+E501 Line too long (156 > 100)
+  --> backend/app/api/incident_map.py:48:101
+   |
+46 | …not inherited from legacy numeric fields.
+47 | …join(LocationRevision,LocationRevision.config_version_id==Camera.active_config_id).where(LocationRevision.state=='confirmed').limit(5…
+48 | …nd=cam.source_kind,is_active=cam.is_active,location=geolocation.out(loc)) for cam,loc in rows]
+   |                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+E501 Line too long (129 > 100)
+  --> backend/app/api/incident_map.py:52:101
+   |
+51 | @router.get('/api/locations/{kind}/{subject_id}')
+52 | def get_location(kind: Literal['recording','alert'],subject_id: UUID,principal: Principal=Depends(require(Permission.map_read))):
+   |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+53 |     bounded(principal,'read')
+54 |     return geolocation.location_state(principal,kind,subject_id)
+   |
+
+E501 Line too long (148 > 100)
+  --> backend/app/api/incident_map.py:58:101
+   |
+57 | …
+58 | …UUID,body: LocationInput,principal: Principal=Depends(require(Permission.location_edit))):
+   |                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+59 | …
+60 | …d,body)
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/api/incident_map.py:60:8
+   |
+58 | def update(kind: Literal['recording','alert'],subject_id: UUID,body: LocationInput,principal: Principal=Depends(require(Permission.loc…
+59 |     bounded(principal,'write')
+60 |     try:return geolocation.assign(principal,kind,subject_id,body)
+   |        ^
+61 |     except HTTPException as error:
+62 |         metrics.inc('rs_map_location_updates_total',result='conflict' if error.status_code==409 else 'denied')
+   |
+
+E501 Line too long (110 > 100)
+  --> backend/app/api/incident_map.py:62:101
+   |
+60 |     try:return geolocation.assign(principal,kind,subject_id,body)
+61 |     except HTTPException as error:
+62 |         metrics.inc('rs_map_location_updates_total',result='conflict' if error.status_code==409 else 'denied')
+   |                                                                                                     ^^^^^^^^^^
+63 |         principal.audit('location.update.denied',resource_type=kind,resource_id=subject_id,details={'status':error.status_code})
+64 |         raise
+   |
+
+E501 Line too long (120 > 100)
+  --> backend/app/api/incident_map.py:68:101
+   |
+67 | @router.post('/api/location-proposals/{location_id}/decision')
+68 | def decision(location_id: UUID,body: LocationDecision,principal: Principal=Depends(require(Permission.cameras_manage))):
+   |                                                                                                     ^^^^^^^^^^^^^^^^^^^^
+69 |     bounded(principal,'write')
+70 |     return geolocation.decide(principal,location_id,body)
+   |
+
+E501 Line too long (353 > 100)
+  --> backend/app/models/geolocation.py:32:101
+   |
+30 | …
+31 | …
+32 | …ete="RESTRICT", name=f"fk_geo_{col}") for col, table in (("camera_id", "cameras"), ("recording_id", "recordings"), ("alert_id", "alerts"), ("actor_id", "users"), ("source_location_id", "location_revisions"), ("config_version_id", "camera_config_versions"))],
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+33 | …
+34 | …
+   |
+
+E501 Line too long (112 > 100)
+  --> backend/app/models/geolocation.py:65:101
+   |
+63 |     __tablename__ = "incident_geo_sources"
+64 |     __table_args__ = (
+65 |         ForeignKeyConstraint(["tenant_id", "alert_id"], ["alerts.tenant_id", "alerts.id"], ondelete="RESTRICT"),
+   |                                                                                                     ^^^^^^^^^^^^
+66 |         ForeignKeyConstraint(["tenant_id", "recording_id"], ["recordings.tenant_id", "recordings.id"], ondelete="RESTRICT"),
+67 |         ForeignKeyConstraint(["tenant_id", "camera_location_id"], ["location_revisions.tenant_id", "location_revisions.id"], ondelete=…
+   |
+
+E501 Line too long (124 > 100)
+  --> backend/app/models/geolocation.py:66:101
+   |
+64 |     __table_args__ = (
+65 |         ForeignKeyConstraint(["tenant_id", "alert_id"], ["alerts.tenant_id", "alerts.id"], ondelete="RESTRICT"),
+66 |         ForeignKeyConstraint(["tenant_id", "recording_id"], ["recordings.tenant_id", "recordings.id"], ondelete="RESTRICT"),
+   |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^
+67 |         ForeignKeyConstraint(["tenant_id", "camera_location_id"], ["location_revisions.tenant_id", "location_revisions.id"], ondelete=…
+68 |     )
+   |
+
+E501 Line too long (146 > 100)
+  --> backend/app/models/geolocation.py:67:101
+   |
+65 | …"alerts.tenant_id", "alerts.id"], ondelete="RESTRICT"),
+66 | …], ["recordings.tenant_id", "recordings.id"], ondelete="RESTRICT"),
+67 | …on_id"], ["location_revisions.tenant_id", "location_revisions.id"], ondelete="RESTRICT"),
+   |                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+68 | …
+69 | …uid=True), primary_key=True)
+   |
+
+E501 Line too long (110 > 100)
+  --> backend/app/schemas/geolocation.py:55:101
+   |
+53 |                 raise ValueError("Only explicitly confirmed fixed-view locations may be placed")
+54 |             if self.source_location_id is None and (self.point is None or self.accuracy_m is None):
+55 |                 raise ValueError("Confirmed location needs point and accuracy or an approved camera revision")
+   |                                                                                                     ^^^^^^^^^^
+56 |         if self.state == "unknown" and (self.point is not None or self.source_location_id):
+57 |             raise ValueError("Unknown location must have NULL coordinates")
+   |
+
+E501 Line too long (125 > 100)
+  --> backend/app/schemas/geolocation.py:74:101
+   |
+72 |     date_to: datetime | None = None
+73 |     types: list[str] = Field(default_factory=list, max_length=20)
+74 |     statuses: list[Literal["new", "confirmed", "rejected"]] = Field(default_factory=lambda:["new","confirmed"], max_length=3)
+   |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+75 |     severities: list[Literal["critical", "high", "medium", "info"]] = Field(default_factory=list,max_length=4)
+76 |     source_kind: Literal["recorded_upload", "live_camera", "local_replay", "unknown"] | None = None
+   |
+
+E501 Line too long (110 > 100)
+  --> backend/app/schemas/geolocation.py:75:101
+   |
+73 |     types: list[str] = Field(default_factory=list, max_length=20)
+74 |     statuses: list[Literal["new", "confirmed", "rejected"]] = Field(default_factory=lambda:["new","confirmed"], max_length=3)
+75 |     severities: list[Literal["critical", "high", "medium", "info"]] = Field(default_factory=list,max_length=4)
+   |                                                                                                     ^^^^^^^^^^
+76 |     source_kind: Literal["recorded_upload", "live_camera", "local_replay", "unknown"] | None = None
+77 |     camera_id: uuid.UUID | None = None
+   |
+
+E501 Line too long (121 > 100)
+  --> backend/app/schemas/geolocation.py:91:101
+   |
+89 |         if self.bbox:
+90 |             w,s,e,n=self.bbox
+91 |             if not all(math.isfinite(v) for v in self.bbox) or not (-180<=w<e<=180 and -90<=s<n<=90) or e-w>30 or n-s>20:
+   |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^
+92 |                 raise ValueError("bbox must be ordered W,S,E,N with extent <=30×20 degrees")
+93 |         for value in (self.date_from,self.date_to):
+   |
+
+RUF001 String contains ambiguous `×` (MULTIPLICATION SIGN). Did you mean `x` (LATIN SMALL LETTER X)?
+  --> backend/app/schemas/geolocation.py:92:80
+   |
+90 |             w,s,e,n=self.bbox
+91 |             if not all(math.isfinite(v) for v in self.bbox) or not (-180<=w<e<=180 and -90<=s<n<=90) or e-w>30 or n-s>20:
+92 |                 raise ValueError("bbox must be ordered W,S,E,N with extent <=30×20 degrees")
+   |                                                                                ^
+93 |         for value in (self.date_from,self.date_to):
+94 |             if value is not None and value.utcoffset() is None:
+   |
+
+E501 Line too long (103 > 100)
+  --> backend/app/services/geo_reference.py:20:101
+   |
+19 | def rings(geometry):
+20 |     return geometry["coordinates"] if geometry["type"] == "MultiPolygon" else [geometry["coordinates"]]
+   |                                                                                                     ^^^
+
+B905 `zip()` without an explicit `strict=` parameter
+  --> backend/app/services/geo_reference.py:25:16
+   |
+23 | def in_ring(x, y, ring):
+24 |     inside = False
+25 |     for a,b in zip(ring, ring[1:]+ring[:1]):
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+26 |         if (a[1]>y)!=(b[1]>y) and x < (b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0]:
+27 |             inside=not inside
+   |
+help: Add explicit value for parameter `strict=`
+   |
+24 |     inside = False
+   -     for a,b in zip(ring, ring[1:]+ring[:1]):
+25 +     for a,b in zip(ring, ring[1:]+ring[:1], strict=False):
+26 |         if (a[1]>y)!=(b[1]>y) and x < (b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0]:
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+E501 Line too long (107 > 100)
+  --> backend/app/services/geo_reference.py:32:101
+   |
+31 | def contains(x, y, geometry):
+32 |     return any(in_ring(x,y,p[0]) and not any(in_ring(x,y,hole) for hole in p[1:]) for p in rings(geometry))
+   |                                                                                                     ^^^^^^^
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/app/services/geo_reference.py:36:46
+   |
+35 | def distance_to_boundary_m(x,y,geometry):
+36 |     scale_x=111_320*math.cos(math.radians(y));scale_y=111_320
+   |                                              ^
+37 |     best=math.inf
+38 |     for polygon in rings(geometry):
+   |
+
+B905 `zip()` without an explicit `strict=` parameter
+  --> backend/app/services/geo_reference.py:40:24
+   |
+38 |     for polygon in rings(geometry):
+39 |         for ring in polygon:
+40 |             for a,b in zip(ring,ring[1:]):
+   |                        ^^^^^^^^^^^^^^^^^^
+41 |                 ax,ay=(a[0]-x)*scale_x,(a[1]-y)*scale_y
+42 |                 dx,dy=(b[0]-a[0])*scale_x,(b[1]-a[1])*scale_y
+   |
+help: Add explicit value for parameter `strict=`
+   |
+39 |         for ring in polygon:
+   -             for a,b in zip(ring,ring[1:]):
+40 +             for a,b in zip(ring,ring[1:], strict=False):
+41 |                 ax,ay=(a[0]-x)*scale_x,(a[1]-y)*scale_y
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+RUF007 Prefer `itertools.pairwise()` over `zip()` when iterating over successive pairs
+  --> backend/app/services/geo_reference.py:40:24
+   |
+38 |     for polygon in rings(geometry):
+39 |         for ring in polygon:
+40 |             for a,b in zip(ring,ring[1:]):
+   |                        ^^^
+41 |                 ax,ay=(a[0]-x)*scale_x,(a[1]-y)*scale_y
+42 |                 dx,dy=(b[0]-a[0])*scale_x,(b[1]-a[1])*scale_y
+   |
+help: Replace `zip()` with `itertools.pairwise()`
+   |
+7  | from pathlib import Path
+8  + import itertools
+9  |
+--------------------------------------------------------------------------------
+40 |         for ring in polygon:
+   -             for a,b in zip(ring,ring[1:]):
+41 +             for a,b in itertools.pairwise(ring):
+42 |                 ax,ay=(a[0]-x)*scale_x,(a[1]-y)*scale_y
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+E501 Line too long (152 > 100)
+  --> backend/app/services/geo_reference.py:59:101
+   |
+57 | …
+58 | …
+59 | …es")["features"] if contains(longitude,latitude,f["geometry"])] if region!="outside" else []
+   |                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+60 | …
+   |
+
+E501 Line too long (114 > 100)
+  --> backend/app/services/geo_reference.py:65:101
+   |
+63 | def reference():
+64 |     boundary=layer("boundary")
+65 |     points=[point for polygon in rings(boundary["features"][0]["geometry"]) for ring in polygon for point in ring]
+   |                                                                                                     ^^^^^^^^^^^^^^
+66 |     return dict(boundary=boundary,counties=layer("counties"),places=layer("places"),roads=layer("roads"),bounds=[min(p[0] for p in poi…
+   |
+
+E501 Line too long (378 > 100)
+  --> backend/app/services/geo_reference.py:66:101
+   |
+64 | …
+65 | … for point in ring]
+66 | …("roads"),bounds=[min(p[0] for p in points),min(p[…DATA/"geodata-provenance.json").read_text()))
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^…^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/services/geolocation.py:19:16
+   |
+17 |     condition=SUBJECTS[kind][1]==subject_id
+18 |     q=select(LocationRevision).where(condition)
+19 |     if resolved:q=q.where(LocationRevision.state.in_(["confirmed","unknown"]))
+   |                ^
+20 |     return db.scalar(q.order_by(LocationRevision.revision.desc()).limit(1))
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/services/geolocation.py:26:12
+   |
+24 |     model=SUBJECTS[kind][0]
+25 |     stmt=select(model).where(model.id==subject_id)
+26 |     if lock:stmt=stmt.with_for_update()
+   |            ^
+27 |     row=principal.db.scalar(stmt)
+28 |     if row is None or (kind=="alert" and not can_view_alert(principal,row)):
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/services/geolocation.py:36:19
+   |
+35 | def out(row):
+36 |     if row is None:return None
+   |                   ^
+37 |     return dict(id=str(row.id),revision=row.revision,state=row.state,confidence=row.confidence,source_type=row.source_type,anchor_kind…
+   |
+
+E501 Line too long (696 > 100)
+  --> backend/app/services/geolocation.py:37:101
+   |
+35 | …
+36 | …
+37 | …source_type=row.source_type,anchor_kind=row.anchor…lse None,config_revision=row.config_revision)
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^…^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+F841 Local variable `row` is assigned to but never used
+  --> backend/app/services/geolocation.py:41:5
+   |
+40 | def location_state(principal,kind,subject_id):
+41 |     row=subject(principal,kind,subject_id)
+   |     ^^^
+42 |     current=head(principal.db,kind,subject_id)
+43 |     resolved=head(principal.db,kind,subject_id,resolved=True)
+   |
+help: Remove assignment to unused variable `row`
+   |
+40 | def location_state(principal,kind,subject_id):
+   -     row=subject(principal,kind,subject_id)
+41 +     subject(principal,kind,subject_id)
+42 |     current=head(principal.db,kind,subject_id)
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+E501 Line too long (265 > 100)
+  --> backend/app/services/geolocation.py:44:101
+   |
+42 | …
+43 | …
+44 | …current) if current and current.state=="pending" else None,can_edit=has_permission(principal.role,Permission.location_edit),can_approve=principal.role==Role.tenant_admin)
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/services/geolocation.py:48:41
+   |
+47 | def assign(principal,kind,subject_id,body):
+48 |     if kind not in {"recording","alert"}:raise HTTPException(422,"Camera locations use approved configuration revisions")
+   |                                         ^
+49 |     row=subject(principal,kind,subject_id,lock=True);db=principal.db
+50 |     current=head(db,kind,subject_id)
+   |
+
+E501 Line too long (121 > 100)
+  --> backend/app/services/geolocation.py:48:101
+   |
+47 | def assign(principal,kind,subject_id,body):
+48 |     if kind not in {"recording","alert"}:raise HTTPException(422,"Camera locations use approved configuration revisions")
+   |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^
+49 |     row=subject(principal,kind,subject_id,lock=True);db=principal.db
+50 |     current=head(db,kind,subject_id)
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/app/services/geolocation.py:49:53
+   |
+47 | def assign(principal,kind,subject_id,body):
+48 |     if kind not in {"recording","alert"}:raise HTTPException(422,"Camera locations use approved configuration revisions")
+49 |     row=subject(principal,kind,subject_id,lock=True);db=principal.db
+   |                                                     ^
+50 |     current=head(db,kind,subject_id)
+51 |     if (current.revision if current else 0)!=body.expected_revision:
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/services/geolocation.py:55:18
+   |
+53 |     if kind=="recording":
+54 |         locked=db.scalar(select(Alert.id).join(IncidentGeoSource,IncidentGeoSource.alert_id==Alert.id).where(IncidentGeoSource.recordi…
+55 |         if locked:raise HTTPException(409,"Reviewed/held incidents require independently approved incident correction")
+   |                  ^
+56 |     if db.scalar(select(LocationRevision.id).where(LocationRevision.request_id==body.request_id)):
+57 |         raise HTTPException(409,"Location request already processed")
+   |
+
+E501 Line too long (119 > 100)
+  --> backend/app/services/geolocation.py:55:101
+   |
+53 |     if kind=="recording":
+54 |         locked=db.scalar(select(Alert.id).join(IncidentGeoSource,IncidentGeoSource.alert_id==Alert.id).where(IncidentGeoSource.recordi…
+55 |         if locked:raise HTTPException(409,"Reviewed/held incidents require independently approved incident correction")
+   |                                                                                                     ^^^^^^^^^^^^^^^^^^^
+56 |     if db.scalar(select(LocationRevision.id).where(LocationRevision.request_id==body.request_id)):
+57 |         raise HTTPException(409,"Location request already processed")
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/app/services/geolocation.py:58:21
+   |
+56 |     if db.scalar(select(LocationRevision.id).where(LocationRevision.request_id==body.request_id)):
+57 |         raise HTTPException(409,"Location request already processed")
+58 |     point=body.point;source=None;state=body.state
+   |                     ^
+59 |     if body.source_location_id:
+60 |         source=db.get(LocationRevision,body.source_location_id)
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/app/services/geolocation.py:58:33
+   |
+56 |     if db.scalar(select(LocationRevision.id).where(LocationRevision.request_id==body.request_id)):
+57 |         raise HTTPException(409,"Location request already processed")
+58 |     point=body.point;source=None;state=body.state
+   |                                 ^
+59 |     if body.source_location_id:
+60 |         source=db.get(LocationRevision,body.source_location_id)
+   |
+
+E501 Line too long (174 > 100)
+  --> backend/app/services/geolocation.py:66:101
+   |
+64 | …
+65 | …rants_for
+66 | …amera,grants_for(db,camera.id),db.get(CameraConfigVersion,source.config_version_id),datetime.now(UTC)):
+   |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+67 | …tive")
+68 | …e:
+   |
+
+E501 Line too long (116 > 100)
+  --> backend/app/services/geolocation.py:69:101
+   |
+67 | …         raise HTTPException(409,"Camera source permission is not active")
+68 | …     if body.captured_at is None and not body.camera_valid_at_capture:
+69 | …         raise HTTPException(422,"Unknown filming time requires explicit camera-position-at-capture attestation")
+   |                                                                                                   ^^^^^^^^^^^^^^^^
+70 | …     if body.captured_at:
+71 | …         historical=db.scalar(select(LocationRevision).where(LocationRevision.camera_id==source.camera_id,LocationRevision.created_at…
+   |
+
+E501 Line too long (115 > 100)
+  --> backend/app/services/geolocation.py:73:101
+   |
+71 |             historical=db.scalar(select(LocationRevision).where(LocationRevision.camera_id==source.camera_id,LocationRevision.created_…
+72 |             if historical is None or historical.id!=source.id:
+73 |                 raise HTTPException(422,"Chosen camera position does not match the available capture-time history")
+   |                                                                                                     ^^^^^^^^^^^^^^^
+74 |     if kind=="alert":state="pending"  # high-impact override always requires a different administrator
+75 |     lat=source.latitude if source else point.latitude if point else None
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/services/geolocation.py:74:21
+   |
+72 |             if historical is None or historical.id!=source.id:
+73 |                 raise HTTPException(422,"Chosen camera position does not match the available capture-time history")
+74 |     if kind=="alert":state="pending"  # high-impact override always requires a different administrator
+   |                     ^
+75 |     lat=source.latitude if source else point.latitude if point else None
+76 |     lon=source.longitude if source else point.longitude if point else None
+   |
+
+E501 Line too long (102 > 100)
+  --> backend/app/services/geolocation.py:74:101
+   |
+72 |             if historical is None or historical.id!=source.id:
+73 |                 raise HTTPException(422,"Chosen camera position does not match the available capture-time history")
+74 |     if kind=="alert":state="pending"  # high-impact override always requires a different administrator
+   |                                                                                                     ^^
+75 |     lat=source.latitude if source else point.latitude if point else None
+76 |     lon=source.longitude if source else point.longitude if point else None
+   |
+
+E501 Line too long (848 > 100)
+  --> backend/app/services/geolocation.py:78:101
+   |
+76 | …
+77 | …
+78 | …=body.expected_revision+1,request_id=body.request_…f source else None,**{kind+"_id":subject_id})
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^…^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+79 | …
+80 | …="confirmed" else "location.unknown",resource_type=kind,resource_id=subject_id,details=dict(location_revision_id=str(location.id),revision=location.revision,previous_revision=current.revision if current else 0,reason=body.explanation,source_type=location.source_type))
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/app/services/geolocation.py:79:21
+   |
+77 |     region,county=classify(lat,lon) if lat is not None else ("unknown",None)
+78 |     location=LocationRevision(tenant_id=principal.tenant_id,actor_id=principal.user_id,revision=body.expected_revision+1,request_id=bo…
+79 |     db.add(location);db.flush();db.commit()
+   |                     ^
+80 |     principal.audit("location.proposed" if state=="pending" else "location.confirmed" if state=="confirmed" else "location.unknown",re…
+81 |     return location_state(principal,kind,subject_id)
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/app/services/geolocation.py:79:32
+   |
+77 |     region,county=classify(lat,lon) if lat is not None else ("unknown",None)
+78 |     location=LocationRevision(tenant_id=principal.tenant_id,actor_id=principal.user_id,revision=body.expected_revision+1,request_id=bo…
+79 |     db.add(location);db.flush();db.commit()
+   |                                ^
+80 |     principal.audit("location.proposed" if state=="pending" else "location.confirmed" if state=="confirmed" else "location.unknown",re…
+81 |     return location_state(principal,kind,subject_id)
+   |
+
+E501 Line too long (363 > 100)
+  --> backend/app/services/geolocation.py:80:101
+   |
+78 | …=body.expected_revision+1,request_id=body.request_id,state=state,confidence="operator_confirmed" if state=="confirmed" else "unverified" if state=="pending" else "unknown",source_type="registered_camera" if source else "manual_map_pin" if point else "unknown",anchor_kind="…
+79 | …
+80 | …="confirmed" else "location.unknown",resource_type=kind,resource_id=subject_id,details=dict(location_revision_id=str(location.id),revision=location.revision,previous_revision=current.revision if current else 0,reason=body.explanation,source_type=location.source_type))
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+81 | …
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/app/services/geolocation.py:85:20
+   |
+84 | def decide(principal,location_id,body):
+85 |     db=principal.db;proposal=db.get(LocationRevision,location_id)
+   |                    ^
+86 |     if proposal is None or proposal.alert_id is None:raise HTTPException(404,"Proposal not found")
+87 |     subject(principal,"alert",proposal.alert_id,lock=True)
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/services/geolocation.py:86:53
+   |
+84 | def decide(principal,location_id,body):
+85 |     db=principal.db;proposal=db.get(LocationRevision,location_id)
+86 |     if proposal is None or proposal.alert_id is None:raise HTTPException(404,"Proposal not found")
+   |                                                     ^
+87 |     subject(principal,"alert",proposal.alert_id,lock=True)
+88 |     current=head(db,"alert",proposal.alert_id)
+   |
+
+E501 Line too long (153 > 100)
+  --> backend/app/services/geolocation.py:89:101
+   |
+87 | …
+88 | …
+89 | …ected_revision or current.state!="pending":raise HTTPException(409,"Proposal was superseded")
+   |                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+90 | …ion(403,"A different administrator must review this location")
+91 | …evision.__table__.columns if c.name not in {"id","revision","request_id","created_at","actor_id","state","confidence","proposal_id"}}
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/services/geolocation.py:89:103
+   |
+87 |     subject(principal,"alert",proposal.alert_id,lock=True)
+88 |     current=head(db,"alert",proposal.alert_id)
+89 |     if current.id!=proposal.id or current.revision!=body.expected_revision or current.state!="pending":raise HTTPException(409,"Propos…
+   |                                                                                                       ^
+90 |     if proposal.actor_id==principal.user_id:raise HTTPException(403,"A different administrator must review this location")
+91 |     copy={c.name:getattr(proposal,c.name) for c in LocationRevision.__table__.columns if c.name not in {"id","revision","request_id","…
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/services/geolocation.py:90:44
+   |
+88 |     current=head(db,"alert",proposal.alert_id)
+89 |     if current.id!=proposal.id or current.revision!=body.expected_revision or current.state!="pending":raise HTTPException(409,"Propos…
+90 |     if proposal.actor_id==principal.user_id:raise HTTPException(403,"A different administrator must review this location")
+   |                                            ^
+91 |     copy={c.name:getattr(proposal,c.name) for c in LocationRevision.__table__.columns if c.name not in {"id","revision","request_id","…
+92 |     accepted=body.decision=="approve"
+   |
+
+E501 Line too long (122 > 100)
+  --> backend/app/services/geolocation.py:90:101
+   |
+88 |     current=head(db,"alert",proposal.alert_id)
+89 |     if current.id!=proposal.id or current.revision!=body.expected_revision or current.state!="pending":raise HTTPException(409,"Propos…
+90 |     if proposal.actor_id==principal.user_id:raise HTTPException(403,"A different administrator must review this location")
+   |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^
+91 |     copy={c.name:getattr(proposal,c.name) for c in LocationRevision.__table__.columns if c.name not in {"id","revision","request_id","…
+92 |     accepted=body.decision=="approve"
+   |
+
+E501 Line too long (193 > 100)
+  --> backend/app/services/geolocation.py:91:101
+   |
+89 | …rrent.state!="pending":raise HTTPException(409,"Proposal was superseded")
+90 | … administrator must review this location")
+91 | …lumns if c.name not in {"id","revision","request_id","created_at","actor_id","state","confidence","proposal_id"}}
+   |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+92 | …
+93 | ….revision+1,state=("confirmed" if proposal.latitude is not None else "unknown") if accepted else "rejected",confidence="operator_conf…
+   |
+
+E501 Line too long (274 > 100)
+  --> backend/app/services/geolocation.py:93:101
+   |
+91 | … not in {"id","revision","request_id","created_at","actor_id","state","confidence","proposal_id"}}
+92 | …
+93 | …te=("confirmed" if proposal.latitude is not None else "unknown") if accepted else "rejected",confidence="operator_confirmed" if accepted else "unverified",proposal_id=proposal.id)
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+94 | …
+95 | …rts",resource_id=proposal.alert_id,details=dict(proposal_id=str(proposal.id),location_revision_id=str(next_row.id),revision=next_row.revision,reason=body.reason))
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/app/services/geolocation.py:94:21
+   |
+92 |     accepted=body.decision=="approve"
+93 |     next_row=LocationRevision(**copy,actor_id=principal.user_id,revision=current.revision+1,state=("confirmed" if proposal.latitude is…
+94 |     db.add(next_row);db.commit()
+   |                     ^
+95 |     principal.audit("location.approved" if accepted else "location.rejected",resource_type="alerts",resource_id=proposal.alert_id,deta…
+96 |     return location_state(principal,"alert",proposal.alert_id)
+   |
+
+E501 Line too long (257 > 100)
+  --> backend/app/services/geolocation.py:95:101
+   |
+93 | …te=("confirmed" if proposal.latitude is not None else "unknown") if accepted else "rejected",confidence="operator_confirmed" if accepted else "unverified",proposal_id=…
+94 | …
+95 | …rts",resource_id=proposal.alert_id,details=dict(proposal_id=str(proposal.id),location_revision_id=str(next_row.id),revision=next_row.revision,reason=body.reason))
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+96 | …
+   |
+
+E501 Line too long (106 > 100)
+   --> backend/app/services/geolocation.py:100:101
+    |
+ 99 | def camera_activated(db,camera,version,actor_id):
+100 |     """Snapshot the exact reviewed config. Rollback reuses its immutable location, never edits history."""
+    |                                                                                                     ^^^^^^
+101 |     if db.scalar(select(LocationRevision.id).where(LocationRevision.config_version_id==version.id)):return
+102 |     data=version.config.get("geolocation")
+    |
+
+E701 Multiple statements on one line (colon)
+   --> backend/app/services/geolocation.py:101:100
+    |
+ 99 | def camera_activated(db,camera,version,actor_id):
+100 |     """Snapshot the exact reviewed config. Rollback reuses its immutable location, never edits history."""
+101 |     if db.scalar(select(LocationRevision.id).where(LocationRevision.config_version_id==version.id)):return
+    |                                                                                                    ^
+102 |     data=version.config.get("geolocation")
+103 |     current=head(db,"camera",camera.id)
+    |
+
+E501 Line too long (106 > 100)
+   --> backend/app/services/geolocation.py:101:101
+    |
+ 99 | def camera_activated(db,camera,version,actor_id):
+100 |     """Snapshot the exact reviewed config. Rollback reuses its immutable location, never edits history."""
+101 |     if db.scalar(select(LocationRevision.id).where(LocationRevision.config_version_id==version.id)):return
+    |                                                                                                     ^^^^^^
+102 |     data=version.config.get("geolocation")
+103 |     current=head(db,"camera",camera.id)
+    |
+
+E702 Multiple statements on one line (semicolon)
+   --> backend/app/services/geolocation.py:104:43
+    |
+102 |     data=version.config.get("geolocation")
+103 |     current=head(db,"camera",camera.id)
+104 |     lat=data["latitude"] if data else None;lon=data["longitude"] if data else None
+    |                                           ^
+105 |     region,county=classify(lat,lon) if data else ("unknown",None)
+106 |     db.add(LocationRevision(tenant_id=camera.tenant_id,camera_id=camera.id,actor_id=actor_id,revision=current.revision+1 if current e…
+    |
+
+E501 Line too long (745 > 100)
+   --> backend/app/services/geolocation.py:106:101
+    |
+104 | …
+105 | …
+106 | …vision=current.revision+1 if current else 1,state…ersion.id,config_revision=version.revision))
+    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^…^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+E501 Line too long (174 > 100)
+   --> backend/app/services/geolocation.py:115:101
+    |
+113 | …
+114 | …ion.
+115 | …camera_id==camera.id,LocationRevision.config_revision==revision)) if isinstance(revision,int) else None
+    |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+116 | …d,camera_location_id=location.id if location else None))
+    |
+
+E501 Line too long (127 > 100)
+   --> backend/app/services/geolocation.py:116:101
+    |
+114 |     # No fallback to mutable legacy coordinates or today's camera location.
+115 |     location=db.scalar(select(LocationRevision).where(LocationRevision.camera_id==camera.id,LocationRevision.config_revision==revisio…
+116 |     db.add(IncidentGeoSource(tenant_id=alert.tenant_id,alert_id=alert.id,camera_location_id=location.id if location else None))
+    |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/app/services/incident_map.py:26:30
+   |
+25 | def projection(principal):
+26 |     record=_head("recording");override=_head("alert");anchor=LocationRevision.__table__.alias("camera_anchor")
+   |                              ^
+27 |     def resolved(name):
+28 |         return case((override.c.id.is_not(None),override.c[name]),(record.c.id.is_not(None),record.c[name]),else_=anchor.c[name])
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/app/services/incident_map.py:26:54
+   |
+25 | def projection(principal):
+26 |     record=_head("recording");override=_head("alert");anchor=LocationRevision.__table__.alias("camera_anchor")
+   |                                                      ^
+27 |     def resolved(name):
+28 |         return case((override.c.id.is_not(None),override.c[name]),(record.c.id.is_not(None),record.c[name]),else_=anchor.c[name])
+   |
+
+E501 Line too long (129 > 100)
+  --> backend/app/services/incident_map.py:28:101
+   |
+26 |     record=_head("recording");override=_head("alert");anchor=LocationRevision.__table__.alias("camera_anchor")
+27 |     def resolved(name):
+28 |         return case((override.c.id.is_not(None),override.c[name]),(record.c.id.is_not(None),record.c[name]),else_=anchor.c[name])
+   |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+29 |     demo=or_(Alert.details["synthetic"].astext=="true",Alert.details["source"].astext=="app.services.seed",func.coalesce(resolved("is_…
+30 |     source=case((Alert.details["origin"].astext.in_(["recorded_upload","live_camera","local_replay"]),Alert.details["origin"].astext),…
+   |
+
+E501 Line too long (1156 > 100)
+  --> backend/app/services/incident_map.py:31:101
+   |
+29 | …vices.seed",func.coalesce(resolved("is_demo"),False))
+30 | …lay"]),Alert.details["origin"].astext),else_="unknown")
+31 | …"),cast(Alert.status,String).label("status"),Alert…r.c.id==IncidentGeoSource.camera_location_id)
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^…^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+32 | …
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/app/services/incident_map.py:36:58
+   |
+35 | def _cursor(body,principal,payload=None):
+36 |     query=body.model_dump(mode="json",exclude={"cursor"});digest=hashlib.sha256(json.dumps(query,sort_keys=True).encode()).hexdigest()
+   |                                                          ^
+37 |     binding=f"{principal.tenant_id}:{principal.user_id}:{principal.role}:{digest}"
+38 |     key=get_settings().url_signing_key.get_secret_value().encode()
+   |
+
+E501 Line too long (264 > 100)
+  --> backend/app/services/incident_map.py:40:101
+   |
+38 | …
+39 | …
+40 | …)+900},sort_keys=True).encode();token=base64.urlsafe_b64encode(raw).decode().rstrip('=');sig=hmac.new(key,token.encode(),hashlib.sha256).hexdigest();return token+'.'+sig
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+41 | …
+42 | …
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/app/services/incident_map.py:40:127
+   |
+38 |     key=get_settings().url_signing_key.get_secret_value().encode()
+39 |     if payload is not None:
+40 |         raw=json.dumps({**payload,"binding":binding,"expires":int(datetime.now(UTC).timestamp())+900},sort_keys=True).encode();token=b…
+   |                                                                                                                               ^
+41 |     if not body.cursor:return None
+42 |     try:
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/app/services/incident_map.py:40:184
+   |
+38 | …
+39 | …
+40 | ….encode();token=base64.urlsafe_b64encode(raw).decode().rstrip('=');sig=hmac.new(key,token.encode(),hashlib.sha256).hexdigest();return…
+   |                                                                    ^
+41 | …
+42 | …
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/app/services/incident_map.py:40:244
+   |
+38 | …
+39 | …
+40 | …p('=');sig=hmac.new(key,token.encode(),hashlib.sha256).hexdigest();return token+'.'+sig
+   |                                                                    ^
+41 | …
+42 | …
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/services/incident_map.py:41:23
+   |
+39 |     if payload is not None:
+40 |         raw=json.dumps({**payload,"binding":binding,"expires":int(datetime.now(UTC).timestamp())+900},sort_keys=True).encode();token=b…
+41 |     if not body.cursor:return None
+   |                       ^
+42 |     try:
+43 |         token,sig=body.cursor.rsplit('.',1)
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/services/incident_map.py:44:96
+   |
+42 |     try:
+43 |         token,sig=body.cursor.rsplit('.',1)
+44 |         if not hmac.compare_digest(sig,hmac.new(key,token.encode(),hashlib.sha256).hexdigest()):raise ValueError()
+   |                                                                                                ^
+45 |         data=json.loads(base64.urlsafe_b64decode(token+'='*(-len(token)%4)))
+46 |         if data['binding']!=binding or data['expires']<datetime.now(UTC).timestamp():raise ValueError()
+   |
+
+E501 Line too long (114 > 100)
+  --> backend/app/services/incident_map.py:44:101
+   |
+42 |     try:
+43 |         token,sig=body.cursor.rsplit('.',1)
+44 |         if not hmac.compare_digest(sig,hmac.new(key,token.encode(),hashlib.sha256).hexdigest()):raise ValueError()
+   |                                                                                                     ^^^^^^^^^^^^^^
+45 |         data=json.loads(base64.urlsafe_b64decode(token+'='*(-len(token)%4)))
+46 |         if data['binding']!=binding or data['expires']<datetime.now(UTC).timestamp():raise ValueError()
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/services/incident_map.py:46:85
+   |
+44 |         if not hmac.compare_digest(sig,hmac.new(key,token.encode(),hashlib.sha256).hexdigest()):raise ValueError()
+45 |         data=json.loads(base64.urlsafe_b64decode(token+'='*(-len(token)%4)))
+46 |         if data['binding']!=binding or data['expires']<datetime.now(UTC).timestamp():raise ValueError()
+   |                                                                                     ^
+47 |         return data
+48 |     except (ValueError,KeyError,TypeError,json.JSONDecodeError):raise HTTPException(422,"Invalid/expired map cursor") from None
+   |
+
+E501 Line too long (103 > 100)
+  --> backend/app/services/incident_map.py:46:101
+   |
+44 |         if not hmac.compare_digest(sig,hmac.new(key,token.encode(),hashlib.sha256).hexdigest()):raise ValueError()
+45 |         data=json.loads(base64.urlsafe_b64decode(token+'='*(-len(token)%4)))
+46 |         if data['binding']!=binding or data['expires']<datetime.now(UTC).timestamp():raise ValueError()
+   |                                                                                                     ^^^
+47 |         return data
+48 |     except (ValueError,KeyError,TypeError,json.JSONDecodeError):raise HTTPException(422,"Invalid/expired map cursor") from None
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/services/incident_map.py:48:64
+   |
+46 |         if data['binding']!=binding or data['expires']<datetime.now(UTC).timestamp():raise ValueError()
+47 |         return data
+48 |     except (ValueError,KeyError,TypeError,json.JSONDecodeError):raise HTTPException(422,"Invalid/expired map cursor") from None
+   |                                                                ^
+
+E501 Line too long (127 > 100)
+  --> backend/app/services/incident_map.py:48:101
+   |
+46 |         if data['binding']!=binding or data['expires']<datetime.now(UTC).timestamp():raise ValueError()
+47 |         return data
+48 |     except (ValueError,KeyError,TypeError,json.JSONDecodeError):raise HTTPException(422,"Invalid/expired map cursor") from None
+   |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+E501 Line too long (122 > 100)
+  --> backend/app/services/incident_map.py:56:101
+   |
+54 |         location=dict(id=str(row["location_id"]),coordinates=[row["longitude"],row["latitude"]],accuracy_m=row["accuracy_m"],confidenc…
+55 |     capture=row["captured_at"]
+56 |     occurred=capture+timedelta(seconds=row["video_t"] or 0) if capture and row["source_kind"]=="recorded_upload" else None
+   |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^
+57 |     return dict(id=str(row['id']),number=row['number'],incident_type=row['event_type'],severity=row['severity'],status=row['status'],d…
+   |
+
+E501 Line too long (991 > 100)
+  --> backend/app/services/incident_map.py:57:101
+   |
+55 | …
+56 | …"recorded_upload" else None
+57 | …=row['severity'],status=row['status'],detected_at=…',detail_href=f"/app/alerte/{row['number']}")
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^…^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/services/incident_map.py:61:89
+   |
+60 | def query(principal,body):
+61 |     if body.include_demo and not has_permission(principal.role,Permission.map_demo_read):raise HTTPException(403,"Demonstration layer …
+   |                                                                                         ^
+62 |     v=projection(principal);c=v.c;clauses=[]
+63 |     if not body.include_demo:clauses.append(c.is_demo.is_(False))
+   |
+
+E501 Line too long (152 > 100)
+  --> backend/app/services/incident_map.py:61:101
+   |
+60 | …
+61 | …le,Permission.map_demo_read):raise HTTPException(403,"Demonstration layer is not permitted")
+   |                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+62 | …
+63 | …lse))
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/app/services/incident_map.py:62:28
+   |
+60 | def query(principal,body):
+61 |     if body.include_demo and not has_permission(principal.role,Permission.map_demo_read):raise HTTPException(403,"Demonstration layer …
+62 |     v=projection(principal);c=v.c;clauses=[]
+   |                            ^
+63 |     if not body.include_demo:clauses.append(c.is_demo.is_(False))
+64 |     if body.statuses:clauses.append(c.status.in_(body.statuses))
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/app/services/incident_map.py:62:34
+   |
+60 | def query(principal,body):
+61 |     if body.include_demo and not has_permission(principal.role,Permission.map_demo_read):raise HTTPException(403,"Demonstration layer …
+62 |     v=projection(principal);c=v.c;clauses=[]
+   |                                  ^
+63 |     if not body.include_demo:clauses.append(c.is_demo.is_(False))
+64 |     if body.statuses:clauses.append(c.status.in_(body.statuses))
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/services/incident_map.py:63:29
+   |
+61 |     if body.include_demo and not has_permission(principal.role,Permission.map_demo_read):raise HTTPException(403,"Demonstration layer …
+62 |     v=projection(principal);c=v.c;clauses=[]
+63 |     if not body.include_demo:clauses.append(c.is_demo.is_(False))
+   |                             ^
+64 |     if body.statuses:clauses.append(c.status.in_(body.statuses))
+65 |     if body.types:clauses.append(c.event_type.in_(body.types))
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/services/incident_map.py:64:21
+   |
+62 |     v=projection(principal);c=v.c;clauses=[]
+63 |     if not body.include_demo:clauses.append(c.is_demo.is_(False))
+64 |     if body.statuses:clauses.append(c.status.in_(body.statuses))
+   |                     ^
+65 |     if body.types:clauses.append(c.event_type.in_(body.types))
+66 |     if body.severities:clauses.append(c.severity.in_(body.severities))
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/services/incident_map.py:65:18
+   |
+63 |     if not body.include_demo:clauses.append(c.is_demo.is_(False))
+64 |     if body.statuses:clauses.append(c.status.in_(body.statuses))
+65 |     if body.types:clauses.append(c.event_type.in_(body.types))
+   |                  ^
+66 |     if body.severities:clauses.append(c.severity.in_(body.severities))
+67 |     for field in ('source_kind','camera_id','recording_id','county_code','city_label'):
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/services/incident_map.py:66:23
+   |
+64 |     if body.statuses:clauses.append(c.status.in_(body.statuses))
+65 |     if body.types:clauses.append(c.event_type.in_(body.types))
+66 |     if body.severities:clauses.append(c.severity.in_(body.severities))
+   |                       ^
+67 |     for field in ('source_kind','camera_id','recording_id','county_code','city_label'):
+68 |         value=getattr(body,field)
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/services/incident_map.py:69:29
+   |
+67 |     for field in ('source_kind','camera_id','recording_id','county_code','city_label'):
+68 |         value=getattr(body,field)
+69 |         if value is not None:clauses.append(c[field]==value)
+   |                             ^
+70 |     # Time filter is explicitly detection/system observation UTC, never invented capture time.
+71 |     if body.date_from:clauses.append(c.detected_at>=body.date_from)
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/services/incident_map.py:71:22
+   |
+69 |         if value is not None:clauses.append(c[field]==value)
+70 |     # Time filter is explicitly detection/system observation UTC, never invented capture time.
+71 |     if body.date_from:clauses.append(c.detected_at>=body.date_from)
+   |                      ^
+72 |     if body.date_to:clauses.append(c.detected_at<=body.date_to)
+73 |     located=and_(c.state=='confirmed',c.latitude.is_not(None),c.region.in_(['romania','border_uncertain']))
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/services/incident_map.py:72:20
+   |
+70 |     # Time filter is explicitly detection/system observation UTC, never invented capture time.
+71 |     if body.date_from:clauses.append(c.detected_at>=body.date_from)
+72 |     if body.date_to:clauses.append(c.detected_at<=body.date_to)
+   |                    ^
+73 |     located=and_(c.state=='confirmed',c.latitude.is_not(None),c.region.in_(['romania','border_uncertain']))
+74 |     outside=and_(c.state=='confirmed',c.latitude.is_not(None),c.region=='outside')
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/services/incident_map.py:76:38
+   |
+74 |     outside=and_(c.state=='confirmed',c.latitude.is_not(None),c.region=='outside')
+75 |     unknown=or_(c.state.is_(None),c.state!='confirmed',c.latitude.is_(None))
+76 |     if body.location_state=='located':clauses.append(located)
+   |                                      ^
+77 |     elif body.location_state=='unknown':clauses.append(unknown)
+78 |     elif body.location_state=='outside':clauses.append(outside)
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/services/incident_map.py:77:40
+   |
+75 |     unknown=or_(c.state.is_(None),c.state!='confirmed',c.latitude.is_(None))
+76 |     if body.location_state=='located':clauses.append(located)
+77 |     elif body.location_state=='unknown':clauses.append(unknown)
+   |                                        ^
+78 |     elif body.location_state=='outside':clauses.append(outside)
+79 |     base=select(v).where(*clauses).cte('filtered_map')
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/app/services/incident_map.py:78:40
+   |
+76 |     if body.location_state=='located':clauses.append(located)
+77 |     elif body.location_state=='unknown':clauses.append(unknown)
+78 |     elif body.location_state=='outside':clauses.append(outside)
+   |                                        ^
+79 |     base=select(v).where(*clauses).cte('filtered_map')
+80 |     # Rebind classifications to selected projection; all aggregates use the same tenant/role/filter set.
+   |
+
+E501 Line too long (104 > 100)
+  --> backend/app/services/incident_map.py:80:101
+   |
+78 |     elif body.location_state=='outside':clauses.append(outside)
+79 |     base=select(v).where(*clauses).cte('filtered_map')
+80 |     # Rebind classifications to selected projection; all aggregates use the same tenant/role/filter set.
+   |                                                                                                     ^^^^
+81 |     b=base.c;is_loc=and_(b.state=='confirmed',b.latitude.is_not(None),b.region.in_(['romania','border_uncertain']))
+82 |     is_out=and_(b.state=='confirmed',b.latitude.is_not(None),b.region=='outside')
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/app/services/incident_map.py:81:13
+   |
+79 |     base=select(v).where(*clauses).cte('filtered_map')
+80 |     # Rebind classifications to selected projection; all aggregates use the same tenant/role/filter set.
+81 |     b=base.c;is_loc=and_(b.state=='confirmed',b.latitude.is_not(None),b.region.in_(['romania','border_uncertain']))
+   |             ^
+82 |     is_out=and_(b.state=='confirmed',b.latitude.is_not(None),b.region=='outside')
+83 |     counts=principal.db.execute(select(func.count().label('total'),func.count().filter(is_loc).label('located'),func.count().filter(is…
+   |
+
+E501 Line too long (194 > 100)
+  --> backend/app/services/incident_map.py:83:101
+   |
+81 | …_(['romania','border_uncertain']))
+82 | …
+83 | …ilter(is_loc).label('located'),func.count().filter(is_out).label('outside')) .select_from(base)).mappings().one()
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+84 | …']
+85 | …
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/app/services/incident_map.py:84:22
+   |
+82 |     is_out=and_(b.state=='confirmed',b.latitude.is_not(None),b.region=='outside')
+83 |     counts=principal.db.execute(select(func.count().label('total'),func.count().filter(is_loc).label('located'),func.count().filter(is…
+84 |     full=dict(counts);full['unknown']=full['total']-full['located']-full['outside']
+   |                      ^
+85 |     viewport=[]
+86 |     if body.bbox:
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/app/services/incident_map.py:87:26
+   |
+85 |     viewport=[]
+86 |     if body.bbox:
+87 |         w,s,e,n=body.bbox;viewport=[b.longitude.between(w,e),b.latitude.between(s,n)]
+   |                          ^
+88 |     points=select(base).where(is_loc,*viewport).cte('viewport_map')
+89 |     p=points.c
+   |
+
+E501 Line too long (106 > 100)
+  --> backend/app/services/incident_map.py:90:101
+   |
+88 |     points=select(base).where(is_loc,*viewport).cte('viewport_map')
+89 |     p=points.c
+90 |     # Adaptive cells bound national aggregation to <=~1200 groups; exact coincident events remain grouped.
+   |                                                                                                     ^^^^^^
+91 |     bounds=body.bbox or (20,43,30,49)
+92 |     cell=max(360/(2**body.zoom)/4,(bounds[2]-bounds[0])/40,(bounds[3]-bounds[1])/30)
+   |
+
+E501 Line too long (234 > 100)
+  --> backend/app/services/incident_map.py:95:101
+   |
+93 | …
+94 | …),func.avg(p.longitude).label('longitude'),func.avg(p.latitude).label('latitude'),func.min(p.longitude).label('west'),func.max(p.longitude).labe…
+95 | …gitude']),float(row['latitude'])],bbox=[row['west'],row['south'],row['east'],row['north']],anchor_kind='cluster_center') for row in groups]
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+96 | …
+97 | …
+   |
+
+E701 Multiple statements on one line (colon)
+   --> backend/app/services/incident_map.py:98:17
+    |
+ 96 |     full['in_viewport']=principal.db.scalar(select(func.count()).select_from(points))
+ 97 |     page=select(base)
+ 98 |     if body.bbox:page=page.where(or_(b.latitude.is_(None),and_(*viewport)))
+    |                 ^
+ 99 |     cursor=_cursor(body,principal)
+100 |     if cursor:
+    |
+
+E702 Multiple statements on one line (semicolon)
+   --> backend/app/services/incident_map.py:101:48
+    |
+ 99 |     cursor=_cursor(body,principal)
+100 |     if cursor:
+101 |         at=datetime.fromisoformat(cursor['at']);id=cursor['id']
+    |                                                ^
+102 |         page=page.where(or_(b.detected_at<at,and_(b.detected_at==at,cast(b.id,String)<id)))
+103 |     result=principal.db.execute(page.order_by(b.detected_at.desc(),b.id.desc()).limit(body.limit+1)).mappings().all()
+    |
+
+E501 Line too long (167 > 100)
+   --> backend/app/services/incident_map.py:104:101
+    |
+102 | …cast(b.id,String)<id)))
+103 | ….id.desc()).limit(body.limit+1)).mappings().all()
+104 | …'detected_at'].isoformat(),id=str(result[body.limit-1]['id']))) if len(result)>body.limit else None
+    |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+105 | …y.limit]],clusters=clusters,counts=full,next_cursor=next_cursor,count_scope='All authorized filtered incidents; in_viewport counts l…
+    |
+
+E501 Line too long (346 > 100)
+   --> backend/app/services/incident_map.py:105:101
+    |
+103 | …t+1)).mappings().all()
+104 | …id=str(result[body.limit-1]['id']))) if len(result)>body.limit else None
+105 | …,counts=full,next_cursor=next_cursor,count_scope='All authorized filtered incidents; in_viewport counts located points inside current bbox. List is paginated.',time_filter_basis='detected_at_utc',generated_at=datetime.now(UTC),refresh_after_seconds=8)
+    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+E701 Multiple statements on one line (colon)
+   --> backend/app/services/incident_map.py:112:13
+    |
+110 |     from app.services.geolocation import head
+111 |     value=head(db,'alert',alert.id,resolved=True)
+112 |     if value:return out(value)
+    |             ^
+113 |     link=db.get(IncidentGeoSource,alert.id)
+114 |     if link is None:return None
+    |
+
+E701 Multiple statements on one line (colon)
+   --> backend/app/services/incident_map.py:114:20
+    |
+112 |     if value:return out(value)
+113 |     link=db.get(IncidentGeoSource,alert.id)
+114 |     if link is None:return None
+    |                    ^
+115 |     if link.recording_id:return out(head(db,'recording',link.recording_id,resolved=True))
+116 |     return out(db.get(LocationRevision,link.camera_location_id)) if link.camera_location_id else None
+    |
+
+E701 Multiple statements on one line (colon)
+   --> backend/app/services/incident_map.py:115:25
+    |
+113 |     link=db.get(IncidentGeoSource,alert.id)
+114 |     if link is None:return None
+115 |     if link.recording_id:return out(head(db,'recording',link.recording_id,resolved=True))
+    |                         ^
+116 |     return out(db.get(LocationRevision,link.camera_location_id)) if link.camera_location_id else None
+    |
+
+E501 Line too long (101 > 100)
+   --> backend/app/services/incident_map.py:116:101
+    |
+114 |     if link is None:return None
+115 |     if link.recording_id:return out(head(db,'recording',link.recording_id,resolved=True))
+116 |     return out(db.get(LocationRevision,link.camera_location_id)) if link.camera_location_id else None
+    |                                                                                                     ^
+
+Found 121 errors (7 fixed, 114 remaining).
+4 unsafe fixes available with `--fix --unsafe-fixes`.

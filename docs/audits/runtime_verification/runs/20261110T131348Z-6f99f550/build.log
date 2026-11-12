@@ -1,0 +1,48 @@
+
+> roadsentinel-web@0.1.0 build
+> tsc -b && vite build --outDir /home/justin7m8/Documents/roadsentinel-integration/docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build
+
+vite v7.3.7 building client environment for production...
+transforming...
+✓ 2882 modules transformed.
+
+(!) outDir /home/justin7m8/Documents/roadsentinel-integration/docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build is not inside project root and will not be emptied.
+Use --emptyOutDir to override.
+
+rendering chunks...
+computing gzip size...
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/index.html                                                    0.71 kB │ gzip:   0.43 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/space-grotesk-vietnamese-wght-normal-D0rl6rjA.woff2    6.71 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/space-grotesk-latin-ext-wght-normal-D9tNdqV9.woff2    18.94 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/space-grotesk-latin-wght-normal-BhU9QXUp.woff2        22.29 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/IasiMap-CIGW-MKW.css                                  15.61 kB │ gzip:   6.46 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/index-MbFB72fx.css                                    82.76 kB │ gzip:  15.61 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/loader-circle-BuzkDsrC.js                              0.20 kB │ gzip:   0.19 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/lock-D_MAOWDm.js                                       0.24 kB │ gzip:   0.21 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/circle-check-BJhpIDr7.js                               0.24 kB │ gzip:   0.21 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/circle-x-BiJlWIWz.js                                   0.26 kB │ gzip:   0.21 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/download-BrKHfgXU.js                                   0.27 kB │ gzip:   0.22 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/radio-onr5JEZL.js                                      0.41 kB │ gzip:   0.27 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/trash-CAYt3Kpq.js                                      0.60 kB │ gzip:   0.34 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/triangle-alert-9pvXJYlm.js                             0.69 kB │ gzip:   0.39 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/BadgePanel-Da23F1ON.js                                 0.75 kB │ gzip:   0.43 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/ClipModal-DYLu0eqw.js                                  1.51 kB │ gzip:   0.73 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/TacticalMap-sy08Ip8B.js                                1.52 kB │ gzip:   0.80 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/SettingsPage-DD-kXC8s.js                               1.74 kB │ gzip:   0.90 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/SeverityBadge-Dq3qbtj-.js                              2.00 kB │ gzip:   0.93 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/cases-BIUf75gz.js                                      2.60 kB │ gzip:   1.23 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/PatrolsPage-C1vTgYSP.js                                2.68 kB │ gzip:   1.16 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/RulesPage-BmlRzErJ.js                                  5.01 kB │ gzip:   1.97 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/AuditPage-CL1IBhbC.js                                 10.70 kB │ gzip:   3.72 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/DashboardPage-WnrYby5E.js                             10.92 kB │ gzip:   3.88 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/EvidencePlayer-94MMnV93.js                            11.83 kB │ gzip:   4.41 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/StatsPage-CnooI0wx.js                                 11.90 kB │ gzip:   4.05 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/ArchivePage-DGlEjFFT.js                               12.18 kB │ gzip:   4.45 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/format-BSWIBcp5.js                                    12.22 kB │ gzip:   3.27 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/VideoAnalysisPage-DSiAjPs-.js                         46.87 kB │ gzip:  13.85 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/AlertDetailPage-DDqiHAX3.js                           52.70 kB │ gzip:  15.07 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/CamerasPage-NizUNf8-.js                               54.84 kB │ gzip:  17.50 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/IasiMap-0wLn9bvS.js                                  156.67 kB │ gzip:  46.02 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/LivePlayer-yl0uhmxT.js                               399.57 kB │ gzip: 123.92 kB
+../docs/audits/runtime_verification/runs/20261110T131348Z-6f99f550/build/assets/index-CFTCjuTY.js                                    425.98 kB │ gzip: 137.38 kB
+✓ built in 3.16s

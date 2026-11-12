@@ -1,0 +1,62 @@
+{
+  "operator.a@roadsentinel.local": {
+    "secret": "NZHYDU5VPMXVYRVRCWECGLDWPH3WYDFD",
+    "otpauth_uri": "otpauth://totp/RoadSentinel:operator.a%40roadsentinel.local?secret=NZHYDU5VPMXVYRVRCWECGLDWPH3WYDFD&issuer=RoadSentinel",
+    "recovery_codes": [
+      "SUDED-UR4NX",
+      "RUXE2-4PA5M",
+      "VQABO-TRHZO",
+      "P2ZO5-LBTTR",
+      "ZPV5D-T6745",
+      "PXJ5M-J65XQ",
+      "C7FZS-TT4K7",
+      "XH2J3-2TN62"
+    ],
+    "lastUsedStep": 59813421
+  },
+  "admin.a@roadsentinel.local": {
+    "secret": "6LBADNTBSAHFFVE2HXIT7T2Y6ZZ6JDVR",
+    "otpauth_uri": "otpauth://totp/RoadSentinel:admin.a%40roadsentinel.local?secret=6LBADNTBSAHFFVE2HXIT7T2Y6ZZ6JDVR&issuer=RoadSentinel",
+    "recovery_codes": [
+      "4ZEHY-D2F32",
+      "P2PCY-ENQQR",
+      "UZWBG-VBB3S",
+      "U2HXY-BJGY3",
+      "MX4TZ-BS5FU",
+      "SWZX2-F46IQ",
+      "XHXSD-3SGO3",
+      "OHINQ-CBAW4"
+    ],
+    "lastUsedStep": 59813421
+  },
+  "patrol.a@roadsentinel.local": {
+    "secret": "3IQIOQZTIMQ5SUELXOSGTALLI6IWKUQA",
+    "otpauth_uri": "otpauth://totp/RoadSentinel:patrol.a%40roadsentinel.local?secret=3IQIOQZTIMQ5SUELXOSGTALLI6IWKUQA&issuer=RoadSentinel",
+    "recovery_codes": [
+      "ALRN6-6QEPT",
+      "YPHOX-AILKE",
+      "YVOX5-AAW5P",
+      "JOJXI-L43FE",
+      "YMNYN-YPNPZ",
+      "DU6WD-OQSAX",
+      "D7XMS-CECYY",
+      "SGAQM-WONQU"
+    ],
+    "lastUsedStep": 59813421
+  },
+  "auditor.a@roadsentinel.local": {
+    "secret": "V6YHYJJXOQSHNNOO2EVZGLFKP6ZNOC6T",
+    "otpauth_uri": "otpauth://totp/RoadSentinel:auditor.a%40roadsentinel.local?secret=V6YHYJJXOQSHNNOO2EVZGLFKP6ZNOC6T&issuer=RoadSentinel",
+    "recovery_codes": [
+      "LYYJH-VP57G",
+      "SKV5L-W3IVU",
+      "VOTK4-EZV73",
+      "MYHO6-74WQG",
+      "TO4KO-74BKP",
+      "GEXTU-FV6I4",
+      "PAHOO-Y7QHQ",
+      "Q5HUN-HVS6V"
+    ],
+    "lastUsedStep": 59813421
+  }
+}

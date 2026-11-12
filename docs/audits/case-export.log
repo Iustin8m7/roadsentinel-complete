@@ -1,0 +1,858 @@
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001, Initial schema: tenants, users, auth state, cameras, alerts, evidence, approvals, audit.
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 0002, Security layer: Row-Level Security, app-role grants, append-only audit log, auth lookups.
+INFO  [alembic.runtime.migration] Running upgrade 0002 -> 0003, Service accounts for signed pipeline ingestion; tighter grants on tenants.
+INFO  [alembic.runtime.migration] Running upgrade 0003 -> 0004, Fields of the API.md contract: camera slugs and timezones, public alert numbers, detection
+details, VLM verdicts, operator actions, and camera-level evidence (annotated recordings).
+INFO  [alembic.runtime.migration] Running upgrade 0004 -> 0005, Per-user MFA exemption (demo accounts): users.mfa_exempt, default false.
+INFO  [alembic.runtime.migration] Running upgrade 0005 -> 0006, Camera heartbeat: cameras.last_seen_at, set by the live pipeline.
+INFO  [alembic.runtime.migration] Running upgrade 0006 -> 0007, Evidence integrity: record whether a distinct original exists.
+INFO  [alembic.runtime.migration] Running upgrade 0007 -> 0008, New rule types, idempotent ingestion, camera rate status.
+INFO  [alembic.runtime.migration] Running upgrade 0008 -> 0009, Account recovery: four-eyes reset requests and single-use reset tokens.
+INFO  [alembic.runtime.migration] Running upgrade 0009 -> 0010, Retention: per-tenant policy per evidence kind, legal hold on alerts, purge marker on evidence.
+INFO  [alembic.runtime.migration] Running upgrade 0010 -> 0011, Patrol workflow status and first-view timestamp (for response-time statistics).
+INFO  [alembic.runtime.migration] Running upgrade 0011 -> 0012, Let the runtime role read alembic_version so /api/ready can tell whether the schema is migrated.
+INFO  [alembic.runtime.migration] Running upgrade 0012 -> 0013, User-owned saved archive searches with tenant RLS.
+INFO  [alembic.runtime.migration] Running upgrade 0013 -> 0014, Tenant-scoped offline recordings and durable analysis runs.
+INFO  [alembic.runtime.migration] Running upgrade 0014 -> 0015, Persist structured vehicle-observation artifact metadata.
+INFO  [alembic.runtime.migration] Running upgrade 0015 -> rsint_cam1, Camera control plane: lifecycle/source columns on cameras, processing grants, immutable
+config versions, worker status (lease) and a bounded health-event history.
+INFO  [alembic.runtime.migration] Running upgrade rsint_cam1 -> rsint_case1, Investigation workspace (Workstream B): case notes with append-only revisions, timeline
+bookmarks, evidence-package export jobs, user-owned saved archive filters; evidence gets
+``duration_s`` (from the MP4 header) and ``purged_at``/``purge_reason`` (explicit purge state).
+INFO  [alembic.runtime.migration] Running upgrade rsint_case1 -> rsint_run1, Camera runtime telemetry (Workstream D): bounded latency/memory/frozen-image metrics on the
+worker status row, a source identity fingerprint on cameras (what the backend registered) and on
+the worker status (what the lease holder reports it opened), and the per-camera, per-state
+failure-notification throttle marks.
+INFO  [alembic.runtime.migration] Running upgrade rsint_run1 -> rsint_case2, Investigation completion (Workstream B, lane E): explicit case links, structured follow-up
+items with an append-only history, manual legal holds; note revisions may carry the recorded
+detection box; export jobs count storage outages separately from attempts. The cross-tenant
+probe allow-list (``rs_resource_tenant``) is extended to every tenant table that the API looks
+up by id, including those of 0007, 0008 and this revision.
+INFO  [alembic.runtime.migration] Running upgrade rsint_case2 -> 0020, Require an RLS-bypassing owner for pre-tenant lookup functions.
+INFO  [alembic.runtime.migration] Running upgrade 0020 -> 0021, Align offline tenant indexes with ORM; additive only.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-zoqwkvb4 is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+ERROR [app] unhandled error
+  + Exception Group Traceback (most recent call last):
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_utils.py", line 104, in create_collapsing_task_group
+  |     async with anyio.create_task_group() as tg:
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 847, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    |     return await call_next(request)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    |     await route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    |     await self.original_router.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    |     await included_router._handle_selected(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    |     await original_route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    |     await effective_context.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    |     return await run_in_threadpool(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    |     return await anyio.to_thread.run_sync(func)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    |     return await get_async_backend().run_sync_in_worker_thread(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    |     return await future
+    |            ^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    |     result = context.run(func, *args)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    |     return function(**arguments)
+    |            ^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/investigation.py", line 591, in export_link
+    |     export_service.check_downloadable(principal.db, job, principal.user_id)
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/exports.py", line 743, in check_downloadable
+    |     raise ExportError(409, "Pachetul nu este gata.", "not_ready")
+    | app.services.exports.ExportError: Pachetul nu este gata.
+    +------------------------------------
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    await route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    await effective_context.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    return await run_in_threadpool(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    return function(**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/investigation.py", line 591, in export_link
+    export_service.check_downloadable(principal.db, job, principal.user_id)
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/exports.py", line 743, in check_downloadable
+    raise ExportError(409, "Pachetul nu este gata.", "not_ready")
+app.services.exports.ExportError: Pachetul nu este gata.
+ERROR:    Exception in ASGI application
+  + Exception Group Traceback (most recent call last):
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_utils.py", line 104, in create_collapsing_task_group
+  |     async with anyio.create_task_group() as tg:
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 847, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 422, in run_asgi
+    |     result = await app(  # type: ignore[func-returns-value]
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 63, in __call__
+    |     return await self.app(scope, receive, send)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/applications.py", line 1216, in __call__
+    |     await super().__call__(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/applications.py", line 96, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    |     return await call_next(request)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    |     await route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    |     await self.original_router.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    |     await included_router._handle_selected(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    |     await original_route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    |     await effective_context.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    |     return await run_in_threadpool(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    |     return await anyio.to_thread.run_sync(func)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    |     return await get_async_backend().run_sync_in_worker_thread(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    |     return await future
+    |            ^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    |     result = context.run(func, *args)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    |     return function(**arguments)
+    |            ^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/investigation.py", line 591, in export_link
+    |     export_service.check_downloadable(principal.db, job, principal.user_id)
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/exports.py", line 743, in check_downloadable
+    |     raise ExportError(409, "Pachetul nu este gata.", "not_ready")
+    | app.services.exports.ExportError: Pachetul nu este gata.
+    +------------------------------------
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 422, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 63, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/applications.py", line 1216, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/applications.py", line 96, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    await route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    await effective_context.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    return await run_in_threadpool(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    return function(**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/investigation.py", line 591, in export_link
+    export_service.check_downloadable(principal.db, job, principal.user_id)
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/exports.py", line 743, in check_downloadable
+    raise ExportError(409, "Pachetul nu este gata.", "not_ready")
+app.services.exports.ExportError: Pachetul nu este gata.
+Disposable test PostgreSQL identity: ('postgres', '127.0.0.1', 55479, 'postgres') target: rsmission_export
+F
+=================================== FAILURES ===================================
+__________ test_real_inference_recorded_candidate_to_encrypted_review __________
+
+world = World(platform=Unit(id=UUID('2e938709-3cf7-44b3-9916-43ac4f4bd059'), users={<Role.system_admin: 'system_admin'>: TUser...b-408cb8aff0d5'), 'evidence': UUID('8b2a862c-223c-4392-8821-5d7e264b1375'), 'plates': ['B00XYZ', 'B10XYZ', 'B20XYZ']}})
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-156/test_real_inference_recorded_c0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7e9fa734d970>
+
+    @pytest.mark.skipif(
+        os.getenv("RS_MISSION_REAL") != "1", reason="explicit licensed fixture/model opt-in"
+    )
+    def test_real_inference_recorded_candidate_to_encrypted_review(world, tmp_path, monkeypatch):
+        from sqlalchemy import select
+    
+        from app.config import get_settings
+        from app.core.http import CSRF, cookie_name
+        from app.db import tenant_session
+        from app.main import create_app
+        from app.models import Alert, Evidence
+        from app.services.evidence import file_path
+    
+        cap = cv2.VideoCapture("/tmp/Street_traffic.webm")
+        ok, frame = cap.read()
+        cap.release()
+        assert ok
+        frame = cv2.resize(frame, (640, 360))
+        clip = tmp_path / "SYNTHETIC_TEST_frozen_licensed_frame.mp4"
+        writer = cv2.VideoWriter(str(clip), cv2.VideoWriter_fourcc(*"mp4v"), 5, (640, 360))
+        assert writer.isOpened()
+        for _ in range(180):
+            writer.write(frame)
+        writer.release()
+        with socket.socket() as sock:
+            sock.bind(("127.0.0.1", 0))
+            port = sock.getsockname()[1]
+        origin = f"http://127.0.0.1:{port}"
+        with socket.socket() as sock:
+            sock.bind(("127.0.0.1", 0))
+            ui_port = sock.getsockname()[1]
+        ui_origin = f"http://127.0.0.1:{ui_port}"
+        monkeypatch.setenv("RS_PUBLIC_ORIGIN", ui_origin)
+        monkeypatch.setenv("RS_COOKIE_SECURE", "false")
+        get_settings.cache_clear()
+        server = uvicorn.Server(
+            uvicorn.Config(create_app(), host="127.0.0.1", port=port, log_level="error")
+        )
+        thread = threading.Thread(target=server.run, daemon=True)
+        thread.start()
+        try:
+            deadline = time.monotonic() + 15
+            while not server.started and time.monotonic() < deadline:
+                time.sleep(0.05)
+            assert server.started
+            with httpx.Client(base_url=origin, timeout=60) as client:
+                client.get("/api/auth/csrf").raise_for_status()
+                client.headers.update(
+                    {"Origin": ui_origin, "X-CSRF-Token": client.cookies.get(cookie_name(CSRF))}
+                )
+                user = world.a.operator
+                r = client.post(
+                    "/api/auth/login", json={"email": user.email, "password": user.password}
+                )
+                assert r.status_code == 200, r.text
+                r = client.post("/api/auth/mfa/verify", json={"code": user.totp()})
+                assert r.status_code == 204, r.text
+                with clip.open("rb") as src:
+                    r = client.post("/api/recordings", files={"file": (clip.name, src, "video/mp4")})
+                assert r.status_code == 201, r.text
+                rid = r.json()["id"]
+                r = client.patch(
+                    f"/api/recordings/{rid}/crop",
+                    json={
+                        "x": 0,
+                        "y": 0,
+                        "width": 1,
+                        "height": 1,
+                        "confirmed": True,
+                        "expected_revision": 0,
+                    },
+                )
+                assert r.status_code == 200, r.text
+                r = client.post(
+                    f"/api/recordings/{rid}/analyses",
+                    json={
+                        "sample_fps": 2,
+                        "confidence": 0.3,
+                        "crop_revision": 1,
+                        "stationary_duration_s": 30,
+                        "queue_enabled": False,
+                    },
+                )
+                assert r.status_code == 202, r.text
+                run = r.json()["id"]
+                deadline = time.monotonic() + 180
+                while time.monotonic() < deadline:
+                    result = client.get(f"/api/analyses/{run}").json()
+                    if result["status"] not in ("queued", "running"):
+                        break
+                    time.sleep(0.5)
+                assert result["status"] == "completed", result
+                assert result["processed_frames"] >= 60
+                candidates = client.get(f"/api/recordings/{rid}/analyses/{run}/candidates")
+                assert candidates.status_code == 200, candidates.text
+                assert candidates.json()["candidates"], result["counts"]
+                path = f"/api/recordings/{rid}/analyses/{run}/candidates/0/promote"
+                r = client.post(
+                    path,
+                    json={
+                        "synthetic_test": True,
+                        "reason": "SYNTHETIC TEST: verify recorded-source review mechanics",
+                    },
+                )
+                assert r.status_code == 200, r.text
+                number = r.json()["id"]
+                assert (
+                    client.post(path, json={"reason": "Repeated test submission"}).json()["id"]
+                    == number
+                )
+                detail = client.get(f"/api/events/{number}")
+                assert detail.status_code == 200, detail.text
+                data = detail.json()
+                assert data["details"]["origin"] == "recorded_upload"
+                for key in ("keyframe_url", "clip_url"):
+                    response = client.get(data[key])
+                    assert response.status_code == 200, response.text[:200]
+                    assert len(response.content) > 200
+                r = client.post(
+                    f"/api/events/{number}/decision",
+                    json={"decision": "reject", "note": "Synthetic fixture; no real incident"},
+                )
+                assert r.status_code == 200, r.text
+                assert client.get(f"/api/events/{number}").json()["status"] == "rejected"
+                with tenant_session(world.a.id) as db:
+                    alert = db.scalar(select(Alert).where(Alert.number == number))
+                    media = db.scalars(select(Evidence).where(Evidence.alert_id == alert.id)).all()
+                    assert len(media) == 2
+                    assert all(
+                        file_path(e, "redacted").read_bytes()[:3] != b"\xff\xd8\xff" for e in media
+                    )
+                # Existing investigation/export authority: real HTTP, independent admin approval,
+                # documented license grant, encrypted package download and offline manifest verifier.
+                note = client.post(
+                    f"/api/events/{number}/notes",
+                    json={
+                        "kind": "observation",
+                        "body": "SYNTHETIC TEST: licensed frozen-frame candidate reviewed.",
+                    },
+                )
+                assert note.status_code == 201, note.text
+                assert client.get(f"/api/events/{number}/case").status_code == 200
+                with tenant_session(world.a.id) as db:
+                    camera_id = db.scalar(select(Alert.camera_id).where(Alert.number == number))
+                from datetime import UTC, datetime, timedelta
+    
+                with httpx.Client(base_url=origin, timeout=30) as admin:
+                    admin.get("/api/auth/csrf").raise_for_status()
+                    admin.headers.update(
+                        {"Origin": ui_origin, "X-CSRF-Token": admin.cookies.get(cookie_name(CSRF))}
+                    )
+                    admin.post(
+                        "/api/auth/login",
+                        json={"email": world.a.admin.email, "password": world.a.admin.password},
+                    ).raise_for_status()
+                    admin.post(
+                        "/api/auth/mfa/verify", json={"code": world.a.admin.totp()}
+                    ).raise_for_status()
+                    grant = admin.post(
+                        f"/api/camera-control/cameras/{camera_id}/grants",
+                        json={
+                            "granting_party": "Editor / Wikimedia Commons",
+                            "basis": "licence",
+                            "basis_reference": "CC BY 3.0 Street traffic.webm; synthetic frozen derivative",
+                            "purpose": "Isolated case export verification",
+                            "valid_from": (datetime.now(UTC) - timedelta(minutes=1)).isoformat(),
+                            "valid_until": (datetime.now(UTC) + timedelta(hours=1)).isoformat(),
+                            "capture_method": "recorded_replay",
+                            "max_analysis_fps": 2,
+                            "max_frame_height": 360,
+                            "retention_days": 1,
+                            "export_allowed": True,
+                            "media_scope": "events_only",
+                        },
+                    )
+                    assert grant.status_code == 201, grant.text
+                    requested = client.post(
+                        f"/api/events/{number}/exports",
+                        json={
+                            "justification": "Verify licensed synthetic recorded candidate package",
+                            "case_reference": "MISSION-SYNTHETIC",
+                            "idempotency_key": "mission-export-positive-01",
+                        },
+                    )
+                    assert requested.status_code == 201, requested.text
+                    job = requested.json()
+>                   assert client.post(f"/api/exports/{job['id']}/link").status_code == 403
+E                   AssertionError: assert 500 == 403
+E                    +  where 500 = <Response [500 Internal Server Error]>.status_code
+E                    +    where <Response [500 Internal Server Error]> = post('/api/exports/1d188bd8-2720-47cf-afd9-b3f1ece7d271/link')
+E                    +      where post = <httpx.Client object at 0x7e9ef9df6750>.post
+
+tests/test_mission_vertical.py:206: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app:main.py:63 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-zoqwkvb4 is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+ERROR    app:main.py:155 unhandled error
+  + Exception Group Traceback (most recent call last):
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_utils.py", line 104, in create_collapsing_task_group
+  |     async with anyio.create_task_group() as tg:
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 847, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    |     return await call_next(request)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    |     await route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    |     await self.original_router.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    |     await included_router._handle_selected(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    |     await original_route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    |     await effective_context.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    |     return await run_in_threadpool(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    |     return await anyio.to_thread.run_sync(func)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    |     return await get_async_backend().run_sync_in_worker_thread(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    |     return await future
+    |            ^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    |     result = context.run(func, *args)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    |     return function(**arguments)
+    |            ^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/investigation.py", line 591, in export_link
+    |     export_service.check_downloadable(principal.db, job, principal.user_id)
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/exports.py", line 743, in check_downloadable
+    |     raise ExportError(409, "Pachetul nu este gata.", "not_ready")
+    | app.services.exports.ExportError: Pachetul nu este gata.
+    +------------------------------------
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    await route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    await effective_context.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    return await run_in_threadpool(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    return function(**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/investigation.py", line 591, in export_link
+    export_service.check_downloadable(principal.db, job, principal.user_id)
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/exports.py", line 743, in check_downloadable
+    raise ExportError(409, "Pachetul nu este gata.", "not_ready")
+app.services.exports.ExportError: Pachetul nu este gata.
+=============================== warnings summary ===============================
+tests/test_mission_vertical.py::test_real_inference_recorded_candidate_to_encrypted_review
+  /home/justin7m8/Documents/roadsentinel-integration/roadsentinel/detector.py:209: FutureWarning: The `ByteTrack` was deprecated since v0.28.0. It will be removed in v0.31.0.
+    return sv.ByteTrack(frame_rate=max(1, round(frame_rate)))
+
+tests/test_mission_vertical.py::test_real_inference_recorded_candidate_to_encrypted_review
+tests/test_mission_vertical.py::test_real_inference_recorded_candidate_to_encrypted_review
+  /home/justin7m8/Documents/roadsentinel-integration/backend/app/services/casework.py:190: SADeprecationWarning: The Result.tuples() method is deprecated, Row now behaves like a tuple and can unpack types directly. (deprecated since: 2.1.0)
+    ).tuples()
+
+tests/test_mission_vertical.py::test_real_inference_recorded_candidate_to_encrypted_review
+tests/test_mission_vertical.py::test_real_inference_recorded_candidate_to_encrypted_review
+  /home/justin7m8/Documents/roadsentinel-integration/backend/app/services/casework.py:202: SADeprecationWarning: The Result.tuples() method is deprecated, Row now behaves like a tuple and can unpack types directly. (deprecated since: 2.1.0)
+    ).tuples()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_mission_vertical.py::test_real_inference_recorded_candidate_to_encrypted_review
+1 failed, 5 warnings in 9.01s

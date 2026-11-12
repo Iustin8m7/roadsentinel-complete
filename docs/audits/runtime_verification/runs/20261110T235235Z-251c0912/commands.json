@@ -1,0 +1,75 @@
+[
+  {
+    "name": "initdb",
+    "command": [
+      "/home/justin7m8/miniconda3/envs/rs-pg/bin/initdb",
+      "-D",
+      "/tmp/rsverify-rst_qur6/pg",
+      "-U",
+      "rsverify_root",
+      "-A",
+      "trust",
+      "--encoding=UTF8",
+      "--no-locale"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration",
+    "start": "2026-11-10T23:52:35.639207+00:00",
+    "end": "2026-11-10T23:52:36.856285+00:00",
+    "duration_s": 1.217,
+    "exit_code": 0
+  },
+  {
+    "name": "start",
+    "command": [
+      "/home/justin7m8/miniconda3/envs/rs-pg/bin/pg_ctl",
+      "-D",
+      "/tmp/rsverify-rst_qur6/pg",
+      "-l",
+      "/tmp/rsverify-rst_qur6/postgres.log",
+      "-o",
+      "-h 127.0.0.1 -p 59037 -k /tmp/rsverify-rst_qur6",
+      "start"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration",
+    "start": "2026-11-10T23:52:36.856807+00:00",
+    "end": "2026-11-10T23:52:36.971801+00:00",
+    "duration_s": 0.115,
+    "exit_code": 0
+  },
+  {
+    "name": "auth",
+    "command": [
+      "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/bin/python",
+      "-m",
+      "pytest",
+      "tests/test_lookup_ownership.py",
+      "tests/test_seed.py",
+      "tests/test_auth.py",
+      "-o",
+      "addopts=",
+      "-q",
+      "-s"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration/backend",
+    "start": "2026-11-10T23:52:36.972335+00:00",
+    "end": "2026-11-10T23:53:00.800663+00:00",
+    "duration_s": 23.828,
+    "exit_code": 0
+  },
+  {
+    "name": "stop",
+    "command": [
+      "/home/justin7m8/miniconda3/envs/rs-pg/bin/pg_ctl",
+      "-D",
+      "/tmp/rsverify-rst_qur6/pg",
+      "stop",
+      "-m",
+      "fast"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration",
+    "start": "2026-11-10T23:53:00.801236+00:00",
+    "end": "2026-11-10T23:53:06.829911+00:00",
+    "duration_s": 6.029,
+    "exit_code": 0
+  }
+]

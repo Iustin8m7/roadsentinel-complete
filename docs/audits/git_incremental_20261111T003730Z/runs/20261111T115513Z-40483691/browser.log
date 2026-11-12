@@ -1,0 +1,265 @@
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001, Initial schema: tenants, users, auth state, cameras, alerts, evidence, approvals, audit.
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 0002, Security layer: Row-Level Security, app-role grants, append-only audit log, auth lookups.
+INFO  [alembic.runtime.migration] Running upgrade 0002 -> 0003, Service accounts for signed pipeline ingestion; tighter grants on tenants.
+INFO  [alembic.runtime.migration] Running upgrade 0003 -> 0004, Fields of the API.md contract: camera slugs and timezones, public alert numbers, detection
+details, VLM verdicts, operator actions, and camera-level evidence (annotated recordings).
+INFO  [alembic.runtime.migration] Running upgrade 0004 -> 0005, Per-user MFA exemption (demo accounts): users.mfa_exempt, default false.
+INFO  [alembic.runtime.migration] Running upgrade 0005 -> 0006, Camera heartbeat: cameras.last_seen_at, set by the live pipeline.
+INFO  [alembic.runtime.migration] Running upgrade 0006 -> 0007, Evidence integrity: record whether a distinct original exists.
+INFO  [alembic.runtime.migration] Running upgrade 0007 -> 0008, New rule types, idempotent ingestion, camera rate status.
+INFO  [alembic.runtime.migration] Running upgrade 0008 -> 0009, Account recovery: four-eyes reset requests and single-use reset tokens.
+INFO  [alembic.runtime.migration] Running upgrade 0009 -> 0010, Retention: per-tenant policy per evidence kind, legal hold on alerts, purge marker on evidence.
+INFO  [alembic.runtime.migration] Running upgrade 0010 -> 0011, Patrol workflow status and first-view timestamp (for response-time statistics).
+INFO  [alembic.runtime.migration] Running upgrade 0011 -> 0012, Let the runtime role read alembic_version so /api/ready can tell whether the schema is migrated.
+INFO  [alembic.runtime.migration] Running upgrade 0012 -> 0013, User-owned saved archive searches with tenant RLS.
+INFO  [alembic.runtime.migration] Running upgrade 0013 -> 0014, Tenant-scoped offline recordings and durable analysis runs.
+INFO  [alembic.runtime.migration] Running upgrade 0014 -> 0015, Persist structured vehicle-observation artifact metadata.
+INFO  [alembic.runtime.migration] Running upgrade 0015 -> rsint_cam1, Camera control plane: lifecycle/source columns on cameras, processing grants, immutable
+config versions, worker status (lease) and a bounded health-event history.
+INFO  [alembic.runtime.migration] Running upgrade rsint_cam1 -> rsint_case1, Investigation workspace (Workstream B): case notes with append-only revisions, timeline
+bookmarks, evidence-package export jobs, user-owned saved archive filters; evidence gets
+``duration_s`` (from the MP4 header) and ``purged_at``/``purge_reason`` (explicit purge state).
+INFO  [alembic.runtime.migration] Running upgrade rsint_case1 -> rsint_run1, Camera runtime telemetry (Workstream D): bounded latency/memory/frozen-image metrics on the
+worker status row, a source identity fingerprint on cameras (what the backend registered) and on
+the worker status (what the lease holder reports it opened), and the per-camera, per-state
+failure-notification throttle marks.
+INFO  [alembic.runtime.migration] Running upgrade rsint_run1 -> rsint_case2, Investigation completion (Workstream B, lane E): explicit case links, structured follow-up
+items with an append-only history, manual legal holds; note revisions may carry the recorded
+detection box; export jobs count storage outages separately from attempts. The cross-tenant
+probe allow-list (``rs_resource_tenant``) is extended to every tenant table that the API looks
+up by id, including those of 0007, 0008 and this revision.
+INFO  [alembic.runtime.migration] Running upgrade rsint_case2 -> 0020, Require an RLS-bypassing owner for pre-tenant lookup functions.
+INFO  [alembic.runtime.migration] Running upgrade 0020 -> 0021, Align offline tenant indexes with ORM; additive only.
+INFO  [alembic.runtime.migration] Running upgrade 0021 -> 0022, Identifier-only lookup functions get a dedicated NOLOGIN column-limited owner.
+Disposable test PostgreSQL identity: ('postgres', '127.0.0.1', 48291, 'rsverify_root') target: rsmission_verify_955de7fcde
+F
+=================================== FAILURES ===================================
+____________ test_browser_upload_review_export_and_process_restart _____________
+
+world = World(platform=Unit(id=UUID('45a62324-8f1a-4cf4-bb19-7a4b37da906d'), users={<Role.system_admin: 'system_admin'>: TUser...9-11545a1243df'), 'evidence': UUID('19ad7a82-3428-4f9c-b76c-44b6ebc4df9e'), 'plates': ['B00XYZ', 'B10XYZ', 'B20XYZ']}})
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-210/test_browser_upload_review_exp0')
+
+    @pytest.mark.skipif(
+        os.getenv("RS_MISSION_REAL") != "1", reason="licensed actual model/browser opt-in"
+    )
+    def test_browser_upload_review_export_and_process_restart(world, tmp_path):
+        from app.db import tenant_session
+        from app.models import Alert, Evidence, Role
+        from app.services.evidence import file_path
+        from app.services.package_verify import verify_package
+        from tests.conftest import make_user
+    
+        actor = make_user(world.a.id, Role.operator, "browser-enrollment@mission.local", mfa=False)
+        root = Path(__file__).resolve().parents[2]
+        output = Path(
+            os.environ.get("RS_MISSION_EVIDENCE_DIR", root / "docs/audits/runtime_verification")
+        )
+        assert output.resolve().is_relative_to(root)
+        (output / "screenshots").mkdir(parents=True, exist_ok=True)
+        with_capture = cv2.VideoCapture("/tmp/Street_traffic.webm")
+        ok, frame = with_capture.read()
+        with_capture.release()
+        assert ok
+        frame = cv2.resize(frame, (640, 360))
+        video = tmp_path / "SYNTHETIC_TEST_frozen_licensed_frame.mp4"
+        writer = cv2.VideoWriter(str(video), cv2.VideoWriter_fourcc(*"mp4v"), 5, (640, 360))
+        assert writer.isOpened()
+        for _ in range(180):
+            writer.write(frame)
+        writer.release()
+        moving = tmp_path / "LICENSED_MOVING_TRAFFIC.mp4"
+        subprocess.run(  # noqa: S603 - fixed encoder and new licensed test derivative
+            [
+                shutil.which("ffmpeg"),
+                "-nostdin",
+                "-loglevel",
+                "error",
+                "-i",
+                "/tmp/Street_traffic.webm",
+                "-t",
+                "30",
+                "-vf",
+                "fps=10,scale=960:540",
+                "-an",
+                "-c:v",
+                "libx264",
+                "-preset",
+                "ultrafast",
+                "-pix_fmt",
+                "yuv420p",
+                str(moving),
+            ],
+            check=True,
+            capture_output=True,
+            timeout=60,
+        )
+        api_port, ui_port = free_port(), free_port()
+        assert api_port != ui_port
+        api = f"http://127.0.0.1:{api_port}"
+        origin = f"http://127.0.0.1:{ui_port}"
+        env = {
+            **os.environ,
+            "RS_PUBLIC_ORIGIN": origin,
+            "RS_COOKIE_SECURE": "false",
+            "PYTHONPATH": os.pathsep.join((str(root / "backend"), str(root))),
+            "PYTHONDONTWRITEBYTECODE": "1",
+        }
+        for key in ("RS_ADMIN_DATABASE_URL", "RS_MIGRATOR_DATABASE_URL"):
+            env.pop(key, None)
+        api_process = frontend = None
+        handles = []
+    
+        def start_backend():
+            log = (tmp_path / f"api-{len(handles)}.log").open("ab")
+            handles.append(log)
+            process = subprocess.Popen(  # noqa: S603 - fixed local executable, owned ports, no shell
+                [
+                    sys.executable,
+                    "-m",
+                    "uvicorn",
+                    "app.main:create_app",
+                    "--factory",
+                    "--host",
+                    "127.0.0.1",
+                    "--port",
+                    str(api_port),
+                    "--no-access-log",
+                    "--log-level",
+                    "error",
+                ],
+                cwd=root / "backend",
+                env=env,
+                stdout=log,
+                stderr=log,
+            )
+            deadline = time.monotonic() + 20
+            while time.monotonic() < deadline and process.poll() is None:
+                try:
+                    if httpx.get(api + "/api/health/live", timeout=1).status_code == 200:
+                        return process
+                except httpx.TransportError:
+                    pass
+                time.sleep(0.1)
+            process.terminate()
+            process.wait(timeout=10)
+            raise AssertionError("Test-owned API process did not start")
+    
+        def browser(stage):
+            completed = subprocess.run(
+                ["/home/justin7m8/miniconda3/envs/rs-node22/bin/node", "e2e/complete-recorded.mjs"],
+                cwd=root / "frontend",
+                env={
+                    **env,
+                    "RS_COMPLETE_ORIGIN": origin,
+                    "RS_COMPLETE_PRIVATE": str(tmp_path),
+                    "RS_COMPLETE_PYTHON": sys.executable,
+                    "RS_COMPLETE_VIDEO": str(video),
+                    "RS_COMPLETE_MOVING_VIDEO": str(moving),
+                    "RS_COMPLETE_OPERATOR": actor.email,
+                    "RS_COMPLETE_OPERATOR_SECRET": actor.totp_secret or "",
+                    "RS_COMPLETE_ADMIN": world.a.admin.email,
+                    "RS_COMPLETE_ADMIN_SECRET": world.a.admin.totp_secret,
+                    "RS_COMPLETE_PASSWORD": world.a.operator.password,
+                    "RS_COMPLETE_STAGE": stage,
+                    "RS_COMPLETE_SCREENSHOT": str(output / f"screenshots/complete-{stage}.png"),
+                },
+                capture_output=True,
+                text=True,
+                timeout=240,
+                check=False,
+            )
+            failure = completed.stderr
+            for value in (
+                world.a.operator.password,
+                world.a.operator.totp_secret,
+                world.a.admin.totp_secret,
+            ):
+                failure = failure.replace(value, "<redacted>")
+            assert completed.returncode == 0, failure[-3000:]
+            print(completed.stdout.strip())
+    
+        try:
+            api_process = start_backend()
+            log = (tmp_path / "vite.log").open("ab")
+            handles.append(log)
+            ui_env = {k: v for k, v in os.environ.items() if not k.startswith(("RS_", "VITE_"))}
+            ui_env.update(RS_API_ORIGIN=api, VITE_USE_MOCKS="0")
+            frontend = subprocess.Popen(  # noqa: S603 - fixed local fixture executable, no shell
+                [
+                    "/home/justin7m8/miniconda3/envs/rs-node22/bin/node",
+                    "node_modules/vite/bin/vite.js",
+                    "--host",
+                    "127.0.0.1",
+                    "--port",
+                    str(ui_port),
+                    "--strictPort",
+                ],
+                cwd=root / "frontend",
+                env=ui_env,
+                stdout=log,
+                stderr=log,
+            )
+            deadline = time.monotonic() + 20
+            while time.monotonic() < deadline:
+                try:
+                    if httpx.get(origin, timeout=1).status_code == 200:
+                        break
+                except httpx.TransportError:
+                    pass
+                time.sleep(0.1)
+>           browser("create")
+
+tests/test_browser_complete_journey.py:197: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+stage = 'create'
+
+    def browser(stage):
+        completed = subprocess.run(
+            ["/home/justin7m8/miniconda3/envs/rs-node22/bin/node", "e2e/complete-recorded.mjs"],
+            cwd=root / "frontend",
+            env={
+                **env,
+                "RS_COMPLETE_ORIGIN": origin,
+                "RS_COMPLETE_PRIVATE": str(tmp_path),
+                "RS_COMPLETE_PYTHON": sys.executable,
+                "RS_COMPLETE_VIDEO": str(video),
+                "RS_COMPLETE_MOVING_VIDEO": str(moving),
+                "RS_COMPLETE_OPERATOR": actor.email,
+                "RS_COMPLETE_OPERATOR_SECRET": actor.totp_secret or "",
+                "RS_COMPLETE_ADMIN": world.a.admin.email,
+                "RS_COMPLETE_ADMIN_SECRET": world.a.admin.totp_secret,
+                "RS_COMPLETE_PASSWORD": world.a.operator.password,
+                "RS_COMPLETE_STAGE": stage,
+                "RS_COMPLETE_SCREENSHOT": str(output / f"screenshots/complete-{stage}.png"),
+            },
+            capture_output=True,
+            text=True,
+            timeout=240,
+            check=False,
+        )
+        failure = completed.stderr
+        for value in (
+            world.a.operator.password,
+            world.a.operator.totp_secret,
+            world.a.admin.totp_secret,
+        ):
+            failure = failure.replace(value, "<redacted>")
+>       assert completed.returncode == 0, failure[-3000:]
+E       AssertionError: locator.click: Error: strict mode violation: getByRole('link', { name: 'Intră în aplicație', exact: true }) resolved to 2 elements:
+E             1) <a href="/login" data-discover="true" class="rs-landing-sign">Intră în aplicație</a> aka getByRole('main').getByRole('link', { name: 'Intră în aplicație' })
+E             2) <a href="/login" data-discover="true" class="rs-landing-sign">Intră în aplicație</a> aka getByRole('contentinfo').getByRole('link', { name: 'Intră în aplicație' })
+E         
+E         Call log:
+E         [2m  - waiting for getByRole('link', { name: 'Intră în aplicație', exact: true })[22m
+E         
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/home/justin7m8/miniconda3/envs/rs-node22/bin/node', 'e2e/complete-recorded.mjs'], returncode=...)\n\nCall log:\n\x1b[2m  - waiting for getByRole(\'link\', { name: \'Intră în aplicație\', exact: true })\x1b[22m\n\n').returncode
+
+tests/test_browser_complete_journey.py:165: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_browser_complete_journey.py::test_browser_upload_review_export_and_process_restart
+1 failed in 5.73s

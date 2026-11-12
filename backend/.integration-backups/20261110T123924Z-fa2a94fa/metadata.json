@@ -1,0 +1,171 @@
+{
+  "identity": [
+    "rsint_20261110b",
+    "127.0.0.1",
+    55446,
+    "rsint_root_261110"
+  ],
+  "system_identifier": "7706309627307635180",
+  "backup_sha256": "4d11b8eee118885eaa73a2ec863d37275d973eec171041b79598c71d73b587db",
+  "before": {
+    "alembic_version": {
+      "rows": 1,
+      "sha256": "f8f5bec0d4233c188b948eae57e63013f5813ee1885119297b489dd1d16d7aa8"
+    },
+    "alerts": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "analysis_runs": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "approval_requests": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "audit_log": {
+      "rows": 3,
+      "sha256": "b599680fd1ed15289696104d181e9654b82a992b6d6a01f0fbe8155b74d503ba"
+    },
+    "camera_config_versions": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "camera_health_events": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "camera_source_grants": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "camera_worker_status": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cameras": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "case_bookmarks": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "case_followup_events": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "case_followups": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "case_legal_holds": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "case_links": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "case_note_revisions": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "case_notes": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "evidence": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "export_jobs": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ingest_nonces": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "invitations": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "push_subscriptions": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "recordings": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "recovery_codes": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "refresh_tokens": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "retention_policies": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "saved_searches": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "service_accounts": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "service_keys": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "tenant_keys": {
+      "rows": 6,
+      "sha256": "8199dd3ebb31fd1e7c8d38678a4c5184b5e0b7993e45af386b9378c030193de6"
+    },
+    "tenants": {
+      "rows": 3,
+      "sha256": "3c900b189031f37e89d4910e9fa43ce3cea86b93cefba4a2200a5c7d87bd218a"
+    },
+    "user_sessions": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "users": {
+      "rows": 9,
+      "sha256": "711c8b0c857ef3fd306c0838cdcdb381a80e9e6ec27630bcaa0ee9ac53c4f675"
+    }
+  },
+  "time": "2026-11-10T12:39:24.625276+00:00",
+  "function_owners": [
+    [
+      "rs_auth_find_invitation_tenant(text)",
+      "rsint_owner_261110b"
+    ],
+    [
+      "rs_auth_find_refresh_tenant(text)",
+      "rsint_owner_261110b"
+    ],
+    [
+      "rs_auth_find_user(text)",
+      "rsint_owner_261110b"
+    ],
+    [
+      "rs_platform_tenant()",
+      "rsint_owner_261110b"
+    ],
+    [
+      "rs_resource_tenant(text,uuid)",
+      "rsint_owner_261110b"
+    ],
+    [
+      "rs_tenant_id_by_slug(text)",
+      "rsint_owner_261110b"
+    ]
+  ]
+}

@@ -1,0 +1,204 @@
+/*
+ * RoadSentinel design tokens — single source of truth.
+ * Copies live in frontend/src/styles/tokens.css and secure-pwa/src/tokens.css;
+ * `node scripts/check-tokens.mjs` fails if they differ from this file.
+ * Theme: follows the system; [data-theme="light"|"dark"] on <html> overrides it.
+ * No external resources: fonts are self-hosted, no inline styles needed.
+ */
+:root {
+  color-scheme: light;
+  /* surfaces */
+  --bg-void: #edf1f7;
+  --bg-panel: #ffffff;
+  --bg-elevation: #e4eaf3;
+  --border-line: #d3dae3;
+  --border-subtle: #e2e7ee;
+  /* text (>= 4.5:1 on all surfaces above) */
+  --text-primary: #0f1a27;
+  --text-secondary: #46566a;
+  --text-muted: #5a6b7e;
+  /* action */
+  --action: #1259c3;
+  --on-action: #ffffff;
+  --focus-ring: #1259c3;
+  /* severity: shape + label always accompany color */
+  --sev-critical: #b3122f;
+  --sev-high: #a8480a;
+  --sev-medium: #7a5a00;
+  --sev-info: #0b6b7a;
+  --ok: #17753f;
+  --danger-bg: #b3122f;
+  /* scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 16px;
+  --shadow-1: 0 1px 2px rgb(15 26 39 / 0.08), 0 0 0 1px rgb(15 26 39 / 0.02);
+  --shadow-2: 0 12px 36px rgb(15 26 39 / 0.2);
+  --accent-2: #5b46d6;
+  --chart-1: #0b57d0;
+  --chart-2: #8a6500;
+  --chart-3: #0b6b7a;
+  --chart-4: #b4470a;
+  --chart-5: #6a3fc0;
+  --chart-6: #b0306b;
+  --glow-signal: 0 0 0 1px rgb(11 87 208 / 0.35), 0 6px 18px rgb(11 87 208 / 0.18);
+  --glow-crit: 0 0 0 1px rgb(179 18 47 / 0.55), 0 4px 14px rgb(179 18 47 / 0.16);
+  --glow-high: 0 0 0 1px rgb(168 72 10 / 0.45), 0 4px 14px rgb(168 72 10 / 0.12);
+  --glass-bg: rgb(255 255 255 / 0.78);
+  --glass-line: rgb(15 26 39 / 0.12);
+  --aurora-a: rgb(11 87 208 / 0.08);
+  --aurora-b: rgb(91 70 214 / 0.07);
+  --grid-line: rgb(15 26 39 / 0.045);
+  --grain-opacity: 0.035;
+  --grad-brand: linear-gradient(120deg, var(--action), var(--accent-2));
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --motion-slow: 360ms;
+  --font-display: "Space Grotesk Variable", "Geist", ui-sans-serif, system-ui, sans-serif;
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-md: 14px;
+  --fs-lg: 16px;
+  --fs-xl: 20px;
+  --fs-2xl: 28px;
+  --fs-3xl: 40px;
+  --fs-4xl: 56px;
+  --row-h: 40px;
+  --target-min: 24px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg-void: #070b14;
+    --bg-panel: #0d1422;
+    --bg-elevation: #141d2f;
+    --border-line: #2a3a56;
+    --border-subtle: #1b2639;
+    --text-primary: #eaf1fb;
+    --text-secondary: #aebbd0;
+    --text-muted: #8a9ab3;
+    --action: #4db5ff;
+    --on-action: #04121f;
+    --focus-ring: #8fd0ff;
+    --accent-2: #8b7bff;
+    --sev-critical: #ff5d73;
+    --sev-high: #ff9a3d;
+    --sev-medium: #f5c542;
+    --sev-info: #3fd0c9;
+    --ok: #4cd38a;
+    --danger-bg: #d92d4b;
+    --chart-1: #4db5ff;
+    --chart-2: #f5c542;
+    --chart-3: #3fd0c9;
+    --chart-4: #ff9a3d;
+    --chart-5: #b69cff;
+    --chart-6: #ff7fb0;
+    --shadow-1: 0 1px 2px rgb(0 0 0 / 0.45), inset 0 1px 0 rgb(255 255 255 / 0.04);
+    --shadow-2: 0 16px 48px rgb(0 0 0 / 0.6);
+    --glow-signal: 0 0 24px rgb(77 181 255 / 0.35);
+    --glow-crit: 0 0 0 1px rgb(255 93 115 / 0.55), 0 0 28px rgb(255 93 115 / 0.28);
+    --glow-high: 0 0 0 1px rgb(255 154 61 / 0.45), 0 0 20px rgb(255 154 61 / 0.18);
+    --glass-bg: rgb(13 20 34 / 0.72);
+    --glass-line: rgb(143 208 255 / 0.16);
+    --aurora-a: rgb(77 181 255 / 0.14);
+    --aurora-b: rgb(139 123 255 / 0.12);
+    --grid-line: rgb(143 180 255 / 0.05);
+    --grain-opacity: 0.05;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg-void: #070b14;
+  --bg-panel: #0d1422;
+  --bg-elevation: #141d2f;
+  --border-line: #2a3a56;
+  --border-subtle: #1b2639;
+  --text-primary: #eaf1fb;
+  --text-secondary: #aebbd0;
+  --text-muted: #8a9ab3;
+  --action: #4db5ff;
+  --on-action: #04121f;
+  --focus-ring: #8fd0ff;
+  --accent-2: #8b7bff;
+  --sev-critical: #ff5d73;
+  --sev-high: #ff9a3d;
+  --sev-medium: #f5c542;
+  --sev-info: #3fd0c9;
+  --ok: #4cd38a;
+  --danger-bg: #d92d4b;
+  --chart-1: #4db5ff;
+  --chart-2: #f5c542;
+  --chart-3: #3fd0c9;
+  --chart-4: #ff9a3d;
+  --chart-5: #b69cff;
+  --chart-6: #ff7fb0;
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.45), inset 0 1px 0 rgb(255 255 255 / 0.04);
+  --shadow-2: 0 16px 48px rgb(0 0 0 / 0.6);
+  --glow-signal: 0 0 24px rgb(77 181 255 / 0.35);
+  --glow-crit: 0 0 0 1px rgb(255 93 115 / 0.55), 0 0 28px rgb(255 93 115 / 0.28);
+  --glow-high: 0 0 0 1px rgb(255 154 61 / 0.45), 0 0 20px rgb(255 154 61 / 0.18);
+  --glass-bg: rgb(13 20 34 / 0.72);
+  --glass-line: rgb(143 208 255 / 0.16);
+  --aurora-a: rgb(77 181 255 / 0.14);
+  --aurora-b: rgb(139 123 255 / 0.12);
+  --grid-line: rgb(143 180 255 / 0.05);
+  --grain-opacity: 0.05;
+}
+
+/* calm mode: no decorative glow, aurora, grain or ambient motion in the work screens */
+:root[data-calm="on"] {
+  --glow-signal: none;
+  --glow-crit: 0 0 0 1px var(--sev-critical);
+  --glow-high: 0 0 0 1px var(--sev-high);
+  --aurora-a: transparent;
+  --aurora-b: transparent;
+  --grid-line: transparent;
+  --grain-opacity: 0;
+  --motion-slow: 0ms;
+}
+
+/* density: compact (dispatch) / comfortable (patrol, touch) */
+:root[data-density="compact"] {
+  --row-h: 36px;
+}
+:root[data-density="comfortable"] {
+  --row-h: 48px;
+  --target-min: 44px;
+}
+@media (pointer: coarse) {
+  :root {
+    --target-min: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 0ms;
+    --motion-base: 0ms;
+    --motion-slow: 0ms;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}

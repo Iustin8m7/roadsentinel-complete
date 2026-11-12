@@ -1,0 +1,68 @@
+# Production web gateway on Railway: one origin for the police UI and
+# the secure API, so session cookies, CSRF and the strict CSP all work same-origin.
+#   /api/*          -> secure backend over Railway's private network ({$RS_API_UPSTREAM})
+#   /               -> police UI (frontend/ build, SPA fallback)
+{
+	admin off
+	auto_https off
+	servers {
+		# Railway's edge terminates TLS and sets X-Forwarded-For; keep the client address.
+		trusted_proxies static private_ranges
+	}
+}
+
+(security_headers) {
+	header {
+		Strict-Transport-Security "max-age=63072000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		X-Frame-Options "DENY"
+		Cross-Origin-Opener-Policy "same-origin"
+		Cross-Origin-Resource-Policy "same-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+		# Only when the upstream did not set one (the API sends its own stricter policy).
+		?Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob: https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org; media-src 'self' blob:; connect-src 'self'; font-src 'self'; manifest-src 'self'; worker-src 'self'; frame-src https://webcamromania.ro; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'"
+		# The optional public live stream is OFF (VITE_LIVE_STREAM unset). To enable it for a
+		# consented source, add that exact host to connect-src and media-src here, nowhere else.
+		-Server
+	}
+}
+
+:{$PORT:8080} {
+	encode zstd gzip
+	import security_headers
+
+	request_body {
+		max_size 64MB
+	}
+
+	handle /healthz {
+		respond "ok" 200
+	}
+
+	handle /api/* {
+		reverse_proxy {$RS_API_UPSTREAM} {
+			# Server-Sent Events (/api/stream) must not be buffered.
+			flush_interval -1
+		}
+	}
+
+	handle {
+		root * {$RS_UI_ROOT:/srv/app}
+		try_files {path} /index.html
+		file_server
+	}
+
+	log {
+		output stdout
+		format filter {
+			wrap json
+			fields {
+				request>headers>Cookie delete
+				request>headers>Authorization delete
+				request>headers>X-Csrf-Token delete
+				resp_headers>Set-Cookie delete
+			}
+		}
+	}
+}

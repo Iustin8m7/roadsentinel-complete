@@ -1,0 +1,345 @@
+diff --git a/frontend/src/components/AuditVerification.tsx b/frontend/src/components/AuditVerification.tsx
+index 0114f93..a601062 100644
+--- a/frontend/src/components/AuditVerification.tsx
++++ b/frontend/src/components/AuditVerification.tsx
+@@ -4,6 +4,7 @@ import { useState } from 'react'
+ import { Link } from 'react-router'
+ import { Loader2, ShieldAlert, ShieldCheck } from 'lucide-react'
+ import { ApiError } from '@/lib/api'
++import { useDataStore } from '@/store/data'
+ import { auditVerify, errorMessage, evidenceIntegrity, type AuditVerify, type IntegrityItem, type IntegrityState } from '@/lib/cases'
+ 
+ const INTEGRITY: Record<IntegrityState, { label: string; cls: string }> = {
+@@ -13,7 +14,7 @@ const INTEGRITY: Record<IntegrityState, { label: string; cls: string }> = {
+   missing: { label: 'Fișier lipsă din stocare', cls: 'text-amber-400' },
+   purged: { label: 'Purjat deliberat', cls: 'text-text-secondary' },
+   unavailable: { label: 'Stocare indisponibilă (necunoscut)', cls: 'text-sky-400' },
+-  no_hash: { label: 'Fără amprentă SHA-256 la preluare', cls: 'text-amber-400' },
++  no_hash: { label: 'Fără amprentă digitală la preluare', cls: 'text-amber-400' },
+   not_checked: { label: 'Neverificat încă', cls: 'text-text-secondary' },
+ }
+ const KIND: Record<string, string> = { keyframe: 'Cadru cheie', clip: 'Clip', camera_video: 'Înregistrare cameră' }
+@@ -30,6 +31,7 @@ function ChainResult({ r }: { r: AuditVerify }) {
+ }
+ 
+ export function AuditVerificationPanel() {
++  const cameras = useDataStore((s) => s.cameras)
+   const [chain, setChain] = useState<AuditVerify | null>(null)
+   const [items, setItems] = useState<IntegrityItem[] | null>(null)
+   const [total, setTotal] = useState(0)
+@@ -73,7 +75,7 @@ export function AuditVerificationPanel() {
+       {chain && (
+         <div className="mb-2 space-y-0.5" role="status">
+           <ChainResult r={chain} />
+-          {chain.head_hash && <p className="text-text-secondary break-all">Hash curent (capul lanțului): <code className="text-text-primary" data-testid="chain-head">{chain.head_hash}</code></p>}
++          {chain.head_hash && <p className="text-text-secondary break-all">Amprentă digitală curentă a jurnalului: <code className="text-[10px]" data-testid="chain-head">{chain.head_hash}</code></p>}
+           <p className="text-[10px] text-text-secondary">Lanțul este verificat pe același sistem care îl scrie: dovadă de modificare, nu ancoră independentă.</p>
+         </div>
+       )}
+@@ -84,13 +86,13 @@ export function AuditVerificationPanel() {
+           </p>
+           {items.length === 0 ? <p className="text-text-secondary">Nicio probă stocată.</p> : (
+             <table className="w-full text-left border-collapse">
+-              <thead className="text-[10px] uppercase text-text-secondary"><tr><th className="py-1 pr-2">Probă</th><th className="py-1 pr-2">Caz / cameră</th><th className="py-1 pr-2">SHA-256</th><th className="py-1">Stare</th></tr></thead>
++              <thead className="text-[10px] uppercase text-text-secondary"><tr><th className="py-1 pr-2">Probă</th><th className="py-1 pr-2">Caz / cameră</th><th className="py-1 pr-2">Amprentă digitală</th><th className="py-1">Stare</th></tr></thead>
+               <tbody className="divide-y divide-border/60">
+                 {items.map((i) => (
+                   <tr key={i.id} data-testid="integrity-row" data-integrity={i.integrity}>
+-                    <td className="py-1 pr-2 font-mono">{KIND[i.kind] ?? i.kind} {i.id.slice(0, 8)}</td>
+-                    <td className="py-1 pr-2">{i.event_id ? <Link to={`/app/alerte/${i.event_id}`} className="text-accent hover:underline">#{i.event_id}</Link> : '—'}{i.camera_id ? ` · ${i.camera_id}` : ''}</td>
+-                    <td className="py-1 pr-2">{i.sha256_recorded ? 'înregistrat' : 'lipsă'}{i.distinct_original ? ' · original separat' : ''}</td>
++                    <td className="py-1 pr-2 font-mono">{KIND[i.kind] ?? i.kind} <span className="text-[10px] text-text-secondary/70" title="Identificator intern al probei">{i.id.slice(0, 8)}</span></td>
++                    <td className="py-1 pr-2">{i.event_id ? <Link to={`/app/alerte/${i.event_id}`} className="text-accent hover:underline">#{i.event_id}</Link> : '—'}{i.camera_id ? ` · ${cameras.find((c) => c.id === i.camera_id)?.name ?? i.camera_id}` : ''}</td>
++                    <td className="py-1 pr-2">{i.sha256_recorded ? 'înregistrată' : 'lipsă'}{i.distinct_original ? ' · original separat' : ''}</td>
+                     <td className={`py-1 ${INTEGRITY[i.integrity].cls}`}>{i.integrity === 'mismatch' || i.integrity === 'unreadable' ? <ShieldAlert className="w-3.5 h-3.5 inline mr-1" /> : null}{INTEGRITY[i.integrity].label}</td>
+                   </tr>
+                 ))}
+diff --git a/frontend/src/components/CaseWorkspace.tsx b/frontend/src/components/CaseWorkspace.tsx
+index 9cb79dd..6715fcb 100644
+--- a/frontend/src/components/CaseWorkspace.tsx
++++ b/frontend/src/components/CaseWorkspace.tsx
+@@ -34,7 +34,7 @@ const EXPORT_STATE: Record<ExportJob['state'], string> = {
+ }
+ export const HISTORY_LABEL: Record<string, string> = {
+   detected: 'Detecție automată', viewed: 'Vizualizat', confirmed: 'Confirmat', rejected: 'Respins', assigned: 'Asignat patrulei',
+-  vlm_verdict: 'Verificare VLM', decision_conflict: 'Decizie concurentă refuzată', note_created: 'Notă adăugată',
++  vlm_verdict: 'Verificare AI', decision_conflict: 'Decizie concurentă refuzată', note_created: 'Notă adăugată',
+   note_revised: 'Notă revizuită', note_retracted: 'Notă retrasă', bookmark_created: 'Marcaj adăugat', bookmark_removed: 'Marcaj șters',
+   evidence_missing: 'Probă lipsă la acces', export_requested: 'Export solicitat', export_approved: 'Export aprobat',
+   export_denied: 'Export respins', export_canceled: 'Export anulat', export_generated: 'Pachet generat',
+@@ -75,7 +75,7 @@ export function EvidencePanel({ dossier }: { dossier: CaseDossier }) {
+             {ev.redaction === 'full' && <div className="text-[#7D8A9B] mt-1" data-testid="redaction-full">Fețe și numere de înmatriculare estompate</div>}
+             <div className="text-[#7D8A9B]">
+               {ev.original_exists ? 'Există original nemascat (acces doar cu aprobare) · ' : ev.redaction === 'full' ? 'Nu există original nemascat stocat · ' : ''}
+-              {ev.sha256_recorded ? 'SHA-256 înregistrat la preluare' : 'fără amprentă SHA-256'}
++              {ev.sha256_recorded ? <>Amprentă digitală înregistrată la preluare <span className="text-[10px] text-[#536070]">(SHA-256)</span></> : 'Fără amprentă digitală'}
+               {ev.duration_s ? ` · ${ev.duration_s.toFixed(2)} s` : ''}
+             </div>
+             {ev.storage_state !== 'available' && (
+@@ -322,7 +322,7 @@ export function ExportPanel({ number, dossier }: { number: string; dossier: Case
+     <section className={card} aria-labelledby="export-title">
+       <h2 id="export-title" className={title}><Archive size={13} /> Pachet de probe (export controlat)</h2>
+       <p className="text-[11px] text-[#7D8A9B] mb-2">
+-        Pachetul conține probele stocate ale cazului, manifestul cu amprente SHA-256 și instrucțiuni de verificare. Necesită aprobarea unui al doilea administrator; linkul de descărcare este de unică folosință pe termen scurt.
++        Pachetul conține probele stocate ale cazului, manifestul cu amprentele digitale ale fișierelor și instrucțiuni de verificare. Necesită aprobarea unui al doilea administrator; linkul de descărcare este de unică folosință pe termen scurt.
+       </p>
+       {jobs === null && <div className="text-xs text-[#7D8A9B] flex items-center gap-1"><Loader2 size={12} className="animate-spin" /> Se încarcă…</div>}
+       <ul className="space-y-2 mb-2">
+@@ -341,7 +341,7 @@ export function ExportPanel({ number, dossier }: { number: string; dossier: Case
+             )}
+             {j.state === 'completed' && (
+               <div className="mt-1 text-[#7D8A9B] break-all">
+-                Manifest SHA-256: <code className="text-[#E6EDF3]" data-testid="manifest-sha256">{j.manifest_sha256}</code>
++                Amprentă digitală a pachetului: <code className="text-[10px] text-[#536070]" data-testid="manifest-sha256">{j.manifest_sha256}</code>
+                 <div>{j.file_count} fișiere · {((j.package_size ?? 0) / 1024).toFixed(1)} KiB · nesemnat (verificare prin amprente) · expiră {j.expires_at ? fmtTime(j.expires_at) : '—'}</div>
+               </div>
+             )}
+diff --git a/frontend/src/layouts/AppLayout.tsx b/frontend/src/layouts/AppLayout.tsx
+index 195aa30..3694a17 100644
+--- a/frontend/src/layouts/AppLayout.tsx
++++ b/frontend/src/layouts/AppLayout.tsx
+@@ -18,7 +18,8 @@ import {
+ } from 'lucide-react'
+ import type { LucideIcon } from 'lucide-react'
+ import { useAuthStore } from '@/store/auth'
+-import { useDataStore } from '@/store/data'
++import { cameraById, useDataStore } from '@/store/data'
++import { ALERT_TYPE, ROLE_LABEL } from '@/lib/constants'
+ import { can, type Permission } from '@/lib/permissions'
+ import { USE_MOCKS } from '@/lib/api'
+ import { useLiveFeed, useQueue } from '@/hooks'
+@@ -44,7 +45,7 @@ export const MAIN_NAV: NavItem[] = [
+ export const EXTRA_NAV: NavItem[] = [
+   { to: '/app/patrule', label: 'Patrule', icon: Car, permission: 'patrols.view' },
+   { to: '/app/reguli', label: 'Reguli & Zone', icon: Sliders, permission: 'rules.view' },
+-  { to: '/app/audit', label: 'Audit Log', icon: FileText, permission: 'audit.view' },
++  { to: '/app/audit', label: 'Jurnal de audit', icon: FileText, permission: 'audit.view' },
+ ]
+ 
+ function beep() {
+@@ -168,7 +169,7 @@ export default function AppLayout() {
+       return { title: 'Configurare / Reguli și zone de trafic', hasLiveDot: false }
+     }
+     if (p === '/app/audit') {
+-      return { title: 'Securitate / Jurnal de audit (Directiva 2016/680)', hasLiveDot: false }
++      return { title: 'Securitate / Jurnal de audit', hasLiveDot: false }
+     }
+     if (p === '/app/setari') {
+       return { title: 'Sistem / Setări operaționale', hasLiveDot: false }
+@@ -352,22 +353,22 @@ export default function AppLayout() {
+                   <div className="absolute right-0 mt-2 w-56 bg-[#111821] border border-[#1E2A36] rounded-md p-2 shadow-2xl z-50">
+                     <div className="p-2 border-b border-[#1E2A36] mb-1">
+                       <div className="font-semibold text-xs text-[#E6EDF3]">{user?.fullName || 'Operator Dispecerat'}</div>
+-                      <div className="text-[10px] text-[#7D8A9B]">{user?.unit || 'Brigada Rutieră'}</div>
+-                      <div className="text-[9px] font-mono text-[#3DA5FF] mt-1 uppercase">
+-                        ROL: {user?.role || 'operator'}
+-                      </div>
++                      {user?.unit && <div className="text-[10px] text-[#7D8A9B]">{user.unit}</div>}
++                      {user && <div className="text-[10px] text-[#3DA5FF] mt-1">{ROLE_LABEL[user.role]}</div>}
+                     </div>
+ 
+-                    <button
+-                      onClick={() => {
+-                        setUserDropdown(false)
+-                        navigate('/app/setari')
+-                      }}
+-                      className="w-full text-left px-2.5 py-1.5 text-xs text-[#7D8A9B] hover:text-[#E6EDF3] hover:bg-[#17202B] rounded-md transition-colors flex items-center gap-2 cursor-pointer"
+-                    >
+-                      <Settings size={14} />
+-                      <span>Setări platformă</span>
+-                    </button>
++                    {can(user?.role, 'settings.admin') && (
++                      <button
++                        onClick={() => {
++                          setUserDropdown(false)
++                          navigate('/app/setari')
++                        }}
++                        className="w-full text-left px-2.5 py-1.5 text-xs text-[#7D8A9B] hover:text-[#E6EDF3] hover:bg-[#17202B] rounded-md transition-colors flex items-center gap-2 cursor-pointer"
++                      >
++                        <Settings size={14} />
++                        <span>Setări platformă</span>
++                      </button>
++                    )}
+ 
+                     <button
+                       onClick={() => {
+@@ -412,10 +413,10 @@ export default function AppLayout() {
+ 
+           <div className="mt-2">
+             <div className="font-bold text-sm text-[#E6EDF3]">
+-              {toast.ruleSummary || toast.type}
++              {toast.ruleSummary || ALERT_TYPE[toast.type].label}
+             </div>
+             <div className="text-xs text-[#7D8A9B] mt-0.5">
+-              Cameră: {toast.cameraId} · {toast.metrics?.speedKmh ? `${toast.metrics.speedKmh} km/h` : 'Eveniment rutier'}
++              Cameră: {cameraById(toast.cameraId)?.name ?? toast.cameraId} · {toast.metrics?.speedKmh ? `${toast.metrics.speedKmh} km/h` : 'Eveniment rutier'}
+             </div>
+           </div>
+ 
+diff --git a/frontend/src/lib/adapters.ts b/frontend/src/lib/adapters.ts
+index db5bfa3..4af0e7d 100644
+--- a/frontend/src/lib/adapters.ts
++++ b/frontend/src/lib/adapters.ts
+@@ -15,8 +15,9 @@ export interface ApiCamera { id: string; name: string; location: string | null;
+ export interface ApiStats { total: number; by_priority: Record<Severity, number>; by_status: Record<string, number>; by_type: Record<string, number>; vlm_available: boolean }
+ export interface ApiMeta { event_types: Record<string, { label: string; priority: Severity }>; actions: Record<string, string> }
+ 
++// The audit API sends the actor's name but not their role, so no role is shown ('anonim' renders as none).
+ export const adaptAudit = (entry: ApiAudit): AuditEntry => ({
+-  id: String(entry.id), at: entry.at, username: entry.actor, role: 'operator', action: entry.action,
++  id: String(entry.id), at: entry.at, username: entry.actor, role: 'anonim', action: entry.action,
+   target: entry.event_id === null ? undefined : String(entry.event_id), details: entry.note ?? undefined,
+ })
+ const OBJECT_CLASS_RO: Record<string, VehicleClass | undefined> = { car: 'autoturism', truck: 'camion', bus: 'autobuz', motorcycle: 'motocicleta', person: 'pieton' }
+diff --git a/frontend/src/lib/constants.ts b/frontend/src/lib/constants.ts
+index 6dd58b4..859e871 100644
+--- a/frontend/src/lib/constants.ts
++++ b/frontend/src/lib/constants.ts
+@@ -64,9 +64,9 @@ export const STATUS_LABEL: Record<AlertStatus, string> = {
+ export const VLM_LABEL: Record<VlmVerdict, string> = {
+   pending: 'În așteptare',
+   skipped: 'Neverificat',
+-  confirmed: 'VLM: confirmat',
+-  rejected: 'VLM: infirmat',
+-  uncertain: 'VLM: incert',
++  confirmed: 'Verificare AI: confirmat',
++  rejected: 'Verificare AI: infirmat',
++  uncertain: 'Verificare AI: incert',
+ }
+ 
+ export const ACTION_LABEL: Record<ActionType, string> = {
+diff --git a/frontend/src/pages/ArchivePage.tsx b/frontend/src/pages/ArchivePage.tsx
+index 9210f90..c186f85 100644
+--- a/frontend/src/pages/ArchivePage.tsx
++++ b/frontend/src/pages/ArchivePage.tsx
+@@ -52,9 +52,14 @@ function Chip({ t }: { t: TokenInterpretation }) {
+ 
+ export default function ArchivePage() {
+   const cameras = useDataStore((s) => s.cameras);
+-  const initialQ = (useLocation().state as { q?: string } | null)?.q ?? "";
++  const location = useLocation();
++  const initialQ = (location.state as { q?: string } | null)?.q ?? "";
++  // "Istoric" on a camera tile links here with ?camera=<id>: the archive opens filtered to that camera.
++  const initialCamera = new URLSearchParams(location.search).get("camera") || undefined;
++  const initialFilters: ArchiveFilters = initialCamera ? { ...DEFAULT_FILTERS, camera_id: initialCamera } : DEFAULT_FILTERS;
++  const cameraName = (ev: ApiEvent) => cameras.find((c) => c.id === ev.camera_id)?.name ?? ev.camera_name ?? ev.camera_id;
+   const [query, setQuery] = useState(initialQ);
+-  const [filters, setFilters] = useState<ArchiveFilters>(DEFAULT_FILTERS);
++  const [filters, setFilters] = useState<ArchiveFilters>(initialFilters);
+   const [days, setDays] = useState<{ from: string; to: string }>({ from: "", to: "" });
+   const [results, setResults] = useState<ApiEvent[]>([]);
+   const [total, setTotal] = useState<number | null>(null);
+@@ -97,7 +102,7 @@ export default function ArchivePage() {
+   };
+   useEffect(() => {
+     if (USE_MOCKS) return;
+-    void run(false, DEFAULT_FILTERS, initialQ);
++    void run(false, initialFilters, initialQ);
+     listSaved().then(setSaved).catch(() => setSaved([]));
+     archiveAssignees().then(setAssignees).catch(() => setAssignees(null));
+   }, []);
+@@ -209,7 +214,7 @@ export default function ArchivePage() {
+                   <span className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-black/70 text-[10px] font-mono text-text-primary">{shownType(ev)}</span>
+                 </div>
+                 <div className="p-2.5 flex flex-col gap-1 border-t border-border/80">
+-                  <div className="text-xs font-semibold text-text-primary truncate">#{ev.id} · {ev.camera_name ?? ev.camera_id}</div>
++                  <div className="text-xs font-semibold text-text-primary truncate">#{ev.id} · {cameraName(ev)}</div>
+                   <div className="flex items-center justify-between text-[11px] font-mono text-text-secondary">
+                     <span>{fmtWhen(ev.occurred_at)}</span>
+                     <span>{STATUS_LABEL[ev.status] ?? ev.status}</span>
+@@ -292,7 +297,7 @@ export default function ArchivePage() {
+       </aside>
+       {playing !== null && (
+         <ClipModal
+-          clips={results.map((c) => ({ id: String(c.id), title: `${shownType(c)} · ${c.camera_name ?? c.camera_id}`, subtitle: fmtWhen(c.occurred_at), src: mediaUrl(c.clip_url), poster: mediaUrl(c.keyframe_url), at: c.occurred_at }))}
++          clips={results.map((c) => ({ id: String(c.id), title: `${shownType(c)} · ${cameraName(c)}`, subtitle: fmtWhen(c.occurred_at), src: mediaUrl(c.clip_url), poster: mediaUrl(c.keyframe_url), at: c.occurred_at }))}
+           start={playing}
+           onClose={() => setPlaying(null)}
+         />
+diff --git a/frontend/src/pages/AuditPage.tsx b/frontend/src/pages/AuditPage.tsx
+index 7b78997..95422e9 100644
+--- a/frontend/src/pages/AuditPage.tsx
++++ b/frontend/src/pages/AuditPage.tsx
+@@ -16,12 +16,14 @@ export default function AuditPage() {
+   const [action, setAction] = useState<AuditAction | "">("");
+ 
+   const users = useMemo(() => [...new Set(entries.map((e) => e.username))], [entries]);
++  // The real API gives no role per entry; the column appears only when some entry has one.
++  const showRole = entries.some((e) => e.role !== "anonim");
+   const filtered = entries.filter((e) => (!user || e.username === user) && (!action || e.action === action));
+ 
+   function exportCsv() {
+     const rows = [
+       ["data", "utilizator", "rol", "actiune", "tinta", "detalii"],
+-      ...filtered.map((e) => [e.at, e.username, e.role, e.action, e.target ?? "", e.details ?? ""]),
++      ...filtered.map((e) => [e.at, e.username, e.role === "anonim" ? "" : e.role, e.action, e.target ?? "", e.details ?? ""]),
+     ];
+     const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+@@ -80,7 +82,7 @@ export default function AuditPage() {
+ 
+       {/* Main Audit Table */}
+       <BadgePanel
+-        title={`Jurnal de Audit Legal (Directiva UE 2016/680) — ${filtered.length} Înregistrări`}
++        title={`Jurnal de audit — ${filtered.length} înregistrări`}
+         icon={<ShieldCheck className="w-4 h-4 text-emerald-400" />}
+         className="flex-1 min-h-0"
+         contentClassName="p-0 overflow-y-auto"
+@@ -88,9 +90,9 @@ export default function AuditPage() {
+         <table className="w-full text-left text-xs border-collapse">
+           <thead className="sticky top-0 bg-elevation border-b border-border z-10 font-mono text-text-secondary uppercase text-[11px]">
+             <tr>
+-              <th className="py-2.5 px-4">TIMESTAMP</th>
++              <th className="py-2.5 px-4">DATA ȘI ORA</th>
+               <th className="py-2.5 px-4">UTILIZATOR</th>
+-              <th className="py-2.5 px-4">ROL</th>
++              {showRole && <th className="py-2.5 px-4">ROL</th>}
+               <th className="py-2.5 px-4">ACȚIUNE EXECUTATĂ</th>
+               <th className="py-2.5 px-4">ȚINTĂ / DOSAR</th>
+               <th className="py-2.5 px-4">DETALII OPERAȚIUNE</th>
+@@ -105,9 +107,11 @@ export default function AuditPage() {
+                 <td className="py-3 px-4 font-semibold text-text-primary">
+                   {e.username}
+                 </td>
+-                <td className="py-3 px-4 font-mono text-[11px] text-accent">
+-                  {e.role === "anonim" ? "—" : ROLE_LABEL[e.role].toUpperCase()}
+-                </td>
++                {showRole && (
++                  <td className="py-3 px-4 font-mono text-[11px] text-accent">
++                    {e.role === "anonim" ? "—" : ROLE_LABEL[e.role].toUpperCase()}
++                  </td>
++                )}
+                 <td className="py-3 px-4 text-text-primary font-medium">
+                   {AUDIT_ACTION_LABEL[e.action]}
+                 </td>
+diff --git a/frontend/src/pages/CamerasPage.tsx b/frontend/src/pages/CamerasPage.tsx
+index 9084012..4380d7b 100644
+--- a/frontend/src/pages/CamerasPage.tsx
++++ b/frontend/src/pages/CamerasPage.tsx
+@@ -128,7 +128,7 @@ export default function CamerasPage() {
+               }`}
+             >
+               <Grid className="w-3.5 h-3.5" />
+-              <span>[Grilă]</span>
++              <span>Grilă</span>
+             </button>
+             <span className="text-border px-1">/</span>
+             <button
+@@ -256,7 +256,7 @@ export default function CamerasPage() {
+                               <span>Redă clipuri</span>
+                             </button>
+                             <Link
+-                              to={`/app/arhiva?camera=${cam.id}`}
++                              to={`/app/arhiva?camera=${encodeURIComponent(cam.id)}`}
+                               className="flex-1 flex items-center justify-center gap-1.5 py-1.5 bg-elevation hover:bg-border text-text-primary text-xs font-medium rounded border border-border transition-colors"
+                             >
+                               <History className="w-3.5 h-3.5" />
+@@ -280,7 +280,7 @@ export default function CamerasPage() {
+                       <div className="flex items-center justify-between gap-2 text-[10px] font-mono text-text-secondary" data-testid={`control-${cam.id}`}>
+                         <span className="truncate" title={control.source_display ?? undefined}>
+                           {control.source_kind ? SOURCE_LABEL[control.source_kind] : "Sursă nedeclarată"}
+-                          {control.runtime.applied_revision != null && ` · r${control.runtime.applied_revision} aplicată`}
++                          {control.runtime.applied_revision != null && ` · configurația nr. ${control.runtime.applied_revision} aplicată`}
+                         </span>
+                         <button
+                           type="button"

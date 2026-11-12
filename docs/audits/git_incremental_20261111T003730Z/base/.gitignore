@@ -1,0 +1,43 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+*.local
+*.local.*
+node_modules/
+__pycache__/
+.venv/
+*.mp4
+data/
+runs/
+wandb/
+*.pt
+
+# IDEs
+.idea/
+.vscode/
+
+# Python tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+.coverage
+htmlcov/
+
+# Frontend build output
+secure-pwa/dist/
+secure-pwa/dev-dist/
+secure-pwa/coverage/
+
+# Runtime data (encrypted evidence store, local DB dumps)
+data/
+backend/data/
+*.sqlite
+*.dump
+*.tsbuildinfo
+
+# Training data and outputs
+training/frames*/
+training/datasets/
+training/runs/

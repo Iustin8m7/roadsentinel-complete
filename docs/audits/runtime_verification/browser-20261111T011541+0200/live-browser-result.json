@@ -1,0 +1,296 @@
+{
+  "runtime": "A: existing 5175 -> 8003 -> rsint_20261110b:55446",
+  "accounts": [],
+  "requests": [
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "POST",
+      "path": "/api/login",
+      "status": 401
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "POST",
+      "path": "/api/login",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "POST",
+      "path": "/api/auth/mfa/verify",
+      "status": 401
+    },
+    {
+      "role": "Operator",
+      "method": "POST",
+      "path": "/api/auth/mfa/verify",
+      "status": 204
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/stream",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/stream",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    }
+  ],
+  "errors": [],
+  "failure": "expect(locator).toBeVisible() failed\n\nLocator: getByRole('heading', { name: 'Acces interzis', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('heading', { name: 'Acces interzis', exact: true }) with timeout 5000ms\n  - waiting for getByRole('heading', { name: 'Acces interzis', exact: true })\n"
+}

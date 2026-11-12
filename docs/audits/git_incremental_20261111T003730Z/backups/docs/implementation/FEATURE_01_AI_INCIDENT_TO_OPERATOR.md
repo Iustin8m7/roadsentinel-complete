@@ -1,0 +1,31 @@
+> Fresh browser mission evidence: [../audits/FEATURE_1_REAL_BROWSER_E2E.md](../audits/FEATURE_1_REAL_BROWSER_E2E.md). Prior acceptance/count statements below are preserved historical checkpoints.
+
+> Current evidence: the dated current-execution appendix below supersedes historical fixture-only/blocked-auth statements.
+
+# Recorded AI candidate to operator review
+
+Implemented entrypoints: app.api.offline_analytics.promote_candidate → app.services.offline_promotion.promote. Existing app.api.offline_video owns upload/crop/jobs. Existing offline_analysis owns actual YOLOX-S + Supervision ByteTrack, output redaction, encrypted output and observation artifacts. No second incident API or worker stack was created.
+
+Only possible_obstruction → stopped_on_road and traffic_queue → congestion are promotable. Counting crossings remain analytics. Operator/admin requires both videos:analyze and alerts:create. The source run must be completed, in the tenant, with completed observations and output. Human enters a reason. Source metadata remains in alert.details with recording/run IDs, candidate index, PTS, model identity/hash, limitations, review_only, synthetic flag and source note. Capture wall-clock time is explicitly unverified. No dispatch or automatic confirmation occurs.
+
+A per-recording transaction advisory lock serializes camera creation and promotion. Existing event key returns the same numeric alert ID. An internal disabled recorded-source camera owns the canonical alert FK; it is not a runnable live camera. Media is extracted from the already redacted annotated output, not raw uploads. Keyframe and up-to-six-second clip use the output timestamp, clipped at boundaries. Encoder is deadline-bounded; files >50MiB refused. Temporary extraction directories are context-managed. Existing evidence service stores AES-GCM ciphertext, SHA-256 metadata and has_original=false. Existing session-bound signed media URLs deliver bytes.
+
+React VideoAnalysisPage now offers a reason field and explicit submission only to permitted users. OfflinePromotion links to /app/alerte/{id}. adaptEvent exposes RECORDED, LOCAL RECORDED REPLAY, SYNTHETIC TEST or SOURCE UNVERIFIED in the rule summary, including archive/queue consumers. Existing decision, case notes/bookmarks and export routers remain canonical.
+
+Current evidence: vertical-final.log, test_mission_vertical.py. Actual HTTP upload/crop/analysis/candidates/promotion/media/reject ran against independent PostgreSQL; real ONNX inference on a frozen licensed frame produced 60 samples and 9 candidates. Synthetic frozen footage exercises temporal mechanics, not real incident accuracy. The source is Editor, Street traffic.webm, CC BY 3.0 (Wikimedia Commons), original SHA in docs/YOLO_REAL_INFERENCE_REPORT.md. No original media copied into repository.
+
+Still open: full browser candidate-to-case journey; broader export-revocation and package-tamper negatives; restart/crash cleanup; concurrent transaction stress; raw-upload expiration/retention policy enforcement; representative moving real-world positive incidents and negatives. Existing evidence writes may leave encrypted orphan objects if a later transaction fails; do not claim crash-atomic storage cleanup. The offline dwell rules use a confirmed crop, not a certified prohibited-stopping zone, and must remain triage candidates.
+
+Run isolated acceptance using INTEGRATED_BROWSER_DEMO_RUNBOOK.md; do not point fixtures at the existing integration DB.
+
+## Additional executed acceptance: export and source recovery
+
+After the earlier checkpoint, real HTTP case export uncovered two integration defects: CaseError/ExportError were not registered with the application error mapper (not-ready export answered 500), and approval API approve/deny/revoke did not call the existing export-job transition hook. app.main now registers the existing domain response mapping; app.api.unblur connects on_approval_decided. No policy was bypassed. The expanded real-model test adds a case observation, records the fixture's explicit CC BY 3.0 license through the existing admin grant API, requests export, observes not-ready 409, obtains independent admin approval, generates/downloads the encrypted package through signed authenticated access, and verifies the canonical manifest digest and all member hashes using verify_package. Package remains unsigned: hash integrity is not independent legal custody. **14 passed in 17.29 s** with the approvals suite (case-export-release.log).
+
+The managed test now forcibly interrupts only sockets belonging to its controlled replay server and temporarily refuses reconnection. It observes authoritative reconnecting health, expiry of stale preview (404), restoration of actual frames and healthy state, then stops the worker on disable. **1 passed in 14.70 s** (managed-recovery.log). This does not establish external-live availability or multi-camera capacity. Approved configuration state is still fixture-created; actual two-admin UI activation and revision change remain unverified.
+
+The full original-suite checkpoint was 419 passed + 2 skipped; backend-final-proof.log is the subsequent full run including these added assertions. Consult its final summary before using it as release evidence. Docs checker now works without Git metadata; snapshot omissions and quoted relative links were corrected, with 0 broken links in 85 Markdown files at that checkpoint. README source snapshot is README_BEFORE_SOURCE.txt.
+
+## Current execution proof — 2026-11-10
+
+The existing native application's login now passes real password/MFA/dashboard verification. The expanded disposable-model test now performs the actual rejection and case observation in Chromium, rather than merely displaying an already rejected incident. Subsequent duplicate decision409 proves persisted UI action. HTTP first upload/promotion and independently approved SHA-256 export remain, with tenant/role denials. Latest full backend422 passed/2 skipped; independent fresh-cluster auth+flows44 passed. Frozen positive produced60 model samples and8 candidates in the focused run; prior9 was historical variation, not accuracy ground truth. Whole browser upload/export/archive/restart and abrupt evidence crash remain unverified. See ../audits/FULL_INTEGRATION_E2E_VALIDATION.md for exact scope and commands.

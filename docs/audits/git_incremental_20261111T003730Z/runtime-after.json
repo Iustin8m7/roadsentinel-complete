@@ -1,0 +1,160 @@
+{
+  "utc": "2026-11-11T12:02:46.821028+00:00",
+  "backend_pid": 2107404,
+  "backend_cwd": "/home/justin7m8/Documents/roadsentinel-integration/backend",
+  "frontend_pid": 1671183,
+  "proxy": "http://127.0.0.1:8003",
+  "http": [
+    {
+      "port": 8003,
+      "path": "/api/health/live",
+      "status": 200
+    },
+    {
+      "port": 8003,
+      "path": "/api/health/ready",
+      "status": 200
+    },
+    {
+      "port": 8003,
+      "path": "/api/camera-control/catalog",
+      "status": 401
+    },
+    {
+      "port": 5175,
+      "path": "/api/health/live",
+      "status": 200
+    },
+    {
+      "port": 5175,
+      "path": "/api/health/ready",
+      "status": 200
+    },
+    {
+      "port": 5175,
+      "path": "/api/camera-control/catalog",
+      "status": 401
+    }
+  ],
+  "database": [
+    "rsint_20261110b",
+    "127.0.0.1",
+    55446,
+    "rsint_app_261110b"
+  ],
+  "revision": [
+    [
+      "0022"
+    ]
+  ],
+  "app_role": [
+    false,
+    false
+  ],
+  "forced_rls_tables": [
+    [
+      "alerts"
+    ],
+    [
+      "analysis_runs"
+    ],
+    [
+      "approval_requests"
+    ],
+    [
+      "audit_log"
+    ],
+    [
+      "camera_config_versions"
+    ],
+    [
+      "camera_health_events"
+    ],
+    [
+      "camera_source_grants"
+    ],
+    [
+      "camera_worker_status"
+    ],
+    [
+      "cameras"
+    ],
+    [
+      "case_bookmarks"
+    ],
+    [
+      "case_followup_events"
+    ],
+    [
+      "case_followups"
+    ],
+    [
+      "case_legal_holds"
+    ],
+    [
+      "case_links"
+    ],
+    [
+      "case_note_revisions"
+    ],
+    [
+      "case_notes"
+    ],
+    [
+      "evidence"
+    ],
+    [
+      "export_jobs"
+    ],
+    [
+      "ingest_nonces"
+    ],
+    [
+      "invitations"
+    ],
+    [
+      "push_subscriptions"
+    ],
+    [
+      "recordings"
+    ],
+    [
+      "recovery_codes"
+    ],
+    [
+      "refresh_tokens"
+    ],
+    [
+      "retention_policies"
+    ],
+    [
+      "saved_searches"
+    ],
+    [
+      "service_accounts"
+    ],
+    [
+      "service_keys"
+    ],
+    [
+      "tenant_keys"
+    ],
+    [
+      "tenants"
+    ],
+    [
+      "user_sessions"
+    ],
+    [
+      "users"
+    ]
+  ],
+  "source_sha256": {
+    "backend/app/api/camera_control.py": "a49c1006513446fa52dfd77650a74d5ce313911b80fb72735f1fb7baf3a9ab95",
+    "backend/app/api/contract.py": "a2ab4f1477aa5856948e33d741318b67875fa30df2e229bcd02a5f362850c19f",
+    "backend/app/api/ingest.py": "c96cc39f9ed55d16251e2acf9147b55e9af8431882ed6965bde20885e616ca00",
+    "frontend/src/App.tsx": "5420c2a595abb58c29be55ea3a6916c6544402ae8a4cfc8e2384f2de1c769a9c",
+    "frontend/src/components/ConfigEditor.tsx": "d0c22c7b213d9e5d3edb5bfa360fc004e55f7e6e0615d64dea224ae1ec953910",
+    "roadsentinel/pipeline.py": "cddf964c1bb9737853410446400812705c054a862a301d2c190fca6f3797ccc7"
+  }
+}

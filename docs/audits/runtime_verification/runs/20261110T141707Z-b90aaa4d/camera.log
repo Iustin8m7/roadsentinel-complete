@@ -1,0 +1,535 @@
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001, Initial schema: tenants, users, auth state, cameras, alerts, evidence, approvals, audit.
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 0002, Security layer: Row-Level Security, app-role grants, append-only audit log, auth lookups.
+INFO  [alembic.runtime.migration] Running upgrade 0002 -> 0003, Service accounts for signed pipeline ingestion; tighter grants on tenants.
+INFO  [alembic.runtime.migration] Running upgrade 0003 -> 0004, Fields of the API.md contract: camera slugs and timezones, public alert numbers, detection
+details, VLM verdicts, operator actions, and camera-level evidence (annotated recordings).
+INFO  [alembic.runtime.migration] Running upgrade 0004 -> 0005, Per-user MFA exemption (demo accounts): users.mfa_exempt, default false.
+INFO  [alembic.runtime.migration] Running upgrade 0005 -> 0006, Camera heartbeat: cameras.last_seen_at, set by the live pipeline.
+INFO  [alembic.runtime.migration] Running upgrade 0006 -> 0007, Evidence integrity: record whether a distinct original exists.
+INFO  [alembic.runtime.migration] Running upgrade 0007 -> 0008, New rule types, idempotent ingestion, camera rate status.
+INFO  [alembic.runtime.migration] Running upgrade 0008 -> 0009, Account recovery: four-eyes reset requests and single-use reset tokens.
+INFO  [alembic.runtime.migration] Running upgrade 0009 -> 0010, Retention: per-tenant policy per evidence kind, legal hold on alerts, purge marker on evidence.
+INFO  [alembic.runtime.migration] Running upgrade 0010 -> 0011, Patrol workflow status and first-view timestamp (for response-time statistics).
+INFO  [alembic.runtime.migration] Running upgrade 0011 -> 0012, Let the runtime role read alembic_version so /api/ready can tell whether the schema is migrated.
+INFO  [alembic.runtime.migration] Running upgrade 0012 -> 0013, User-owned saved archive searches with tenant RLS.
+INFO  [alembic.runtime.migration] Running upgrade 0013 -> 0014, Tenant-scoped offline recordings and durable analysis runs.
+INFO  [alembic.runtime.migration] Running upgrade 0014 -> 0015, Persist structured vehicle-observation artifact metadata.
+INFO  [alembic.runtime.migration] Running upgrade 0015 -> rsint_cam1, Camera control plane: lifecycle/source columns on cameras, processing grants, immutable
+config versions, worker status (lease) and a bounded health-event history.
+INFO  [alembic.runtime.migration] Running upgrade rsint_cam1 -> rsint_case1, Investigation workspace (Workstream B): case notes with append-only revisions, timeline
+bookmarks, evidence-package export jobs, user-owned saved archive filters; evidence gets
+``duration_s`` (from the MP4 header) and ``purged_at``/``purge_reason`` (explicit purge state).
+INFO  [alembic.runtime.migration] Running upgrade rsint_case1 -> rsint_run1, Camera runtime telemetry (Workstream D): bounded latency/memory/frozen-image metrics on the
+worker status row, a source identity fingerprint on cameras (what the backend registered) and on
+the worker status (what the lease holder reports it opened), and the per-camera, per-state
+failure-notification throttle marks.
+INFO  [alembic.runtime.migration] Running upgrade rsint_run1 -> rsint_case2, Investigation completion (Workstream B, lane E): explicit case links, structured follow-up
+items with an append-only history, manual legal holds; note revisions may carry the recorded
+detection box; export jobs count storage outages separately from attempts. The cross-tenant
+probe allow-list (``rs_resource_tenant``) is extended to every tenant table that the API looks
+up by id, including those of 0007, 0008 and this revision.
+INFO  [alembic.runtime.migration] Running upgrade rsint_case2 -> 0020, Require an RLS-bypassing owner for pre-tenant lookup functions.
+INFO  [alembic.runtime.migration] Running upgrade 0020 -> 0021, Align offline tenant indexes with ORM; additive only.
+INFO  [alembic.runtime.migration] Running upgrade 0021 -> 0022, Identifier-only lookup functions get a dedicated NOLOGIN column-limited owner.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-0nqn0oub is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-0nqn0oub is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-0nqn0oub is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-0nqn0oub is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+Disposable test PostgreSQL identity: ('postgres', '127.0.0.1', 49137, 'rsverify_root') target: rsmission_verify_ee6f1c904b
+PASS actual camera browser register
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-0nqn0oub is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+PASS actual camera browser draft
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-0nqn0oub is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+PASS actual camera browser approve
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-0nqn0oub is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+PASS duplicate real worker denied before source open
+PASS actual camera browser preview
+F
+=================================== FAILURES ===================================
+________________ test_managed_replay_ack_preview_and_revocation ________________
+
+world = World(platform=Unit(id=UUID('1ddf67e6-55af-4e2d-85ce-2b0385061c12'), users={<Role.system_admin: 'system_admin'>: TUser...f-9669aae802ef'), 'evidence': UUID('98795b2a-a03e-456f-acd2-72378ebb50c6'), 'plates': ['B00XYZ', 'B10XYZ', 'B20XYZ']}})
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-177/test_managed_replay_ack_previe0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7aa2f0c4d430>
+login = <function login.<locals>._login at 0x7aa2f0a13100>
+
+    @pytest.mark.skipif(os.getenv("RS_MISSION_REAL") != "1", reason="licensed model/media opt-in")
+    def test_managed_replay_ack_preview_and_revocation(world, tmp_path, monkeypatch, login):
+        from roadsentinel.replay import make_server
+    
+        from app.config import get_settings
+        from app.db import tenant_session
+        from app.main import create_app
+        from app.models import CameraWorkerStatus
+        from app.services import camera_config as cc
+        from app.services import ingest_auth
+        from app.services.keys import load_keyring
+    
+        root = Path(__file__).resolve().parents[2]
+        # A moving licensed excerpt contains actual person detections. The road zone below is
+        # deliberately SYNTHETIC TEST geometry, not a claim those pedestrians violated a rule.
+        import shutil
+    
+        excerpt = tmp_path / "SYNTHETIC_TEST_geometry_licensed_moving_excerpt.mp4"
+        subprocess.run(  # noqa: S603 - fixed encoder and test-owned local output, no shell
+            [
+                shutil.which("ffmpeg"),
+                "-nostdin",
+                "-loglevel",
+                "error",
+                "-ss",
+                "32",
+                "-i",
+                "/tmp/Street_traffic.webm",
+                "-t",
+                "3",
+                "-vf",
+                "fps=10",
+                "-an",
+                "-c:v",
+                "libx264",
+                "-preset",
+                "ultrafast",
+                "-pix_fmt",
+                "yuv420p",
+                str(excerpt),
+            ],
+            check=True,
+            timeout=30,
+            capture_output=True,
+        )
+        replay = make_server(excerpt, "127.0.0.1", free_port(), 10)
+        disconnect = threading.Event()
+        connections = []
+        original_get_request = replay.get_request
+    
+        def tracked_request():
+            connection, address = original_get_request()
+            connections.append(connection)
+            del connections[:-32]
+            return connection, address
+    
+        replay.get_request = tracked_request
+        replay.verify_request = lambda *_: not disconnect.is_set()
+        rt = threading.Thread(target=replay.serve_forever, daemon=True)
+        rt.start()
+        source = f"http://127.0.0.1:{replay.server_port}/stream.mjpg"
+        model = os.environ["RS_YOLOX_MODEL_PATH"]
+        digest = __import__("hashlib").sha256(Path(model).read_bytes()).hexdigest()
+        cfg = yaml.safe_load((root / "cameras/demo-highway.yaml").read_text())
+        config = dict(
+            schema_version=1,
+            reference_frame=dict(width=1920, height=1080),
+            calibration=None,
+            min_y=0,
+            zones=[
+                dict(
+                    id="scene",
+                    name="Synthetic scene geometry",
+                    kind="carriageway",
+                    direction=[0, 1],
+                    polygon=[[0, 0], [1919, 0], [1919, 1079], [0, 1079]],
+                )
+            ],
+            rules=["pedestrian_on_road"],
+            thresholds=cfg["thresholds"],
+            acquisition=dict(
+                target_fps=10, reconnect_backoff_s=1, read_timeout_s=3, max_reconnect_attempts=20
+            ),
+            model=dict(id="override", sha256=digest),
+        )
+        assert cc.validate(config) == []
+        # Control state is created through authenticated APIs, never preapproved DB rows.
+        from uuid import UUID
+    
+        from app.models import Role
+        from tests.conftest import make_user
+    
+        monkeypatch.setenv("RS_COOKIE_SECURE", "false")
+        get_settings.cache_clear()
+        administrator = login(world.a.admin)
+        reviewer_user = make_user(world.a.id, Role.tenant_admin, "reviewer@mission.local")
+        reviewer = login(reviewer_user)
+        from tests.camera_browser import camera_browser
+    
+        created = camera_browser(world.a.admin, tmp_path, monkeypatch, "register")
+        cid = UUID(created["id"])
+        base = f"/api/camera-control/cameras/{cid}"
+    
+        def revision():
+            response = administrator.get(base)
+            assert response.status_code == 200, response.text
+            return response.json()["revision"]
+    
+        adopted = administrator.post(
+            base + "/lifecycle",
+            {
+                "expected_revision": revision(),
+                "reason": "Adopt controlled local replay",
+                "to": "onboarding",
+            },
+        )
+        assert adopted.status_code == 200, adopted.text
+        registered = administrator.post(
+            base + "/source",
+            {
+                "expected_revision": revision(),
+                "reason": "Licensed loopback replay reference",
+                "kind": "recorded_replay",
+                "url": "replay://mission-fixture",
+            },
+        )
+        assert registered.status_code == 200, registered.text
+        grant = administrator.post(
+            base + "/grants",
+            {
+                "granting_party": "Editor / Wikimedia Commons",
+                "basis": "licence",
+                "basis_reference": "CC BY 3.0 Street traffic.webm",
+                "purpose": "Isolated local replay integration test",
+                "valid_from": (datetime.now(UTC) - timedelta(days=1)).isoformat(),
+                "valid_until": (datetime.now(UTC) + timedelta(days=1)).isoformat(),
+                "capture_method": "recorded_replay",
+                "max_analysis_fps": 10,
+                "max_frame_height": 1080,
+                "retention_days": 1,
+                "media_scope": "events_only",
+            },
+        )
+        assert grant.status_code == 201, grant.text
+    
+        def publish_configuration(value):
+            drafted = camera_browser(
+                world.a.admin,
+                tmp_path,
+                monkeypatch,
+                "draft",
+                config=value,
+                revision=len(administrator.get(base + "/versions").json()) + 1,
+            )
+            vid = drafted["id"]
+            assert (
+                administrator.post(
+                    base + f"/versions/{vid}/approve", {"note": "Self approval must be refused"}
+                ).status_code
+                == 403
+            )
+            return camera_browser(
+                reviewer_user, tmp_path, monkeypatch, "approve", revision=drafted["revision"]
+            )
+    
+        publish_configuration(config)
+        with tenant_session(world.a.id) as db:
+            account = ingest_auth.create_account(db, world.a.id, "mission-runtime", camera_ids=[cid])
+            key = ingest_auth.issue_key(db, load_keyring(db, world.a.id), account)
+            db.commit()
+        cfg.update(
+            id="mission-replay",
+            video=source,
+            enabled=True,
+            source_replay=True,
+            source_fps=10,
+            synthetic_test=True,
+            test_disclosure=(
+                "SYNTHETIC TEST whole-scene road zone on lawful moving replay; "
+                "no real traffic violation"
+            ),
+            source_provenance={
+                "title": "Licensed moving excerpt with SYNTHETIC TEST road zone",
+                "url": "https://commons.wikimedia.org/wiki/File:Street_traffic.webm",
+                "author": "Editor",
+                "license": "CC BY 3.0",
+            },
+            control_source_reference="replay://mission-fixture",
+            model=model,
+            source_consent=dict(
+                granted=True,
+                by="Editor / CC BY 3.0",
+                date="2026-11-10",
+                scope="Local test replay and inference",
+                evidence="https://commons.wikimedia.org/wiki/File:Street_traffic.webm",
+                licence="CC BY 3.0",
+            ),
+        )
+        profile = tmp_path / "managed.yaml"
+        profile.write_text(yaml.safe_dump(cfg))
+        port = free_port()
+        monkeypatch.setenv("RS_COOKIE_SECURE", "false")
+        get_settings.cache_clear()
+        server = uvicorn.Server(
+            uvicorn.Config(create_app(), host="127.0.0.1", port=port, log_level="error")
+        )
+        thread = threading.Thread(target=server.run, daemon=True)
+        thread.start()
+        proc = None
+        try:
+            deadline = time.monotonic() + 10
+            while not server.started and time.monotonic() < deadline:
+                time.sleep(0.05)
+            log = (tmp_path / "worker.log").open("w+")
+    
+            def launch_worker():
+                return subprocess.Popen(  # noqa: S603 - fixed local fixture executable, no shell
+                    [
+                        sys.executable,
+                        "-m",
+                        "roadsentinel.pipeline",
+                        str(profile),
+                        "--model",
+                        model,
+                        "--live",
+                        "--no-wandb",
+                    ],
+                    cwd=root,
+                    env={
+                        **os.environ,
+                        "RS_API_URL": f"http://127.0.0.1:{port}",
+                        "RS_INGEST_KEY_ID": key.key_id,
+                        "RS_INGEST_SECRET": key.secret,
+                    },
+                    stdout=log,
+                    stderr=log,
+                )
+    
+            proc = launch_worker()
+            deadline = time.monotonic() + 35
+            ack = False
+            operator = login(world.a.operator)
+            previews = []
+            while time.monotonic() < deadline and proc.poll() is None:
+                with tenant_session(world.a.id) as db:
+                    row = db.scalar(
+                        select(CameraWorkerStatus).where(CameraWorkerStatus.camera_id == cid)
+                    )
+                    ack = bool(row and row.applied_revision == 1 and row.health == "healthy")
+                response = operator.get(f"/api/cameras/{cid}/preview")
+                if response.status_code == 200:
+                    previews.append(__import__("hashlib").sha256(response.content).hexdigest())
+                if ack and len(set(previews)) >= 2:
+                    break
+                time.sleep(1)
+            log.flush()
+            log.seek(0)
+            assert ack, log.read()[-2000:]
+            assert len(set(previews)) >= 2
+            # A competing real process must lose the lease before opening another source.
+            opened_before = len(connections)
+            duplicate = subprocess.run(  # noqa: S603 - fixed local fixture executable, no shell
+                [
+                    sys.executable,
+                    "-m",
+                    "roadsentinel.pipeline",
+                    str(profile),
+                    "--model",
+                    model,
+                    "--live",
+                    "--no-wandb",
+                ],
+                cwd=root,
+                env={
+                    **os.environ,
+                    "RS_API_URL": f"http://127.0.0.1:{port}",
+                    "RS_INGEST_KEY_ID": key.key_id,
+                    "RS_INGEST_SECRET": key.secret,
+                },
+                stdout=log,
+                stderr=log,
+                timeout=12,
+            )
+            assert duplicate.returncode != 0
+            assert len(connections) == opened_before
+            print("PASS duplicate real worker denied before source open")
+            camera_browser(world.a.operator, tmp_path, monkeypatch, "preview", api_port=port)
+            from app.models import Alert, Evidence
+            from app.services.evidence import file_path
+    
+            deadline = time.monotonic() + 30
+            incident = None
+            while time.monotonic() < deadline and proc.poll() is None:
+                with tenant_session(world.a.id) as db:
+                    incident = db.scalar(
+                        select(Alert).where(Alert.camera_id == cid).order_by(Alert.detected_at)
+                    )
+                if incident is not None:
+                    break
+                time.sleep(0.5)
+            assert incident is not None, "Actual model-derived pedestrian candidate was not ingested"
+            assert (
+                incident.details["origin"] == "local_replay" and incident.details["synthetic"] is True
+            )
+            assert (
+                incident.details["config_revision"] == 1 and incident.details["model_sha256"] == digest
+            )
+            with tenant_session(world.a.id) as db:
+                evidence = db.scalars(select(Evidence).where(Evidence.alert_id == incident.id)).all()
+                assert len(evidence) == 2
+                assert all(
+                    file_path(item, "redacted").read_bytes().startswith(b"RSE1") for item in evidence
+                )
+>           camera_browser(
+                world.a.operator,
+                tmp_path,
+                monkeypatch,
+                "event",
+                api_port=port,
+                config={"event_number": incident.number},
+            )
+
+tests/test_managed_live_runtime.py:341: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+actor = TUser(id=UUID('f78b1378-3069-44c8-bd0a-9900ba65097b'), tenant_id=UUID('e65f6ebe-a054-4fa7-9f9e-91cd9c28606b'), email='... role=<Role.operator: 'operator'>, totp_secret='<redacted>', password='<redacted>')
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-177/test_managed_replay_ack_previe0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7aa2f0c4d430>
+task = 'event', api_port = 36501, config = {'event_number': 4}, revision = None
+
+    def camera_browser(actor, tmp_path, monkeypatch, task, api_port=None, config=None, revision=None):
+        from app.config import get_settings
+        from app.main import create_app
+    
+        root = Path(__file__).resolve().parents[2]
+        ui_port = free_port()
+        origin = f"http://127.0.0.1:{ui_port}"
+        server = thread = None
+        frontend = None
+        result = tmp_path / f"camera-{task}.json"
+        try:
+            with monkeypatch.context() as settings:
+                settings.setenv("RS_PUBLIC_ORIGIN", origin)
+                settings.setenv("RS_COOKIE_SECURE", "false")
+                get_settings.cache_clear()
+                if api_port is None:
+                    api_port = free_port()
+                    server = uvicorn.Server(
+                        uvicorn.Config(create_app(), host="127.0.0.1", port=api_port, log_level="error")
+                    )
+                    thread = threading.Thread(target=server.run, daemon=True)
+                    thread.start()
+                    deadline = time.monotonic() + 15
+                    while not server.started and time.monotonic() < deadline:
+                        time.sleep(0.05)
+                    assert server.started
+                with (tmp_path / f"vite-{task}.log").open("wb") as log:
+                    node = "/home/justin7m8/miniconda3/envs/rs-node22/bin/node"
+                    frontend = subprocess.Popen(  # noqa: S603 - fixed local fixture executable, no shell
+                        [
+                            node,
+                            "node_modules/vite/bin/vite.js",
+                            "--host",
+                            "127.0.0.1",
+                            "--port",
+                            str(ui_port),
+                            "--strictPort",
+                        ],
+                        cwd=root / "frontend",
+                        env={
+                            **os.environ,
+                            "RS_API_ORIGIN": f"http://127.0.0.1:{api_port}",
+                            "VITE_USE_MOCKS": "0",
+                        },
+                        stdout=log,
+                        stderr=log,
+                    )
+                    deadline = time.monotonic() + 20
+                    while time.monotonic() < deadline:
+                        try:
+                            if httpx.get(origin).status_code == 200:
+                                break
+                        except httpx.TransportError:
+                            pass
+                        time.sleep(0.1)
+                    output = Path(
+                        os.environ.get(
+                            "RS_MISSION_EVIDENCE_DIR", root / "docs/audits/runtime_verification"
+                        )
+                    )
+                    assert output.resolve().is_relative_to(root)
+                    shot = output / f"screenshots/camera-{task}-{revision or 0}.png"
+                    shot.parent.mkdir(parents=True, exist_ok=True)
+                    browser = subprocess.run(  # noqa: S603 - fixed local fixture executable, no shell
+                        [node, "e2e/camera-control-runtime.mjs"],
+                        cwd=root / "frontend",
+                        env={
+                            **os.environ,
+                            "RS_UI_ORIGIN": origin,
+                            "RS_UI_USER": actor.email,
+                            "RS_UI_PASSWORD": actor.password,
+                            "RS_UI_TOTP": actor.totp(),
+                            "RS_UI_TOTP_SECRET": actor.totp_secret,
+                            "RS_UI_PYTHON": sys.executable,
+                            "RS_CAMERA_TASK": task,
+                            "RS_CAMERA_RESULT": str(result),
+                            "RS_CAMERA_CONFIG": json.dumps(config),
+                            "RS_CAMERA_REVISION": str(revision or 0),
+                            "RS_E2E_SCREENSHOT": str(shot),
+                        },
+                        capture_output=True,
+                        text=True,
+                        timeout=60,
+                    )
+>                   assert browser.returncode == 0, browser.stderr.replace(
+                           ^^^^^^^^^^^^^^^^^^^^^^^
+                        actor.password, "<redacted>"
+                    )[-2000:]
+E                   AssertionError: uplimentar"\n' +
+E                         '          - text: Necesită context suplimentar\n' +
+E                         '        - text: Moment în clip (s, opțional)\n' +
+E                         '        - textbox "Moment în clip în secunde"\n' +
+E                         '        - group "Referințe la detecție":\n' +
+E                         '          - text: Referințe la detecție\n' +
+E                         `          - 'checkbox "Citează traseul #2 (înregistrat de pipeline)"'\n` +
+E                         '          - text: "Citează traseul #2 (înregistrat de pipeline)"\n' +
+E                         '          - paragraph: Pipeline-ul nu a trimis chenarul detecției pentru acest caz; o notă poate cita doar traseul înregistrat.\n' +
+E                         '        - button "Adaugă nota" [disabled]\n' +
+E                         '    - region "Pachet de probe (export controlat)":\n' +
+E                         '      - heading "Pachet de probe (export controlat)" [level=2]\n' +
+E                         '      - paragraph: Pachetul conține probele mascate ale cazului, manifestul cu amprente SHA-256 și instrucțiuni de verificare. Necesită aprobarea unui al doilea administrator; linkul de descărcare este de unică folosință pe termen scurt.\n' +
+E                         '      - list\n' +
+E                         '      - form "Cerere export":\n' +
+E                         '        - textbox "Justificare export":\n' +
+E                         '          - /placeholder: Justificare (minimum 10 caractere)\n' +
+E                         '        - textbox "Referință dosar":\n' +
+E                         '          - /placeholder: Referință dosar (ex. DOS-2026-17)\n' +
+E                         `        - 'checkbox "Include originalele nemascate — indisponibil: nu există original nemascat stocat" [disabled]'\n` +
+E                         '        - text: "Include originalele nemascate — indisponibil: nu există original nemascat stocat"\n' +
+E                         '        - button "Solicită export" [disabled]\n' +
+E                         '      - form "Verificare pachet":\n' +
+E                         '        - text: Verifică un pachet descărcat\n' +
+E                         '        - paragraph: Fișierul este verificat pe server și șters imediat; nu se păstrează.\n' +
+E                         '        - button "Pachetul .zip de verificat"\n' +
+E                         '        - textbox "Amprenta SHA-256'... 449 more characters
+E                     }
+E                   }
+E                   
+E                   Node.js v22.23.4
+
+tests/camera_browser.py:106: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app:main.py:65 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-0nqn0oub is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNING  app:main.py:65 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-0nqn0oub is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNING  app:main.py:65 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-0nqn0oub is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNING  app:main.py:65 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-0nqn0oub is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNING  app:main.py:65 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-0nqn0oub is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNING  app:main.py:65 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-0nqn0oub is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNING  app:main.py:65 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-0nqn0oub is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+=============================== warnings summary ===============================
+tests/test_managed_live_runtime.py::test_managed_replay_ack_preview_and_revocation
+tests/test_managed_live_runtime.py::test_managed_replay_ack_preview_and_revocation
+tests/test_managed_live_runtime.py::test_managed_replay_ack_preview_and_revocation
+tests/test_managed_live_runtime.py::test_managed_replay_ack_preview_and_revocation
+  /home/justin7m8/Documents/roadsentinel-integration/backend/app/services/casework.py:190: SADeprecationWarning: The Result.tuples() method is deprecated, Row now behaves like a tuple and can unpack types directly. (deprecated since: 2.1.0)
+    ).tuples()
+
+tests/test_managed_live_runtime.py::test_managed_replay_ack_preview_and_revocation
+tests/test_managed_live_runtime.py::test_managed_replay_ack_preview_and_revocation
+tests/test_managed_live_runtime.py::test_managed_replay_ack_preview_and_revocation
+tests/test_managed_live_runtime.py::test_managed_replay_ack_preview_and_revocation
+  /home/justin7m8/Documents/roadsentinel-integration/backend/app/services/casework.py:202: SADeprecationWarning: The Result.tuples() method is deprecated, Row now behaves like a tuple and can unpack types directly. (deprecated since: 2.1.0)
+    ).tuples()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_managed_live_runtime.py::test_managed_replay_ack_preview_and_revocation
+1 failed, 8 warnings in 31.97s

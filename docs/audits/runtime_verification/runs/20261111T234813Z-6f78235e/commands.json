@@ -1,0 +1,86 @@
+[
+  {
+    "name": "initdb",
+    "command": [
+      "/home/justin7m8/miniconda3/envs/rs-pg/bin/initdb",
+      "-D",
+      "/tmp/rsverify-a7s27shi/pg",
+      "-U",
+      "rsverify_root",
+      "-A",
+      "trust",
+      "--encoding=UTF8",
+      "--no-locale"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration",
+    "start": "2026-11-11T23:48:13.300445+00:00",
+    "end": "2026-11-11T23:48:14.266802+00:00",
+    "duration_s": 0.966,
+    "exit_code": 0
+  },
+  {
+    "name": "start",
+    "command": [
+      "/home/justin7m8/miniconda3/envs/rs-pg/bin/pg_ctl",
+      "-D",
+      "/tmp/rsverify-a7s27shi/pg",
+      "-l",
+      "/tmp/rsverify-a7s27shi/postgres.log",
+      "-o",
+      "-h 127.0.0.1 -p 59847 -k /tmp/rsverify-a7s27shi",
+      "start"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration",
+    "start": "2026-11-11T23:48:14.267375+00:00",
+    "end": "2026-11-11T23:48:14.382663+00:00",
+    "duration_s": 0.115,
+    "exit_code": 0
+  },
+  {
+    "name": "browser",
+    "command": [
+      "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/bin/python",
+      "-m",
+      "pytest",
+      "tests/test_browser_complete_journey.py",
+      "-o",
+      "addopts=",
+      "-q",
+      "-s"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration/backend",
+    "start": "2026-11-11T23:48:14.383255+00:00",
+    "end": "2026-11-11T23:49:14.554862+00:00",
+    "duration_s": 60.172,
+    "exit_code": 0
+  },
+  {
+    "name": "schema-security",
+    "command": [
+      "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/bin/python",
+      "-c",
+      "\nimport json, os, psycopg\nfrom sqlalchemy.engine import make_url\nu=make_url(os.environ['RS_TEST_ADMIN_DATABASE_URL']).set(database=os.environ['RS_TEST_DATABASE_NAME'])\nwith psycopg.connect(u.render_as_string(hide_password=False).replace('postgresql+psycopg://','postgresql://'), autocommit=True) as c:\n    identity=c.execute('SELECT current_database(),host(inet_server_addr()),inet_server_port(),current_user').fetchone()\n    assert identity[0]==os.environ['RS_TEST_DATABASE_NAME'] and str(identity[2])==os.environ['RS_TEST_EXPECTED_PORT']\n    revision=c.execute('SELECT version_num FROM alembic_version').fetchall()\n    tables=c.execute(\"SELECT relname,relrowsecurity,relforcerowsecurity FROM pg_class WHERE relnamespace='public'::regnamespace AND relkind='r' AND (relname='tenants' OR EXISTS (SELECT 1 FROM pg_attribute a WHERE a.attrelid=pg_class.oid AND a.attname='tenant_id' AND NOT a.attisdropped)) ORDER BY relname\").fetchall()\n    roles=c.execute(\"SELECT rolname,rolsuper,rolbypassrls FROM pg_roles WHERE rolname IN ('rs_test_owner','rs_test_app') ORDER BY rolname\").fetchall()\n    assert revision==[('0026',)] and len(tables)==36 and all(row[1] and row[2] for row in tables)\n    print(json.dumps(dict(identity=identity,revision=revision,tenant_tables=tables,roles=roles),indent=2),flush=True)\n    assert len(roles)==2 and all(not row[1] for row in roles)\n    assert next(row for row in roles if row[0]=='rs_test_app')==('rs_test_app',False,False)\n    # The disposable bootstrap migrator retains its documented pre-0022 BYPASSRLS; never used by API.\n"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration",
+    "start": "2026-11-11T23:49:14.555277+00:00",
+    "end": "2026-11-11T23:49:14.819816+00:00",
+    "duration_s": 0.265,
+    "exit_code": 0
+  },
+  {
+    "name": "stop",
+    "command": [
+      "/home/justin7m8/miniconda3/envs/rs-pg/bin/pg_ctl",
+      "-D",
+      "/tmp/rsverify-a7s27shi/pg",
+      "stop",
+      "-m",
+      "fast"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration",
+    "start": "2026-11-11T23:49:14.820588+00:00",
+    "end": "2026-11-11T23:49:15.537381+00:00",
+    "duration_s": 0.717,
+    "exit_code": 0
+  }
+]

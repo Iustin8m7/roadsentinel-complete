@@ -1,0 +1,73 @@
+[
+  {
+    "name": "initdb",
+    "command": [
+      "/home/justin7m8/miniconda3/envs/rs-pg/bin/initdb",
+      "-D",
+      "/tmp/rsverify-87x0ix_y/pg",
+      "-U",
+      "rsverify_root",
+      "-A",
+      "trust",
+      "--encoding=UTF8",
+      "--no-locale"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration",
+    "start": "2026-11-10T23:24:07.633044+00:00",
+    "end": "2026-11-10T23:24:08.602477+00:00",
+    "duration_s": 0.969,
+    "exit_code": 0
+  },
+  {
+    "name": "start",
+    "command": [
+      "/home/justin7m8/miniconda3/envs/rs-pg/bin/pg_ctl",
+      "-D",
+      "/tmp/rsverify-87x0ix_y/pg",
+      "-l",
+      "/tmp/rsverify-87x0ix_y/postgres.log",
+      "-o",
+      "-h 127.0.0.1 -p 34979 -k /tmp/rsverify-87x0ix_y",
+      "start"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration",
+    "start": "2026-11-10T23:24:08.603193+00:00",
+    "end": "2026-11-10T23:24:08.768156+00:00",
+    "duration_s": 0.165,
+    "exit_code": 0
+  },
+  {
+    "name": "backend",
+    "command": [
+      "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/bin/python",
+      "-m",
+      "pytest",
+      "tests",
+      "-o",
+      "addopts=",
+      "-q",
+      "-s"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration/backend",
+    "start": "2026-11-10T23:24:08.768675+00:00",
+    "end": "2026-11-10T23:29:44.848542+00:00",
+    "duration_s": 336.08,
+    "exit_code": 0
+  },
+  {
+    "name": "stop",
+    "command": [
+      "/home/justin7m8/miniconda3/envs/rs-pg/bin/pg_ctl",
+      "-D",
+      "/tmp/rsverify-87x0ix_y/pg",
+      "stop",
+      "-m",
+      "fast"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration",
+    "start": "2026-11-10T23:29:44.848965+00:00",
+    "end": "2026-11-10T23:30:34.241094+00:00",
+    "duration_s": 49.392,
+    "exit_code": 0
+  }
+]

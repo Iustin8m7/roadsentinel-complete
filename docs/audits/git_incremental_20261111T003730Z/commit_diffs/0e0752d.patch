@@ -1,0 +1,240 @@
+diff --git a/frontend/src/components/IasiMap.tsx b/frontend/src/components/IasiMap.tsx
+index 7f1a1da..38fe75c 100644
+--- a/frontend/src/components/IasiMap.tsx
++++ b/frontend/src/components/IasiMap.tsx
+@@ -16,18 +16,15 @@ import {
+   IASI_MAP_CONFIG,
+   isDemoCamera,
+   type MapCamera,
+-  type MapPatrol,
+   type MapAlert,
+   type Severity,
+ } from '@/lib/iasi';
+ 
+ export interface IasiMapProps {
+   cameras: MapCamera[];
+-  patrols?: MapPatrol[];
+   alerts?: MapAlert[];
+   focusCameraId?: string;
+   onCameraClick?: (id: string) => void;
+-  onPatrolClick?: (id: string) => void;
+   /** Hide the overlay label and zoom buttons (background use). */
+   bare?: boolean;
+   className?: string;
+@@ -108,38 +105,11 @@ const createCameraIcon = (camera: MapCamera, isWorstAlert: boolean, alertLabel?:
+   });
+ };
+ 
+-// Icon generator for patrols
+-const createPatrolIcon = (patrol: MapPatrol) => {
+-  const color =
+-    patrol.status === 'available'
+-      ? '#2ED47A'
+-      : patrol.status === 'busy'
+-      ? '#FF8A1F'
+-      : '#7D8A9B';
+-
+-  const label = patrol.status === 'available' ? 'DISP' : patrol.status === 'busy' ? 'MISIUNE' : 'PAUZĂ';
+-
+-  return L.divIcon({
+-    className: 'iasi-custom-patrol-marker',
+-    html: `
+-      <div class="iasi-patrol-badge font-mono" style="border-color: ${color}66; box-shadow: 0 0 12px ${color}33;">
+-        <span class="iasi-patrol-dot" style="background-color: ${color};"></span>
+-        <span class="iasi-patrol-callsign font-bold text-[#E6EDF3]">${patrol.callsign}</span>
+-        <span class="iasi-patrol-pill" style="color: ${color}; background-color: ${color}1A;">${label}</span>
+-      </div>
+-    `,
+-    iconSize: [115, 26],
+-    iconAnchor: [57, 13],
+-  });
+-};
+-
+ export function IasiMap({
+   cameras,
+-  patrols = [],
+   alerts = [],
+   focusCameraId,
+   onCameraClick,
+-  onPatrolClick,
+   bare = false,
+   className = '',
+ }: IasiMapProps) {
+@@ -230,36 +200,6 @@ export function IasiMap({
+           />
+         )}
+ 
+-        {/* Patrol Markers */}
+-        {patrols.map((patrol) => (
+-          <Marker
+-            key={`patrol-${patrol.id}`}
+-            position={[patrol.lat, patrol.lng]}
+-            icon={createPatrolIcon(patrol)}
+-            eventHandlers={{ click: () => onPatrolClick?.(patrol.id) }}
+-          >
+-            <Popup className="iasi-custom-popup">
+-              <div className="p-3 bg-[#111821] text-[#E6EDF3] rounded-md border border-[#1E2A36] text-xs font-sans min-w-[180px]">
+-                <div className="flex items-center justify-between pb-1.5 border-b border-[#1E2A36] mb-2 font-mono">
+-                  <span className="font-bold text-[#3DA5FF]">{patrol.callsign}</span>
+-                  <span className={`text-[10px] px-1.5 py-0.5 rounded ${
+-                    patrol.status === 'available'
+-                      ? 'text-[#2ED47A] bg-[#2ED47A]/15'
+-                      : patrol.status === 'busy'
+-                      ? 'text-[#FF8A1F] bg-[#FF8A1F]/15'
+-                      : 'text-[#7D8A9B] bg-[#7D8A9B]/15'
+-                  }`}>
+-                    {patrol.status.toUpperCase()}
+-                  </span>
+-                </div>
+-                <div className="text-[11px] text-[#7D8A9B] mb-2">
+-                  Zonă: <strong className="text-[#E6EDF3]">{patrol.area || 'Centru'}</strong>
+-                </div>
+-              </div>
+-            </Popup>
+-          </Marker>
+-        ))}
+-
+         {/* Camera Markers */}
+         {cameras.map((camera) => {
+           const isTopAlertCamera = topAlert && topAlert.cameraId === camera.id;
+diff --git a/frontend/src/components/TacticalMap.tsx b/frontend/src/components/TacticalMap.tsx
+index 36a9711..c409be8 100644
+--- a/frontend/src/components/TacticalMap.tsx
++++ b/frontend/src/components/TacticalMap.tsx
+@@ -2,7 +2,6 @@ import { useMemo, Suspense, lazy } from 'react';
+ import { useDataStore } from '@/store/data';
+ import {
+   IASI_CAMERAS,
+-  IASI_PATROLS,
+   iasiCameraName,
+   type MapCamera,
+   type MapAlert,
+@@ -19,7 +18,6 @@ export interface TacticalMapProps {
+   bare?: boolean;
+   focusCameraId?: string;
+   onCameraClick?: (id: string) => void;
+-  onPatrolClick?: (id: string) => void;
+   criticalAlertLocation?: string;
+ }
+ 
+@@ -28,7 +26,6 @@ export function TacticalMap({
+   bare,
+   focusCameraId,
+   onCameraClick,
+-  onPatrolClick,
+ }: TacticalMapProps) {
+   const storeCameras = useDataStore((s) => s.cameras);
+   const alerts = useDataStore((s) => s.alerts);
+@@ -99,11 +96,9 @@ export function TacticalMap({
+       >
+         <IasiMapLazy
+           cameras={bare ? mapCameras.map((c) => ({ ...c, openAlerts: 0, worst: undefined })) : mapCameras}
+-          patrols={IASI_PATROLS}
+           alerts={bare ? [] : mapAlerts}
+           focusCameraId={focusCameraId}
+           onCameraClick={onCameraClick}
+-          onPatrolClick={onPatrolClick}
+           bare={bare}
+           className="w-full h-full"
+         />
+diff --git a/frontend/src/lib/iasi.ts b/frontend/src/lib/iasi.ts
+index b2216b3..84f1bd6 100644
+--- a/frontend/src/lib/iasi.ts
++++ b/frontend/src/lib/iasi.ts
+@@ -11,15 +11,6 @@ export interface MapCamera {
+   worst?: Severity;
+ }
+ 
+-export interface MapPatrol {
+-  id: string;
+-  callsign: string;
+-  lat: number;
+-  lng: number;
+-  status: 'available' | 'busy' | 'break';
+-  area?: string;
+-}
+-
+ export interface MapAlert {
+   id: string;
+   cameraId: string;
+@@ -82,13 +73,6 @@ export const isDemoCamera = (id: string) => id !== REAL_STREAM_ID && Object.hasO
+ export const iasiCameraName = (id: string): string | undefined =>
+   Object.hasOwn(IASI_CAMERAS, id) ? `${isDemoCamera(id) ? 'DEMO · ' : ''}${IASI_CAMERAS[id].name}` : undefined;
+ 
+-export const IASI_PATROLS: MapPatrol[] = [
+-  { id: 'IS-21', callsign: 'IS-21-POL', lat: 47.1800, lng: 27.5680, status: 'available', area: 'Copou' },
+-  { id: 'IS-14', callsign: 'IS-14-POL', lat: 47.1545, lng: 27.5900, status: 'busy',      area: 'Podu Roș' },
+-  { id: 'IS-07', callsign: 'IS-07-POL', lat: 47.1610, lng: 27.6080, status: 'available', area: 'Tătărași' },
+-  { id: 'IS-33', callsign: 'IS-33-POL', lat: 47.1370, lng: 27.5770, status: 'break',     area: 'Nicolina' },
+-];
+-
+ export const IASI_MAP_CONFIG = {
+   center: [47.1585, 27.6014] as [number, number],
+   defaultZoom: 13,
+diff --git a/frontend/src/pages/DashboardPage.tsx b/frontend/src/pages/DashboardPage.tsx
+index de15bc4..18acebf 100644
+--- a/frontend/src/pages/DashboardPage.tsx
++++ b/frontend/src/pages/DashboardPage.tsx
+@@ -11,13 +11,6 @@ import { StatusBadge } from '@/components/ui'
+ import { TacticalMap } from '@/components/TacticalMap'
+ import { ClipModal } from '@/components/ClipModal'
+ 
+-// MOCK: the backend has no patrols yet.
+-const PATROLS = [
+-  { callsign: 'IS-21-POL', status: 'Disponibilă', color: '#2ED47A', area: 'Copou' },
+-  { callsign: 'IS-14-POL', status: 'În misiune', color: '#FF8A1F', area: 'Podu Roș' },
+-  { callsign: 'IS-07-POL', status: 'Disponibilă', color: '#2ED47A', area: 'Tătărași' },
+-  { callsign: 'IS-33-POL', status: 'Pauză', color: '#7D8A9B', area: 'Nicolina' },
+-]
+ const ROW_H = 68 // px per queue row incl. gap; the queue shows as many rows as fit, no scrolling
+ 
+ const ACCENT: Record<string, string> = { critical: '#FF3B3B', high: '#FF8A1F', medium: '#FFC23D', info: '#3DA5FF' }
+@@ -44,8 +37,6 @@ export default function DashboardPage() {
+   useEffect(() => { if (page > pages - 1) setPage(pages - 1) }, [page, pages])
+   const visible = queue.slice(page * perPage, page * perPage + perPage)
+ 
+-  const camerasOnline = cameras.filter((c) => c.status !== 'offline').length
+-  const availablePatrols = PATROLS.filter((p) => p.status === 'Disponibilă').length
+   const kpi = 'bg-[#111821] border border-[#1E2A36] rounded-md px-3.5 py-2.5'
+ 
+   return (
+@@ -56,12 +47,12 @@ export default function DashboardPage() {
+           <div className="font-sans text-3xl font-bold text-[#E6EDF3] leading-none mt-1">{openCount}</div>
+         </div>
+         <div className={kpi}>
+-          <div className="text-xs text-[#7D8A9B] font-medium">Camere online</div>
+-          <div className="font-sans text-3xl font-bold text-[#E6EDF3] leading-none mt-1">{camerasOnline}/{cameras.length}</div>
++          <div className="text-xs text-[#7D8A9B] font-medium">Camere configurate</div>
++          <div className="font-sans text-3xl font-bold text-[#E6EDF3] leading-none mt-1">{cameras.length}</div>
+         </div>
+         <div className={kpi}>
+-          <div className="text-xs text-[#7D8A9B] font-medium">Patrule disponibile</div>
+-          <div className="font-sans text-3xl font-bold text-[#E6EDF3] leading-none mt-1">{availablePatrols}/{PATROLS.length}</div>
++          <div className="text-xs text-[#7D8A9B] font-medium">Alerte confirmate</div>
++          <div className="font-sans text-3xl font-bold text-[#E6EDF3] leading-none mt-1">{stats.confirmed}</div>
+         </div>
+         <div className={kpi}>
+           <div className="text-xs text-[#7D8A9B] font-medium">Rată alarme false</div>
+@@ -130,22 +121,6 @@ export default function DashboardPage() {
+           <div className="flex-1 min-h-0">
+             <TacticalMap className="w-full h-full" />
+           </div>
+-          <div className="bg-[#111821] border border-[#1E2A36] rounded-md px-3.5 py-2.5 shrink-0">
+-            <div className="flex items-center justify-between mb-1.5">
+-              <h3 className="font-sans text-sm font-bold uppercase tracking-wider text-[#E6EDF3]">Patrule pe teren</h3>
+-              <span className="text-[10px] text-[#536070] font-mono">DEMO</span>
+-            </div>
+-            <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+-              {PATROLS.map((p) => (
+-                <div key={p.callsign} className="flex items-center gap-2 text-xs">
+-                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />
+-                  <span className="font-mono font-bold text-[#E6EDF3]">{p.callsign}</span>
+-                  <span className="text-[11px] truncate" style={{ color: p.color }}>{p.status}</span>
+-                  <span className="text-[11px] text-[#7D8A9B] ml-auto">{p.area}</span>
+-                </div>
+-              ))}
+-            </div>
+-          </div>
+         </div>
+       </div>
+ 

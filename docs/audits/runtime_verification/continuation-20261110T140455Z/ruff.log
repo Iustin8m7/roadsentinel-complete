@@ -1,0 +1,4 @@
+backend/tests/test_browser_complete_journey.py:105:38: RUF100 [*] Unused `noqa` directive (unused: `S603`)
+backend/tests/test_browser_complete_journey.py:216:101: E501 Line too long (117 > 100)
+Found 2 errors.
+[*] 1 fixable with `--fix`.

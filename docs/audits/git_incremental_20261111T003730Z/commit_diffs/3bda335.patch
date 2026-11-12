@@ -1,0 +1,550 @@
+diff --git a/frontend/scripts/e2e-investigation.mjs b/frontend/scripts/e2e-investigation.mjs
+index 9e74f95..017f29b 100644
+--- a/frontend/scripts/e2e-investigation.mjs
++++ b/frontend/scripts/e2e-investigation.mjs
+@@ -76,7 +76,7 @@ try {
+   await op.getByTestId('case-workspace').waitFor()
+   assert.equal(await op.getByTestId('evidence-clip').getByTestId('storage-state').innerText(), 'Disponibilă')
+   assert.match(await op.getByTestId('source-kind').innerText(), /Necunoscută/)
+-  assert.match(await op.getByTestId('model-status').innerText(), /neverificat/)
++  assert.match(await op.getByTestId('model-status').innerText(), /nu a fost măsurată/)
+   assert.match(await op.getByTestId('speed').innerText(), /necalibrată/)
+   step('case opened from the archive: evidence available, source/model/speed shown honestly')
+ 
+diff --git a/frontend/src/components/CasePanels.tsx b/frontend/src/components/CasePanels.tsx
+index fafa3c1..2e5603d 100644
+--- a/frontend/src/components/CasePanels.tsx
++++ b/frontend/src/components/CasePanels.tsx
+@@ -96,8 +96,10 @@ export function RelatedPanel({ number, dossier, reload }: PanelProps) {
+     catch (e) { setError(denied(e)) } finally { setBusy(false) }
+   }
+   const [confirming, setConfirming] = useState<string | null>(null)
++  const armedAt = useRef(0)
+   const remove = async (id: string) => {
+-    if (confirming !== id) { setConfirming(id); return }  // first click only asks
++    if (confirming !== id) { setConfirming(id); armedAt.current = Date.now(); return }  // first click only asks
++    if (Date.now() - armedAt.current < 400) return  // a double-click is not a confirmation
+     setConfirming(null); setError(null)
+     try { await removeLink(number, id); await reload() } catch (e) { setError(denied(e)) }
+   }
+@@ -119,7 +121,7 @@ export function RelatedPanel({ number, dossier, reload }: PanelProps) {
+                     {why.label}{why.reason ? ` — „${why.reason}”` : ''}{why.created_by ? ` · ${why.created_by}` : ''}
+                   </span>
+                   {why.can_remove && why.link_id && (
+-                    <button type="button" onClick={() => void remove(why.link_id!)} className="text-[#7D8A9B] hover:text-[#FF3B3B] cursor-pointer" aria-label={confirming === why.link_id ? `Confirmă eliminarea legăturii cu cazul #${r.number}` : `Elimină legătura cu cazul #${r.number}`}>{confirming === why.link_id ? <span className="text-[#FF3B3B] font-semibold">Confirmă eliminarea</span> : <Trash2 size={12} />}</button>
++                    <button type="button" onClick={() => void remove(why.link_id!)} onBlur={() => setConfirming(null)} className="text-[#7D8A9B] hover:text-[#FF3B3B] cursor-pointer" aria-label={confirming === why.link_id ? `Confirmă eliminarea legăturii cu cazul #${r.number}` : `Elimină legătura cu cazul #${r.number}`}>{confirming === why.link_id ? <span className="text-[#FF3B3B] font-semibold">Confirmă eliminarea</span> : <Trash2 size={12} />}</button>
+                   )}
+                 </li>
+               ))}
+diff --git a/frontend/src/components/CaseWorkspace.tsx b/frontend/src/components/CaseWorkspace.tsx
+index 6715fcb..17da925 100644
+--- a/frontend/src/components/CaseWorkspace.tsx
++++ b/frontend/src/components/CaseWorkspace.tsx
+@@ -71,11 +71,9 @@ export function EvidencePanel({ dossier }: { dossier: CaseDossier }) {
+                 {STATE[ev.storage_state].label}{ev.purged_at ? ` · ${fmtTime(ev.purged_at)}` : ''}
+               </span>
+             </div>
+-            {/* Only "full" is a claim the stored file is known to meet; older clips carry other labels unblurred. */}
+-            {ev.redaction === 'full' && <div className="text-[#7D8A9B] mt-1" data-testid="redaction-full">Fețe și numere de înmatriculare estompate</div>}
+             <div className="text-[#7D8A9B]">
+               {ev.original_exists ? 'Există original nemascat (acces doar cu aprobare) · ' : ev.redaction === 'full' ? 'Nu există original nemascat stocat · ' : ''}
+-              {ev.sha256_recorded ? <>Amprentă digitală înregistrată la preluare <span className="text-[10px] text-[#536070]">(SHA-256)</span></> : 'Fără amprentă digitală'}
++              {ev.sha256_recorded ? <>Amprentă digitală înregistrată la preluare <span className="text-[10px] text-[#7D8A9B]">(SHA-256)</span></> : 'Fără amprentă digitală'}
+               {ev.duration_s ? ` · ${ev.duration_s.toFixed(2)} s` : ''}
+             </div>
+             {ev.storage_state !== 'available' && (
+diff --git a/frontend/src/hooks/index.ts b/frontend/src/hooks/index.ts
+index 4700d69..5809d1d 100644
+--- a/frontend/src/hooks/index.ts
++++ b/frontend/src/hooks/index.ts
+@@ -7,7 +7,7 @@ import { useDataStore } from '@/store/data'
+ import { useAuthStore } from '@/store/auth'
+ import { can, type Permission } from '@/lib/permissions'
+ import { SEVERITY_ORDER } from '@/lib/constants'
+-import { assignDemoTimes, demoSort } from '@/lib/demo'
++import { demoSort } from '@/lib/demo'
+ import type { Alert, Severity } from '@/types'
+ 
+ const openModals: HTMLElement[] = []
+@@ -50,6 +50,10 @@ export function useCan(p: Permission) {
+ }
+ 
+ /** Simulated real-time feed: pushes a new alert every N seconds while enabled. */
++
++// A refresh nobody asked for must not raise the operator's error banner; the next one retries.
++const background = (error: unknown) => console.warn('background refresh failed', error)
++
+ export function useLiveFeed(onAlert?: (a: Alert) => void) {
+   const { liveFeed, liveIntervalSec } = useDataStore((s) => s.settings)
+   const push = useDataStore((s) => s.pushLiveAlert)
+@@ -60,23 +64,23 @@ export function useLiveFeed(onAlert?: (a: Alert) => void) {
+     if (!liveFeed) return
+     if (!USE_MOCKS) {
+       const stream = new EventSource(apiUrl('/api/stream'), { withCredentials: true })
+-      stream.onopen = () => { void reloadData().catch(reportError) }
++      stream.onopen = () => { void reloadData().catch(background) }
+       stream.addEventListener('alert', (message) => {
+-        try { const alert = adaptEvent(JSON.parse(message.data)); upsertAlert(alert); cb.current?.(alert); void reloadStats().catch(reportError) }
+-        catch (error) { reportError(error) }
++        try { const alert = adaptEvent(JSON.parse(message.data)); upsertAlert(alert); cb.current?.(alert); void reloadStats().catch(background) }
++        catch (error) { background(error) }
+       })
+       stream.addEventListener('audit', (message) => {
+         try {
+           const entry = adaptAudit(JSON.parse(message.data))
+           mergeAudit([entry])
+-          if (entry.target) void loadDetail(entry.target).catch(reportError)
+-          if (['confirmed', 'rejected'].includes(entry.action)) void reloadStats().catch(reportError)
++          if (entry.target) void loadDetail(entry.target).catch(background)
++          if (['confirmed', 'rejected'].includes(entry.action)) void reloadStats().catch(background)
+         }
+-        catch (error) { reportError(error) }
++        catch (error) { background(error) }
+       })
+       stream.onerror = () => { void api<Me>('/api/me').then((me) => {
+         if (!me.operator && me.auth_required) { stream.close(); location.assign('/login') }
+-      }).catch(reportError) }
++      }).catch(background) }
+       return () => stream.close()
+     }
+     const t = setInterval(() => cb.current?.(push()), liveIntervalSec * 1000)
+@@ -102,9 +106,7 @@ export function useQueue() {
+   const alerts = useDataStore((s) => s.alerts)
+   return useMemo(() => {
+     // Every shown alert stays in the list after a decision; its status is shown on the row.
+-    const queue = [...alerts].sort(demoSort)
+-    assignDemoTimes(queue)
+-    return queue
++    return [...alerts].sort(demoSort)
+   }, [alerts])
+ }
+ 
+@@ -138,7 +140,6 @@ export function useStats() {
+       open,
+       confirmed,
+       rejected,
+-      falseAlarmRate: confirmed + rejected ? rejected / (confirmed + rejected) : 0,
+       avgResponseMin: responseMin.length ? responseMin.reduce((s, x) => s + x, 0) / responseMin.length : 0,
+       bySeverity,
+       byType,
+diff --git a/frontend/src/index.css b/frontend/src/index.css
+index e3fbfbb..5608c88 100644
+--- a/frontend/src/index.css
++++ b/frontend/src/index.css
+@@ -379,49 +379,6 @@ html, body {
+   z-index: 15;
+ }
+ 
+-/* Patrol Custom Marker */
+-.iasi-custom-patrol-marker {
+-  background: transparent !important;
+-  border: none !important;
+-}
+-
+-.iasi-patrol-badge {
+-  display: flex;
+-  align-items: center;
+-  gap: 5px;
+-  padding: 3px 8px;
+-  border-radius: 6px;
+-  background: #111821;
+-  border: 1px solid #1E2A36;
+-  font-size: 11px;
+-  cursor: pointer;
+-  white-space: nowrap;
+-  transition: all 0.3s ease;
+-}
+-
+-.iasi-patrol-badge:hover {
+-  transform: translateY(-2px);
+-}
+-
+-.iasi-patrol-dot {
+-  width: 7px;
+-  height: 7px;
+-  border-radius: 50%;
+-  flex-shrink: 0;
+-}
+-
+-.iasi-patrol-callsign {
+-  font-size: 11px;
+-}
+-
+-.iasi-patrol-pill {
+-  padding: 1px 4px;
+-  border-radius: 4px;
+-  font-size: 8px;
+-  font-weight: 700;
+-  letter-spacing: 0.5px;
+-}
+-
+ /* OSM standard tiles turned into a dark tactical basemap */
+ .rs-dark-tiles {
+   filter: invert(1) hue-rotate(195deg) brightness(0.78) contrast(0.95) saturate(0.35);
+diff --git a/frontend/src/layouts/AppLayout.tsx b/frontend/src/layouts/AppLayout.tsx
+index 3694a17..169e1ed 100644
+--- a/frontend/src/layouts/AppLayout.tsx
++++ b/frontend/src/layouts/AppLayout.tsx
+@@ -200,7 +200,7 @@ export default function AppLayout() {
+           <div className="text-xs font-mono text-[#7D8A9B]">
+             {clipTarget ? `${Math.min(clipsDone, clipTarget)} / ${clipTarget} clipuri pregătite` : 'Se conectează la server…'}
+           </div>
+-          <button type="button" onClick={() => setOverlay(false)} className="text-[11px] text-[#536070] hover:text-[#7D8A9B] underline cursor-pointer">
++          <button type="button" onClick={() => setOverlay(false)} className="text-[11px] text-[#7D8A9B] hover:text-[#E6EDF3] underline cursor-pointer">
+             Continuă oricum (restul se încarcă în fundal)
+           </button>
+         </div>
+diff --git a/frontend/src/lib/alertSummary.test.ts b/frontend/src/lib/alertSummary.test.ts
+index a039238..b988ace 100644
+--- a/frontend/src/lib/alertSummary.test.ts
++++ b/frontend/src/lib/alertSummary.test.ts
+@@ -14,8 +14,8 @@ const TAIL = ', la camera Pasaj Mihai Eminescu, azi la 14:32.'
+ 
+ describe('summarizeAlert: what happened, per type', () => {
+   const cases: Record<AlertType, [Partial<AlertSummaryInput>, string]> = {
+-    very_high_speed: [{ speedKmh: 116.4, limitKmh: 50 }, 'Sistemul a semnalat un autoturism care circula cu aproximativ 116 km/h pe un tronson cu limita de 50 km/h'],
+-    high_speed: [{ speedKmh: 180, limitKmh: 130, objectClass: 'motocicleta' }, 'Sistemul a semnalat o motocicletă care circula cu aproximativ 180 km/h pe un tronson cu limita de 130 km/h'],
++    very_high_speed: [{ speedKmh: 116.4, limitKmh: 50 }, 'Sistemul a semnalat un autoturism care circula cu o viteză estimată la 116 km/h pe un tronson cu limita de 50 km/h'],
++    high_speed: [{ speedKmh: 180, limitKmh: 130, objectClass: 'motocicleta' }, 'Sistemul a semnalat o motocicletă care circula cu o viteză estimată la 180 km/h pe un tronson cu limita de 130 km/h'],
+     probable_crash: [{}, 'Sistemul a semnalat un autoturism care a frânat brusc și apoi s-a oprit pe carosabil, ceea ce poate însemna un accident'],
+     pedestrian_on_road: [{ objectClass: 'pieton' }, 'Sistemul a semnalat o persoană pe carosabil'],
+     pedestrian_highway: [{ objectClass: 'pieton' }, 'Sistemul a semnalat o persoană pe autostradă'],
+@@ -26,9 +26,9 @@ describe('summarizeAlert: what happened, per type', () => {
+     road_object: [{ objectClass: 'obiect' }, 'Sistemul a semnalat un obiect pe carosabil'],
+     near_miss: [{}, 'Sistemul a semnalat un autoturism care a trecut foarte aproape de un alt participant la trafic'],
+     hard_braking: [{ speedKmh: 80 }, 'Sistemul a semnalat un autoturism care a frânat brusc'],
+-    tailgating: [{ speedKmh: 92 }, 'Sistemul a semnalat un autoturism care circula prea aproape de vehiculul din față, la aproximativ 92 km/h'],
++    tailgating: [{ speedKmh: 92 }, 'Sistemul a semnalat un autoturism care circula prea aproape de vehiculul din față, cu o viteză estimată la 92 km/h'],
+     dangerous_lane_change: [{}, 'Sistemul a semnalat un autoturism care a schimbat brusc banda, cu un alt vehicul foarte aproape'],
+-    congestion: [{ objectClass: undefined, speedKmh: 11.6 }, 'Sistemul a semnalat trafic aglomerat, cu o viteză medie de aproximativ 12 km/h'],
++    congestion: [{ objectClass: undefined, speedKmh: 11.6 }, 'Sistemul a semnalat trafic aglomerat, cu o viteză medie estimată la 12 km/h'],
+     road_conditions: [{}, 'Sistemul a semnalat condiții de drum care pot îngreuna circulația'],
+   }
+   for (const [type, [patch, expected]] of Object.entries(cases)) {
+@@ -36,7 +36,7 @@ describe('summarizeAlert: what happened, per type', () => {
+       const summary = summarizeAlert({ ...base, ...patch, type }, NOW)
+       expect(summary.what).toBe(expected + TAIL)
+       expect(summary.why).toMatch(/^[A-ZĂÂÎȘȚ].+\.$/)
+-      expect(summary.next).toContain('confirmă sau respinge')
++      expect(summary.next).toContain('confirmați sau respingeți')
+     })
+   }
+ 
+@@ -50,7 +50,7 @@ describe('summarizeAlert: missing or odd data', () => {
+   const clean = (text: string) => expect(text).not.toMatch(/undefined|NaN|null|,\s*,|\s{2}/)
+ 
+   it('speed without a limit', () => {
+-    expect(what({ speedKmh: 116 })).toBe('Sistemul a semnalat un autoturism care circula cu aproximativ 116 km/h, peste pragul stabilit pentru această cameră' + TAIL)
++    expect(what({ speedKmh: 116 })).toBe('Sistemul a semnalat un autoturism care circula cu o viteză estimată la 116 km/h, peste pragul stabilit pentru această cameră' + TAIL)
+   })
+   it('no speed at all', () => {
+     for (const speedKmh of [undefined, null, Number.NaN, 0]) {
+@@ -87,12 +87,12 @@ describe('summarizeAlert: next step', () => {
+   it('undecided alerts ask for a human decision', () => {
+     for (const status of ['new', 'in_review']) {
+       expect(summarizeAlert({ ...base, status }, NOW).next)
+-        .toBe('Verifică clipul și confirmă sau respinge alerta. Sistemul nu trimite singur echipaje și nu dă amenzi; decizia este a omului.')
++        .toBe('Verificați clipul și confirmați sau respingeți alerta. Sistemul nu trimite singur echipaje și nu dă amenzi; decizia este a omului.')
+     }
+   })
+   it('says who decided and when', () => {
+     expect(summarizeAlert({ ...base, status: 'confirmed', decidedBy: 'operator', decidedAt: iso(13, 14, 40) }, NOW).next)
+-      .toBe('Alerta a fost confirmată de operator, azi la 14:40. Decizia a fost luată de un om și rămâne în jurnal. Sistemul nu trimite singur echipaje și nu dă amenzi.')
++      .toBe('Alerta a fost confirmată de operator, azi la 14:40. Decizia a fost luată de un om. Sistemul nu trimite singur echipaje și nu dă amenzi.')
+     expect(summarizeAlert({ ...base, status: 'rejected', decidedBy: 'admin', decidedAt: iso(12, 9, 5) }, NOW).next)
+       .toMatch(/^Alerta a fost respinsă de admin, ieri la 09:05\./)
+   })
+@@ -111,3 +111,13 @@ describe('whenPhrase', () => {
+     expect(whenPhrase('', NOW)).toBeNull()
+   })
+ })
++
++describe('summarizeAlert: honesty edge cases', () => {
++  it('does not claim a threshold was exceeded when the speed is under the limit', () => {
++    expect(what({ speedKmh: 120, limitKmh: 130 })).toBe('Sistemul a semnalat un autoturism care circula cu o viteză estimată la 120 km/h' + TAIL)
++  })
++  it('says a person reclassified the alert instead of naming a rule that never fired', () => {
++    const s = summarizeAlert({ ...base, type: 'tailgating', typeLabel: 'Distanță prea mică', reclassifiedByHuman: true }, NOW)
++    expect(s.why).toBe('Sistemul a încadrat inițial altfel acest eveniment; un om a verificat clipul și l-a reîncadrat manual ca „distanță prea mică”.')
++  })
++})
+diff --git a/frontend/src/lib/alertSummary.ts b/frontend/src/lib/alertSummary.ts
+index 641394a..90050d9 100644
+--- a/frontend/src/lib/alertSummary.ts
++++ b/frontend/src/lib/alertSummary.ts
+@@ -17,6 +17,8 @@ export interface AlertSummaryInput {
+   status: string
+   decidedBy?: string
+   decidedAt?: string
++  /** A person changed the type after watching the clip (demo curation). */
++  reclassifiedByHuman?: boolean
+ }
+ 
+ export interface AlertSummary {
+@@ -60,15 +62,16 @@ export function whenPhrase(iso: string | undefined, now: Date): string | null {
+ 
+ interface Wording {
+   /** What the system flagged, without place and time. */
+-  what: (vehicle: string, speed: string | null, limit: string | null) => string
++  what: (vehicle: string, speed: string | null, limit: string | null, underLimit: boolean) => string
+   why: string
+ }
+ 
+ const WORDING: Record<string, Wording> = {
+   very_high_speed: {
+-    what: (v, speed, limit) =>
+-      speed && limit ? `${v} care circula cu aproximativ ${speed} pe un tronson cu limita de ${limit}`
+-        : speed ? `${v} care circula cu aproximativ ${speed}, peste pragul stabilit pentru această cameră`
++    what: (v, speed, limit, underLimit) =>
++      speed && limit ? `${v} care circula cu o viteză estimată la ${speed} pe un tronson cu limita de ${limit}`
++        : speed && underLimit ? `${v} care circula cu o viteză estimată la ${speed}`
++        : speed ? `${v} care circula cu o viteză estimată la ${speed}, peste pragul stabilit pentru această cameră`
+           : `${v} care circula cu o viteză peste pragul stabilit pentru această cameră`,
+     why: 'Viteza estimată a depășit pragul stabilit pentru această cameră.',
+   },
+@@ -109,7 +112,7 @@ const WORDING: Record<string, Wording> = {
+     why: 'Viteza vehiculului a scăzut mult într-un timp foarte scurt.',
+   },
+   tailgating: {
+-    what: (v, speed) => `${v} care circula prea aproape de vehiculul din față${speed ? `, la aproximativ ${speed}` : ''}`,
++    what: (v, speed) => `${v} care circula prea aproape de vehiculul din față${speed ? `, cu o viteză estimată la ${speed}` : ''}`,
+     why: 'Distanța față de vehiculul din față a rămas sub pragul de siguranță stabilit pentru această cameră.',
+   },
+   dangerous_lane_change: {
+@@ -117,7 +120,7 @@ const WORDING: Record<string, Wording> = {
+     why: 'Vehiculul s-a mutat rapid pe altă bandă în timp ce un alt vehicul se afla foarte aproape.',
+   },
+   congestion: {
+-    what: (_v, speed) => `trafic aglomerat${speed ? `, cu o viteză medie de aproximativ ${speed}` : ''}`,
++    what: (_v, speed) => `trafic aglomerat${speed ? `, cu o viteză medie estimată la ${speed}` : ''}`,
+     why: 'Multe vehicule au circulat încet pe aceeași porțiune de drum, mai mult timp decât pragul stabilit.',
+   },
+   road_conditions: {
+@@ -134,29 +137,32 @@ export function summarizeAlert(input: AlertSummaryInput, now: Date = new Date())
+   const speed = kmh(input.speedKmh)
+   const limitValue = kmh(input.limitKmh)
+   // A limit at or above the estimated speed would contradict the sentence; leave it out.
+-  const limit = speed && limitValue && (input.speedKmh ?? 0) > (input.limitKmh ?? 0) ? limitValue : null
++  const underLimit = !!(speed && limitValue && (input.speedKmh ?? 0) <= (input.limitKmh ?? 0))
++  const limit = speed && limitValue && !underLimit ? limitValue : null
+ 
+   const label = (input.typeLabel || input.type || '').replace(/_/g, ' ').trim()
+-  const subject = wording ? wording.what(vehicle, speed, limit)
++  const subject = wording ? wording.what(vehicle, speed, limit, underLimit)
+     : label ? `un eveniment de tip „${label}”` : 'un eveniment rutier'
+   const camera = input.cameraName?.trim()
+   const at = whenPhrase(input.at, now)
+   const what = `Sistemul a semnalat ${subject}${camera ? `, la camera ${camera}` : ''}${at ? `, ${at}` : ''}.`
+ 
+   const rule = input.rule?.trim()
+-  const why = wording?.why
++  const why = input.reclassifiedByHuman
++    ? `Sistemul a încadrat inițial altfel acest eveniment; un om a verificat clipul și l-a reîncadrat manual${label ? ` ca „${label.toLowerCase()}”` : ''}.`
++    : wording?.why
+     ?? (rule ? `Regula care a declanșat alerta: ${rule.replace(/\.$/, '')}.` : 'S-a îndeplinit o regulă configurată pentru această cameră.')
+ 
+   const decision = input.status === 'confirmed' ? 'Alerta a fost confirmată'
+     : input.status === 'rejected' ? 'Alerta a fost respinsă'
+       : input.status === 'closed' ? 'Dosarul alertei a fost închis' : null
+   if (!decision) {
+-    return { what, why, next: `Verifică clipul și confirmă sau respinge alerta. ${NO_AUTOMATION}; decizia este a omului.` }
++    return { what, why, next: `Verificați clipul și confirmați sau respingeți alerta. ${NO_AUTOMATION}; decizia este a omului.` }
+   }
+   const by = input.decidedBy?.trim()
+   const decidedAt = whenPhrase(input.decidedAt, now)
+   return {
+     what, why,
+-    next: `${decision}${by ? ` de ${by}` : ''}${decidedAt ? `, ${decidedAt}` : ''}. Decizia a fost luată de un om și rămâne în jurnal. ${NO_AUTOMATION}.`,
++    next: `${decision}${by ? ` de ${by}` : ''}${decidedAt ? `, ${decidedAt}` : ''}. Decizia a fost luată de un om. ${NO_AUTOMATION}.`,
+   }
+ }
+diff --git a/frontend/src/lib/demo.test.ts b/frontend/src/lib/demo.test.ts
+index 1be5886..515a13e 100644
+--- a/frontend/src/lib/demo.test.ts
++++ b/frontend/src/lib/demo.test.ts
+@@ -84,12 +84,8 @@ describe('pitch staging and rejected alerts', () => {
+     expect(demo.keepAudit({ ...decision, target: '107' })).toBe(true)
+     expect(demo.keepAudit({ ...decision, target: '99' })).toBe(false)
+   })
+-  it('gives a rejected alert its real age, not a staged one', async () => {
++  it('shows the real age of an alert, never a staged one', async () => {
+     const demo = await staged()
+-    const rejected = alert('300', 'rejected', 'congestion', '2020-01-01T10:00:00Z')
+-    const fresh = alert('301', 'new', 'congestion', '2020-01-01T10:00:00Z')
+-    demo.assignDemoTimes([fresh, rejected])
+-    expect(demo.demoAgo(fresh)).toMatch(/^acum \d+ s$/)
+-    expect(demo.demoAgo(rejected)).not.toMatch(/ s$/)
++    expect(demo.demoAgo(alert('301', 'new', 'congestion', '2020-01-01T10:00:00Z'))).not.toMatch(/ s$/)
+   })
+ })
+diff --git a/frontend/src/lib/demo.ts b/frontend/src/lib/demo.ts
+index 8d65729..85fb554 100644
+--- a/frontend/src/lib/demo.ts
++++ b/frontend/src/lib/demo.ts
+@@ -6,15 +6,20 @@ import type { Alert, AuditEntry } from '@/types'
+ // Every evidence clip is downloaded once into memory and played from a blob URL,
+ // so playback never waits on the network (the media endpoint has no Range support).
+ // Signed media URLs change on every reload, so the cache key drops the query string.
+-const CLIP_TIMEOUT_MS = 20_000
++const CLIP_IDLE_MS = 20_000
+ type Entry = { promise: Promise<string>; url?: string; progress: number; listeners: Set<(p: number) => void> }
+ const cache = new Map<string, Entry>()
+ const keyOf = (src: string) => src.split('?')[0]
+ 
+ function download(src: string, entry: Entry) {
+   return (async () => {
+-    // A stalled request must not hold a preload slot (or the player) forever.
+-    const res = await fetch(src, { credentials: 'include', signal: AbortSignal.timeout(CLIP_TIMEOUT_MS) })
++    // A stalled request must not hold a preload slot (or the player) forever, but a slow one that
++    // keeps sending must finish: the timer restarts with every chunk.
++    const stall = new AbortController()
++    let timer = setTimeout(() => stall.abort(), CLIP_IDLE_MS)
++    const alive = () => { clearTimeout(timer); timer = setTimeout(() => stall.abort(), CLIP_IDLE_MS) }
++    try {
++    const res = await fetch(src, { credentials: 'include', signal: stall.signal })
+     if (!res.ok || !res.body) throw new Error(String(res.status))
+     const total = Number(res.headers.get('content-length')) || 0
+     const reader = res.body.getReader()
+@@ -23,6 +28,7 @@ function download(src: string, entry: Entry) {
+     for (;;) {
+       const { done, value } = await reader.read()
+       if (done) break
++      alive()
+       chunks.push(value)
+       got += value.length
+       if (total) { entry.progress = got / total; entry.listeners.forEach((l) => l(entry.progress)) }
+@@ -30,6 +36,7 @@ function download(src: string, entry: Entry) {
+     entry.url = URL.createObjectURL(new Blob(chunks, { type: res.headers.get('content-type') || 'video/mp4' }))
+     entry.progress = 1
+     return entry.url
++    } finally { clearTimeout(timer) }
+   })()
+ }
+ 
+@@ -72,7 +79,8 @@ export async function preloadClips(srcs: (string | undefined)[], onEach?: (done:
+         preloadActive--
+         preloadWaiting.shift()?.()
+       }
+-      onEach?.(++done, todo.length)
++      done++
++      if (run === preloadRun) onEach?.(done, todo.length)
+     }
+   }
+   await Promise.all(Array.from({ length: PRELOAD_PARALLEL }, worker))
+@@ -109,19 +117,10 @@ export const demoSort = (a: Alert, b: Alert) =>
+   (DEMO_CURATION ? (DEMO_RANK[a.type] ?? 6) - (DEMO_RANK[b.type] ?? 6) : 0) ||
+   b.createdAt.localeCompare(a.createdAt)
+ 
+-// ---------------------------------------------------------------- "acum X" (MOCK)
+-// Relative times are faked from the queue position so the pitch shows fresh alerts:
+-// the first one a few seconds ago, then growing. Fixed at first sight, then they tick.
+-const fakeCreated = new Map<string, number>()
+-const ageFor = (i: number) => Math.round(4 + i * 23 + i * i * 6) // s: 4s, 33s, 1m14s, 2m7s, ...
+-export function assignDemoTimes(queue: Alert[]) {
+-  if (!DEMO_CURATION) return
+-  const now = Date.now()
+-  // Rejected alerts keep their real age: a fresh "acum 4 s" would present them as new.
+-  queue.filter((a) => a.status !== 'rejected').forEach((a, i) => { if (!fakeCreated.has(a.id)) fakeCreated.set(a.id, now - ageFor(i) * 1000) })
+-}
++// ---------------------------------------------------------------- "acum X"
++// The real age of the alert: a staged "acum 4 s" would present old footage as live detection.
+ export function demoAgo(alert: Alert) {
+-  const at = fakeCreated.get(alert.id) ?? new Date(alert.createdAt).getTime()
++  const at = new Date(alert.createdAt).getTime()
+   const sec = Math.max(1, Math.round((Date.now() - at) / 1000))
+   if (sec < 60) return `acum ${sec} s`
+   return formatDistanceToNowStrict(at, { locale: ro, addSuffix: true })
+diff --git a/frontend/src/pages/AlertDetailPage.tsx b/frontend/src/pages/AlertDetailPage.tsx
+index 02fefd3..4728dad 100644
+--- a/frontend/src/pages/AlertDetailPage.tsx
++++ b/frontend/src/pages/AlertDetailPage.tsx
+@@ -10,6 +10,7 @@ import { useCan } from '@/hooks'
+ import { useAuditStore } from '@/store/audit'
+ import { ALERT_TYPE, AUDIT_ACTION_LABEL } from '@/lib/constants'
+ import { summarizeAlert } from '@/lib/alertSummary'
++import { RECLASSIFY } from '@/lib/demo'
+ import { SeverityBadge } from '@/components/SeverityBadge'
+ import { StatusBadge } from '@/components/ui'
+ import { EvidencePlayer } from '@/components/EvidencePlayer'
+@@ -132,6 +133,7 @@ export default function AlertDetailPage() {
+     type: alert.type, typeLabel: ALERT_TYPE[alert.type].label, cameraName: cam?.name, at: alert.createdAt,
+     objectClass: alert.metrics.vehicleClass, speedKmh: alert.metrics.speedKmh, limitKmh: alert.metrics.speedLimitKmh,
+     rule: alert.ruleSummary, status: alert.status, decidedBy: alert.decidedBy, decidedAt: alert.decidedAt,
++    reclassifiedByHuman: alert.id in RECLASSIFY,
+   })
+   const viewers = [...new Set(alert.viewedBy)]
+ 
+@@ -180,9 +182,9 @@ export default function AlertDetailPage() {
+         {/* Human decision, context, history */}
+         <div className="col-span-12 md:col-span-4 flex flex-col gap-3 min-h-0 overflow-y-auto">
+           <section className={`${card} border-l-2 border-l-[#3DA5FF] shrink-0`} data-testid="plain-summary" aria-label="Pe scurt">
+-            <div className={cardTitle}>Pe scurt</div>
++            <h2 className={cardTitle}>Pe scurt</h2>
+             <dl className="space-y-2 text-[13px] leading-snug">
+-              {([['Ce s-a întâmplat', summary.what], ['De ce a sunat alarma', summary.why], ['Ce poate face dispecerul', summary.next]] as const).map(([label, text]) => (
++              {([['Ce s-a întâmplat', summary.what], ['De ce a apărut alerta', summary.why], ['Ce poate face dispecerul', summary.next]] as const).map(([label, text]) => (
+                 <div key={label}>
+                   <dt className="text-[11px] font-semibold text-[#3DA5FF]">{label}</dt>
+                   <dd className="text-[#E6EDF3]">{text}</dd>
+@@ -191,7 +193,7 @@ export default function AlertDetailPage() {
+             </dl>
+             {viewers.length > 0 && (
+               <p className="mt-2.5 pt-2 border-t border-[#1E2A36] text-[11px] text-[#7D8A9B]" data-testid="evidence-viewers">
+-                Cine a văzut dovada: <span className="text-[#E6EDF3]">{viewers.join(', ')}</span>
++                Cine a văzut clipul: <span className="text-[#E6EDF3]">{viewers.join(', ')}</span>
+               </p>
+             )}
+           </section>
+@@ -287,7 +289,7 @@ export default function AlertDetailPage() {
+                   </dd>
+                   <dt className="text-[#7D8A9B]">Model</dt>
+                   <dd className="col-span-2" data-testid="model-status">
+-                    {prov.model_status === 'recorded' ? `${prov.model_id ?? ''} ${prov.model_hash ? `· ${prov.model_hash.slice(0, 12)}` : ''}` : 'Model în evaluare, neverificat pe date etichetate de om'}
++                    {prov.model_status === 'recorded' ? `${prov.model_id ?? ''} ${prov.model_hash ? `· ${prov.model_hash.slice(0, 12)}` : ''}` : 'Model neînregistrat pentru acest caz; precizia nu a fost măsurată'}
+                   </dd>
+                 </>
+               )}
+diff --git a/frontend/src/pages/DashboardPage.tsx b/frontend/src/pages/DashboardPage.tsx
+index f0c2c0a..1cc531f 100644
+--- a/frontend/src/pages/DashboardPage.tsx
++++ b/frontend/src/pages/DashboardPage.tsx
+@@ -55,7 +55,7 @@ export default function DashboardPage() {
+           <div className="font-sans text-3xl font-bold text-[#E6EDF3] leading-none mt-1">{stats.confirmed}</div>
+         </div>
+         <div className={kpi}>
+-          <div className="text-xs text-[#7D8A9B] font-medium">Decizii luate de operator</div>
++          <div className="text-xs text-[#7D8A9B] font-medium">Decizii luate de dispecer</div>
+           <div className="font-sans text-3xl font-bold text-[#E6EDF3] leading-none mt-1">{stats.confirmed + stats.rejected}</div>
+         </div>
+       </div>
+diff --git a/frontend/src/pages/LandingPage.tsx b/frontend/src/pages/LandingPage.tsx
+index 8b947a2..00475de 100644
+--- a/frontend/src/pages/LandingPage.tsx
++++ b/frontend/src/pages/LandingPage.tsx
+@@ -5,7 +5,7 @@ import { Logo } from '@/assets/brand/Logo'
+ const POINTS = [
+   {
+     title: 'Ce este',
+-    text: 'Camerele rutiere existente devin ochi care anunță dispecerul în câteva secunde atunci când pe drum apare un pericol.',
++    text: 'Programul urmărește imaginile camerelor rutiere existente și îl anunță pe dispecer când pe drum pare să apară un pericol.',
+   },
+   {
+     title: 'Cine decide',
+@@ -13,7 +13,7 @@ const POINTS = [
+   },
+   {
+     title: 'Viața privată',
+-    text: 'Fără recunoaștere facială; fețele și numerele de înmatriculare pot fi estompate, iar fiecare vizualizare rămâne în jurnal.',
++    text: 'Fără recunoaștere facială. Estomparea fețelor și a numerelor de înmatriculare există, dar nu este încă aplicată pe toate clipurile. Fiecare vizualizare rămâne în jurnal.',
+   },
+ ]
+ 
+@@ -85,7 +85,7 @@ export default function LandingPage() {
+ 
+         <footer className="shrink-0 border-t border-[#1E2A36] pt-3 text-[13px] text-[#7D8A9B]">
+           <span className="text-[#FFC23D] font-semibold">Prototip demonstrativ.</span>{' '}
+-          Filmările sunt înregistrări de arhivă și fluxuri publice; precizia nu a fost încă măsurată pe date etichetate de om.
++          Majoritatea filmărilor sunt imagini de stoc filmate în alte țări, așezate pe harta Iașului doar ca exemplu; un singur flux este real (Piața Unirii). Precizia detecției nu a fost încă măsurată.
+         </footer>
+       </div>
+     </div>

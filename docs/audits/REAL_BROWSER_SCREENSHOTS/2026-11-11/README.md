@@ -1,0 +1,48 @@
+# Fresh Chromium screenshots
+
+A-auth is the existing 5175/8003/55446 runtime. B-recorded and B-camera use separate disposable databases. QR/manual secrets, recovery codes and MFA inputs are masked before screenshots. The moving source is licensed; synthetic stimuli and local replay remain labeled.
+
+- [A-auth-live-auditor.png](A-auth-live-auditor.png) — 2026-11-10T23:48:04.138299+00:00; source `runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/live-auditor.png`
+- [A-auth-live-operator.png](A-auth-live-operator.png) — 2026-11-10T23:48:07.040065+00:00; source `runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/live-operator.png`
+- [A-auth-live-patrol.png](A-auth-live-patrol.png) — 2026-11-10T23:48:00.890570+00:00; source `runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/live-patrol.png`
+- [A-auth-live-tenant_admin.png](A-auth-live-tenant_admin.png) — 2026-11-10T23:47:57.942825+00:00; source `runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/live-tenant_admin.png`
+- [A-auth-login-auditor.png](A-auth-login-auditor.png) — 2026-11-10T23:48:03.057388+00:00; source `runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/login-auditor.png`
+- [A-auth-login-operator.png](A-auth-login-operator.png) — 2026-11-10T23:48:05.852160+00:00; source `runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/login-operator.png`
+- [A-auth-login-patrol.png](A-auth-login-patrol.png) — 2026-11-10T23:47:59.780665+00:00; source `runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/login-patrol.png`
+- [A-auth-login-tenant_admin.png](A-auth-login-tenant_admin.png) — 2026-11-10T23:47:56.771929+00:00; source `runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/login-tenant_admin.png`
+- [A-auth-logout-auditor.png](A-auth-logout-auditor.png) — 2026-11-10T23:48:05.289205+00:00; source `runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/logout-auditor.png`
+- [A-auth-logout-operator.png](A-auth-logout-operator.png) — 2026-11-10T23:48:08.595942+00:00; source `runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/logout-operator.png`
+- [A-auth-logout-patrol.png](A-auth-logout-patrol.png) — 2026-11-10T23:48:02.461437+00:00; source `runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/logout-patrol.png`
+- [A-auth-logout-tenant_admin.png](A-auth-logout-tenant_admin.png) — 2026-11-10T23:47:59.161718+00:00; source `runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/logout-tenant_admin.png`
+- [A-auth-mfa-auditor.png](A-auth-mfa-auditor.png) — 2026-11-10T23:48:03.616342+00:00; source `runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/mfa-auditor.png`
+- [A-auth-mfa-operator.png](A-auth-mfa-operator.png) — 2026-11-10T23:48:06.449112+00:00; source `runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/mfa-operator.png`
+- [A-auth-mfa-patrol.png](A-auth-mfa-patrol.png) — 2026-11-10T23:48:00.339617+00:00; source `runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/mfa-patrol.png`
+- [A-auth-mfa-tenant_admin.png](A-auth-mfa-tenant_admin.png) — 2026-11-10T23:47:57.338878+00:00; source `runtime_verification/browser-20261111T011541+0200/auth-final-code/screenshots/mfa-tenant_admin.png`
+- [B-recorded-complete-create.png](B-recorded-complete-create.png) — 2026-11-10T23:27:16.708714+00:00; source `runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/complete-create.png`
+- [B-recorded-complete-persist.png](B-recorded-complete-persist.png) — 2026-11-10T23:27:20.536716+00:00; source `runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/complete-persist.png`
+- [B-recorded-enrollment-qr-masked.png](B-recorded-enrollment-qr-masked.png) — 2026-11-10T23:26:25.921695+00:00; source `runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/enrollment-qr-masked.png`
+- [B-recorded-enrollment-recovery-masked.png](B-recorded-enrollment-recovery-masked.png) — 2026-11-10T23:26:26.440695+00:00; source `runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/enrollment-recovery-masked.png`
+- [B-recorded-export-awaiting-second-approval.png](B-recorded-export-awaiting-second-approval.png) — 2026-11-10T23:27:14.174714+00:00; source `runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/export-awaiting-second-approval.png`
+- [B-recorded-independent-approval.png](B-recorded-independent-approval.png) — 2026-11-10T23:27:15.394714+00:00; source `runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/independent-approval.png`
+- [B-recorded-moving-annotated-result.png](B-recorded-moving-annotated-result.png) — 2026-11-10T23:26:58.691709+00:00; source `runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/moving-annotated-result.png`
+- [B-recorded-moving-heatmap-counts.png](B-recorded-moving-heatmap-counts.png) — 2026-11-10T23:26:59.257709+00:00; source `runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/moving-heatmap-counts.png`
+- [B-recorded-moving-job-progress.png](B-recorded-moving-job-progress.png) — 2026-11-10T23:26:27.888696+00:00; source `runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/moving-job-progress.png`
+- [B-recorded-moving-upload.png](B-recorded-moving-upload.png) — 2026-11-10T23:26:27.345695+00:00; source `runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/moving-upload.png`
+- [B-recorded-synthetic-candidates.png](B-recorded-synthetic-candidates.png) — 2026-11-10T23:27:09.910713+00:00; source `runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/synthetic-candidates.png`
+- [B-recorded-synthetic-job-progress.png](B-recorded-synthetic-job-progress.png) — 2026-11-10T23:27:00.864710+00:00; source `runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/synthetic-job-progress.png`
+- [B-recorded-synthetic-upload.png](B-recorded-synthetic-upload.png) — 2026-11-10T23:27:00.411710+00:00; source `runtime_verification/runs/20261110T232618Z-eb8e75d7/screenshots/synthetic-upload.png`
+- [B-camera-camera-approve-1.png](B-camera-camera-approve-1.png) — 2026-11-10T23:41:43.597710+00:00; source `runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-approve-1.png`
+- [B-camera-camera-approve-2.png](B-camera-camera-approve-2.png) — 2026-11-10T23:42:07.212663+00:00; source `runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-approve-2.png`
+- [B-camera-camera-disable-0.png](B-camera-camera-disable-0.png) — 2026-11-10T23:44:31.739366+00:00; source `runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-disable-0.png`
+- [B-camera-camera-draft-1-editor.png](B-camera-camera-draft-1-editor.png) — 2026-11-10T23:41:40.070716+00:00; source `runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-draft-1-editor.png`
+- [B-camera-camera-draft-1.png](B-camera-camera-draft-1.png) — 2026-11-10T23:41:40.465716+00:00; source `runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-draft-1.png`
+- [B-camera-camera-draft-2-editor.png](B-camera-camera-draft-2-editor.png) — 2026-11-10T23:42:02.955671+00:00; source `runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-draft-2-editor.png`
+- [B-camera-camera-draft-2.png](B-camera-camera-draft-2.png) — 2026-11-10T23:42:03.804669+00:00; source `runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-draft-2.png`
+- [B-camera-camera-event-0.png](B-camera-camera-event-0.png) — 2026-11-10T23:41:59.016679+00:00; source `runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-event-0.png`
+- [B-camera-camera-health-1.png](B-camera-camera-health-1.png) — 2026-11-10T23:42:21.111635+00:00; source `runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-health-1.png`
+- [B-camera-camera-health-2.png](B-camera-camera-health-2.png) — 2026-11-10T23:42:33.365610+00:00; source `runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-health-2.png`
+- [B-camera-camera-preview-0.png](B-camera-camera-preview-0.png) — 2026-11-10T23:41:54.860816+00:00; source `runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-preview-0.png`
+- [B-camera-camera-register-0-form.png](B-camera-camera-register-0-form.png) — 2026-11-10T23:41:36.619723+00:00; source `runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-register-0-form.png`
+- [B-camera-camera-register-0.png](B-camera-camera-register-0.png) — 2026-11-10T23:41:37.307722+00:00; source `runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-register-0.png`
+- [B-camera-camera-rollback-1.png](B-camera-camera-rollback-1.png) — 2026-11-10T23:44:21.871386+00:00; source `runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-rollback-1.png`
+- [B-camera-camera-start-0.png](B-camera-camera-start-0.png) — 2026-11-10T23:44:25.625378+00:00; source `runtime_verification/runs/20261110T234129Z-259e8c90/screenshots/camera-start-0.png`

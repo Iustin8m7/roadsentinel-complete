@@ -1,0 +1,2167 @@
+diff --git a/backend/app/api/camera_control.py b/backend/app/api/camera_control.py
+index aed55e2..5c9b3f6 100644
+--- a/backend/app/api/camera_control.py
++++ b/backend/app/api/camera_control.py
+@@ -132,6 +132,12 @@ def _audit_camera(
+ # --------------------------------------------------------------------------- reads
+ 
+ 
++@router.get("/catalog")
++def config_catalog(principal: Principal = READ) -> dict[str, Any]:
++    """Rules, zone kinds and numeric bounds the validator enforces (no tenant data)."""
++    return cc.catalog()
++
++
+ @router.get("/cameras", response_model=list[s.ControlSummary])
+ def list_cameras(principal: Principal = READ) -> list[s.ControlSummary]:
+     cameras = principal.db.scalars(select(Camera).order_by(Camera.name, Camera.slug))
+diff --git a/backend/app/services/camera_config.py b/backend/app/services/camera_config.py
+index d44af7d..8b9aaec 100644
+--- a/backend/app/services/camera_config.py
++++ b/backend/app/services/camera_config.py
+@@ -416,6 +416,74 @@ def validate(config: Any) -> list[ConfigError]:
+     return c.errors
+ 
+ 
++# Starting values the editor offers for a new camera. Conservative for a town road: a wide margin
++# over the limit before a speed alert, long dwell before "stopped", dense and slow before
++# "congestion". They are a starting point for a human, never applied without an approved version.
++DEFAULT_THRESHOLDS: dict[str, float] = {
++    "speed_limit_kmh": 50,
++    "very_high_speed_kmh": 80,
++    "stopped_speed_kmh": 3,
++    "stopped_seconds": 60,
++    "hard_brake_mps2": 5,
++    "headway_seconds": 1,
++    "headway_min_speed_kmh": 30,
++    "lane_change_m": 3,
++    "lane_change_window_s": 1.5,
++    "wrong_way_min_px": 150,
++    "congestion_vehicles": 12,
++    "congestion_avg_speed_kmh": 5,
++    "congestion_seconds": 30,
++}
++DEFAULT_ACQUISITION: dict[str, float] = {
++    "target_fps": 10,
++    "reconnect_backoff_s": 2,
++    "read_timeout_s": 10,
++    "max_reconnect_attempts": 100,
++}
++assert set(DEFAULT_THRESHOLDS) == set(REQUIRED_THRESHOLDS)
++assert set(DEFAULT_ACQUISITION) == set(ACQUISITION)
++
++
++def catalog() -> dict[str, Any]:
++    """What ``validate`` accepts, as data: the editor builds its rule list, threshold fields and
++    limits from this, so a form can never offer what the validator (and the worker) refuses."""
++
++    defaults = {**DEFAULT_THRESHOLDS, **DEFAULT_ACQUISITION}
++
++    def bounds(table: dict[str, tuple[float, float, bool]], required: bool) -> list[dict[str, Any]]:
++        return [
++            {
++                "id": key,
++                "min": lo,
++                "max": hi,
++                "integer": integer,
++                "required": required,
++                "default": defaults.get(key),
++            }
++            for key, (lo, hi, integer) in table.items()
++        ]
++
++    return {
++        "schema_version": SCHEMA_VERSION,
++        "coordinate_convention": COORDINATE_CONVENTION,
++        "zone_kinds": list(ZONE_KINDS),
++        "vehicle_classes": list(VEHICLE_CLASSES),
++        "rules": [
++            {
++                "id": rule,
++                "needs_calibration": spec.calibration,
++                "min_fps": spec.min_fps,
++                "zone_kinds": list(spec.zone_kinds),
++                "needs_direction": spec.needs_direction,
++            }
++            for rule, spec in RULES.items()
++        ],
++        "thresholds": bounds(REQUIRED_THRESHOLDS, True) + bounds(OPTIONAL_THRESHOLDS, False),
++        "acquisition": bounds(ACQUISITION, True),
++        "limits": {"zones": 32, "polygon_points": 64, "frame_min": 64, "frame_max": 8192},
++    }
++
++
+ def storable(value: Any) -> bool:
+     """False for what JSONB cannot hold: NaN, Infinity and NUL characters, at any depth."""
+     if isinstance(value, float):
+diff --git a/backend/tests/test_camera_control.py b/backend/tests/test_camera_control.py
+index eb24d14..39caecc 100644
+--- a/backend/tests/test_camera_control.py
++++ b/backend/tests/test_camera_control.py
+@@ -1194,3 +1194,50 @@ class TestSecrets:
+                 "SELECT source_url_enc, source_display FROM cameras WHERE id = %s", (cam,)
+             ).fetchone()
+         assert b"S3cr3tPass" not in bytes(row[0]) and row[1] == "rtsps://cam.example.org:8554"
++
++
++# --------------------------------------------------------------------------- editor catalogue
++
++
++def test_the_catalogue_states_exactly_what_the_validator_enforces(a1: Ctl, client: Any) -> None:
++    """The editor builds its forms from this answer, so it cannot drift from the validator."""
++    r = a1.c.get("/api/camera-control/catalog")
++    assert r.status_code == 200, r.text
++    cat = r.json()
++    assert cat["schema_version"] == cc.SCHEMA_VERSION
++    assert cat["coordinate_convention"] == "pixels_top_left"
++    assert cat["zone_kinds"] == list(cc.ZONE_KINDS)
++    assert {x["id"] for x in cat["rules"]} == set(cc.RULES)
++    wrong_way = next(x for x in cat["rules"] if x["id"] == "wrong_way")
++    assert wrong_way == {
++        "id": "wrong_way",
++        "needs_calibration": True,
++        "min_fps": 10.0,
++        "zone_kinds": ["carriageway", "emergency_lane"],
++        "needs_direction": True,
++    }
++    limit = next(x for x in cat["thresholds"] if x["id"] == "speed_limit_kmh")
++    assert limit == {
++        "id": "speed_limit_kmh",
++        "min": 5,
++        "max": 200,
++        "integer": False,
++        "required": True,
++        "default": 50,
++    }
++    # The offered starting values are themselves valid: a config built from them passes.
++    built = config()
++    built["thresholds"] = {x["id"]: x["default"] for x in cat["thresholds"] if x["required"]}
++    built["acquisition"] = {x["id"]: x["default"] for x in cat["acquisition"]}
++    assert [e.path for e in cc.validate(built) if e.path.startswith(("thresholds", "acquis"))] == []
++    assert all(x["default"] is None for x in cat["thresholds"] if not x["required"])
++    assert {x["id"] for x in cat["thresholds"] if x["required"]} == set(cc.REQUIRED_THRESHOLDS)
++    optional = {x["id"] for x in cat["thresholds"] if not x["required"]}
++    assert optional == set(cc.OPTIONAL_THRESHOLDS)
++    assert next(x for x in cat["acquisition"] if x["id"] == "target_fps")["max"] == 60
++    assert cat["limits"] == {"zones": 32, "polygon_points": 64, "frame_min": 64, "frame_max": 8192}
++    # Every rule the catalogue lists is one the validator knows: none is reported as unknown.
++    built = config()
++    built["rules"] = [x["id"] for x in cat["rules"]]
++    assert "unknown_rule" not in {e.code for e in cc.validate(built)}
++    assert client.get("/api/camera-control/catalog").status_code == 401
+diff --git a/docs/implementation/G-ledger.md b/docs/implementation/G-ledger.md
+new file mode 100644
+index 0000000..c88f6bc
+--- /dev/null
++++ b/docs/implementation/G-ledger.md
+@@ -0,0 +1,78 @@
++# Workstream G: recorded-video analysis (A) and camera administration (B)
++
++Feature B was merged to `main` on 2026-11-10 at the owner's instruction ("merge into main and
++deploy"), which replaced the no-push rule of the specification that started this work. Feature A is
++not started. The specification was pasted on 2026-11-10 and is cut off at test `B-T01`; a second,
++wider specification pasted the same day is cut off inside its Feature 10. Sections after those
++points are unknown.
++
++Status words: DONE (evidence named), PARTIAL, MISSING, BLOCKED. Nothing is DONE without a test or a
++browser run named next to it.
++
++## Baseline (read from the code on 2026-11-10)
++
++| Topic | What exists | Where |
++|---|---|---|
++| Detector | Ultralytics YOLO11 + ByteTrack. There is no YOLOX or ONNX path in this repository; the specification's "existing YOLOX-S ONNX path" does not exist, so the existing detector is kept. | `roadsentinel/pipeline.py` |
++| Processing location | The API has no model and no ffmpeg. Detection runs on a separate machine that signs requests with a service-account key. | `roadsentinel/sink.py`, `backend/app/api/ingest.py` |
++| Events, evidence | Signed ingest of event + key frame + clip, encrypted per tenant, signed media links. | `backend/app/services/evidence.py` |
++| Casework | Notes, bookmarks, decision, follow-ups, legal hold, export with second-admin approval, offline package verification. | `backend/app/api/investigation.py`, `casework.py`, `services/exports.py` |
++| Camera control plane | Source registration, grants, immutable config versions, server validation (bounds, area, self-intersection, rule requirements), fingerprint, diff, four-eyes approval (database CHECK), activate, rollback, worker lease / ack / heartbeat, derived runtime state. | `backend/app/services/camera_control.py`, `camera_config.py` |
++| Camera UI | Status, worker metrics, grants (read only), version list with validate / submit / approve / reject / activate / rollback, diff. A draft is typed as raw JSON. | `frontend/src/components/CameraControlPanel.tsx` |
++| Disposable stack | Fresh database, two administrators, API, built UI, API harness and headless browser check. | `scripts/e2e/run_camera_control_e2e.sh` |
++
++## Feature A: recorded video to casework
++
++| Requirement | Current | Status | Work |
++|---|---|---|---|
++| Browser upload of a recording, validated | nothing | MISSING | upload sessions (chunked, digest, quota), MP4 probe with `services/mp4.py`, encrypted storage |
++| Durable analysis job with real progress | nothing | MISSING | job table, state machine in the service layer, lease + fencing, worker API |
++| Real inference on the upload | pipeline only reads a local file from a camera YAML | MISSING | analysis worker on the processing machine: claim, download, run, report |
++| Annotated playback, counts, heatmap, timeline | nothing | MISSING | result artifacts + summary JSON, results page |
++| Candidates, review-only by default | events go straight to the alert queue | MISSING | candidate table, explicit promotion (idempotent), provenance `RECORDED` / `SYNTHETIC TEST` |
++| Case notes, decision, approval, export | exists for events | PARTIAL | reuse after promotion; show recorded provenance in case and export |
++| Operator pages reachable from navigation | nothing | MISSING | "Analize" section |
++
++## Feature B: camera administration
++
++| Requirement | Status on 2026-11-10 | Evidence |
++|---|---|---|
++| Add a camera in the UI (starts "in configuration", never enabled) | DONE | G-B3 |
++| Register a source in the UI; a wrong scheme is refused and not stored | DONE | G-B3 |
++| Record and revoke a permission in the UI; revocation blocks an approved camera | DONE | G-B3 |
++| Visual editor: zones, travel direction, calibration quad, far limit; drag, add / remove corner, arrow keys, typed coordinates, undo / redo, a no-mouse path | DONE | G-B1, G-B3 |
++| Coordinates stored in reference-frame pixels at any display size | DONE | G-B1 (unit), G-B3 (drawn at 1440 px, dragged at 1100 px) |
++| Rule form built from the server's catalogue; a rule that lacks calibration, a zone, a direction or frame rate is disabled with the reason | DONE | G-B1, G-B2, G-B3 |
++| Thresholds with units and the server's bounds; problems listed and linked to the shape; saving blocked while any exists | DONE | G-B1, G-B3 |
++| Save draft, submit, diff, approve by a different administrator, activate, rollback | DONE (existing backend, now driven from the editor) | G-B3 |
++| Requested / applied / in effect shown apart | DONE | G-B1 (`configStage`), G-B3 |
++| Worker applies the exact revision | DONE for the config handshake (real `remote_config` client: fetch, fingerprint check, ack, heartbeat). The detector run with a remote config is covered by the existing `camera_detector_e2e.py`, not re-run here. | G-B3 |
++| Backdrop is a real frame of the camera | PARTIAL: the editor shows a frame of the camera's uploaded recording or its last alert key frame when one exists; the E2E camera has neither, so the run draws on an empty stage | manual look on the dev stack |
++| Dry run of a draft on recorded media | MISSING: depends on Feature A's job engine | |
++| Lanes, crosswalks, exclusion masks, counting lines | NOT IN SCOPE OF THE ENGINE: `roadsentinel/rules.py` knows two zone kinds (carriageway, emergency lane); the editor offers exactly what the validator and the worker accept | `camera_config.catalog()` |
++
++Known gaps found on the way, not fixed: `bg-deep-void` is used in 24 places but the theme defines
++only `--color-void`, so those backgrounds are transparent (the editor uses `bg-void`). The primary
++button style is light grey with white text and reads as disabled.
++
++## Order of work
++
++1. B: done as listed above.
++2. A: NOT STARTED. Migration 0011, upload sessions, job table and state machine, analysis worker
++   on the processing machine, results, candidates, promotion, operator pages. Nothing of Feature A
++   exists in this worktree yet.
++3. B dry run on top of the A job engine.
++
++## Test ledger
++
++| Id | What | Command | Result |
++|---|---|---|---|
++| G-B1 | Editor logic: pointer mapping, geometry checks, rule gating, defaults, undo, revision stage | `cd frontend && npm run test` | PASS, 99 tests (21 new in `lib/cameraConfig.test.ts` and `lib/cameraControl.test.ts`) |
++| G-B2 | Catalogue endpoint states what the validator enforces; its defaults are valid; 401 without a session | `pytest tests/test_camera_control.py -k catalogue` | PASS |
++| G-B3 | Browser, real API, fresh database, two administrators, worker handshake: draw, edit, gate, submit, self-approval refused, diff, approve, activate, apply, rollback; new camera from the UI; revoke | `PG_PORT=55491 scripts/e2e/run_camera_control_e2e.sh` | PASS (`E2E CAMERA CONTROL: PASS`, `E2E CONFIG EDITOR: PASS`) |
++| G-R1 | Regression: whole backend suite | `pytest` in `backend/` with `RS_TEST_ADMIN_DATABASE_URL` on a throwaway PostgreSQL 16 | PASS, 669 |
++| G-R2 | Regression: pipeline suite | `pytest tests` | PASS, 143 |
++| G-R3 | Frontend typecheck, lint, build | `npm run typecheck && npm run lint && npm run build` | PASS |
++
++Provenance of G-B3: LOCAL REPLAY reference and a permission labelled test-only; no camera or
++third-party stream is contacted; no detector inference runs in it (config handshake only).
+diff --git a/frontend/scripts/e2e-camera-control.mjs b/frontend/scripts/e2e-camera-control.mjs
+index 5da11c5..e24c8da 100644
+--- a/frontend/scripts/e2e-camera-control.mjs
++++ b/frontend/scripts/e2e-camera-control.mjs
+@@ -84,7 +84,7 @@ try {
+   const op = await openCamera(operator.page)
+   assert.equal(await op.panel.locator('[data-testid="applied-revision"]').innerText(), '1')
+   assert.ok(await op.panel.getByText('Doar citire').isVisible())
+-  for (const name of ['Dezactivează', 'Pauză', 'Activează', 'Validează', 'Ciornă nouă de configurație']) {
++  for (const name of ['Dezactivează', 'Pauză', 'Activează', 'Validează', 'Ciornă ca JSON', /Editor vizual/]) {
+     assert.equal(await op.panel.getByRole('button', { name }).count(), 0, `operator must not see "${name}"`)
+   }
+   const csrf = (await operator.context.cookies()).find((c) => c.name.endsWith('rs_csrf'))?.value ?? ''
+diff --git a/frontend/scripts/e2e-config-editor.mjs b/frontend/scripts/e2e-config-editor.mjs
+new file mode 100644
+index 0000000..ce2a089
+--- /dev/null
++++ b/frontend/scripts/e2e-config-editor.mjs
+@@ -0,0 +1,300 @@
++// Browser check for the visual camera configuration editor, against a REAL local API (no route
++// stubs) with two administrators. Run by scripts/e2e/run_config_editor_e2e.sh after the camera
++// control harness created a replay camera whose revision 1 a worker acknowledged. Headless Chromium.
++//
++// What it proves: a zone drawn with the mouse is stored in reference-frame pixels at two display
++// sizes; keyboard and numeric editing, undo and redo; rules gated by what they need; problems
++// shown before saving; submit; self-approval refused by the server; approval by a second
++// administrator; activation shown as requested until a worker applies it; rollback.
++//
++// env: E2E_BASE, E2E_PASSWORD, E2E_WORKER (shell command that runs one worker pass and prints
++//      {"applied_revision": n}; it inherits this environment), E2E_SLUG, E2E_ARTIFACTS (optional)
++import assert from 'node:assert/strict'
++import { execSync } from 'node:child_process'
++import path from 'node:path'
++import { chromium } from '@playwright/test'
++
++const base = process.env.E2E_BASE ?? 'http://localhost:5441'
++const password = process.env.E2E_PASSWORD
++const worker = process.env.E2E_WORKER
++const slug = process.env.E2E_SLUG ?? 'e2e-replay'
++const artifacts = process.env.E2E_ARTIFACTS
++assert(password && worker, 'E2E_PASSWORD and E2E_WORKER are required')
++
++const FRAME = { width: 1920, height: 1080 }
++const browser = await chromium.launch({ headless: true })
++const log = (text) => console.log(`[editor] ${text}`)
++const shot = async (page, name) => { if (artifacts) await page.screenshot({ path: path.join(artifacts, `${name}.png`) }) }
++const near = (actual, expected, what, tolerance = 2) => assert.ok(Math.abs(actual - expected) <= tolerance, `${what}: got ${actual}, expected ${expected} ±${tolerance}`)
++
++async function login(user, viewport = { width: 1440, height: 900 }) {
++  const context = await browser.newContext({ viewport })
++  const page = await context.newPage()
++  page.setDefaultTimeout(20000)
++  const errors = []
++  page.on('pageerror', (error) => errors.push(String(error)))
++  await page.goto(`${base}/login`)
++  await page.fill('#username', user)
++  await page.fill('#password', password)
++  await page.click('button[type=submit]')
++  await page.waitForURL(/\/app/)
++  return { context, page, errors }
++}
++async function openPanel(page, camera = slug, hasWorker = true) {
++  await page.goto(`${base}/app/camere`)
++  const row = page.locator(`[data-testid="control-${camera}"]`)
++  await row.waitFor()
++  await page.getByRole('button', { name: /Continuă oricum/ }).click({ timeout: 3000 }).catch(() => {})
++  await row.locator('button').click()
++  const panel = page.getByRole('dialog', { name: 'Control cameră' })
++  await panel.locator('[data-testid="applied-revision"]').filter({ hasText: hasWorker ? /^\d+$/ : /./ }).waitFor()
++  return panel
++}
++/** Client position of a reference-frame point on the editor stage as it is displayed now. */
++async function at(page, x, y) {
++  const box = await page.locator('[data-testid="editor-stage"]').boundingBox()
++  return [box.x + (x / FRAME.width) * box.width, box.y + (y / FRAME.height) * box.height]
++}
++const pointValue = async (editor, n, axis) => Number(await editor.getByLabel(`Punctul ${n}, ${axis}`, { exact: true }).inputValue())
++const text = (locator) => locator.innerText()
++
++let failures = 0
++try {
++  const admin = await login('admin')
++  let panel = await openPanel(admin.page)
++  assert.equal(await text(panel.locator('[data-testid="desired-revision"]')), '1')
++  await panel.locator('[data-testid="open-editor"]').click()
++  const editor = admin.page.locator('[data-testid="config-editor"]')
++  await editor.locator('[data-testid="editor-stage"]').waitFor()
++  assert.equal(await editor.locator('[data-testid^="zone-row-"]').count(), 2, 'the editor starts from the active version (2 zones)')
++  assert.match(await text(editor.locator('[data-testid="backdrop-note"]')), /Fără imagine de fundal|Fundal:/)
++
++  // ---- draw a zone with the mouse: stored in reference-frame pixels
++  const corners = [[200, 120], [600, 120], [600, 320], [200, 320]]
++  await editor.locator('[data-testid="draw-zone"]').click()
++  for (const [x, y] of corners) await admin.page.mouse.click(...(await at(admin.page, x, y)))
++  await editor.getByRole('button', { name: 'Închide zona' }).click()
++  assert.equal(await editor.locator('[data-testid^="zone-row-"]').count(), 3)
++  for (const [i, [x, y]] of corners.entries()) {
++    near(await pointValue(editor, i + 1, 'x'), x, `drawn point ${i + 1} x`)
++    near(await pointValue(editor, i + 1, 'y'), y, `drawn point ${i + 1} y`)
++  }
++  log('zone drawn with 4 clicks; its points are the clicked reference-frame pixels (±2)')
++
++  // ---- the same mapping at another display size: drag a corner after shrinking the window
++  await admin.page.setViewportSize({ width: 1100, height: 720 })
++  await admin.page.waitForTimeout(300)
++  const from = await at(admin.page, await pointValue(editor, 3, 'x'), await pointValue(editor, 3, 'y'))
++  const to = await at(admin.page, 900, 400)
++  await admin.page.mouse.move(...from)
++  await admin.page.mouse.down()
++  await admin.page.mouse.move((from[0] + to[0]) / 2, (from[1] + to[1]) / 2, { steps: 4 })
++  await admin.page.mouse.move(...to, { steps: 4 })
++  await admin.page.mouse.up()
++  near(await pointValue(editor, 3, 'x'), 900, 'dragged corner x at 1100 px wide', 3)
++  near(await pointValue(editor, 3, 'y'), 400, 'dragged corner y at 1100 px wide', 3)
++  await admin.page.setViewportSize({ width: 1440, height: 900 })
++  await admin.page.waitForTimeout(300)
++  near(await pointValue(editor, 3, 'x'), 900, 'corner x unchanged after resizing back', 3)
++  log('corner dragged at a smaller display size lands on the intended frame pixel; resizing does not move it')
++
++  // ---- keyboard and numeric editing, undo and redo
++  const x1 = await pointValue(editor, 1, 'x'), y1 = await pointValue(editor, 1, 'y')
++  await editor.locator('[data-testid="zone-2-vertex-0"]').focus()
++  await admin.page.keyboard.press('ArrowRight')
++  await admin.page.keyboard.press('Shift+ArrowDown')
++  assert.equal(await pointValue(editor, 1, 'x'), x1 + 1)
++  assert.equal(await pointValue(editor, 1, 'y'), y1 + 10)
++  await editor.getByRole('button', { name: 'Anulează ultima modificare' }).click()
++  await editor.getByRole('button', { name: 'Anulează ultima modificare' }).click()
++  await editor.locator('[data-testid="zone-row-2"]').click()
++  assert.equal(await pointValue(editor, 1, 'x'), x1)
++  assert.equal(await pointValue(editor, 1, 'y'), y1)
++  await editor.getByRole('button', { name: 'Refă modificarea' }).click()
++  await editor.locator('[data-testid="zone-row-2"]').click()
++  assert.equal(await pointValue(editor, 1, 'x'), x1 + 1)
++  await editor.getByLabel('Punctul 1, x', { exact: true }).fill('210')
++  assert.equal(await pointValue(editor, 1, 'x'), 210)
++  log('arrow keys move a corner by 1 px (Shift: 10 px); undo, redo and typed coordinates work')
++
++  // ---- a problem is shown on the shape and blocks saving
++  await editor.getByLabel('Punctul 2, x', { exact: true }).fill('5000')
++  const problems = editor.locator('[data-testid="editor-problems"]')
++  assert.match(await text(problems), /zones\[2\]\.polygon\[1\]/)
++  await editor.locator('[data-testid="editor-reason"]').fill('Zonă nouă pentru banda de urgență')
++  assert.ok(await editor.locator('[data-testid="editor-submit"]').isDisabled(), 'a config with problems cannot be saved')
++  await editor.getByLabel('Punctul 2, x', { exact: true }).fill('600')
++  await problems.waitFor({ state: 'detached' })
++
++  // ---- rules are gated by what they need
++  await editor.locator('[data-testid="tab-rules"]').click()
++  const lane = editor.locator('[data-testid="rule-stopped_emergency_lane"]')
++  assert.match(await text(lane.locator('[data-testid="rule-stopped_emergency_lane-blocked"]')), /lipsește zona/)
++  assert.ok(await lane.getByRole('checkbox').isDisabled(), 'a rule without its zone cannot be switched on')
++  await editor.locator('[data-testid="tab-zones"]').click()
++  await editor.locator('[data-testid="zone-row-2"]').click()
++  await editor.locator('[data-testid="zone-form"]').getByLabel('Nume').fill('Bandă de urgență')
++  await editor.locator('[data-testid="zone-form"]').getByLabel('Identificator').fill('banda_urgenta')
++  await editor.locator('[data-testid="zone-form"]').getByLabel('Tip').selectOption('emergency_lane')
++  await editor.locator('[data-testid="tab-rules"]').click()
++  assert.equal(await lane.locator('[data-testid="rule-stopped_emergency_lane-blocked"]').count(), 0)
++  await lane.getByRole('checkbox').check()
++  log('"stopped in the emergency lane" is unavailable until an emergency-lane zone exists, then can be enabled')
++
++  // ---- thresholds: bounds and consistency
++  await editor.locator('[data-testid="tab-thresholds"]').click()
++  const veryHigh = editor.locator('[data-testid="threshold-very_high_speed_kmh"]')
++  const before = await veryHigh.inputValue()
++  await veryHigh.fill('10')
++  assert.match(await text(problems), /thresholds\.very_high_speed_kmh/)
++  await veryHigh.fill(before)
++  await problems.waitFor({ state: 'detached' })
++  await editor.locator('[data-testid="threshold-stopped_seconds"]').fill('45')
++  await shot(admin.page, 'editor-before-submit')
++
++  // ---- server check, save and submit
++  await editor.locator('[data-testid="editor-check"]').click()
++  await editor.locator('[data-testid="editor-notice"]').filter({ hasText: 'Serverul acceptă configurația' }).waitFor()
++  await editor.locator('[data-testid="editor-submit"]').click()
++  await editor.waitFor({ state: 'detached' })
++  assert.match(await text(panel.locator('[data-testid="control-notice"]')), /Versiunea 2 a fost trimisă spre aprobare/)
++  const v2 = panel.locator('[data-testid="version-2"]')
++  assert.equal(await text(v2.locator('[data-testid="version-status"]')), 'Așteaptă aprobare')
++  log('server accepted the config; revision 2 saved and submitted from the editor')
++
++  // ---- four eyes: the author cannot approve
++  await panel.locator('[data-testid="control-reason"]').fill('încerc să aprob singur')
++  await v2.getByRole('button', { name: /Aprobă/ }).click()
++  await panel.locator('[data-testid="control-notice"]').filter({ hasText: /Refuzat de server/ }).waitFor()
++  assert.equal(await text(v2.locator('[data-testid="version-status"]')), 'Așteaptă aprobare', 'self-approval must not change the status')
++  const refusal = await text(panel.locator('[data-testid="control-notice"]'))
++  assert.match(refusal, /different administrator/)
++  log(`author's approval refused by the server: "${refusal.slice(0, 110)}"`)
++
++  // ---- a second administrator reviews the diff and approves
++  const second = await login('admin2@roadsentinel.local')
++  const panel2 = await openPanel(second.page)
++  const v2b = panel2.locator('[data-testid="version-2"]')
++  await v2b.getByRole('button', { name: 'Diferențe față de activă' }).click()
++  const diffText = await text(panel2.locator('[data-testid="version-diff"]'))
++  assert.match(diffText, /banda_urgenta/, 'the diff names the new zone')
++  assert.match(diffText, /stopped_seconds/, 'the diff shows the changed threshold')
++  await shot(second.page, 'reviewer-diff')
++  await panel2.locator('[data-testid="control-reason"]').fill('Am verificat zona și pragurile')
++  await v2b.getByRole('button', { name: /Aprobă/ }).click()
++  await v2b.locator('[data-testid="version-status"]').filter({ hasText: 'Aprobată' }).waitFor()
++  log('second administrator saw the diff (new zone, changed threshold) and approved revision 2')
++
++  // ---- activation is a request until a worker applies it
++  panel = await openPanel(admin.page)
++  await panel.locator('[data-testid="control-reason"]').fill('Activez configurația aprobată')
++  await panel.locator('[data-testid="version-2"]').getByRole('button', { name: 'Activează' }).click()
++  await panel.locator('[data-testid="desired-revision"]').filter({ hasText: /^2$/ }).waitFor()
++  assert.equal(await text(panel.locator('[data-testid="applied-revision"]')), '1', 'no worker has applied revision 2 yet')
++  assert.equal(await text(panel.locator('[data-testid="config-stage"]')), 'Cerută, neaplicată încă')
++  await shot(admin.page, 'activated-not-applied')
++  log('after activation the panel shows requested r2, applied r1: not yet in effect')
++
++  const applied = JSON.parse(execSync(worker, { encoding: 'utf8' }).trim().split('\n').pop()).applied_revision
++  assert.equal(applied, 2, 'the worker applied the activated revision')
++  panel = await openPanel(admin.page)
++  assert.equal(await text(panel.locator('[data-testid="applied-revision"]')), '2')
++  assert.equal(await text(panel.locator('[data-testid="config-stage"]')), 'Aplicată de worker')
++  await shot(admin.page, 'applied-by-worker')
++  log('a worker pass fetched, verified and acknowledged r2; the panel now shows it applied')
++
++  // ---- the saved geometry is exactly what was drawn (read back through the editor after reload)
++  await panel.locator('[data-testid="open-editor"]').click()
++  await editor.locator('[data-testid="zone-row-2"]').click()
++  assert.equal(await editor.locator('[data-testid="zone-form"]').getByLabel('Identificator').inputValue(), 'banda_urgenta')
++  assert.equal(await pointValue(editor, 1, 'x'), 210)
++  near(await pointValue(editor, 3, 'x'), 900, 'saved corner x', 3)
++  await editor.getByRole('button', { name: 'Închide editorul' }).click()
++
++  // ---- rollback to revision 1 is again only a request until applied
++  await panel.locator('[data-testid="control-reason"]').fill('Revin la configurația anterioară')
++  await panel.locator('[data-testid="version-1"]').getByRole('button', { name: 'Revino la această versiune' }).click()
++  await panel.locator('[data-testid="desired-revision"]').filter({ hasText: /^1$/ }).waitFor()
++  assert.equal(await text(panel.locator('[data-testid="applied-revision"]')), '2')
++  assert.equal(JSON.parse(execSync(worker, { encoding: 'utf8' }).trim().split('\n').pop()).applied_revision, 1)
++  log('rollback requested r1 while the worker still ran r2; the next worker pass applied r1')
++
++  // ---- a new camera, onboarded entirely from the UI: nothing runs until every step is done
++  await admin.page.goto(`${base}/app/camere`)
++  await admin.page.locator('[data-testid="add-camera-open"]').click()
++  await admin.page.locator('[data-testid="add-camera-name"]').fill('Cameră nouă E2E')
++  await admin.page.locator('[data-testid="add-camera-location"]').fill('Stradă de test, fără cameră reală')
++  await admin.page.locator('[data-testid="add-camera-slug"]').fill('e2e-noua')
++  await admin.page.locator('[data-testid="add-camera-save"]').click()
++  const fresh = admin.page.getByRole('dialog', { name: 'Control cameră' })
++  await fresh.locator('[data-testid="lifecycle"]').filter({ hasText: 'În configurare' }).waitFor()
++  assert.equal(await text(fresh.locator('[data-testid="source-kind"]')), 'Sursă nedeclarată')
++  assert.equal(await text(fresh.locator('[data-testid="config-stage"]')), 'Nicio configurație activată')
++  assert.ok((await text(fresh.locator('[data-testid="unmet"]'))).length > 10, 'a new camera lists what is missing')
++  await fresh.locator('[data-testid="control-reason"]').fill('Înregistrez sursa camerei noi')
++  await fresh.locator('[data-testid="open-source-form"]').click()
++  await fresh.locator('[data-testid="source-url-input"]').fill('rtsp://camera.invalid/stream') // wrong scheme for a recording
++  await fresh.locator('[data-testid="source-save"]').click()
++  await fresh.locator('[data-testid="control-notice"]').filter({ hasText: /Sursă înregistrată:/ }).waitFor()
++  assert.equal(await text(fresh.locator('[data-testid="source-kind"]')), 'Sursă nedeclarată', 'a refused source is not stored')
++  await fresh.locator('[data-testid="source-url-input"]').fill('replay://data/videos/vehicles-2.mp4')
++  await fresh.locator('[data-testid="source-save"]').click()
++  await fresh.locator('[data-testid="source-kind"]').filter({ hasText: 'Înregistrare redată (replay)' }).waitFor()
++  assert.equal(await fresh.locator('[data-testid="source-form"]').count(), 0, 'the form closes once the source is stored')
++  await fresh.locator('[data-testid="open-grant-form"]').click()
++  await fresh.locator('[data-testid="grant-party"]').fill('Fixture local de test (E2E)')
++  await fresh.locator('[data-testid="grant-reference"]').fill('E2E-TEST-ONLY: nu este o autorizare reală')
++  await fresh.locator('[data-testid="grant-purpose"]').fill('Verificare automată locală pe un clip demonstrativ licențiat')
++  await fresh.locator('[data-testid="grant-scope"]').selectOption('events_and_recordings')
++  await fresh.locator('[data-testid="grant-save"]').click()
++  await fresh.getByText('alerte și înregistrări').waitFor()
++  log('new camera added from the UI; a wrong source address was refused, a replay source and a test-only permission recorded')
++
++  await fresh.locator('[data-testid="open-editor"]').click()
++  await editor.locator('[data-testid="frame-width"]').fill('1920')
++  await editor.locator('[data-testid="frame-height"]').fill('1080')
++  await editor.locator('[data-testid="frame-start"]').click()
++  await editor.locator('[data-testid="add-rectangle"]').click()
++  assert.equal(await pointValue(editor, 1, 'x'), 720)
++  await editor.locator('[data-testid="tab-rules"]').click()
++  const speed = editor.locator('[data-testid="rule-very_high_speed"]')
++  assert.match(await text(speed.locator('[data-testid="rule-very_high_speed-blocked"]')), /necalibrat/)
++  assert.ok(await speed.getByRole('checkbox').isDisabled(), 'a speed rule cannot be enabled without calibration')
++  await editor.locator('[data-testid="rule-pedestrian_on_road"]').getByRole('checkbox').check()
++  await editor.locator('[data-testid="editor-reason"]').fill('Prima configurație a camerei noi')
++  await editor.locator('[data-testid="editor-submit"]').click()
++  await editor.waitFor({ state: 'detached' })
++  await fresh.locator('[data-testid="version-1"] [data-testid="version-status"]').filter({ hasText: 'Așteaptă aprobare' }).waitFor()
++  const review = await openPanel(second.page, 'e2e-noua', false)
++  await review.locator('[data-testid="control-reason"]').fill('Verificat: zonă simplă, fără reguli de viteză')
++  await review.locator('[data-testid="version-1"]').getByRole('button', { name: /Aprobă/ }).click()
++  await review.locator('[data-testid="version-1"] [data-testid="version-status"]').filter({ hasText: 'Aprobată' }).waitFor()
++  const mine = await openPanel(admin.page, 'e2e-noua', false)
++  await mine.locator('[data-testid="control-reason"]').fill('Activez prima configurație')
++  await mine.locator('[data-testid="version-1"]').getByRole('button', { name: 'Activează' }).click()
++  await mine.locator('[data-testid="desired-revision"]').filter({ hasText: /^1$/ }).waitFor()
++  assert.equal(await text(mine.locator('[data-testid="config-stage"]')), 'Cerută, neaplicată încă')
++  assert.match(await text(mine.locator('[data-testid="config-stage-detail"]')), /niciun worker/)
++  await shot(admin.page, 'new-camera-activated')
++  log('speed rule unavailable without calibration; first config drawn without a mouse, approved by the second administrator, activated: requested, no worker yet')
++
++  // ---- revoking the permission blocks the camera, whatever was approved
++  await mine.locator('[data-testid="control-reason"]').fill('Proprietarul a retras acordul')
++  await mine.locator('[data-testid="grant-revoke"]').click()
++  await mine.locator('[data-testid="unmet"]').filter({ hasText: /revoked/ }).waitFor()
++  assert.match(await text(mine.locator('[data-testid="runtime-state"]')), /Blocată: autorizare lipsă/)
++  log('permission revoked from the UI: the approved camera is shown blocked')
++
++  // ---- an operator cannot open the editor
++  const operator = await login('operator')
++  const opPanel = await openPanel(operator.page)
++  assert.equal(await opPanel.locator('[data-testid="open-editor"]').count(), 0)
++  assert.deepEqual([...admin.errors, ...second.errors, ...operator.errors], [], 'no page errors')
++} catch (error) {
++  failures++
++  console.error(error)
++} finally {
++  await browser.close()
++}
++console.log(failures ? 'E2E CONFIG EDITOR: FAIL' : 'E2E CONFIG EDITOR: PASS')
++process.exit(failures ? 1 : 0)
+diff --git a/frontend/src/components/CameraAuthorizationForms.tsx b/frontend/src/components/CameraAuthorizationForms.tsx
+new file mode 100644
+index 0000000..4349e39
+--- /dev/null
++++ b/frontend/src/components/CameraAuthorizationForms.tsx
+@@ -0,0 +1,164 @@
++import { useState } from 'react'
++import { Button } from '@/components/ui'
++import { createCamera, createGrant, registerSource, SOURCE_LABEL, type GrantInput, type SourceKind } from '@/lib/cameraControl'
++
++const field = 'bg-elevation border border-border rounded px-2 py-1 text-xs text-text-primary w-full'
++const KINDS = Object.keys(SOURCE_LABEL) as SourceKind[]
++const URL_HINT: Record<SourceKind, string> = {
++  recorded_replay: 'replay://cale/relativă/clip.mp4 (doar o referință: fișierul rămâne pe mașina de procesare)',
++  owned_optical_live: 'rtsp://… , https://… sau device://0',
++  authorized_network_live: 'rtsp://… sau https://…',
++}
++const BASIS_LABEL: Record<GrantInput['basis'], string> = {
++  written_agreement: 'Acord scris', licence: 'Licență', own_infrastructure: 'Infrastructură proprie', statutory_mandate: 'Mandat legal',
++}
++/** A datetime-local value in the browser's zone, as an ISO instant with offset. */
++const toIso = (local: string) => new Date(local).toISOString()
++const localNow = (addDays = 0) => {
++  const d = new Date(Date.now() + addDays * 86_400_000)
++  return new Date(d.getTime() - d.getTimezoneOffset() * 60_000).toISOString().slice(0, 16)
++}
++
++/** Register (or replace) the camera's source. The server shows back only a short display form of
++ *  the address (scheme and host; for a recording, its reference), never credentials. */
++export function SourceForm({ cameraId, revision, reason, current, run }: {
++  cameraId: string; revision: number; reason: string; current: SourceKind | null
++  run: (label: string, fn: () => Promise<unknown>) => Promise<boolean>
++}) {
++  const [kind, setKind] = useState<SourceKind>(current ?? 'recorded_replay')
++  const [url, setUrl] = useState('')
++  return (
++    <form className="flex flex-col gap-1.5 text-xs" data-testid="source-form" onSubmit={(e) => {
++      e.preventDefault()
++      void run('Sursă înregistrată', () => registerSource(cameraId, kind, url, revision, reason)).then((ok) => { if (ok) setUrl('') })
++    }}>
++      <label className="flex flex-col gap-1">Tipul sursei
++        <select className={field} value={kind} onChange={(e) => setKind(e.target.value as SourceKind)} data-testid="source-kind-input">
++          {KINDS.map((k) => <option key={k} value={k}>{SOURCE_LABEL[k]}</option>)}
++        </select>
++      </label>
++      <label className="flex flex-col gap-1">Adresa sursei
++        <input className={`${field} font-mono`} value={url} onChange={(e) => setUrl(e.target.value)} autoComplete="off" spellCheck={false} required minLength={3} maxLength={2048} data-testid="source-url-input" />
++        <span className="text-text-secondary">{URL_HINT[kind]}. După salvare se afișează doar o formă scurtă a adresei, fără utilizator, parolă sau cale.</span>
++      </label>
++      <div><Button size="sm" variant="secondary" type="submit" disabled={url.trim().length < 3 || reason.trim().length < 3} data-testid="source-save">{current ? 'Înlocuiește sursa' : 'Înregistrează sursa'}</Button></div>
++      {current && <p className="text-amber-300">O sursă nouă trebuie verificată din nou: configurația activă nu mai rulează până la o nouă aprobare.</p>}
++    </form>
++  )
++}
++
++/** Record the owner's permission to process this camera. Who granted it and on what basis are
++ *  typed by the administrator; the app stores the statement, it cannot verify it. */
++export function GrantForm({ cameraId, sourceKind, run }: {
++  cameraId: string; sourceKind: SourceKind | null; run: (label: string, fn: () => Promise<unknown>) => Promise<boolean>
++}) {
++  const [g, setG] = useState({
++    granting_party: '', basis: 'written_agreement' as GrantInput['basis'], basis_reference: '', purpose: '',
++    valid_from: localNow(), valid_until: localNow(30), capture_method: sourceKind ?? ('recorded_replay' as SourceKind),
++    max_analysis_fps: 30, max_frame_height: 1080, retention_days: 30, export_allowed: false, media_scope: 'events_only' as GrantInput['media_scope'],
++  })
++  const set = <K extends keyof typeof g>(key: K, value: (typeof g)[K]) => setG((prev) => ({ ...prev, [key]: value }))
++  const ordered = g.valid_from && g.valid_until && new Date(g.valid_until) > new Date(g.valid_from)
++  const complete = g.granting_party.trim().length >= 2 && g.basis_reference.trim().length >= 2 && g.purpose.trim().length >= 3 && ordered
++  return (
++    <form className="flex flex-col gap-1.5 text-xs" data-testid="grant-form" onSubmit={(e) => {
++      e.preventDefault()
++      void run('Autorizare înregistrată', () => createGrant(cameraId, { ...g, valid_from: toIso(g.valid_from), valid_until: toIso(g.valid_until) }))
++    }}>
++      <label className="flex flex-col gap-1">Cine a dat acordul (proprietarul camerei sau al fluxului)
++        <input className={field} value={g.granting_party} onChange={(e) => set('granting_party', e.target.value)} maxLength={200} data-testid="grant-party" />
++      </label>
++      <div className="grid grid-cols-2 gap-1.5">
++        <label className="flex flex-col gap-1">Temei
++          <select className={field} value={g.basis} onChange={(e) => set('basis', e.target.value as GrantInput['basis'])}>
++            {(Object.keys(BASIS_LABEL) as GrantInput['basis'][]).map((b) => <option key={b} value={b}>{BASIS_LABEL[b]}</option>)}
++          </select>
++        </label>
++        <label className="flex flex-col gap-1">Referința documentului
++          <input className={field} value={g.basis_reference} onChange={(e) => set('basis_reference', e.target.value)} maxLength={200} data-testid="grant-reference" />
++        </label>
++      </div>
++      <label className="flex flex-col gap-1">Scopul prelucrării
++        <input className={field} value={g.purpose} onChange={(e) => set('purpose', e.target.value)} maxLength={500} data-testid="grant-purpose" />
++      </label>
++      <div className="grid grid-cols-2 gap-1.5">
++        <label className="flex flex-col gap-1">Valabilă de la
++          <input className={field} type="datetime-local" value={g.valid_from} onChange={(e) => set('valid_from', e.target.value)} />
++        </label>
++        <label className="flex flex-col gap-1">până la
++          <input className={field} type="datetime-local" value={g.valid_until} onChange={(e) => set('valid_until', e.target.value)} data-testid="grant-until" />
++        </label>
++      </div>
++      {!ordered && <p className="text-amber-300" role="alert">Data de sfârșit trebuie să fie după cea de început.</p>}
++      <div className="grid grid-cols-2 gap-1.5">
++        <label className="flex flex-col gap-1">Metoda de captură acoperită
++          <select className={field} value={g.capture_method} onChange={(e) => set('capture_method', e.target.value as SourceKind)}>
++            {KINDS.map((k) => <option key={k} value={k}>{SOURCE_LABEL[k]}</option>)}
++          </select>
++        </label>
++        <label className="flex flex-col gap-1">Ce se poate păstra
++          <select className={field} value={g.media_scope} onChange={(e) => set('media_scope', e.target.value as GrantInput['media_scope'])} data-testid="grant-scope">
++            <option value="events_only">Doar clipurile alertelor</option>
++            <option value="events_and_recordings">Alerte și înregistrări</option>
++          </select>
++        </label>
++      </div>
++      <div className="grid grid-cols-3 gap-1.5">
++        <label className="flex flex-col gap-1">Cadre/s cel mult
++          <input className={field} type="number" min={0.5} max={60} step={0.5} value={g.max_analysis_fps} onChange={(e) => set('max_analysis_fps', Number(e.target.value))} />
++        </label>
++        <label className="flex flex-col gap-1">Înălțime cadru cel mult
++          <input className={field} type="number" min={64} max={8192} value={g.max_frame_height} onChange={(e) => set('max_frame_height', Number(e.target.value))} />
++        </label>
++        <label className="flex flex-col gap-1">Păstrare (zile)
++          <input className={field} type="number" min={1} max={3650} value={g.retention_days} onChange={(e) => set('retention_days', Number(e.target.value))} />
++        </label>
++      </div>
++      <label className="flex items-center gap-2"><input type="checkbox" checked={g.export_allowed} onChange={(e) => set('export_allowed', e.target.checked)} />Exportul dovezilor este permis de acord</label>
++      <div><Button size="sm" variant="secondary" type="submit" disabled={!complete} data-testid="grant-save">Înregistrează autorizarea</Button></div>
++      <p className="text-text-secondary">Aplicația păstrează declarația dumneavoastră și cine a introdus-o; nu poate verifica documentul.</p>
++    </form>
++  )
++}
++
++/** Register a camera. It starts "in configuration": nothing is processed until it has a source,
++ *  a recorded permission and a configuration approved by a second administrator. */
++export function AddCameraDialog({ onClose, onCreated }: { onClose: () => void; onCreated: (id: string) => void }) {
++  const [name, setName] = useState('')
++  const [location, setLocation] = useState('')
++  const [slug, setSlug] = useState('')
++  const [error, setError] = useState<string | null>(null)
++  const [busy, setBusy] = useState(false)
++  const slugOk = slug === '' || /^[A-Za-z0-9_-]{1,64}$/.test(slug)
++  return (
++    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
++      <form role="dialog" aria-modal="true" aria-label="Adaugă cameră" data-testid="add-camera" className="w-full max-w-md bg-void border border-border rounded-md p-4 flex flex-col gap-2 text-xs text-text-primary"
++        onClick={(e) => e.stopPropagation()} onSubmit={(e) => {
++          e.preventDefault()
++          setBusy(true); setError(null)
++          createCamera({ name: name.trim(), location: location.trim(), ...(slug ? { slug } : {}) })
++            .then((camera) => onCreated(camera.id))
++            .catch((err: Error) => setError(err.message))
++            .finally(() => setBusy(false))
++        }}>
++        <h2 className="font-heading text-lg font-bold">Adaugă cameră</h2>
++        <p className="text-text-secondary">Camera este doar înregistrată. Nu se procesează nimic până când are o sursă, o autorizare și o configurație aprobată de un al doilea administrator.</p>
++        <label className="flex flex-col gap-1">Nume
++          <input className={field} value={name} onChange={(e) => setName(e.target.value)} minLength={2} maxLength={200} required data-testid="add-camera-name" />
++        </label>
++        <label className="flex flex-col gap-1">Amplasare
++          <input className={field} value={location} onChange={(e) => setLocation(e.target.value)} minLength={2} maxLength={300} required data-testid="add-camera-location" />
++        </label>
++        <label className="flex flex-col gap-1">Identificator stabil (opțional; litere, cifre, „-” și „_”)
++          <input className={`${field} font-mono`} value={slug} onChange={(e) => setSlug(e.target.value)} maxLength={64} data-testid="add-camera-slug" />
++        </label>
++        {!slugOk && <p className="text-amber-300" role="alert">Identificatorul poate avea doar litere, cifre, „-” și „_”.</p>}
++        {error && <p className="text-rose-300" role="alert" data-testid="add-camera-error">Camera nu a fost adăugată: {error}</p>}
++        <div className="flex gap-2 pt-1">
++          <Button size="sm" variant="confirm" type="submit" disabled={busy || name.trim().length < 2 || location.trim().length < 2 || !slugOk} data-testid="add-camera-save">Adaugă</Button>
++          <Button size="sm" variant="ghost" type="button" onClick={onClose}>Renunță</Button>
++        </div>
++      </form>
++    </div>
++  )
++}
+diff --git a/frontend/src/components/CameraControlPanel.tsx b/frontend/src/components/CameraControlPanel.tsx
+index 5c2bcd1..7e13528 100644
+--- a/frontend/src/components/CameraControlPanel.tsx
++++ b/frontend/src/components/CameraControlPanel.tsx
+@@ -2,12 +2,15 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+ import { AlertTriangle, CheckCircle2, Lock, RefreshCw, ShieldCheck, X } from 'lucide-react'
+ import { ApiError } from '@/lib/api'
+ import {
+-  activate, ageLabel, ATTESTATION_LABEL, cameraAction, createDraft, diffVersion, frozenLabel, getControl, getVersion,
+-  healthHistory, listVersions, LIFECYCLE_LABEL, metric, SOURCE_LABEL, STATE_LABEL, stateTone, validateDraft, VERSION_LABEL,
++  activate, ageLabel, ATTESTATION_LABEL, cameraAction, configStage, createDraft, diffVersion, frozenLabel, getControl, getVersion,
++  healthHistory, listVersions, revokeGrant, LIFECYCLE_LABEL, metric, SOURCE_LABEL, STATE_LABEL, stateTone, validateDraft, VERSION_LABEL,
+   versionAction,
+   type CameraAction, type Change, type ConfigError, type ControlDetail, type HealthEvent, type Version, type VersionAction,
+ } from '@/lib/cameraControl'
+ import { Button } from '@/components/ui'
++import { ConfigEditor, type Backdrop } from '@/components/ConfigEditor'
++import { GrantForm, SourceForm } from '@/components/CameraAuthorizationForms'
++import type { CameraConfig } from '@/lib/cameraConfig'
+ import { useModalFocus } from '@/hooks'
+ 
+ const TONE: Record<string, string> = {
+@@ -49,7 +52,7 @@ const TEMPLATE = {
+ 
+ /** Camera control plane detail: truthful runtime state, revisions, authorization, versions.
+  *  Mutation controls are rendered only for administrators; the server enforces them anyway. */
+-export function CameraControlPanel({ cameraId, isAdmin, onClose }: { cameraId: string; isAdmin: boolean; onClose: () => void }) {
++export function CameraControlPanel({ cameraId, isAdmin, onClose, backdrop = null }: { cameraId: string; isAdmin: boolean; onClose: () => void; backdrop?: Backdrop | null }) {
+   const [detail, setDetail] = useState<ControlDetail | null>(null)
+   const [versions, setVersions] = useState<Version[]>([])
+   const [history, setHistory] = useState<HealthEvent[]>([])
+@@ -58,6 +61,8 @@ export function CameraControlPanel({ cameraId, isAdmin, onClose }: { cameraId: s
+   const [busy, setBusy] = useState(false)
+   const [reason, setReason] = useState('')
+   const [confirmDisable, setConfirmDisable] = useState(false)
++  const [editor, setEditor] = useState<{ base: CameraConfig | null } | null>(null)
++  const [form, setForm] = useState<'source' | 'grant' | null>(null)
+   const [diff, setDiff] = useState<{ revision: number; from: number | null; changes: Change[] } | null>(null)
+   const [draft, setDraft] = useState<string | null>(null)
+   const [draftErrors, setDraftErrors] = useState<ConfigError[] | null>(null)
+@@ -108,6 +113,15 @@ export function CameraControlPanel({ cameraId, isAdmin, onClose }: { cameraId: s
+   const camAct = (action: CameraAction, label: string) => run(label, () => cameraAction(cameraId, action, detail!.revision, reason))
+   const verAct = (v: Version, action: VersionAction, label: string) => run(label, () => versionAction(cameraId, v.id, action, reason))
+ 
++  /** The visual editor starts from the active version, else from the newest one, else empty. */
++  async function openEditor() {
++    try {
++      const from = detail?.active_version_id ?? versions[0]?.id
++      setEditor({ base: from ? (await getVersion(cameraId, from)).config as unknown as CameraConfig : null })
++    } catch (error) {
++      setNotice({ tone: 'bad', text: `Editor: ${(error as Error).message}` })
++    }
++  }
+   async function openDraft() {
+     try {
+       let base: unknown = TEMPLATE
+@@ -122,6 +136,7 @@ export function CameraControlPanel({ cameraId, isAdmin, onClose }: { cameraId: s
+   }
+ 
+   const rt = detail?.runtime
++  const stage = rt ? configStage(rt, detail?.worker ?? null) : { label: '', detail: '' }
+   // Same minimum as the server's reason field. Only actions that really send the reason need it.
+   const blocked = busy || reason.trim().length < 3
+   const managed = detail?.lifecycle_state !== 'legacy' && detail?.lifecycle_state !== 'discovered'
+@@ -169,6 +184,8 @@ export function CameraControlPanel({ cameraId, isAdmin, onClose }: { cameraId: s
+               <Row k="Revizie dorită" v={rt.desired_revision ?? '—'} testId="desired-revision" />
+               <Row k="Revizie aplicată de worker" v={rt.applied_revision ?? '—'} testId="applied-revision" />
+               <Row k="Sincronizat" v={rt.revision_in_sync ? 'da' : 'nu'} />
++              <Row k="Starea configurației" v={stage.label} testId="config-stage" />
++              <p className="text-[11px] text-text-secondary" data-testid="config-stage-detail">{stage.detail}.</p>
+               {rt.blocked_reason && <Row k="Motiv blocare" v={rt.blocked_reason} />}
+               {detail.disabled_reason && <Row k="Motiv dezactivare" v={detail.disabled_reason} />}
+               {rt.duplicate_worker && <p className="text-xs text-amber-300 flex items-center gap-1"><AlertTriangle className="w-3.5 h-3.5" />Două workere au raportat aceeași cameră; doar deținătorul lease-ului procesează.</p>}
+@@ -216,8 +233,19 @@ export function CameraControlPanel({ cameraId, isAdmin, onClose }: { cameraId: s
+                 <div key={g.id} className="text-xs border-t border-border/60 pt-1">
+                   <span className={g.status === 'active' ? 'text-emerald-300' : 'text-rose-300'}>{g.status === 'active' ? 'Activă' : 'Revocată'}</span>
+                   {' · '}{g.granting_party} · {g.basis_reference} · {SOURCE_LABEL[g.capture_method]} · valabilă {fmt(g.valid_from)} – {fmt(g.valid_until)} · max {g.max_analysis_fps} fps / {g.max_frame_height}p
++                  {' · '}{g.media_scope === 'events_and_recordings' ? 'alerte și înregistrări' : 'doar clipurile alertelor'}
++                  {isAdmin && g.status === 'active' && <button type="button" disabled={blocked} className="ml-2 underline text-rose-300 disabled:opacity-40" data-testid="grant-revoke" onClick={() => void run('Autorizare revocată', () => revokeGrant(cameraId, g.id, reason))}>Revocă</button>}
+                 </div>
+               ))}
++              {isAdmin && managed && (
++                <div className="flex flex-wrap gap-1.5 pt-1">
++                  <Button size="sm" variant="ghost" onClick={() => setForm(form === 'source' ? null : 'source')} data-testid="open-source-form">{detail.source_kind ? 'Schimbă sursa' : 'Înregistrează sursa'}</Button>
++                  <Button size="sm" variant="ghost" onClick={() => setForm(form === 'grant' ? null : 'grant')} data-testid="open-grant-form">Înregistrează o autorizare</Button>
++                </div>
++              )}
++              {isAdmin && form === 'source' && <SourceForm cameraId={cameraId} revision={detail.revision} reason={reason} current={detail.source_kind} run={async (l, f) => { const ok = await run(l, f); if (ok) setForm(null); return ok }} />}
++              {isAdmin && form === 'source' && reason.trim().length < 3 && <p className="text-[11px] text-amber-300">Completați mai jos motivul (intră în jurnalul de audit) înainte de a salva sursa.</p>}
++              {isAdmin && form === 'grant' && <GrantForm cameraId={cameraId} sourceKind={detail.source_kind} run={async (l, f) => { const ok = await run(l, f); if (ok) setForm(null); return ok }} />}
+             </Section>
+ 
+             {isAdmin && (
+@@ -235,7 +263,8 @@ export function CameraControlPanel({ cameraId, isAdmin, onClose }: { cameraId: s
+                   {Object.entries(detail.unsupported_actions).map(([key, why]) => (
+                     <Button key={key} size="sm" variant="secondary" disabled title={why} aria-label={`Repornire indisponibilă: ${why}`}>Repornire (indisponibil)</Button>
+                   ))}
+-                  {managed && <Button size="sm" variant="secondary" disabled={busy} onClick={() => void openDraft()}>Ciornă nouă de configurație</Button>}
++                  {managed && <Button size="sm" disabled={busy} onClick={() => void openEditor()} data-testid="open-editor">Editor vizual (zone, reguli, praguri)</Button>}
++                  {managed && <Button size="sm" variant="ghost" disabled={busy} onClick={() => void openDraft()}>Ciornă ca JSON</Button>}
+                 </div>
+                 {confirmDisable && canDisable && (
+                   <div role="group" aria-label="Confirmare dezactivare" data-testid="confirm-disable" className="rounded border border-rose-500/40 bg-rose-500/10 p-2 text-xs text-rose-200 flex flex-col gap-2">
+@@ -292,7 +321,7 @@ export function CameraControlPanel({ cameraId, isAdmin, onClose }: { cameraId: s
+                 </div>
+               ))}
+               {diff && (
+-                <div className="text-[11px] font-mono bg-elevation rounded p-2">
++                <div className="text-[11px] font-mono bg-elevation rounded p-2" data-testid="version-diff">
+                   <div className="text-text-secondary mb-1">r{diff.revision} față de {diff.from ? `r${diff.from}` : 'nimic activ'}:</div>
+                   {diff.changes.length === 0 ? 'Fără diferențe.' : diff.changes.map((c) => (
+                     <div key={c.path}>{c.op === 'added' ? '+' : c.op === 'removed' ? '−' : '~'} {c.path}: {JSON.stringify(c.before)} → {JSON.stringify(c.after)}</div>
+@@ -312,6 +341,14 @@ export function CameraControlPanel({ cameraId, isAdmin, onClose }: { cameraId: s
+           </>
+         )}
+       </aside>
++      {editor && detail && (
++        <div onClick={(e) => e.stopPropagation()}>
++          <ConfigEditor cameraId={cameraId} cameraName={detail.name} base={editor.base} backdrop={backdrop}
++            workerFrame={detail.worker?.frame_width && detail.worker.frame_height ? { width: detail.worker.frame_width, height: detail.worker.frame_height } : null}
++            modelId={detail.worker?.model_id ?? 'yolo11s.pt'} onClose={() => setEditor(null)}
++            onSaved={(message) => { setEditor(null); setNotice({ tone: 'ok', text: message }); void load() }} />
++        </div>
++      )}
+     </div>
+   )
+ }
+diff --git a/frontend/src/components/ConfigEditor.tsx b/frontend/src/components/ConfigEditor.tsx
+new file mode 100644
+index 0000000..fffe8bb
+--- /dev/null
++++ b/frontend/src/components/ConfigEditor.tsx
+@@ -0,0 +1,612 @@
++import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent } from 'react'
++import { AlertTriangle, CheckCircle2, MousePointer2, Plus, Redo2, RotateCcw, Trash2, Undo2, X } from 'lucide-react'
++import { Button } from '@/components/ui'
++import { createDraft, validateDraft, versionAction, type ConfigError } from '@/lib/cameraControl'
++import {
++  ACQUISITION_INFO, centroid, clamp, clientToFrame, defaultConfig, errorTarget, GATE_TEXT, getCatalog, History, localProblems,
++  RULE_LABEL, ruleGates, THRESHOLD_INFO, unitDirection, ZONE_KIND_LABEL, zoneId,
++  type CameraConfig, type Catalog, type Frame, type Pt, type Zone,
++} from '@/lib/cameraConfig'
++
++/** The picture the shapes are drawn on. `note` says where it comes from; it is shown as it is. */
++export interface Backdrop { kind: 'video' | 'image'; src: string; note: string }
++type Selection = { type: 'zone'; index: number; vertex?: number } | { type: 'calibration'; vertex?: number } | { type: 'limit' } | null
++type Drag =
++  | { kind: 'zone-vertex'; zone: number; vertex: number } | { kind: 'zone-move'; zone: number; from: Pt; polygon: Pt[] }
++  | { kind: 'zone-direction'; zone: number } | { kind: 'cal-vertex'; vertex: number } | { kind: 'limit' }
++type Tab = 'zones' | 'calibration' | 'rules' | 'thresholds'
++const TABS: [Tab, string][] = [['zones', 'Zone'], ['calibration', 'Calibrare'], ['rules', 'Reguli'], ['thresholds', 'Praguri']]
++const ZONE_COLOR: Record<string, string> = { carriageway: '#3DA5FF', emergency_lane: '#FF5C7A' }
++const input = 'bg-elevation border border-border rounded px-1.5 py-1 text-xs text-text-primary font-mono w-full disabled:opacity-50'
++const num = (text: string) => (text.trim() === '' || Number.isNaN(Number(text)) ? null : Number(text))
++
++interface Props {
++  cameraId: string
++  cameraName: string
++  /** Config to start from (the active or the newest version); null for a camera that has none. */
++  base: CameraConfig | null
++  /** Frame size the worker reports for the source, when it has reported one. */
++  workerFrame: Frame | null
++  backdrop: Backdrop | null
++  modelId: string
++  onClose: () => void
++  onSaved: (message: string) => void
++}
++
++/** Visual editor for a camera's zones, directions, calibration, rules and thresholds. It produces a
++ *  schema v1 config and saves it as a new draft version; approval and activation stay in the panel. */
++export function ConfigEditor({ cameraId, cameraName, base, workerFrame, backdrop, modelId, onClose, onSaved }: Props) {
++  const [catalog, setCatalog] = useState<Catalog | null>(null)
++  const [loadError, setLoadError] = useState<string | null>(null)
++  const [config, setConfig] = useState<CameraConfig | null>(null)
++  const history = useRef<History<CameraConfig> | null>(null)
++  const [, bump] = useState(0) // re-render after undo / redo availability changes
++  const [selection, setSelection] = useState<Selection>(null)
++  const [drawing, setDrawing] = useState<Pt[] | null>(null)
++  const [tab, setTab] = useState<Tab>('zones')
++  const [serverErrors, setServerErrors] = useState<ConfigError[] | null>(null)
++  const [reason, setReason] = useState('')
++  const [busy, setBusy] = useState(false)
++  const [notice, setNotice] = useState<{ tone: 'ok' | 'bad'; text: string } | null>(null)
++  const [unit, setUnit] = useState(2) // reference-frame pixels per CSS pixel, for handle sizes
++  const [mediaSize, setMediaSize] = useState<Frame | null>(null)
++  const [typedFrame, setTypedFrame] = useState<Frame | null>(null)
++  const [typing, setTyping] = useState({ width: '', height: '' })
++  const svgRef = useRef<SVGSVGElement>(null)
++  const drag = useRef<Drag | null>(null)
++  const dragEnded = useRef(false) // the click that ends a drag lands on the stage and must not deselect
++
++  useEffect(() => {
++    getCatalog().then(setCatalog).catch((e: Error) => setLoadError(e.message))
++  }, [])
++  // The starting config needs the catalogue and, for a camera without one, a real frame size.
++  const startFrame = base?.reference_frame ?? workerFrame ?? mediaSize ?? typedFrame
++  useEffect(() => {
++    if (config || !catalog || !startFrame) return
++    const start = base ? structuredClone(base) : defaultConfig(startFrame, catalog, modelId)
++    history.current = new History(start)
++    setConfig(start)
++  }, [base, catalog, config, modelId, startFrame])
++
++  const frame: Frame | null = config?.reference_frame ?? null
++  useEffect(() => {
++    const svg = svgRef.current
++    if (!svg || !frame) return
++    const measure = () => { const w = svg.getBoundingClientRect().width; if (w > 0) setUnit(frame.width / w) }
++    measure()
++    const observer = new ResizeObserver(measure)
++    observer.observe(svg)
++    return () => observer.disconnect()
++  }, [frame?.width, frame?.height]) // size only: a new config object with the same frame must not re-attach the observer
++
++  const local = useMemo(() => (config && catalog ? localProblems(config, catalog) : []), [config, catalog])
++  const problems = useMemo(() => {
++    const seen = new Set(local.map((e) => `${e.path}|${e.code}`))
++    return [...local, ...(serverErrors ?? []).filter((e) => !seen.has(`${e.path}|${e.code}`))]
++  }, [local, serverErrors])
++  const gates = useMemo(() => (config && catalog ? ruleGates(config, catalog) : {}), [config, catalog])
++  const badZones = useMemo(() => new Set(problems.map((e) => errorTarget(e.path)).flatMap((t) => (t.kind === 'zone' ? [t.index] : []))), [problems])
++
++  /** One finished edit: goes on the undo stack and clears the last server verdict. */
++  function commit(next: CameraConfig) {
++    history.current?.push(next)
++    setConfig(next); setServerErrors(null); setNotice(null); bump((n) => n + 1)
++  }
++  const edit = (change: (draft: CameraConfig) => void) => { if (!config) return; const next = structuredClone(config); change(next); commit(next) }
++  function step(direction: 'undo' | 'redo') {
++    const value = direction === 'undo' ? history.current?.undo() : history.current?.redo()
++    if (value) { setConfig(value); setServerErrors(null); setSelection(null); bump((n) => n + 1) }
++  }
++  function reset() {
++    if (!catalog || !startFrame) return
++    commit(base ? structuredClone(base) : defaultConfig(startFrame, catalog, modelId))
++    setSelection(null); setDrawing(null)
++  }
++
++  // ------------------------------------------------------------------------- pointer work
++  const pointAt = (e: { clientX: number; clientY: number }): Pt | null =>
++    svgRef.current && frame ? clientToFrame(svgRef.current.getBoundingClientRect(), frame, e.clientX, e.clientY) : null
++  function startDrag(e: ReactPointerEvent, d: Drag) {
++    if (drawing) return
++    e.stopPropagation(); e.preventDefault()
++    svgRef.current?.setPointerCapture(e.pointerId)
++    drag.current = d
++  }
++  function onPointerMove(e: ReactPointerEvent) {
++    const d = drag.current, p = pointAt(e)
++    if (!d || !p || !config || !frame) return
++    const next = structuredClone(config)
++    if (d.kind === 'zone-vertex') next.zones[d.zone].polygon[d.vertex] = p
++    else if (d.kind === 'zone-move') {
++      // Keep the whole shape inside the frame: clamp the shift, never the single points.
++      const xs = d.polygon.map((q) => q[0]), ys = d.polygon.map((q) => q[1])
++      const dx = clamp(p[0] - d.from[0], -Math.min(...xs), frame.width - Math.max(...xs))
++      const dy = clamp(p[1] - d.from[1], -Math.min(...ys), frame.height - Math.max(...ys))
++      next.zones[d.zone].polygon = d.polygon.map((q) => [q[0] + dx, q[1] + dy])
++    } else if (d.kind === 'zone-direction') {
++      const c = centroid(next.zones[d.zone].polygon)
++      next.zones[d.zone].direction = unitDirection([p[0] - c[0], p[1] - c[1]]) ?? next.zones[d.zone].direction
++    } else if (d.kind === 'cal-vertex' && next.calibration) next.calibration.source[d.vertex] = p
++    else if (d.kind === 'limit') next.min_y = p[1]
++    setConfig(next) // live preview; the undo stack gets one entry when the pointer is released
++  }
++  function onPointerUp(e: ReactPointerEvent) {
++    if (!drag.current) return
++    drag.current = null
++    dragEnded.current = true
++    window.setTimeout(() => { dragEnded.current = false }, 0)
++    svgRef.current?.releasePointerCapture(e.pointerId)
++    if (config && history.current && JSON.stringify(config) !== JSON.stringify(history.current.current)) commit(config)
++  }
++  function onStageClick(e: React.MouseEvent) {
++    if (dragEnded.current) { dragEnded.current = false; return }
++    if (!drawing) { setSelection(null); return }
++    const p = pointAt(e)
++    if (p) setDrawing([...drawing, p])
++  }
++  function finishDrawing() {
++    if (!drawing || drawing.length < 3 || !config) return
++    const name = `Zonă ${config.zones.length + 1}`
++    const zone: Zone = { id: zoneId(name, config.zones.map((z) => z.id)), name, kind: 'carriageway', direction: [0, 1], polygon: drawing }
++    edit((c) => { c.zones.push(zone) })
++    setSelection({ type: 'zone', index: config.zones.length }); setDrawing(null); setTab('zones')
++  }
++  function addRectangle() {
++    if (!config || !frame) return
++    const w = Math.round(frame.width / 4), h = Math.round(frame.height / 4), x = Math.round(frame.width / 2 - w / 2), y = Math.round(frame.height / 2 - h / 2)
++    const name = `Zonă ${config.zones.length + 1}`
++    edit((c) => { c.zones.push({ id: zoneId(name, c.zones.map((z) => z.id)), name, kind: 'carriageway', direction: [0, 1], polygon: [[x, y], [x + w, y], [x + w, y + h], [x, y + h]] }) })
++    setSelection({ type: 'zone', index: config.zones.length })
++  }
++  function vertexKey(e: ReactKeyboardEvent, move: (dx: number, dy: number) => void, remove?: () => void) {
++    const stepSize = e.shiftKey ? 10 : 1
++    const delta: Record<string, Pt> = { ArrowLeft: [-stepSize, 0], ArrowRight: [stepSize, 0], ArrowUp: [0, -stepSize], ArrowDown: [0, stepSize] }
++    if (delta[e.key]) { e.preventDefault(); move(...delta[e.key]) }
++    else if ((e.key === 'Delete' || e.key === 'Backspace') && remove) { e.preventDefault(); remove() }
++  }
++  useEffect(() => {
++    const onKey = (e: KeyboardEvent) => {
++      const typing = ['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement)?.tagName)
++      if (e.key === 'Escape') { if (drawing) setDrawing(null); else onClose() }
++      else if (e.key === 'Enter' && drawing && !typing) finishDrawing()
++      else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z' && !typing) { e.preventDefault(); step(e.shiftKey ? 'redo' : 'undo') }
++    }
++    window.addEventListener('keydown', onKey)
++    return () => window.removeEventListener('keydown', onKey)
++  })
++
++  // ------------------------------------------------------------------------- saving
++  async function check() {
++    if (!config) return null
++    setBusy(true)
++    try {
++      const result = await validateDraft(cameraId, config)
++      setServerErrors(result.errors)
++      setNotice(result.errors.length ? { tone: 'bad', text: `Serverul a găsit ${result.errors.length} probleme.` } : { tone: 'ok', text: 'Serverul acceptă configurația.' })
++      return result.errors
++    } catch (error) {
++      setNotice({ tone: 'bad', text: `Verificare: ${(error as Error).message}` })
++      return null
++    } finally { setBusy(false) }
++  }
++  async function save(submit: boolean) {
++    if (!config) return
++    const errors = await check()
++    if (!errors || errors.length) return
++    setBusy(true)
++    try {
++      const draft = await createDraft(cameraId, config, reason.trim())
++      if (submit) {
++        await versionAction(cameraId, draft.id, 'validate')
++        await versionAction(cameraId, draft.id, 'submit')
++      }
++      onSaved(submit ? `Versiunea ${draft.revision} a fost trimisă spre aprobare. Un alt administrator trebuie să o aprobe.` : `Ciorna (versiunea ${draft.revision}) a fost salvată.`)
++    } catch (error) {
++      setNotice({ tone: 'bad', text: `Salvare: ${(error as Error).message}` })
++    } finally { setBusy(false) }
++  }
++  function goTo(e: ConfigError) {
++    const t = errorTarget(e.path)
++    if (t.kind === 'zone') { setTab('zones'); setSelection({ type: 'zone', index: t.index, vertex: t.vertex }) }
++    else if (t.kind === 'calibration') { setTab('calibration'); setSelection({ type: 'calibration', vertex: t.vertex }) }
++    else if (t.kind === 'limit') { setTab('calibration'); setSelection({ type: 'limit' }) }
++    else if (t.kind === 'rule') setTab('rules')
++    else setTab('thresholds')
++  }
++
++  const selectedZone = selection?.type === 'zone' ? config?.zones[selection.index] : undefined
++  const r = 7 * unit // handle radius in frame pixels
++  const aspectOff = !!(frame && mediaSize && Math.abs(mediaSize.width / mediaSize.height - frame.width / frame.height) > 0.01)
++  const hasShapes = !!config && (config.zones.length > 0 || !!config.calibration)
++  const saveBlocked = busy || !config || problems.length > 0 || reason.trim().length < 3 || !!drawing
++
++  return (
++    <div className="fixed inset-0 z-[60] bg-void flex flex-col" role="dialog" aria-modal="true" aria-label={`Editor configurație ${cameraName}`} data-testid="config-editor">
++      <header className="flex items-center justify-between gap-3 px-4 py-2 border-b border-border">
++        <div className="min-w-0">
++          <h2 className="font-heading text-lg font-bold text-text-primary truncate">Configurație: {cameraName}</h2>
++          <p className="text-[11px] text-text-secondary">
++            {frame ? `Cadru de referință ${frame.width}×${frame.height} px. Coordonatele se salvează în pixelii acestui cadru.` : 'Se încarcă…'}
++          </p>
++        </div>
++        <div className="flex items-center gap-1.5">
++          <Button size="sm" variant="ghost" disabled={!history.current?.canUndo} onClick={() => step('undo')} aria-label="Anulează ultima modificare"><Undo2 className="w-4 h-4" /></Button>
++          <Button size="sm" variant="ghost" disabled={!history.current?.canRedo} onClick={() => step('redo')} aria-label="Refă modificarea"><Redo2 className="w-4 h-4" /></Button>
++          <Button size="sm" variant="ghost" onClick={reset} aria-label="Revino la configurația de pornire"><RotateCcw className="w-4 h-4" /></Button>
++          <button type="button" onClick={onClose} className="p-1.5 rounded hover:bg-elevation" aria-label="Închide editorul"><X className="w-5 h-5" /></button>
++        </div>
++      </header>
++
++      {loadError && <div role="alert" className="m-4 rounded border border-rose-500/40 bg-rose-500/10 p-3 text-sm text-rose-300">Editorul nu a putut porni: {loadError}</div>}
++      {!loadError && !config && (
++        <div className="m-4 text-sm text-text-secondary" data-testid="editor-waiting">
++          {catalog && !startFrame ? (
++            <form className="flex flex-col gap-2 max-w-md" data-testid="frame-form" onSubmit={(e) => {
++              e.preventDefault()
++              setTypedFrame({ width: Number(typing.width), height: Number(typing.height) })
++            }}>
++              <p>Camera nu are încă nici configurație, nici un cadru real (de la un worker sau dintr-o înregistrare). Zonele se desenează în pixelii imaginii, deci introduceți rezoluția reală a camerei.</p>
++              <div className="flex items-end gap-2">
++                <label className="flex flex-col gap-1 text-xs">Lățime (px)
++                  <input className={input} type="number" min={catalog.limits.frame_min} max={catalog.limits.frame_max} required value={typing.width} onChange={(e) => setTyping({ ...typing, width: e.target.value })} data-testid="frame-width" />
++                </label>
++                <label className="flex flex-col gap-1 text-xs">Înălțime (px)
++                  <input className={input} type="number" min={catalog.limits.frame_min} max={catalog.limits.frame_max} required value={typing.height} onChange={(e) => setTyping({ ...typing, height: e.target.value })} data-testid="frame-height" />
++                </label>
++                <Button size="sm" type="submit" variant="secondary" data-testid="frame-start">Începe</Button>
++              </div>
++              <p className="text-xs text-amber-300">Dacă rezoluția nu este cea reală, worker-ul va refuza configurația (cadru diferit) și nimic nu va rula.</p>
++            </form>
++          ) : 'Se încarcă…'}
++        </div>
++      )}
++
++      {config && catalog && frame && (
++        <div className="flex-1 min-h-0 flex flex-col lg:flex-row">
++          <div className="flex-1 min-w-0 min-h-0 p-3 flex flex-col gap-2">
++            <div className="flex flex-wrap items-center gap-2 text-xs">
++              {drawing ? (
++                <>
++                  <span className="text-amber-300" role="status">Desenați zona: clic pentru fiecare colț ({drawing.length} puncte). Enter sau clic pe primul punct închide zona.</span>
++                  <Button size="sm" disabled={drawing.length < 3} onClick={finishDrawing}>Închide zona</Button>
++                  <Button size="sm" variant="ghost" onClick={() => setDrawing(null)}>Renunță</Button>
++                </>
++              ) : (
++                <>
++                  <Button size="sm" variant="secondary" onClick={() => { setDrawing([]); setSelection(null) }} data-testid="draw-zone"><MousePointer2 className="w-3.5 h-3.5" />Desenează o zonă</Button>
++                  <Button size="sm" variant="ghost" onClick={addRectangle} data-testid="add-rectangle"><Plus className="w-3.5 h-3.5" />Zonă dreptunghi (fără mouse)</Button>
++                  <span className="text-text-secondary">Trageți de colțuri; săgețile mută punctul selectat cu 1 px (Shift: 10 px).</span>
++                </>
++              )}
++            </div>
++            <div className="flex-1 min-h-0 flex items-start justify-center overflow-hidden">
++              <div className="relative bg-black border border-border rounded" style={{ aspectRatio: `${frame.width} / ${frame.height}`, width: `min(100%, calc((100vh - 190px) * ${frame.width / frame.height}))` }}>
++                {backdrop?.kind === 'video' && (
++                  <video src={`${backdrop.src}#t=3`} muted playsInline preload="metadata" className="absolute inset-0 w-full h-full object-fill"
++                    onLoadedMetadata={(e) => setMediaSize({ width: e.currentTarget.videoWidth, height: e.currentTarget.videoHeight })} />
++                )}
++                {backdrop?.kind === 'image' && (
++                  <img src={backdrop.src} alt="" className="absolute inset-0 w-full h-full object-fill"
++                    onLoad={(e) => setMediaSize({ width: e.currentTarget.naturalWidth, height: e.currentTarget.naturalHeight })} />
++                )}
++                {!backdrop && <div className="absolute inset-0 flex items-center justify-center text-xs text-text-secondary p-6 text-center">Niciun cadru real disponibil pentru această cameră. Punctele pot fi introduse numeric, dar verificați-le pe o imagine reală înainte de aprobare.</div>}
++                <svg ref={svgRef} viewBox={`0 0 ${frame.width} ${frame.height}`} preserveAspectRatio="none" data-testid="editor-stage"
++                  className={`absolute inset-0 w-full h-full touch-none ${drawing ? 'cursor-crosshair' : ''}`}
++                  onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp} onClick={onStageClick}>
++                  {config.min_y != null && (
++                    <g>
++                      <rect x={0} y={0} width={frame.width} height={config.min_y} fill="#000" opacity={0.35} pointerEvents="none" />
++                      <line x1={0} x2={frame.width} y1={config.min_y} y2={config.min_y} stroke="#FFD400" strokeWidth={2} strokeDasharray="8 6" vectorEffect="non-scaling-stroke" pointerEvents="none" />
++                      <line x1={0} x2={frame.width} y1={config.min_y} y2={config.min_y} stroke="transparent" strokeWidth={14 * unit} className="cursor-row-resize"
++                        onPointerDown={(e) => { setSelection({ type: 'limit' }); startDrag(e, { kind: 'limit' }) }} onClick={(e) => e.stopPropagation()} />
++                    </g>
++                  )}
++                  {config.zones.map((zone, i) => {
++                    const color = badZones.has(i) ? '#FF4D4D' : ZONE_COLOR[zone.kind] ?? '#3DA5FF'
++                    const selected = selection?.type === 'zone' && selection.index === i
++                    const c = centroid(zone.polygon)
++                    const tip: Pt | null = zone.direction ? [c[0] + zone.direction[0] * 70 * unit, c[1] + zone.direction[1] * 70 * unit] : null
++                    return (
++                      <g key={i} data-testid={`zone-shape-${i}`}>
++                        <polygon points={zone.polygon.map((p) => p.join(',')).join(' ')} fill={color} fillOpacity={selected ? 0.28 : 0.14} stroke={color} strokeWidth={selected ? 3 : 2}
++                          strokeDasharray={badZones.has(i) ? '6 4' : undefined} vectorEffect="non-scaling-stroke" className={drawing ? '' : 'cursor-move'}
++                          onPointerDown={(e) => { const p = pointAt(e); if (!p) return; setSelection({ type: 'zone', index: i }); setTab('zones'); startDrag(e, { kind: 'zone-move', zone: i, from: p, polygon: zone.polygon }) }}
++                          onClick={(e) => { if (!drawing) e.stopPropagation() }} />
++                        <text x={c[0]} y={c[1] - 12 * unit} fontSize={13 * unit} fill="#fff" stroke="#000" strokeWidth={3 * unit} paintOrder="stroke" textAnchor="middle" pointerEvents="none">{zone.name}</text>
++                        {tip && (
++                          <g>
++                            <line x1={c[0]} y1={c[1]} x2={tip[0]} y2={tip[1]} stroke="#fff" strokeWidth={3} vectorEffect="non-scaling-stroke" pointerEvents="none" />
++                            <circle cx={tip[0]} cy={tip[1]} r={r} fill="#fff" stroke="#000" strokeWidth={1.5} vectorEffect="non-scaling-stroke" className="cursor-grab"
++                              role="img" aria-label={`Sensul de mers al zonei ${zone.name}`}
++                              onPointerDown={(e) => { setSelection({ type: 'zone', index: i }); startDrag(e, { kind: 'zone-direction', zone: i }) }} onClick={(e) => e.stopPropagation()} />
++                          </g>
++                        )}
++                        {selected && zone.polygon.map((p, j) => {
++                          const q = zone.polygon[(j + 1) % zone.polygon.length]
++                          return (
++                            <rect key={`m${j}`} x={(p[0] + q[0]) / 2 - r * 0.6} y={(p[1] + q[1]) / 2 - r * 0.6} width={r * 1.2} height={r * 1.2} fill="#0A0E14" stroke={color} strokeWidth={1.5}
++                              vectorEffect="non-scaling-stroke" className="cursor-copy" role="button" aria-label={`Adaugă un punct după punctul ${j + 1}`}
++                              onPointerDown={(e) => e.stopPropagation()}
++                              onClick={(e) => { e.stopPropagation(); edit((d) => { d.zones[i].polygon.splice(j + 1, 0, [Math.round((p[0] + q[0]) / 2), Math.round((p[1] + q[1]) / 2)]) }); setSelection({ type: 'zone', index: i, vertex: j + 1 }) }} />
++                          )
++                        })}
++                        {selected && zone.polygon.map((p, j) => (
++                          <circle key={`v${j}`} cx={p[0]} cy={p[1]} r={selection.vertex === j ? r * 1.25 : r} fill={selection.vertex === j ? '#fff' : color} stroke="#000" strokeWidth={1.5} vectorEffect="non-scaling-stroke"
++                            className="cursor-grab outline-none" tabIndex={0} role="button" data-testid={`zone-${i}-vertex-${j}`}
++                            aria-label={`${zone.name}, punctul ${j + 1}: x ${p[0]}, y ${p[1]}. Săgețile îl mută, Delete îl șterge.`}
++                            onFocus={() => setSelection({ type: 'zone', index: i, vertex: j })}
++                            onPointerDown={(e) => { setSelection({ type: 'zone', index: i, vertex: j }); startDrag(e, { kind: 'zone-vertex', zone: i, vertex: j }) }}
++                            onClick={(e) => e.stopPropagation()}
++                            onKeyDown={(e) => vertexKey(e,
++                              (dx, dy) => edit((d) => { d.zones[i].polygon[j] = [clamp(p[0] + dx, 0, frame.width), clamp(p[1] + dy, 0, frame.height)] }),
++                              zone.polygon.length > 3 ? () => { edit((d) => { d.zones[i].polygon.splice(j, 1) }); setSelection({ type: 'zone', index: i }) } : undefined)} />
++                        ))}
++                      </g>
++                    )
++                  })}
++                  {config.calibration && (
++                    <g data-testid="calibration-shape">
++                      <polygon points={config.calibration.source.map((p) => p.join(',')).join(' ')} fill="#FFD400" fillOpacity={0.08} stroke="#FFD400" strokeWidth={2} strokeDasharray="4 4" vectorEffect="non-scaling-stroke" pointerEvents="none" />
++                      {config.calibration.source.map((p, j) => (
++                        <g key={j}>
++                          <circle cx={p[0]} cy={p[1]} r={r} fill="#FFD400" stroke="#000" strokeWidth={1.5} vectorEffect="non-scaling-stroke" className="cursor-grab outline-none" tabIndex={0} role="button"
++                            data-testid={`calibration-vertex-${j}`} aria-label={`Calibrare, punctul ${j + 1}: x ${p[0]}, y ${p[1]}. Săgețile îl mută.`}
++                            onFocus={() => { setSelection({ type: 'calibration', vertex: j }); setTab('calibration') }}
++                            onPointerDown={(e) => { setSelection({ type: 'calibration', vertex: j }); setTab('calibration'); startDrag(e, { kind: 'cal-vertex', vertex: j }) }}
++                            onClick={(e) => e.stopPropagation()}
++                            onKeyDown={(e) => vertexKey(e, (dx, dy) => edit((d) => { if (d.calibration) d.calibration.source[j] = [clamp(p[0] + dx, 0, frame.width), clamp(p[1] + dy, 0, frame.height)] }))} />
++                          <text x={p[0] + r * 1.4} y={p[1] - r * 1.1} fontSize={14 * unit} fill="#FFD400" stroke="#000" strokeWidth={3 * unit} paintOrder="stroke" pointerEvents="none">{j + 1}</text>
++                        </g>
++                      ))}
++                    </g>
++                  )}
++                  {drawing && drawing.length > 0 && (
++                    <g>
++                      <polyline points={drawing.map((p) => p.join(',')).join(' ')} fill="none" stroke="#FFD400" strokeWidth={2} vectorEffect="non-scaling-stroke" pointerEvents="none" />
++                      {drawing.map((p, j) => (
++                        <circle key={j} cx={p[0]} cy={p[1]} r={j === 0 ? r * 1.3 : r * 0.8} fill={j === 0 ? '#FFD400' : '#fff'} stroke="#000" strokeWidth={1.5} vectorEffect="non-scaling-stroke"
++                          className={j === 0 ? 'cursor-pointer' : ''} pointerEvents={j === 0 ? 'auto' : 'none'}
++                          onClick={(e) => { if (j === 0 && drawing.length >= 3) { e.stopPropagation(); finishDrawing() } }} />
++                      ))}
++                    </g>
++                  )}
++                </svg>
++              </div>
++            </div>
++            <p className="text-[11px] text-text-secondary" data-testid="backdrop-note">
++              {backdrop ? backdrop.note : 'Fără imagine de fundal.'}
++              {aspectOff && <span className="text-amber-300"> Atenție: imaginea afișată are alt raport de aspect decât cadrul de referință, deci formele pot părea deplasate.</span>}
++            </p>
++          </div>
++
++          <aside className="w-full lg:w-[400px] shrink-0 border-t lg:border-t-0 lg:border-l border-border flex flex-col min-h-0">
++            <div className="flex border-b border-border" role="tablist">
++              {TABS.map(([id, label]) => (
++                <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => setTab(id)} data-testid={`tab-${id}`}
++                  className={`flex-1 px-2 py-2 text-xs font-semibold ${tab === id ? 'text-text-primary border-b-2 border-accent' : 'text-text-secondary hover:text-text-primary'}`}>{label}</button>
++              ))}
++            </div>
++            <div className="flex-1 min-h-0 overflow-y-auto p-3 flex flex-col gap-3 text-xs text-text-primary">
++              {tab === 'zones' && (
++                <>
++                  {config.zones.length === 0 && <p className="text-text-secondary">Nicio zonă încă. Desenați zona de carosabil pe imagine: regulile se aplică doar în zone.</p>}
++                  <ul className="flex flex-col gap-1">
++                    {config.zones.map((zone, i) => (
++                      <li key={i}>
++                        <button type="button" onClick={() => setSelection({ type: 'zone', index: i })} data-testid={`zone-row-${i}`}
++                          className={`w-full flex items-center gap-2 px-2 py-1.5 rounded border text-left ${selection?.type === 'zone' && selection.index === i ? 'border-accent bg-elevation' : 'border-border'}`}>
++                          <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ background: ZONE_COLOR[zone.kind] ?? '#3DA5FF' }} />
++                          <span className="truncate flex-1">{zone.name || '(fără nume)'}</span>
++                          <span className="text-text-secondary">{ZONE_KIND_LABEL[zone.kind] ?? zone.kind} · {zone.polygon.length} puncte</span>
++                          {badZones.has(i) && <AlertTriangle className="w-3.5 h-3.5 text-rose-400" aria-label="are probleme" />}
++                        </button>
++                      </li>
++                    ))}
++                  </ul>
++                  {selectedZone && selection?.type === 'zone' && (() => {
++                    const i = selection.index
++                    return (
++                      <div className="flex flex-col gap-2 border-t border-border pt-2" data-testid="zone-form">
++                        <label className="flex flex-col gap-1">Nume
++                          <input className={input} value={selectedZone.name} onChange={(e) => edit((d) => { d.zones[i].name = e.target.value })} />
++                        </label>
++                        <label className="flex flex-col gap-1">Identificator (litere mici, cifre, „_”)
++                          <input className={input} value={selectedZone.id} onChange={(e) => edit((d) => { d.zones[i].id = e.target.value })} />
++                        </label>
++                        <label className="flex flex-col gap-1">Tip
++                          <select className={input} value={selectedZone.kind} onChange={(e) => edit((d) => { d.zones[i].kind = e.target.value })}>
++                            {catalog.zone_kinds.map((k) => <option key={k} value={k}>{ZONE_KIND_LABEL[k] ?? k}</option>)}
++                          </select>
++                        </label>
++                        <fieldset className="flex flex-col gap-1">
++                          <legend>Sens de mers (în imagine: x spre dreapta, y în jos)</legend>
++                          <div className="flex items-center gap-1.5">
++                            {([['↑', [0, -1]], ['↓', [0, 1]], ['←', [-1, 0]], ['→', [1, 0]]] as [string, Pt][]).map(([label, v]) => (
++                              <button key={label} type="button" className="px-2 py-1 rounded border border-border hover:border-accent" aria-label={`Sens ${label}`} onClick={() => edit((d) => { d.zones[i].direction = v })}>{label}</button>
++                            ))}
++                            <input className={input} aria-label="Sens, componenta x" type="number" step="0.01" value={selectedZone.direction?.[0] ?? ''} placeholder="x"
++                              onChange={(e) => { const v = num(e.target.value); if (v != null) edit((d) => { d.zones[i].direction = [v, d.zones[i].direction?.[1] ?? 0] }) }} />
++                            <input className={input} aria-label="Sens, componenta y" type="number" step="0.01" value={selectedZone.direction?.[1] ?? ''} placeholder="y"
++                              onChange={(e) => { const v = num(e.target.value); if (v != null) edit((d) => { d.zones[i].direction = [d.zones[i].direction?.[0] ?? 0, v] }) }} />
++                          </div>
++                          {selectedZone.kind !== 'carriageway' && selectedZone.direction != null && (
++                            <button type="button" className="self-start text-text-secondary underline" onClick={() => edit((d) => { d.zones[i].direction = null })}>Fără sens de mers</button>
++                          )}
++                        </fieldset>
++                        <div>
++                          <div className="mb-1">Puncte (pixeli în cadrul de referință)</div>
++                          <ol className="flex flex-col gap-1">
++                            {selectedZone.polygon.map((p, j) => (
++                              <li key={j} className={`flex items-center gap-1.5 ${selection.vertex === j ? 'text-accent' : ''}`}>
++                                <span className="w-5 text-right text-text-secondary">{j + 1}</span>
++                                <input className={input} type="number" aria-label={`Punctul ${j + 1}, x`} value={p[0]} min={0} max={frame.width}
++                                  onChange={(e) => { const v = num(e.target.value); if (v != null) edit((d) => { d.zones[i].polygon[j][0] = Math.round(v) }) }} />
++                                <input className={input} type="number" aria-label={`Punctul ${j + 1}, y`} value={p[1]} min={0} max={frame.height}
++                                  onChange={(e) => { const v = num(e.target.value); if (v != null) edit((d) => { d.zones[i].polygon[j][1] = Math.round(v) }) }} />
++                                <button type="button" disabled={selectedZone.polygon.length <= 3} className="p-1 rounded hover:bg-elevation disabled:opacity-30" aria-label={`Șterge punctul ${j + 1}`}
++                                  onClick={() => { edit((d) => { d.zones[i].polygon.splice(j, 1) }); setSelection({ type: 'zone', index: i }) }}><Trash2 className="w-3.5 h-3.5" /></button>
++                              </li>
++                            ))}
++                          </ol>
++                        </div>
++                        <Button size="sm" variant="reject" onClick={() => { edit((d) => { d.zones.splice(i, 1) }); setSelection(null) }} data-testid="delete-zone">Șterge zona</Button>
++                      </div>
++                    )
++                  })()}
++                </>
++              )}
++
++              {tab === 'calibration' && (
++                <>
++                  <label className="flex items-start gap-2">
++                    <input type="checkbox" checked={!!config.calibration} data-testid="calibration-toggle" onChange={(e) => edit((d) => {
++                      const w = frame.width, h = frame.height
++                      d.calibration = e.target.checked ? { source: [[Math.round(w * 0.35), Math.round(h * 0.45)], [Math.round(w * 0.65), Math.round(h * 0.45)], [Math.round(w * 0.8), Math.round(h * 0.85)], [Math.round(w * 0.2), Math.round(h * 0.85)]], target_width_m: 7, target_length_m: 20 } : null
++                    })} />
++                    <span>Calibrare pixel–metru. Fără ea, regulile care au nevoie de viteză sau distanță rămân oprite.</span>
++                  </label>
++                  {config.calibration && (
++                    <>
++                      <p className="text-text-secondary">Așezați cele patru puncte pe colțurile unui dreptunghi de pe asfalt pe care îl puteți măsura. De la punctul 1 la 2 este lățimea, de la 2 la 3 lungimea. Valorile de mai jos sunt doar un punct de pornire: măsurați-le.</p>
++                      <ol className="flex flex-col gap-1">
++                        {config.calibration.source.map((p, j) => (
++                          <li key={j} className="flex items-center gap-1.5">
++                            <span className="w-5 text-right text-text-secondary">{j + 1}</span>
++                            <input className={input} type="number" aria-label={`Calibrare, punctul ${j + 1}, x`} value={p[0]} onChange={(e) => { const v = num(e.target.value); if (v != null) edit((d) => { if (d.calibration) d.calibration.source[j][0] = Math.round(v) }) }} />
++                            <input className={input} type="number" aria-label={`Calibrare, punctul ${j + 1}, y`} value={p[1]} onChange={(e) => { const v = num(e.target.value); if (v != null) edit((d) => { if (d.calibration) d.calibration.source[j][1] = Math.round(v) }) }} />
++                          </li>
++                        ))}
++                      </ol>
++                      <label className="flex flex-col gap-1">Lățime reală între punctele 1 și 2 (m)
++                        <input className={input} type="number" step="0.1" value={config.calibration.target_width_m} onChange={(e) => { const v = num(e.target.value); if (v != null) edit((d) => { if (d.calibration) d.calibration.target_width_m = v }) }} />
++                      </label>
++                      <label className="flex flex-col gap-1">Lungime reală între punctele 2 și 3 (m)
++                        <input className={input} type="number" step="0.1" value={config.calibration.target_length_m} onChange={(e) => { const v = num(e.target.value); if (v != null) edit((d) => { if (d.calibration) d.calibration.target_length_m = v }) }} />
++                      </label>
++                      <p className="text-amber-300">Vitezele rezultate sunt estimări pentru triere, nu măsurători.</p>
++                    </>
++                  )}
++                  <div className="border-t border-border pt-2 flex flex-col gap-2">
++                    <label className="flex items-start gap-2">
++                      <input type="checkbox" checked={config.min_y != null} onChange={(e) => edit((d) => { d.min_y = e.target.checked ? Math.round(frame.height / 3) : null })} />
++                      <span>Ignoră tot ce este deasupra unei linii (prea departe de cameră pentru o măsurare corectă).</span>
++                    </label>
++                    {config.min_y != null && (
++                      <label className="flex flex-col gap-1">Poziția liniei, y (px)
++                        <input className={input} type="number" min={0} max={frame.height} value={config.min_y} onChange={(e) => { const v = num(e.target.value); if (v != null) edit((d) => { d.min_y = Math.round(v) }) }} />
++                      </label>
++                    )}
++                  </div>
++                </>
++              )}
++
++              {tab === 'rules' && (
++                <ul className="flex flex-col gap-2">
++                  {catalog.rules.map((spec) => {
++                    const on = config.rules.includes(spec.id), missing = gates[spec.id] ?? []
++                    const needs = [spec.needs_calibration && 'calibrare', spec.zone_kinds.length > 0 && `zonă: ${spec.zone_kinds.map((k) => ZONE_KIND_LABEL[k] ?? k).join(' sau ')}`, spec.needs_direction && 'sens de mers', `cel puțin ${spec.min_fps} cadre/s`].filter(Boolean).join(' · ')
++                    return (
++                      <li key={spec.id} className="rounded border border-border p-2" data-testid={`rule-${spec.id}`}>
++                        <label className="flex items-start gap-2">
++                          <input type="checkbox" checked={on} disabled={!on && missing.length > 0} aria-describedby={`rule-${spec.id}-needs`}
++                            onChange={(e) => edit((d) => { d.rules = e.target.checked ? [...d.rules, spec.id] : d.rules.filter((x) => x !== spec.id) })} />
++                          <span className="flex-1">
++                            <span className="font-semibold">{RULE_LABEL[spec.id] ?? spec.id}</span>
++                            <span id={`rule-${spec.id}-needs`} className="block text-text-secondary">Are nevoie de: {needs}</span>
++                            {missing.length > 0 && <span className="block text-amber-300" data-testid={`rule-${spec.id}-blocked`}>{on ? 'Nu poate rula' : 'Indisponibilă'}: {missing.map((m) => GATE_TEXT[m] ?? m).join('; ')}.</span>}
++                          </span>
++                        </label>
++                      </li>
++                    )
++                  })}
++                </ul>
++              )}
++
++              {tab === 'thresholds' && (
++                <>
++                  {catalog.thresholds.map((b) => {
++                    const info = THRESHOLD_INFO[b.id] ?? { label: b.id, unit: '' }, value = config.thresholds[b.id]
++                    const bad = problems.some((e) => e.path === `thresholds.${b.id}`)
++                    return (
++                      <label key={b.id} className="flex flex-col gap-1">
++                        <span className="flex items-center gap-2">
++                          {!b.required && <input type="checkbox" checked={value !== undefined} aria-label={`Folosește: ${info.label}`} onChange={(e) => edit((d) => { if (e.target.checked) d.thresholds[b.id] = b.min; else delete d.thresholds[b.id] })} />}
++                          {info.label}{info.unit && ` (${info.unit})`} <span className="text-text-secondary">{b.min}–{b.max}</span>
++                        </span>
++                        <input className={`${input} ${bad ? 'border-rose-500' : ''}`} type="number" step={b.integer ? 1 : 0.1} min={b.min} max={b.max} disabled={value === undefined} data-testid={`threshold-${b.id}`}
++                          value={typeof value === 'number' ? value : ''} onChange={(e) => { const v = num(e.target.value); if (v != null) edit((d) => { d.thresholds[b.id] = v }) }} />
++                      </label>
++                    )
++                  })}
++                  <fieldset className="flex flex-col gap-1">
++                    <legend>Clase ignorate la „accident probabil” (de exemplu autobuzele, care opresc brusc în stații)</legend>
++                    <div className="flex flex-wrap gap-3">
++                      {catalog.vehicle_classes.map((cls) => {
++                        const list = Array.isArray(config.thresholds.crash_ignore_classes) ? config.thresholds.crash_ignore_classes : []
++                        return (
++                          <label key={cls} className="flex items-center gap-1">
++                            <input type="checkbox" checked={list.includes(cls)} onChange={(e) => edit((d) => {
++                              const next = e.target.checked ? [...list, cls] : list.filter((x) => x !== cls)
++                              if (next.length) d.thresholds.crash_ignore_classes = next; else delete d.thresholds.crash_ignore_classes
++                            })} />{cls}
++                          </label>
++                        )
++                      })}
++                    </div>
++                  </fieldset>
++                  <div className="border-t border-border pt-2 flex flex-col gap-2">
++                    {catalog.acquisition.map((b) => {
++                      const info = ACQUISITION_INFO[b.id] ?? { label: b.id, unit: '' }
++                      return (
++                        <label key={b.id} className="flex flex-col gap-1">{info.label}{info.unit && ` (${info.unit})`} <span className="text-text-secondary">{b.min}–{b.max}</span>
++                          <input className={input} type="number" step={b.integer ? 1 : 0.5} min={b.min} max={b.max} value={config.acquisition[b.id] ?? ''} data-testid={`acquisition-${b.id}`}
++                            onChange={(e) => { const v = num(e.target.value); if (v != null) edit((d) => { d.acquisition[b.id] = v }) }} />
++                        </label>
++                      )
++                    })}
++                    <label className="flex flex-col gap-1">Model de detecție (referință pe mașina de procesare)
++                      <input className={input} value={config.model.id} onChange={(e) => edit((d) => { d.model = { id: e.target.value } })} />
++                    </label>
++                    <div className="flex items-end gap-1.5">
++                      <label className="flex flex-col gap-1 flex-1">Cadru de referință, lățime (px)
++                        <input className={input} type="number" disabled={hasShapes} value={frame.width} onChange={(e) => { const v = num(e.target.value); if (v != null) edit((d) => { d.reference_frame.width = Math.round(v) }) }} />
++                      </label>
++                      <label className="flex flex-col gap-1 flex-1">înălțime (px)
++                        <input className={input} type="number" disabled={hasShapes} value={frame.height} onChange={(e) => { const v = num(e.target.value); if (v != null) edit((d) => { d.reference_frame.height = Math.round(v) }) }} />
++                      </label>
++                    </div>
++                    <p className="text-text-secondary">{hasShapes ? 'Cadrul de referință nu se poate schimba cât timp există zone sau calibrare: coordonatele lor s-ar referi la altă imagine.' : 'Trebuie să fie rezoluția reală a camerei.'}</p>
++                  </div>
++                </>
++              )}
++            </div>
++
++            <div className="border-t border-border p-3 flex flex-col gap-2 text-xs">
++              {problems.length === 0
++                ? <p className="text-emerald-300 flex items-center gap-1" data-testid="editor-ok"><CheckCircle2 className="w-3.5 h-3.5" />Nicio problemă găsită{serverErrors ? ' (verificat și pe server)' : ' local; serverul verifică la salvare'}.</p>
++                : (
++                  <div data-testid="editor-problems">
++                    <p className="text-amber-300 flex items-center gap-1"><AlertTriangle className="w-3.5 h-3.5" />{problems.length} {problems.length === 1 ? 'problemă' : 'probleme'} de rezolvat înainte de salvare:</p>
++                    <ul className="max-h-28 overflow-y-auto mt-1 flex flex-col gap-0.5">
++                      {problems.map((e, i) => (
++                        <li key={i}><button type="button" className="text-left text-amber-200 hover:underline" onClick={() => goTo(e)}><span className="font-mono text-text-secondary">{e.path || 'configurație'}</span>: {e.message}</button></li>
++                      ))}
++                    </ul>
++                  </div>
++                )}
++              {notice && <p role="status" className={notice.tone === 'ok' ? 'text-emerald-300' : 'text-rose-300'} data-testid="editor-notice">{notice.text}</p>}
++              <label className="flex flex-col gap-1">Motivul modificării (intră în jurnalul de audit)
++                <input className={input} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={500} data-testid="editor-reason" />
++              </label>
++              <div className="flex flex-wrap gap-2">
++                <Button size="sm" variant="secondary" disabled={busy || !!drawing} onClick={() => void check()} data-testid="editor-check">Verifică pe server</Button>
++                <Button size="sm" variant="secondary" disabled={saveBlocked} onClick={() => void save(false)} data-testid="editor-save">Salvează ciorna</Button>
++                <Button size="sm" variant="confirm" disabled={saveBlocked} onClick={() => void save(true)} data-testid="editor-submit">Salvează și trimite spre aprobare</Button>
++              </div>
++            </div>
++          </aside>
++        </div>
++      )}
++    </div>
++  )
++}
+diff --git a/frontend/src/lib/cameraConfig.test.ts b/frontend/src/lib/cameraConfig.test.ts
+new file mode 100644
+index 0000000..05c9b06
+--- /dev/null
++++ b/frontend/src/lib/cameraConfig.test.ts
+@@ -0,0 +1,146 @@
++import { describe, expect, it } from 'vitest'
++import {
++  clientToFrame, defaultConfig, errorTarget, History, localProblems, polygonArea, ruleGates, selfIntersects,
++  unitDirection, zoneId, type CameraConfig, type Catalog, type Pt,
++} from './cameraConfig'
++
++const CATALOG: Catalog = {
++  schema_version: 1, coordinate_convention: 'pixels_top_left', zone_kinds: ['carriageway', 'emergency_lane'],
++  vehicle_classes: ['car', 'truck', 'bus', 'motorcycle'],
++  rules: [
++    { id: 'very_high_speed', needs_calibration: true, min_fps: 5, zone_kinds: [], needs_direction: false },
++    { id: 'wrong_way', needs_calibration: true, min_fps: 10, zone_kinds: ['carriageway', 'emergency_lane'], needs_direction: true },
++    { id: 'stopped_emergency_lane', needs_calibration: true, min_fps: 5, zone_kinds: ['emergency_lane'], needs_direction: false },
++    { id: 'pedestrian_on_road', needs_calibration: false, min_fps: 1, zone_kinds: ['carriageway', 'emergency_lane'], needs_direction: false },
++  ],
++  thresholds: [
++    { id: 'speed_limit_kmh', min: 5, max: 200, integer: false, required: true, default: 50 },
++    { id: 'very_high_speed_kmh', min: 5, max: 300, integer: false, required: true, default: 80 },
++    { id: 'min_track_age_s', min: 0.2, max: 10, integer: false, required: false, default: null },
++  ],
++  acquisition: [{ id: 'target_fps', min: 0.5, max: 60, integer: false, required: true, default: 10 }],
++  limits: { zones: 32, polygon_points: 64, frame_min: 64, frame_max: 8192 },
++}
++const FRAME = { width: 1920, height: 1080 }
++const square = (x: number, y: number, s: number): Pt[] => [[x, y], [x + s, y], [x + s, y + s], [x, y + s]]
++function config(patch: Partial<CameraConfig> = {}): CameraConfig {
++  return {
++    ...defaultConfig(FRAME, CATALOG, 'yolo11s.pt'),
++    zones: [{ id: 'road', name: 'Carosabil', kind: 'carriageway', direction: [0, 1], polygon: square(100, 100, 400) }],
++    calibration: { source: [[100, 100], [500, 100], [500, 500], [100, 500]], target_width_m: 7, target_length_m: 30 },
++    rules: ['very_high_speed'],
++    ...patch,
++  }
++}
++
++describe('pointer position to reference-frame pixels', () => {
++  const rect = { left: 40, top: 20, width: 960, height: 540 } // the 1920x1080 frame shown at half size
++  it('scales by the displayed size, whatever the zoom or pixel density', () => {
++    expect(clientToFrame(rect, FRAME, 40, 20)).toEqual([0, 0])
++    expect(clientToFrame(rect, FRAME, 520, 290)).toEqual([960, 540])
++    expect(clientToFrame(rect, FRAME, 1000, 560)).toEqual([1920, 1080])
++  })
++  it('clamps a pointer outside the picture to the frame edge and returns whole pixels', () => {
++    expect(clientToFrame(rect, FRAME, -500, 9000)).toEqual([0, 1080])
++    expect(clientToFrame(rect, FRAME, 40.4, 20.4)).toEqual([1, 1])
++  })
++  it('gives the same frame point for the same spot at two display sizes', () => {
++    const big = { left: 0, top: 0, width: 1920, height: 1080 }
++    expect(clientToFrame(rect, FRAME, 40 + 240, 20 + 135)).toEqual(clientToFrame(big, FRAME, 480, 270))
++  })
++})
++
++describe('geometry checks that mirror the server', () => {
++  it('measures area and finds crossing edges', () => {
++    expect(polygonArea(square(0, 0, 10))).toBe(100)
++    expect(selfIntersects(square(0, 0, 10))).toBe(false)
++    expect(selfIntersects([[0, 0], [10, 10], [10, 0], [0, 10]])).toBe(true)
++  })
++  it('accepts a valid config', () => {
++    expect(localProblems(config(), CATALOG)).toEqual([])
++  })
++  it('names the zone and the point that is wrong', () => {
++    const bad = config({ zones: [
++      { id: 'road', name: 'A', kind: 'carriageway', direction: [0, 1], polygon: [[0, 0], [10, 10], [10, 0], [0, 10]] },
++      { id: 'road', name: '', kind: 'carriageway', direction: [0, 0], polygon: [[0, 0], [5000, 0], [0, 50]] },
++      { id: 'Bad Id', name: 'C', kind: 'emergency_lane', polygon: [[0, 0], [10, 0]] },
++    ] })
++    const found = localProblems(bad, CATALOG).map((e) => `${e.path} ${e.code}`)
++    expect(found).toEqual(expect.arrayContaining([
++      'zones[0].polygon self_intersecting', 'zones[1].id duplicate_id', 'zones[1].name invalid_name',
++      'zones[1].direction invalid_direction', 'zones[1].polygon[1] outside_reference_frame',
++      'zones[2].id invalid_id', 'zones[2].polygon invalid_polygon',
++    ]))
++  })
++  it('refuses a calibration with three points on one line', () => {
++    const bad = config({ calibration: { source: [[0, 0], [10, 0], [20, 0], [0, 10]], target_width_m: 7, target_length_m: 30 } })
++    expect(localProblems(bad, CATALOG).map((e) => e.code)).toContain('degenerate_calibration')
++  })
++  it('requires a direction on a carriageway and at least one zone and one rule', () => {
++    const bad = config({ zones: [{ id: 'road', name: 'A', kind: 'carriageway', polygon: square(0, 0, 50) }] })
++    expect(localProblems(bad, CATALOG).map((e) => `${e.path} ${e.code}`)).toContain('zones[0].direction required')
++    expect(localProblems(config({ zones: [], rules: [] }), CATALOG).map((e) => e.code)).toEqual(expect.arrayContaining(['invalid_zones', 'invalid_rules']))
++  })
++  it('checks thresholds against the catalogue bounds', () => {
++    const bad = config({ thresholds: { speed_limit_kmh: 90, very_high_speed_kmh: 60 } })
++    expect(localProblems(bad, CATALOG).map((e) => `${e.path} ${e.code}`)).toContain('thresholds.very_high_speed_kmh inconsistent')
++    const low = config({ thresholds: { speed_limit_kmh: 1, very_high_speed_kmh: 80 } })
++    expect(localProblems(low, CATALOG).map((e) => `${e.path} ${e.code}`)).toContain('thresholds.speed_limit_kmh out_of_range')
++  })
++})
++
++describe('why a rule cannot be switched on', () => {
++  it('lists every missing prerequisite', () => {
++    const c = config({ calibration: null, zones: [{ id: 'road', name: 'A', kind: 'carriageway', polygon: square(0, 0, 50) }], acquisition: { target_fps: 6 } })
++    const gates = ruleGates(c, CATALOG)
++    expect(gates.very_high_speed).toEqual(['calibration_required'])
++    expect(gates.wrong_way).toEqual(['calibration_required', 'unsupported_at_fps', 'direction_required'])
++    expect(gates.stopped_emergency_lane).toEqual(['calibration_required', 'zone_required'])
++    expect(gates.pedestrian_on_road).toEqual([])
++  })
++  it('opens the rule once the prerequisites exist', () => {
++    expect(ruleGates(config({ acquisition: { target_fps: 12 } }), CATALOG).wrong_way).toEqual([])
++  })
++})
++
++describe('helpers', () => {
++  it('builds a starting config from the catalogue defaults', () => {
++    const c = defaultConfig(FRAME, CATALOG, 'yolo11s.pt')
++    expect(c.reference_frame).toEqual({ width: 1920, height: 1080, coordinate_convention: 'pixels_top_left' })
++    expect(c.thresholds).toEqual({ speed_limit_kmh: 50, very_high_speed_kmh: 80 })
++    expect(c.acquisition).toEqual({ target_fps: 10 })
++    expect(c.zones).toEqual([])
++  })
++  it('makes a valid, unused zone id from a name', () => {
++    expect(zoneId('Carosabil sens Nord', [])).toBe('carosabil_sens_nord')
++    expect(zoneId('Bandă de urgență', ['banda_de_urgenta'])).toBe('banda_de_urgenta_2')
++    expect(zoneId('###', [])).toBe('zona')
++  })
++  it('stores a direction as a unit vector with two decimals', () => {
++    expect(unitDirection([0, -37])).toEqual([0, -1])
++    expect(unitDirection([10, 10])).toEqual([0.71, 0.71])
++    expect(unitDirection([0, 0])).toBeNull()
++  })
++  it('maps a server error path to the shape or field it is about', () => {
++    expect(errorTarget('zones[2].polygon[5]')).toEqual({ kind: 'zone', index: 2, vertex: 5 })
++    expect(errorTarget('zones[0].direction')).toEqual({ kind: 'zone', index: 0 })
++    expect(errorTarget('calibration.source[1]')).toEqual({ kind: 'calibration', vertex: 1 })
++    expect(errorTarget('rules[3]')).toEqual({ kind: 'rule', index: 3 })
++    expect(errorTarget('thresholds.speed_limit_kmh')).toEqual({ kind: 'threshold', id: 'speed_limit_kmh' })
++    expect(errorTarget('acquisition.target_fps')).toEqual({ kind: 'acquisition', id: 'target_fps' })
++    expect(errorTarget('min_y')).toEqual({ kind: 'limit' })
++    expect(errorTarget('model.id')).toEqual({ kind: 'model' })
++  })
++  it('undoes and redoes edits, and drops the redo branch after a new edit', () => {
++    const h = new History<number>(1)
++    h.push(2); h.push(3)
++    expect(h.undo()).toBe(2)
++    expect(h.undo()).toBe(1)
++    expect(h.undo()).toBeNull()
++    expect(h.redo()).toBe(2)
++    h.push(9)
++    expect(h.redo()).toBeNull()
++    expect(h.current).toBe(9)
++    expect(h.canUndo && !h.canRedo).toBe(true)
++  })
++})
+diff --git a/frontend/src/lib/cameraConfig.ts b/frontend/src/lib/cameraConfig.ts
+new file mode 100644
+index 0000000..090b126
+--- /dev/null
++++ b/frontend/src/lib/cameraConfig.ts
+@@ -0,0 +1,281 @@
++// Camera configuration (schema v1) as the visual editor handles it.
++//
++// Coordinates are whole pixels of the reference frame (x right, y down, origin top-left): the same
++// domain the server validator and the worker use. The checks here mirror
++// backend/app/services/camera_config.py so a problem shows on the shape while it is drawn; the server
++// stays the authority and its answer is shown as well.
++import { api } from './api'
++import type { ConfigError } from './cameraControl'
++
++export type Pt = [number, number]
++export interface Zone { id: string; name: string; kind: string; direction?: Pt | null; polygon: Pt[] }
++export interface Calibration { source: Pt[]; target_width_m: number; target_length_m: number }
++export interface Frame { width: number; height: number }
++export interface CameraConfig {
++  schema_version: number
++  reference_frame: Frame & { coordinate_convention?: string }
++  calibration: Calibration | null
++  min_y: number | null
++  zones: Zone[]
++  rules: string[]
++  thresholds: Record<string, number | string[]>
++  acquisition: Record<string, number>
++  model: { id: string; sha256?: string }
++}
++export interface RuleSpec { id: string; needs_calibration: boolean; min_fps: number; zone_kinds: string[]; needs_direction: boolean }
++export interface Bound { id: string; min: number; max: number; integer: boolean; required: boolean; default: number | null }
++export interface Catalog {
++  schema_version: number; coordinate_convention: string; zone_kinds: string[]; vehicle_classes: string[]
++  rules: RuleSpec[]; thresholds: Bound[]; acquisition: Bound[]
++  limits: { zones: number; polygon_points: number; frame_min: number; frame_max: number }
++}
++export const getCatalog = () => api<Catalog>('/api/camera-control/catalog')
++
++// --------------------------------------------------------------------------- pointer mapping
++
++/** Pointer position (client pixels) to a reference-frame pixel. `rect` is the on-screen box that
++ *  shows the whole frame edge to edge, so the result does not depend on zoom, CSS scaling or the
++ *  screen's pixel density. Outside the picture the point is clamped to the frame edge. */
++export function clientToFrame(rect: { left: number; top: number; width: number; height: number }, frame: Frame, clientX: number, clientY: number): Pt {
++  const x = rect.width > 0 ? ((clientX - rect.left) / rect.width) * frame.width : 0
++  const y = rect.height > 0 ? ((clientY - rect.top) / rect.height) * frame.height : 0
++  return [clamp(Math.round(x), 0, frame.width), clamp(Math.round(y), 0, frame.height)]
++}
++export const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v))
++
++// --------------------------------------------------------------------------- geometry
++
++export function polygonArea(points: Pt[]): number {
++  let sum = 0
++  for (let i = 0; i < points.length; i++) {
++    const [x1, y1] = points[i], [x2, y2] = points[(i + 1) % points.length]
++    sum += x1 * y2 - x2 * y1
++  }
++  return Math.abs(sum / 2)
++}
++const cross = (o: Pt, a: Pt, b: Pt) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
++function segmentsCross(p1: Pt, p2: Pt, q1: Pt, q2: Pt) {
++  const d1 = cross(q1, q2, p1), d2 = cross(q1, q2, p2), d3 = cross(p1, p2, q1), d4 = cross(p1, p2, q2)
++  return d1 * d2 < 0 && d3 * d4 < 0
++}
++export function selfIntersects(points: Pt[]): boolean {
++  const n = points.length
++  for (let i = 0; i < n; i++) {
++    for (let j = i + 2; j < n; j++) {
++      if (i === 0 && j === n - 1) continue // neighbours through the closing edge
++      if (segmentsCross(points[i], points[(i + 1) % n], points[j], points[(j + 1) % n])) return true
++    }
++  }
++  return false
++}
++export function centroid(points: Pt[]): Pt {
++  const n = Math.max(1, points.length)
++  return [points.reduce((s, p) => s + p[0], 0) / n, points.reduce((s, p) => s + p[1], 0) / n]
++}
++/** A direction as the unit vector the config stores (two decimals); null for no direction. */
++export function unitDirection(v: Pt): Pt | null {
++  const len = Math.hypot(v[0], v[1])
++  if (len < 1e-9) return null
++  const r = (n: number) => { const x = Math.round((n / len) * 100) / 100; return x === 0 ? 0 : x }
++  return [r(v[0]), r(v[1])]
++}
++
++// --------------------------------------------------------------------------- checks
++
++const ZONE_ID = /^[a-z0-9_]{1,40}$/
++const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v)
++const isPt = (v: unknown): v is Pt => Array.isArray(v) && v.length === 2 && isNum(v[0]) && isNum(v[1])
++
++/** Problems the editor can see without asking the server, with the server's paths and codes. */
++export function localProblems(config: CameraConfig, catalog: Catalog): ConfigError[] {
++  const out: ConfigError[] = []
++  const add = (path: string, code: string, message: string) => out.push({ path, code, message })
++  const { width, height } = config.reference_frame
++  const bound = (path: string, value: unknown, b: Bound) => {
++    if (!isNum(value) || (b.integer && !Number.isInteger(value))) { add(path, 'invalid_type', b.integer ? 'trebuie să fie un număr întreg' : 'trebuie să fie un număr'); return null }
++    if (value < b.min || value > b.max) { add(path, 'out_of_range', `trebuie să fie între ${b.min} și ${b.max}`); return null }
++    return value
++  }
++
++  const cal = config.calibration
++  if (cal) {
++    if (!(Array.isArray(cal.source) && cal.source.length === 4 && cal.source.every(isPt))) add('calibration.source', 'invalid_calibration', 'trebuie exact 4 puncte')
++    else {
++      const p = cal.source
++      const collinear = ([[0, 1, 2], [0, 1, 3], [0, 2, 3], [1, 2, 3]] as const).some(([a, b, d]) => Math.abs(cross(p[a], p[b], p[d])) < 1e-6)
++      if (collinear || selfIntersects(p)) add('calibration.source', 'degenerate_calibration', 'punctele trebuie să formeze un patrulater simplu (fără trei puncte pe aceeași linie)')
++    }
++    if (!isNum(cal.target_width_m) || cal.target_width_m < 0.5 || cal.target_width_m > 500) add('calibration.target_width_m', 'out_of_range', 'lățimea trebuie să fie între 0,5 și 500 m')
++    if (!isNum(cal.target_length_m) || cal.target_length_m < 0.5 || cal.target_length_m > 5000) add('calibration.target_length_m', 'out_of_range', 'lungimea trebuie să fie între 0,5 și 5000 m')
++  }
++  if (config.min_y != null && (!Number.isInteger(config.min_y) || config.min_y < 0 || config.min_y > height)) add('min_y', 'out_of_range', `trebuie să fie între 0 și ${height}`)
++
++  if (config.zones.length < 1 || config.zones.length > catalog.limits.zones) add('zones', 'invalid_zones', `trebuie între 1 și ${catalog.limits.zones} zone`)
++  const seen = new Set<string>()
++  config.zones.forEach((zone, i) => {
++    const zp = `zones[${i}]`
++    if (!ZONE_ID.test(zone.id)) add(`${zp}.id`, 'invalid_id', 'identificatorul poate avea doar litere mici, cifre și „_” (cel mult 40)')
++    else if (seen.has(zone.id)) add(`${zp}.id`, 'duplicate_id', `identificatorul „${zone.id}” este folosit de două ori`)
++    else seen.add(zone.id)
++    if (!(zone.name.trim().length >= 1 && zone.name.trim().length <= 80)) add(`${zp}.name`, 'invalid_name', 'numele trebuie să aibă între 1 și 80 de caractere')
++    if (!catalog.zone_kinds.includes(zone.kind)) add(`${zp}.kind`, 'unsupported_value', 'tip de zonă necunoscut')
++    if (zone.direction != null) {
++      if (!isPt(zone.direction)) add(`${zp}.direction`, 'invalid_point', 'direcția trebuie să aibă două numere')
++      else if (zone.direction[0] === 0 && zone.direction[1] === 0) add(`${zp}.direction`, 'invalid_direction', 'direcția nu poate fi [0, 0]')
++    } else if (zone.kind === 'carriageway') add(`${zp}.direction`, 'required', 'o zonă de carosabil are nevoie de sensul de mers')
++    if (zone.polygon.length < 3 || zone.polygon.length > catalog.limits.polygon_points) { add(`${zp}.polygon`, 'invalid_polygon', `zona trebuie să aibă între 3 și ${catalog.limits.polygon_points} puncte`); return }
++    let allPoints = true
++    zone.polygon.forEach((p, j) => {
++      if (!isPt(p)) { add(`${zp}.polygon[${j}]`, 'invalid_point', 'punct invalid'); allPoints = false }
++      else if (p[0] < 0 || p[0] > width || p[1] < 0 || p[1] > height) add(`${zp}.polygon[${j}]`, 'outside_reference_frame', `punctul trebuie să fie în cadrul de ${width}×${height}`)
++    })
++    if (!allPoints) return
++    if (selfIntersects(zone.polygon)) add(`${zp}.polygon`, 'self_intersecting', 'laturile zonei se intersectează')
++    else if (polygonArea(zone.polygon) < 1) add(`${zp}.polygon`, 'degenerate_polygon', 'zona nu are suprafață')
++  })
++
++  for (const b of catalog.acquisition) bound(`acquisition.${b.id}`, config.acquisition[b.id], b)
++  if (config.rules.length === 0) add('rules', 'invalid_rules', 'alegeți cel puțin o regulă')
++  const gates = ruleGates(config, catalog)
++  config.rules.forEach((rule, i) => {
++    if (!catalog.rules.some((r) => r.id === rule)) add(`rules[${i}]`, 'unknown_rule', 'regulă necunoscută')
++    else for (const code of gates[rule] ?? []) add(`rules[${i}]`, code, GATE_TEXT[code] ?? code)
++  })
++  const values: Record<string, number | null> = {}
++  for (const b of catalog.thresholds) {
++    const value = config.thresholds[b.id]
++    if (value === undefined) { if (b.required) add(`thresholds.${b.id}`, 'required', 'prag obligatoriu'); continue }
++    values[b.id] = bound(`thresholds.${b.id}`, value, b)
++  }
++  const limit = values.speed_limit_kmh, veryHigh = values.very_high_speed_kmh
++  if (limit != null && veryHigh != null && veryHigh < limit) add('thresholds.very_high_speed_kmh', 'inconsistent', 'trebuie să fie cel puțin cât limita de viteză')
++  if (!/^[A-Za-z0-9._/-]{1,120}$/.test(config.model.id) || config.model.id.startsWith('/') || config.model.id.split('/').includes('..')) add('model.id', 'invalid_id', 'referință de model invalidă')
++  return out
++}
++
++/** For every rule in the catalogue, what is missing before it can run (empty = can be enabled). */
++export function ruleGates(config: CameraConfig, catalog: Catalog): Record<string, string[]> {
++  const cal = config.calibration
++  const hasCalibration = !!cal && cal.source.length === 4 && isNum(cal.target_width_m) && isNum(cal.target_length_m)
++  const kinds = new Map<string, boolean>() // kind -> some zone of that kind has a direction
++  for (const z of config.zones) {
++    if (catalog.zone_kinds.includes(z.kind)) kinds.set(z.kind, (kinds.get(z.kind) ?? false) || (z.direction != null && !(z.direction[0] === 0 && z.direction[1] === 0)))
++  }
++  const fps = config.acquisition.target_fps
++  const out: Record<string, string[]> = {}
++  for (const spec of catalog.rules) {
++    const missing: string[] = []
++    if (spec.needs_calibration && !hasCalibration) missing.push('calibration_required')
++    if (isNum(fps) && fps < spec.min_fps) missing.push('unsupported_at_fps')
++    if (spec.zone_kinds.length && !spec.zone_kinds.some((k) => kinds.has(k))) missing.push('zone_required')
++    else if (spec.needs_direction && !spec.zone_kinds.some((k) => kinds.get(k))) missing.push('direction_required')
++    out[spec.id] = missing
++  }
++  return out
++}
++export const GATE_TEXT: Record<string, string> = {
++  calibration_required: 'necalibrat: are nevoie de calibrarea pixel–metru',
++  unsupported_at_fps: 'prea puține cadre pe secundă pentru această regulă',
++  zone_required: 'lipsește zona de care are nevoie',
++  direction_required: 'lipsește o zonă cu sens de mers',
++}
++
++// --------------------------------------------------------------------------- helpers
++
++export function defaultConfig(frame: Frame, catalog: Catalog, modelId: string): CameraConfig {
++  const defaults = (bounds: Bound[]) => Object.fromEntries(bounds.filter((b) => b.required && b.default != null).map((b) => [b.id, b.default as number]))
++  return {
++    schema_version: catalog.schema_version,
++    reference_frame: { width: frame.width, height: frame.height, coordinate_convention: catalog.coordinate_convention },
++    calibration: null, min_y: null, zones: [], rules: [],
++    thresholds: defaults(catalog.thresholds), acquisition: defaults(catalog.acquisition), model: { id: modelId },
++  }
++}
++
++/** A valid, unused zone id from a display name ("Bandă de urgență" → "banda_de_urgenta"). */
++export function zoneId(name: string, taken: string[]): string {
++  const base = name.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 36) || 'zona'
++  if (!taken.includes(base)) return base
++  for (let n = 2; ; n++) if (!taken.includes(`${base}_${n}`)) return `${base}_${n}`
++}
++
++export type ErrorTarget =
++  | { kind: 'zone'; index: number; vertex?: number } | { kind: 'calibration'; vertex?: number } | { kind: 'rule'; index: number }
++  | { kind: 'threshold'; id: string } | { kind: 'acquisition'; id: string } | { kind: 'limit' } | { kind: 'model' } | { kind: 'other' }
++/** Which shape or field a validator path ("zones[2].polygon[5]") is about. */
++export function errorTarget(path: string): ErrorTarget {
++  let m = /^zones\[(\d+)\](?:\.polygon\[(\d+)\])?/.exec(path)
++  if (m) return m[2] === undefined ? { kind: 'zone', index: +m[1] } : { kind: 'zone', index: +m[1], vertex: +m[2] }
++  m = /^calibration(?:\.source\[(\d+)\])?/.exec(path)
++  if (m) return m[1] === undefined ? { kind: 'calibration' } : { kind: 'calibration', vertex: +m[1] }
++  m = /^rules\[(\d+)\]/.exec(path)
++  if (m) return { kind: 'rule', index: +m[1] }
++  m = /^thresholds\.(\w+)/.exec(path)
++  if (m) return { kind: 'threshold', id: m[1] }
++  m = /^acquisition\.(\w+)/.exec(path)
++  if (m) return { kind: 'acquisition', id: m[1] }
++  if (path.startsWith('min_y')) return { kind: 'limit' }
++  if (path.startsWith('model')) return { kind: 'model' }
++  return { kind: 'other' }
++}
++
++/** Linear undo / redo over whole values; a new edit drops the redo branch. */
++export class History<T> {
++  private past: T[] = []
++  private future: T[] = []
++  current: T
++  constructor(initial: T, private limit = 200) { this.current = initial }
++  push(value: T) {
++    this.past.push(this.current)
++    if (this.past.length > this.limit) this.past.shift()
++    this.current = value
++    this.future = []
++  }
++  undo(): T | null {
++    const previous = this.past.pop()
++    if (previous === undefined) return null
++    this.future.push(this.current)
++    this.current = previous
++    return previous
++  }
++  redo(): T | null {
++    const next = this.future.pop()
++    if (next === undefined) return null
++    this.past.push(this.current)
++    this.current = next
++    return next
++  }
++  get canUndo() { return this.past.length > 0 }
++  get canRedo() { return this.future.length > 0 }
++}
++
++export const RULE_LABEL: Record<string, string> = {
++  pedestrian_on_road: 'Pieton pe carosabil', very_high_speed: 'Viteză foarte mare', stopped_on_road: 'Vehicul oprit pe carosabil',
++  stopped_emergency_lane: 'Vehicul oprit pe banda de urgență', hard_braking: 'Frânare bruscă', probable_crash: 'Accident probabil',
++  tailgating: 'Distanță prea mică', dangerous_lane_change: 'Schimbare de bandă periculoasă', wrong_way: 'Mers pe contrasens', congestion: 'Aglomerare',
++}
++export const ZONE_KIND_LABEL: Record<string, string> = { carriageway: 'Carosabil', emergency_lane: 'Bandă de urgență' }
++/** Threshold name, unit and plain meaning, in the order the form shows them. */
++export const THRESHOLD_INFO: Record<string, { label: string; unit: string }> = {
++  speed_limit_kmh: { label: 'Limita de viteză a drumului', unit: 'km/h' },
++  very_high_speed_kmh: { label: 'Viteză de la care apare alerta', unit: 'km/h' },
++  stopped_speed_kmh: { label: 'Sub această viteză vehiculul e considerat oprit', unit: 'km/h' },
++  stopped_seconds: { label: 'Cât stă oprit până la alertă', unit: 's' },
++  hard_brake_mps2: { label: 'Decelerare considerată frânare bruscă', unit: 'm/s²' },
++  headway_seconds: { label: 'Distanță minimă în timp față de vehiculul din față', unit: 's' },
++  headway_min_speed_kmh: { label: 'Distanța se verifică doar peste această viteză', unit: 'km/h' },
++  lane_change_m: { label: 'Deplasare laterală considerată schimbare de bandă', unit: 'm' },
++  lane_change_window_s: { label: 'Intervalul în care se măsoară deplasarea laterală', unit: 's' },
++  wrong_way_min_px: { label: 'Deplasare minimă împotriva sensului', unit: 'px' },
++  congestion_vehicles: { label: 'Vehicule în zonă pentru aglomerare', unit: 'vehicule' },
++  congestion_avg_speed_kmh: { label: 'Viteză medie sub care e aglomerare', unit: 'km/h' },
++  congestion_seconds: { label: 'Cât durează până la alerta de aglomerare', unit: 's' },
++  min_track_age_s: { label: 'Vârsta minimă a unei urmăriri înainte de reguli', unit: 's' },
++  crash_window_s: { label: 'Fereastra în care se caută oprirea după frânare', unit: 's' },
++}
++export const ACQUISITION_INFO: Record<string, { label: string; unit: string }> = {
++  target_fps: { label: 'Cadre analizate pe secundă (cel mult)', unit: 'cadre/s' },
++  reconnect_backoff_s: { label: 'Pauză înainte de reconectare', unit: 's' },
++  read_timeout_s: { label: 'Timp de așteptare la citire', unit: 's' },
++  max_reconnect_attempts: { label: 'Încercări de reconectare', unit: '' },
++}
+diff --git a/frontend/src/lib/cameraControl.test.ts b/frontend/src/lib/cameraControl.test.ts
+index 53d2b1c..59e252a 100644
+--- a/frontend/src/lib/cameraControl.test.ts
++++ b/frontend/src/lib/cameraControl.test.ts
+@@ -1,7 +1,7 @@
+ import { afterEach, describe, expect, it, vi } from 'vitest'
+ import { ApiError } from './api'
+ import { adaptCamera } from './adapters'
+-import { activate, ageLabel, ATTESTATION_LABEL, cameraAction, frozenLabel, metric, STATE_LABEL, stateTone } from './cameraControl'
++import { activate, ageLabel, ATTESTATION_LABEL, cameraAction, configStage, frozenLabel, metric, STATE_LABEL, stateTone, type Runtime, type Worker } from './cameraControl'
+ 
+ afterEach(() => vi.unstubAllGlobals())
+ 
+@@ -76,3 +76,33 @@ describe('camera control client', () => {
+     expect(frozenLabel('frozen_image', { frozen_signal: 0, frozen_confidence: 0.95, unchanged_s: 30 })).toMatch(/^DA/)
+   })
+ })
++
++describe('where a configuration revision stands', () => {
++  const rt = (patch: Partial<Runtime>): Runtime => ({
++    state: 'replay', is_live: false, freshness: 'fresh', heartbeat_age_s: 4, stale_after_s: 90, offline_after_s: 600, runnable: true,
++    blocked_reason: null, unmet: [], desired_revision: 2, desired_fingerprint: 'a', applied_revision: 2, applied_fingerprint: 'a',
++    revision_in_sync: true, reference_frame_mismatch: null, duplicate_worker: false, server_time: '', source_attestation: 'match', ...patch,
++  })
++  const worker = (patch: Partial<Worker>) => ({ health: 'healthy', last_ack_status: 'accepted', last_ack_revision: 2, last_ack_reason: null, ...patch }) as Worker
++
++  it('says nothing is activated when no revision was requested', () => {
++    expect(configStage(rt({ desired_revision: null, applied_revision: null, revision_in_sync: false }), null).stage).toBe('none')
++  })
++  it('keeps an activated revision apart from an applied one', () => {
++    const waiting = configStage(rt({ applied_revision: 1, revision_in_sync: false }), worker({ last_ack_revision: 1 }))
++    expect(waiting).toMatchObject({ stage: 'requested', label: 'Cerută, neaplicată încă' })
++    expect(waiting.detail).toMatch(/revizia 1/)
++    expect(configStage(rt({ applied_revision: null, revision_in_sync: false }), null).detail).toMatch(/niciun worker/)
++  })
++  it('reports a revision the worker refused, with its reason', () => {
++    const refused = configStage(rt({ applied_revision: 1, revision_in_sync: false }), worker({ last_ack_status: 'rejected', last_ack_reason: 'frame_size_mismatch' }))
++    expect(refused).toMatchObject({ stage: 'rejected', label: 'Respinsă de worker' })
++    expect(refused.detail).toMatch(/frame_size_mismatch/)
++  })
++  it('calls a revision in effect only while a worker with a fresh signal runs it', () => {
++    expect(configStage(rt({}), worker({})).stage).toBe('effective')
++    expect(configStage(rt({ freshness: 'stale', state: 'stale' }), worker({}))).toMatchObject({ stage: 'applied', label: 'Aplicată de worker' })
++    expect(configStage(rt({ state: 'stopped' }), worker({ health: 'stopped' })).stage).toBe('applied')
++    expect(configStage(rt({ state: 'paused' }), worker({})).stage).toBe('applied')
++  })
++})
+diff --git a/frontend/src/lib/cameraControl.ts b/frontend/src/lib/cameraControl.ts
+index 6a1ff88..5080518 100644
+--- a/frontend/src/lib/cameraControl.ts
++++ b/frontend/src/lib/cameraControl.ts
+@@ -72,6 +72,18 @@ export const versionAction = (id: string, v: string, action: VersionAction, note
+   post<Version>(`${cam(id)}/versions/${v}/${action}`, action === 'approve' || action === 'reject' ? { note } : {})
+ export const activate = (id: string, versionId: string, expectedRevision: number, reason: string, rollback = false) =>
+   post<{ changed: boolean }>(`${cam(id)}/${rollback ? 'rollback' : 'activate'}`, { version_id: versionId, expected_revision: expectedRevision, reason })
++export interface GrantInput {
++  granting_party: string; basis: 'written_agreement' | 'licence' | 'own_infrastructure' | 'statutory_mandate'; basis_reference: string
++  purpose: string; valid_from: string; valid_until: string; capture_method: SourceKind; max_analysis_fps: number
++  max_frame_height: number; retention_days: number; export_allowed: boolean; media_scope: 'events_only' | 'events_and_recordings'
++}
++/** Registers a camera in the "onboarding" state: never enabled by creation. */
++export const createCamera = (body: { name: string; location: string; slug?: string }) => post<{ id: string; slug: string }>('/api/cameras', body)
++/** The full source address is never returned; responses carry only its short display form. */
++export const registerSource = (id: string, kind: SourceKind, url: string, expectedRevision: number, reason: string) =>
++  post<ControlSummary>(`${cam(id)}/source`, { kind, url, expected_revision: expectedRevision, reason })
++export const createGrant = (id: string, body: GrantInput) => post<Grant>(`${cam(id)}/grants`, body)
++export const revokeGrant = (id: string, grantId: string, reason: string) => post<Grant>(`${cam(id)}/grants/${grantId}/revoke`, { reason })
+ export type CameraAction = 'pause' | 'resume' | 'disable' | 'enable-request' | 'enable'
+ export const cameraAction = (id: string, action: CameraAction, expectedRevision: number, reason: string) =>
+   post<ControlSummary>(`${cam(id)}/${action}`, { expected_revision: expectedRevision, reason })
+@@ -109,6 +121,23 @@ export const stateTone = (state: string) =>
+   state === 'live' ? 'live' : state === 'replay' || state === 'processing' ? 'info'
+     : ['paused', 'onboarding', 'never_seen', 'not_onboarded', 'starting'].includes(state) ? 'muted' : 'bad'
+ 
++export type ConfigStage = 'none' | 'requested' | 'rejected' | 'applied' | 'effective'
++/** Where the activated revision stands. Activation is only a request: a revision is "applied"
++ *  once a worker acknowledged it, and "in effect" only while a worker with a fresh signal runs it. */
++export function configStage(rt: Runtime, worker: Pick<Worker, 'health' | 'last_ack_status' | 'last_ack_revision' | 'last_ack_reason'> | null): { stage: ConfigStage; label: string; detail: string } {
++  if (rt.desired_revision == null) return { stage: 'none', label: 'Nicio configurație activată', detail: 'camera nu are o versiune aprobată și activată' }
++  if (!rt.revision_in_sync) {
++    if (worker?.last_ack_status === 'rejected' && worker.last_ack_revision === rt.desired_revision) {
++      return { stage: 'rejected', label: 'Respinsă de worker', detail: `worker-ul a refuzat revizia ${rt.desired_revision} (${worker.last_ack_reason ?? 'fără motiv raportat'}) și rulează în continuare ${rt.applied_revision == null ? 'fără configurație' : `revizia ${rt.applied_revision}`}` }
++    }
++    return { stage: 'requested', label: 'Cerută, neaplicată încă', detail: rt.applied_revision == null ? `niciun worker nu a confirmat revizia ${rt.desired_revision}` : `worker-ul rulează încă revizia ${rt.applied_revision}` }
++  }
++  const running = rt.freshness === 'fresh' && worker?.health !== 'stopped' && ['live', 'replay', 'processing'].includes(rt.state)
++  return running
++    ? { stage: 'effective', label: 'În vigoare', detail: `un worker rulează acum revizia ${rt.desired_revision} (semnal ${ageLabel(rt.heartbeat_age_s)})` }
++    : { stage: 'applied', label: 'Aplicată de worker', detail: `revizia ${rt.desired_revision} a fost confirmată, dar acum niciun worker nu o rulează (ultimul semnal ${ageLabel(rt.heartbeat_age_s)})` }
++}
++
+ export function ageLabel(seconds: number | null) {
+   if (seconds == null) return 'niciodată'
+   if (seconds < 90) return `acum ${Math.round(seconds)} s`
+diff --git a/frontend/src/pages/CamerasPage.tsx b/frontend/src/pages/CamerasPage.tsx
+index 2af0124..39cfa08 100644
+--- a/frontend/src/pages/CamerasPage.tsx
++++ b/frontend/src/pages/CamerasPage.tsx
+@@ -1,11 +1,13 @@
+ import { useState, useMemo, useEffect } from "react";
+ import { Link } from "react-router";
+ import { Grid, Map as MapIcon, AlertTriangle, Eye, History, Radio, Video, X, SlidersHorizontal } from "lucide-react";
+-import { useDataStore } from "@/store/data";
++import { reloadData, useDataStore } from "@/store/data";
+ import { useAuthStore } from "@/store/auth";
+ import { USE_MOCKS } from "@/lib/api";
+ import { listControl, SOURCE_LABEL, STATE_LABEL, type ControlSummary } from "@/lib/cameraControl";
+ import { CameraControlPanel, StateBadge } from "@/components/CameraControlPanel";
++import type { Backdrop } from "@/components/ConfigEditor";
++import { AddCameraDialog } from "@/components/CameraAuthorizationForms";
+ import TacticalMap from "@/components/TacticalMap";
+ import { ClipModal, type ModalClip } from "@/components/ClipModal";
+ import { ALERT_TYPE } from "@/lib/constants";
+@@ -69,6 +71,7 @@ export default function CamerasPage() {
+   const isAdmin = useAuthStore((st) => st.user?.role === "admin");
+   const [controls, setControls] = useState<Record<string, ControlSummary>>({});
+   const [controlCam, setControlCam] = useState<string | null>(null);
++  const [adding, setAdding] = useState(false);
+   useEffect(() => {
+     if (USE_MOCKS) return;
+     const load = () => listControl()
+@@ -78,6 +81,14 @@ export default function CamerasPage() {
+     const timer = window.setInterval(load, 15_000);
+     return () => window.clearInterval(timer);
+   }, [controlCam]);
++  /** A real picture from the camera for the config editor, with a plain note on where it comes from. */
++  const editorBackdrop = (controlId: string): Backdrop | null => {
++    const slug = Object.values(controls).find((c) => c.id === controlId)?.slug
++    const cam = cameras.find((c) => c.id === slug)
++    if (cam?.video_url) return { kind: 'video', src: cam.video_url, note: 'Fundal: un cadru din înregistrarea analizată a camerei (chenarele din imagine sunt desenate de program).' }
++    if (cam?.image_url && !cam.image_url.startsWith('/cams/')) return { kind: 'image', src: cam.image_url, note: 'Fundal: cadrul-cheie al ultimei alerte de la această cameră.' }
++    return null
++  }
+   const openPlayer = (camId: string) => {
+     const cam = realCameras.find((c) => c.id === camId);
+     const list = alerts.filter((a) => a.cameraId === camId && a.clip?.src).sort((x, y) => y.createdAt.localeCompare(x.createdAt))
+@@ -121,6 +132,12 @@ export default function CamerasPage() {
+ 
+         {/* View Mode & Add Camera */}
+         <div className="flex items-center gap-4">
++          {isAdmin && !USE_MOCKS && (
++            <button type="button" onClick={() => setAdding(true)} data-testid="add-camera-open"
++              className="px-3 py-1.5 rounded-md border border-border bg-panel hover:border-accent text-xs font-semibold text-text-primary">
++              Adaugă cameră
++            </button>
++          )}
+           <div className="flex items-center bg-panel border border-border rounded-md p-1 text-xs">
+             <span className="text-text-secondary px-2 font-sans font-medium">Vizualizare:</span>
+             <button
+@@ -333,7 +350,8 @@ export default function CamerasPage() {
+       </div>
+ 
+       {playerClips && <ClipModal clips={playerClips} onClose={() => setPlayerClips(null)} />}
+-      {controlCam && <CameraControlPanel cameraId={controlCam} isAdmin={isAdmin} onClose={() => setControlCam(null)} />}
++      {adding && <AddCameraDialog onClose={() => setAdding(false)} onCreated={(id) => { setAdding(false); void reloadData().catch(() => {}); setControlCam(id); }} />}
++      {controlCam && <CameraControlPanel cameraId={controlCam} isAdmin={isAdmin} onClose={() => setControlCam(null)} backdrop={editorBackdrop(controlCam)} />}
+       {recordingCam?.video_url && (
+         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6" onClick={() => setRecordingCam(null)} data-testid="camera-recording">
+           <div className="w-full max-w-6xl flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
+diff --git a/scripts/e2e/run_camera_control_e2e.sh b/scripts/e2e/run_camera_control_e2e.sh
+index bd812f8..2f773cf 100755
+--- a/scripts/e2e/run_camera_control_e2e.sh
++++ b/scripts/e2e/run_camera_control_e2e.sh
+@@ -12,7 +12,9 @@
+ # Steps: bootstrap + migrate + seed + demo accounts (+ a second admin), start the API, run the
+ # API/worker harness (scripts/e2e/camera_control_e2e.py), RESTART the API (status must survive),
+ # build the UI, serve it with `vite preview` proxied to the API, run the headless browser check
+-# (frontend/scripts/e2e-camera-control.mjs). Servers are stopped on exit.
++# (frontend/scripts/e2e-camera-control.mjs) and the visual editor check
++# (frontend/scripts/e2e-config-editor.mjs, two administrators and a worker pass). Servers are
++# stopped on exit.
+ set -euo pipefail
+ REPO=$(cd "$(dirname "$0")/../.." && pwd)
+ PG_PORT=${PG_PORT:-55441}
+@@ -102,5 +104,9 @@ for _ in $(seq 1 100); do curl -fsS "http://localhost:${WEB_PORT}/login" >/dev/n
+ 
+ E2E_BASE="http://localhost:${WEB_PORT}" E2E_PASSWORD="$E2E_PASSWORD" E2E_CAMERA_ID="$CAMERA_ID" \
+   E2E_ARTIFACTS="$ARTIFACTS" node scripts/e2e-camera-control.mjs
++# The visual editor: draw, validate, submit, four-eyes approval, activation, worker application, rollback.
++E2E_BASE="http://localhost:${WEB_PORT}" E2E_PASSWORD="$E2E_PASSWORD" E2E_ARTIFACTS="$ARTIFACTS" \
++  E2E_WORKER="$ROOT_PY $REPO/scripts/e2e/worker_once.py --api http://localhost:${API_PORT} --origin http://localhost:${WEB_PORT} --video $E2E_VIDEO" \
++  node scripts/e2e-config-editor.mjs
+ echo "[e2e] screenshots: $ARTIFACTS  logs: $LOGS"
+ if grep -q -E "S3cr3t|password=|token=" "$LOGS/api.log"; then echo "[e2e] secret-looking text in API log"; exit 1; fi
+diff --git a/scripts/e2e/worker_once.py b/scripts/e2e/worker_once.py
+new file mode 100644
+index 0000000..d74f89a
+--- /dev/null
++++ b/scripts/e2e/worker_once.py
+@@ -0,0 +1,69 @@
++"""One pass of the real worker config client against a local API: fetch the camera's desired
++config, verify it (fingerprint, schema, frame size, frame rate), acknowledge it, send one
++heartbeat and stop gracefully (which releases the lease). Prints {"applied_revision": n}.
++Used by browser checks to show the difference between a revision that was activated and one a
++worker has applied.
++
++usage: E2E_PASSWORD=... worker_once.py --api http://localhost:8441 --origin http://localhost:5441
++       --video CLIP [--slug e2e-replay]
++
++The detector is not run here (scripts/e2e/camera_detector_e2e.py does that); only the worker's
++config handshake is, with the same code the pipeline uses (roadsentinel/remote_config.py).
++"""
++import argparse
++import json
++import os
++import sys
++import time
++from pathlib import Path
++
++import cv2
++import yaml
++
++ROOT = Path(__file__).resolve().parents[2]
++sys.path.insert(0, str(ROOT))
++sys.path.insert(0, str(Path(__file__).parent))
++from camera_control_e2e import Session
++
++from roadsentinel import remote_config, sink
++
++ap = argparse.ArgumentParser()
++ap.add_argument("--api", required=True)
++ap.add_argument("--origin", required=True)
++ap.add_argument("--password", default=os.environ.get("E2E_PASSWORD"), help="default: $E2E_PASSWORD")
++ap.add_argument("--video", required=True)
++ap.add_argument("--slug", default="e2e-replay")
++a = ap.parse_args()
++assert a.password, "set E2E_PASSWORD or pass --password"
++
++admin = Session(a.api, a.origin, "admin", a.password)
++account = next(x for x in admin.ok("GET", "/api/service-accounts") if x["name"] == "e2e-worker")
++for old in account["keys"]:
++    if not old["revoked_at"]:
++        admin.call("DELETE", f"/api/service-accounts/{account['id']}/keys/{old['key_id']}")
++key = admin.ok("POST", f"/api/service-accounts/{account['id']}/keys", expect=(201,))
++
++cap = cv2.VideoCapture(a.video)
++width, height = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
++fps = float(cap.get(cv2.CAP_PROP_FPS))
++cap.release()
++assert width and height and fps, "fixture video unreadable"
++
++out = sink.RemoteSink(a.api, key["key_id"], key["secret"])
++base_cfg = yaml.safe_load((ROOT / "cameras/demo-urban.yaml").read_text())
++deadline = time.time() + 150
++while True:  # an earlier worker's lease (90 s) fences this one out until it expires or is released
++    client = remote_config.RemoteConfigClient(out.request_json, a.slug, frame_size=(width, height),
++                                              source_fps=fps, source_is_stream=False)
++    try:
++        client.initial(base_cfg)
++        answer = client.heartbeat(source_fps=round(fps, 2), frame_width=width, frame_height=height,
++                                  last_frame_at=remote_config.utc_iso(time.time()))
++        break
++    except remote_config.RemoteConfigError as err:
++        if err.reason != "duplicate_worker" or time.time() > deadline:
++            raise
++        time.sleep(5)
++assert answer["lease"] == "holder", answer
++client.heartbeat(health="stopped")  # graceful stop: releases the lease for the next pass
++print(json.dumps({"applied_revision": client.applied[0]}))

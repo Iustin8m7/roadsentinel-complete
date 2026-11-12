@@ -1,0 +1,15 @@
+{
+  "frames": 15,
+  "fps": 5,
+  "duration_s": 3,
+  "actual_detection_observations": 142,
+  "model_sha256": "c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063",
+  "files": {
+    "alerta-viteza.jpg": "728dd40d8db695c080a1301eccff8a0955d8979aa10cc6444482577946e109ff",
+    "LICENSE.md": "c91863b242bdfa853ab47b25a4581112f6d7d1187696975119141e06c210a16d",
+    "ambuteiaj.jpg": "cd1b81916a063e8c57dff94fe5158cfa4b2851f99cc12b2c5ecfa3597351b592",
+    "viteza.jpg": "728dd40d8db695c080a1301eccff8a0955d8979aa10cc6444482577946e109ff",
+    "distanta.jpg": "0b771fe455de6f2b49c43c06cec433dd3f9623a65f361cb5d30974830868bc6a",
+    "alerta-viteza.mp4": "fed66819a074e01b7a9886baea2d941f3a68ed6c73e2d56fc32d684e70795a73"
+  }
+}

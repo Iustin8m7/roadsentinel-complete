@@ -1,0 +1,160 @@
+diff --git a/roadsentinel/pipeline.py b/roadsentinel/pipeline.py
+index 8bc0b74..8c8596f 100644
+--- a/roadsentinel/pipeline.py
++++ b/roadsentinel/pipeline.py
+@@ -43,6 +43,32 @@ def touches_edge(box, w, h):
+     return x1 < margin or x2 > w - margin or y2 > h - margin
+ 
+ 
++def keep_detector_boxes(model):
++    """Remember each frame's boxes as the detector found them, before the tracker replaces them."""
++    seen = {"boxes": np.empty((0, 4))}
++    model.add_callback("on_predict_postprocess_end",
++                       lambda predictor: seen.update(boxes=predictor.results[0].boxes.xyxy.cpu().numpy()))
++    return seen
++
++
++def detector_box(box, detected, min_iou=0.3):
++    """The detector's box on the same vehicle as a tracker box; the tracker box when none overlaps enough.
++
++    The tracker reports a smoothed box that trails a moving vehicle and swells in dense traffic
++    (underpass clip: one tracker box in eight overlaps a detection by less than half). Rules keep
++    the tracker's box, so the alerts do not change; the picture shows the detector's.
++    """
++    if len(detected) == 0:
++        return tuple(box)
++    x1, y1, x2, y2 = box
++    iw = np.clip(np.minimum(x2, detected[:, 2]) - np.maximum(x1, detected[:, 0]), 0, None)
++    ih = np.clip(np.minimum(y2, detected[:, 3]) - np.maximum(y1, detected[:, 1]), 0, None)
++    areas = (detected[:, 2] - detected[:, 0]) * (detected[:, 3] - detected[:, 1])
++    iou = iw * ih / ((x2 - x1) * (y2 - y1) + areas - iw * ih + 1e-9)
++    best = int(iou.argmax())
++    return tuple(float(v) for v in detected[best]) if iou[best] >= min_iou else tuple(box)
++
++
+ def drop_occupants(objs):
+     """Drop 'person' detections that sit inside a vehicle box (drivers, passengers)."""
+     vehicles = [b for _, c, _, b in objs if c != "person"]
+@@ -112,7 +138,12 @@ def redact_frame(frame, detections, mode=None):
+     return frame
+ 
+ 
+-def draw(frame, zones, objs, engine, flash):
++def draw(frame, zones, objs, engine, flash, shown=None):
++    """Outline each tracked object; ``shown`` maps a track to the box to outline instead of its own.
++
++    A vehicle an alert is about gets a heavy outline and a full label on a plate in the alert's
++    colour. The others get a thin outline and only their speed, so dense traffic stays readable.
++    """
+     overlay = frame.copy()
+     for z in zones:
+         color = (60, 60, 230) if z.kind == "emergency_lane" else (200, 160, 40)
+@@ -120,14 +151,27 @@ def draw(frame, zones, objs, engine, flash):
+     cv2.addWeighted(overlay, 0.12, frame, 0.88, 0, frame)
+     scale = frame.shape[1] / 1920
+     th = max(2, int(3 * scale))
+-    for tid, cls, _, (x1, y1, x2, y2) in objs:
++    font, dark = cv2.FONT_HERSHEY_SIMPLEX, (20, 20, 20)
++    # Flagged vehicles last, so their outline and label sit on top of their neighbours'.
++    for tid, cls, _, box in sorted(objs, key=lambda o: o[0] in flash):
++        x1, y1, x2, y2 = (int(v) for v in (shown or {}).get(tid, box))
+         tr = engine.tracks.get(tid)
+-        color = flash.get(tid, (90, 220, 90))
+-        cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), color, th)
+-        label = f"#{tid} {cls}"
+-        if tr and tr.speed_kmh() is not None and cls != "person":
+-            label += f" {tr.speed_kmh():.0f} km/h"
+-        cv2.putText(frame, label, (int(x1), int(y1) - 8), cv2.FONT_HERSHEY_SIMPLEX, 0.9 * scale, color, th)
++        speed = f"{tr.speed_kmh():.0f} km/h" if tr and tr.speed_kmh() is not None and cls != "person" else ""
++        if tid not in flash:
++            color = (90, 220, 90)
++            cv2.rectangle(frame, (x1, y1), (x2, y2), color, th, cv2.LINE_AA)
++            if speed:  # dark edge under the text keeps it readable over road markings and headlights
++                at = (x1, max(int(22 * scale), y1 - int(8 * scale)))
++                cv2.putText(frame, speed, at, font, 0.75 * scale, dark, th + 3, cv2.LINE_AA)
++                cv2.putText(frame, speed, at, font, 0.75 * scale, color, th, cv2.LINE_AA)
++            continue
++        color, label, size = flash[tid], f"#{tid} {cls} {speed}".rstrip(), 1.1 * scale
++        cv2.rectangle(frame, (x1, y1), (x2, y2), color, th * 2, cv2.LINE_AA)
++        (tw, text_h), _ = cv2.getTextSize(label, font, size, th)
++        pad = max(3, int(8 * scale))
++        top = max(0, y1 - text_h - 2 * pad)
++        cv2.rectangle(frame, (x1 - th, top), (x1 + tw + 2 * pad, top + text_h + 2 * pad), color, -1)
++        cv2.putText(frame, label, (x1 + pad, top + pad + text_h), font, size, dark, th, cv2.LINE_AA)
+ 
+ 
+ class ClipWriter:
+@@ -300,6 +344,7 @@ def run(camera_path, model_name=None, imgsz=1280, max_seconds=None, use_wandb=No
+     start = datetime.fromisoformat(cfg["start_time"])
+ 
+     model = YOLO(model_name)
++    detected = keep_detector_boxes(model)
+     torch = __import__("torch")
+     device = "mps" if torch.backends.mps.is_available() else 0 if torch.cuda.is_available() else "cpu"
+     engine = RuleEngine(zones, cfg["thresholds"], cfg.get("rules"))
+@@ -419,6 +464,7 @@ def run(camera_path, model_name=None, imgsz=1280, max_seconds=None, use_wandb=No
+             # Restart the feed: new tracker state, same rules config.
+             cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+             model = YOLO(model_name)
++            detected = keep_detector_boxes(model)
+             engine = RuleEngine(zones, cfg["thresholds"], cfg.get("rules"))
+             n, frame_no, wall0, flash = 0, 0, time.time(), {}
+             cadence.set(None)
+@@ -457,7 +503,8 @@ def run(camera_path, model_name=None, imgsz=1280, max_seconds=None, use_wandb=No
+         for e in events:
+             if e["track_id"] is not None:
+                 flash[e["track_id"]] = PRIORITY_COLORS[e["priority"]]
+-        draw(frame, zones, objs, engine, flash)
++        shown = {o[0]: detector_box(o[3], detected["boxes"]) for o in objs}
++        draw(frame, zones, objs, engine, flash, shown)
+         small = cv2.resize(frame, (OUT_W, out_h))
+         recent.append((t, cv2.imencode(".jpg", small, [cv2.IMWRITE_JPEG_QUALITY, 85])[1].tobytes()))
+         if writer:
+@@ -472,7 +519,7 @@ def run(camera_path, model_name=None, imgsz=1280, max_seconds=None, use_wandb=No
+             kf = small.copy()
+             if e["bbox"]:
+                 s = OUT_W / W
+-                x1, y1, x2, y2 = (int(v * s) for v in e["bbox"])
++                x1, y1, x2, y2 = (int(v * s) for v in shown.get(e["track_id"], e["bbox"]))
+                 cv2.rectangle(kf, (x1 - 6, y1 - 6), (x2 + 6, y2 + 6), PRIORITY_COLORS[e["priority"]], 4)
+             cv2.putText(kf, f"{e['label']} | t={t:.1f}s", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 255, 255), 3)
+             e["keyframe_path"] = folder / f"{e['stem']}.jpg"
+diff --git a/tests/test_pipeline_boxes.py b/tests/test_pipeline_boxes.py
+new file mode 100644
+index 0000000..56c99aa
+--- /dev/null
++++ b/tests/test_pipeline_boxes.py
+@@ -0,0 +1,33 @@
++"""The picture shows the detector's box for a vehicle, not the tracker's smoothed one."""
++import numpy as np
++
++from roadsentinel import pipeline
++from roadsentinel.rules import RuleEngine
++
++
++def test_a_trailing_tracker_box_is_replaced_by_the_detector_box_on_the_same_vehicle():
++    detected = np.array([[100, 100, 160, 140], [300, 100, 360, 140]], dtype=float)
++    assert pipeline.detector_box((110, 108, 185, 160), detected) == (100, 100, 160, 140)
++
++
++def test_the_tracker_box_is_kept_when_no_detection_overlaps_it_enough():
++    detected = np.array([[300, 100, 360, 140]], dtype=float)
++    assert pipeline.detector_box((110, 108, 185, 160), detected) == (110, 108, 185, 160)
++    assert pipeline.detector_box((110, 108, 185, 160), np.empty((0, 4))) == (110, 108, 185, 160)
++
++
++def test_draw_outlines_the_shown_box_and_not_the_tracker_box():
++    frame = np.zeros((400, 640, 3), dtype=np.uint8)
++    objs = [(7, "car", (150, 260), (100, 180, 200, 260))]
++    pipeline.draw(frame, [], objs, RuleEngine([], {}), {}, {7: (300, 180, 400, 260)})
++    assert frame[180:261, 300].any() and frame[180:261, 400].any()
++    assert not frame[200:240, 95:105].any() and not frame[200:240, 195:205].any()
++
++
++def test_a_flagged_vehicle_gets_a_heavier_outline_than_the_others():
++    frame = np.zeros((400, 640, 3), dtype=np.uint8)
++    objs = [(1, "car", (150, 260), (100, 180, 200, 260)), (2, "car", (450, 260), (400, 180, 500, 260))]
++    pipeline.draw(frame, [], objs, RuleEngine([], {}), {2: (0, 140, 255)})
++    plain = int(frame[220, 90:112].any(axis=1).sum())
++    flagged = int(frame[220, 390:412].any(axis=1).sum())
++    assert flagged > plain > 0

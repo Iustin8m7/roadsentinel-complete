@@ -1,0 +1,10 @@
+# Python 3.12; backend runtime lock plus the independently verified vision/test environment.
+-r backend/requirements.lock
+numpy==2.2.6
+opencv-python-headless==4.12.0.88
+onnxruntime==1.23.2
+supervision==0.30.7
+pytest==9.2.0
+httpx==0.28.1
+# Isolated compatibility tests for the deprecated local server only.
+itsdangerous==2.2.0

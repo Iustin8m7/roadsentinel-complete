@@ -1,0 +1,65 @@
+# Candidate webcam at Grand Hotel Traian (WebcamRomania.ro), Piața Unirii, Iași.
+# On 2026-11-06 the supplied HLS master URL returned HTTP 200 and advertised a 1080p/20 fps variant;
+# no variant playlist or media frames were fetched, so live decode/vehicle visibility is unverified.
+# Automated processing permission was not found. Keep LIVE OFF until a documented valid basis/scope
+# is recorded in `source_consent`; public viewing alone is not permission to run analytics.
+# Calibration is a rough estimate from lane markings (fisheye lens), so speeds are approximate.
+id: iasi-piata-unirii
+name: "Piața Unirii (live)"
+video: https://w1.webcamromania.ro/piatauniriiiasi/index.m3u8
+enabled: false  # Remains disabled until written processing permission is recorded.
+source_mode: video
+source_transport: hls  # Explicit bounded master/variant selection, then OpenCV/FFmpeg decode.
+source_timeout_s: 10
+hls_max_height: 1080
+hls_max_bandwidth: 5000000
+source_timeout_s: 10
+source_poll_interval_s: 1
+start_time: "2026-10-20T00:00:00"
+location: "Piața Unirii, Iași (WebcamRomania.ro / Grand Hotel Traian)"
+# Fine-tuned on night footage from this camera (training/RESULTS-iasi.md); git-ignored, so
+# machines without the file stop with an error (RS_ALLOW_MODEL_FALLBACK=1 accepts stock yolo11s.pt knowingly).
+source_consent:
+  granted: false   # set true ONLY with written permission, and fill by/date/scope/evidence
+  by: ""
+  date: ""
+  scope: ""
+  evidence: ""
+model: models/rs-yolo11s-iasi.pt
+min_y: 520  # beyond the calibrated area, distance errors make lane changes look sudden
+calibration:
+  source: [[1060, 520], [1330, 520], [1650, 1000], [1150, 1000]]
+  target_width_m: 16
+  target_length_m: 60
+# City junction with traffic lights: braking and stopping are normal here, so those rules stay off.
+# Lane changes are off too: turns into the side street and the fisheye lens look like sudden lane changes.
+rules: [very_high_speed, probable_crash]
+zones:
+  - id: boulevard
+    name: "Carosabil bulevard"
+    kind: carriageway
+    direction: [0, 1]
+    polygon: [[1010, 440], [1160, 440], [1420, 600], [1520, 760], [1680, 1080], [1110, 1080], [1050, 700]]
+thresholds:
+  speed_limit_kmh: 50
+  very_high_speed_kmh: 80  # rough calibration: keep a wide margin over the 50 km/h limit
+  stopped_speed_kmh: 3
+  stopped_seconds: 60
+  hard_brake_mps2: 5.0
+  headway_seconds: 1.0
+  headway_min_speed_kmh: 30
+  lane_change_m: 3.0
+  lane_change_window_s: 1.5
+  wrong_way_min_px: 150
+  congestion_vehicles: 12
+  congestion_avg_speed_kmh: 5
+  congestion_seconds: 30
+  # Slow processing (~0.4-0.5 fps on the dev laptop): time-window mode, alerts are marked lower confidence;
+  # probable_crash cannot work at this rate and is reported as unsupported in the heartbeat (docs/RULES.md).
+  speed_window_s: 12
+  speed_min_samples: 3
+  speed_min_span_s: 4
+  sustain_s: 12
+  sustain_samples: 2
+  min_track_age_s: 4
+  crash_ignore_classes: [bus]  # trams are detected as buses and brake hard at the tram stop

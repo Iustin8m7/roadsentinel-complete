@@ -1,0 +1,74 @@
+[
+  {
+    "email": "sysadmin@roadsentinel.local",
+    "tenant": "platform",
+    "role": "system_admin",
+    "saved_password_matches": true,
+    "mfa_enabled": false,
+    "mfa_exempt": false
+  },
+  {
+    "email": "admin.a@roadsentinel.local",
+    "tenant": "unit-a",
+    "role": "tenant_admin",
+    "saved_password_matches": true,
+    "mfa_enabled": true,
+    "mfa_exempt": false
+  },
+  {
+    "email": "operator.a@roadsentinel.local",
+    "tenant": "unit-a",
+    "role": "operator",
+    "saved_password_matches": true,
+    "mfa_enabled": true,
+    "mfa_exempt": false
+  },
+  {
+    "email": "auditor.a@roadsentinel.local",
+    "tenant": "unit-a",
+    "role": "auditor",
+    "saved_password_matches": true,
+    "mfa_enabled": true,
+    "mfa_exempt": false
+  },
+  {
+    "email": "patrol.a@roadsentinel.local",
+    "tenant": "unit-a",
+    "role": "patrol",
+    "saved_password_matches": true,
+    "mfa_enabled": true,
+    "mfa_exempt": false
+  },
+  {
+    "email": "admin.b@roadsentinel.local",
+    "tenant": "unit-b",
+    "role": "tenant_admin",
+    "saved_password_matches": true,
+    "mfa_enabled": false,
+    "mfa_exempt": false
+  },
+  {
+    "email": "auditor.b@roadsentinel.local",
+    "tenant": "unit-b",
+    "role": "auditor",
+    "saved_password_matches": true,
+    "mfa_enabled": false,
+    "mfa_exempt": false
+  },
+  {
+    "email": "operator.b@roadsentinel.local",
+    "tenant": "unit-b",
+    "role": "operator",
+    "saved_password_matches": true,
+    "mfa_enabled": false,
+    "mfa_exempt": false
+  },
+  {
+    "email": "patrol.b@roadsentinel.local",
+    "tenant": "unit-b",
+    "role": "patrol",
+    "saved_password_matches": true,
+    "mfa_enabled": false,
+    "mfa_exempt": false
+  }
+]

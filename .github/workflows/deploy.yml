@@ -1,0 +1,90 @@
+name: Deploy
+
+# Production deploy to Railway: MANUAL (workflow_dispatch) and gated on a green CI run.
+# Needs the repository secret RAILWAY_TOKEN: a Railway *project* token for the
+# "production" environment of project "roadsentinel" (Project → Settings → Tokens).
+on:
+  # Manual only. A deploy redeploys the API and can drop ephemeral evidence storage: it must be
+  # a conscious act, and it refuses to run unless CI is green for the exact commit.
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type DEPLOY to confirm (evidence storage must be a volume or S3, see docs/OPERATIONS.md)'
+        required: true
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  ci-gate:
+    name: CI must be green for this commit
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Confirm
+        run: test "${{ inputs.confirm }}" = "DEPLOY"
+      - name: Require a successful CI run for this SHA
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run list --repo "$GITHUB_REPOSITORY" --workflow ci.yml --commit "${{ github.sha }}" \
+            --json conclusion --jq '.[].conclusion' | grep -qx success \
+            || { echo "::error::no successful CI run for ${{ github.sha }}"; exit 1; }
+
+  deploy:
+    name: Deploy secure backend and web gateway
+    needs: ci-gate
+    runs-on: ubuntu-24.04
+    environment: production
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      WEB_URL: ${{ vars.WEB_URL }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Check token and URL
+        run: |
+          if [ -z "$WEB_URL" ]; then
+            echo "::error::Repository variable WEB_URL (public https URL of the web service) is not set"; exit 1
+          fi
+          if [ -z "$RAILWAY_TOKEN" ]; then
+            echo "::error::Repository secret RAILWAY_TOKEN is not set"; exit 1
+          fi
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli@4.58.0
+
+      - name: Deploy secure backend (migrations run on start)
+        run: scripts/deploy_secure_backend.sh serve
+
+      - name: Deploy web gateway
+        run: scripts/deploy_web_gateway.sh
+
+      - name: Wait for both deployments
+        run: |
+          for svc in secure-api web; do
+            for i in $(seq 1 120); do
+              status=$(railway deployment list --service "$svc" --json | python3 -c "import sys,json;print(json.load(sys.stdin)[0]['status'])")
+              case "$status" in SUCCESS) echo "$svc: $status"; break;; FAILED|CRASHED) echo "::error::$svc $status"; exit 1;; esac
+              sleep 10
+            done
+            [ "$status" = SUCCESS ] || { echo "::error::$svc not ready ($status)"; exit 1; }
+          done
+
+      - name: Smoke test production
+        run: |
+          for i in $(seq 1 30); do
+            [ "$(curl -s -o /dev/null -w '%{http_code}' "$WEB_URL/api/health")" = 200 ] && break; sleep 10
+          done
+          check() { code=$(curl -s -o /dev/null -w '%{http_code}' "${@:3}" "$WEB_URL$2"); echo "$2 -> $code (want $1)"; [ "$code" = "$1" ]; }
+          check 200 /api/health
+          check 200 /
+          check 401 /api/events
+          check 401 /api/ingest/ping -X POST
+          check 403 /api/login -X POST -H 'content-type: application/json' -d '{}'

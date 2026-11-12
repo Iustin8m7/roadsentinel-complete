@@ -1,0 +1,7 @@
+{
+  "runtime": "B: new disposable cluster",
+  "root": "/tmp/rsverify-uqv4vtf6",
+  "port": 49137,
+  "role": "rsverify_root",
+  "database": "rsmission_verify_ee6f1c904b"
+}

@@ -1,0 +1,90 @@
+Trimit evenimentele către http://127.0.0.1:36031
+model: stock-yolox-s (/home/justin7m8/Documents/roadsentinel/models/yolox_s.onnx)
+inference provider: CPUExecutionProvider
+inference provider fallback: CUDAExecutionProvider is not installed in this ONNX Runtime
+/home/justin7m8/Documents/roadsentinel-integration/roadsentinel/detector.py:209: FutureWarning: The `ByteTrack` was deprecated since v0.28.0. It will be removed in v0.31.0.
+  return sv.ByteTrack(frame_rate=max(1, round(frame_rate)))
+[   0.3s] CRITICAL Pieton pe carosabil: Persoană detectată în zona „Synthetic scene geometry”
+[   0.3s] CRITICAL Pieton pe carosabil: Persoană detectată în zona „Synthetic scene geometry”
+[   1.3s] CRITICAL Pieton pe carosabil: Persoană detectată în zona „Synthetic scene geometry”
+  event upload accepted id=4 key=evt-46a177961e960b12f1f679e1c5530544f6bb3f96 type=pedestrian_on_road track=5 source_t=0.300s
+  event upload accepted id=5 key=evt-15525d0be2f2812693d4d2ca027ed2849c738f9b type=pedestrian_on_road track=8 source_t=0.300s
+  event upload accepted id=6 key=evt-3b33d06679fa457a45a389c7ae6f0733bb4bed64 type=pedestrian_on_road track=3 source_t=1.300s
+[   5.0s] CRITICAL Pieton pe carosabil: Persoană detectată în zona „Synthetic scene geometry”
+  event upload accepted id=7 key=evt-910c4a095c8d0bce5997965d525f001e9fedef6f type=pedestrian_on_road track=30 source_t=5.000s
+[  15.0s] CRITICAL Pieton pe carosabil: Persoană detectată în zona „Synthetic scene geometry”
+  stop requested: finishing
+  event upload accepted id=8 key=evt-f8e17c628de5d22f942a3036d2d7a4a07ff78d2c type=pedestrian_on_road track=42 source_t=15.000s
+  uploads: {'done': 5, 'failed': 0, 'dropped': 0, 'pending': 0, 'last_errors': []}  suppressed by the alert gate: {'duplicate': 4}
+  annotated previews: {'done': 36, 'failed': 0, 'dropped': 0, 'pending': 0, 'last_errors': []}
+
+Rezumat: {'frames': 36, 'video_seconds': 16.9, 'processing_fps': 2.07, 'detections': 730, 'unique_tracks': 37, 'events': 5, 'tracks_by_class': {'car': 14, 'person': 9, 'truck': 5, 'bus': 8, 'object': 1}, 'events_by_type': {'pedestrian_on_road': 5}, 'median_vehicle_speed_kmh': None, 'traffic': {'total_crossings': 1, 'counts_by_line_lane_class': [{'line': 'crossing', 'lane': 'test', 'object_class': 'car', 'count': 1}], 'rolling_flow_per_minute': {'window_seconds': 60, 'total': 0.0, 'by_class': {}, 'by_direction': {}, 'by_line': {}}}, 'source': {'kind': 'network', 'transport': 'http_video', 'state': 'healthy', 'last_frame_age_s': 0.71, 'width': 1920, 'height': 1080, 'frames': 36, 'failures': 0, 'reconnects': 0}, 'detector': 'YOLOX-S ONNX / Supervision ByteTrack', 'model_sha256': 'c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063', 'device': 'CPUExecutionProvider', 'inference_latency_ms_p50': 93.0, 'inference_latency_ms_p95': 130.53, 'inference_latency_ms_p99': 153.62, 'process_peak_rss_mb': 451.2, 'detection_log': None}
+Trimit evenimentele către http://127.0.0.1:36031
+model: stock-yolox-s (/home/justin7m8/Documents/roadsentinel/models/yolox_s.onnx)
+inference provider: CPUExecutionProvider
+inference provider fallback: CUDAExecutionProvider is not installed in this ONNX Runtime
+/home/justin7m8/Documents/roadsentinel-integration/roadsentinel/detector.py:209: FutureWarning: The `ByteTrack` was deprecated since v0.28.0. It will be removed in v0.31.0.
+  return sv.ByteTrack(frame_rate=max(1, round(frame_rate)))
+[   0.3s] CRITICAL Pieton pe carosabil: Persoană detectată în zona „Synthetic scene geometry”
+[   0.3s] CRITICAL Pieton pe carosabil: Persoană detectată în zona „Synthetic scene geometry”
+[   1.3s] CRITICAL Pieton pe carosabil: Persoană detectată în zona „Synthetic scene geometry”
+[http @ 0x744288001bc0] Stream ends prematurely at 6684184, should be 18446744073709551615
+  stream lost (stream ended), reconnecting (#1)
+[ WARN:20@3.833] global cap.cpp:215 open VIDEOIO(FFMPEG): backend is generally available but can't be used to capture by name
+  stream lost (open failed (SourceError)), reconnecting (#2)
+[ WARN:20@5.833] global cap.cpp:215 open VIDEOIO(FFMPEG): backend is generally available but can't be used to capture by name
+  stream lost (open failed (SourceError)), reconnecting (#3)
+[ WARN:20@9.834] global cap.cpp:215 open VIDEOIO(FFMPEG): backend is generally available but can't be used to capture by name
+  stream lost (open failed (SourceError)), reconnecting (#4)
+  event upload accepted id=4 key=evt-46a177961e960b12f1f679e1c5530544f6bb3f96 type=pedestrian_on_road track=5 source_t=0.300s
+  event upload accepted id=5 key=evt-15525d0be2f2812693d4d2ca027ed2849c738f9b type=pedestrian_on_road track=8 source_t=0.300s
+  event upload accepted id=6 key=evt-3b33d06679fa457a45a389c7ae6f0733bb4bed64 type=pedestrian_on_road track=3 source_t=1.300s
+Trimit evenimentele către http://127.0.0.1:36031
+model: stock-yolox-s (/home/justin7m8/Documents/roadsentinel/models/yolox_s.onnx)
+inference provider: CPUExecutionProvider
+inference provider fallback: CUDAExecutionProvider is not installed in this ONNX Runtime
+/home/justin7m8/Documents/roadsentinel-integration/roadsentinel/detector.py:209: FutureWarning: The `ByteTrack` was deprecated since v0.28.0. It will be removed in v0.31.0.
+  return sv.ByteTrack(frame_rate=max(1, round(frame_rate)))
+[   0.4s] CRITICAL Pieton pe carosabil: Persoană detectată în zona „Synthetic scene geometry”
+[   0.4s] CRITICAL Pieton pe carosabil: Persoană detectată în zona „Synthetic scene geometry”
+[   1.5s] CRITICAL Pieton pe carosabil: Persoană detectată în zona „Synthetic scene geometry”
+  control stopped capture (RuntimeError)
+  uploads: {'done': 0, 'failed': 0, 'dropped': 2, 'pending': 0, 'last_errors': []}  suppressed by the alert gate: {'duplicate': 1}
+  annotated previews: {'done': 3, 'failed': 3, 'dropped': 1, 'pending': 0, 'last_errors': ["HTTPStatusError: Client error '403 Forbidden' for url 'http://127.0.0.1:36031/api/ingest/cameras/mission-replay/preview?captured_at=2026-11-10T23%3A44%3A07.080553%2B00%3A00&sequence=3&worker_epoch=658", "HTTPStatusError: Client error '403 Forbidden' for url 'http://127.0.0.1:36031/api/ingest/cameras/mission-replay/preview?captured_at=2026-11-10T23%3A44%3A07.667346%2B00%3A00&sequence=4&worker_epoch=658", "HTTPStatusError: Client error '403 Forbidden' for url 'http://127.0.0.1:36031/api/ingest/cameras/mission-replay/preview?captured_at=2026-11-10T23%3A44%3A08.323553%2B00%3A00&sequence=5&worker_epoch=658"]}
+
+Rezumat: {'frames': 7, 'video_seconds': 4.2, 'processing_fps': 1.5, 'detections': 132, 'unique_tracks': 22, 'events': 0, 'tracks_by_class': {'person': 4, 'car': 9, 'bus': 6, 'truck': 2, 'object': 1}, 'events_by_type': {}, 'median_vehicle_speed_kmh': None, 'traffic': {'total_crossings': 1, 'counts_by_line_lane_class': [{'line': 'crossing', 'lane': 'test', 'object_class': 'car', 'count': 1}], 'rolling_flow_per_minute': {'window_seconds': 60, 'total': 1.0, 'by_class': {'car': 1}, 'by_direction': {'positive': 1}, 'by_line': {'crossing': 1}}}, 'source': {'kind': 'network', 'transport': 'http_video', 'state': 'healthy', 'last_frame_age_s': 0.88, 'width': 1920, 'height': 1080, 'frames': 7, 'failures': 0, 'reconnects': 0}, 'detector': 'YOLOX-S ONNX / Supervision ByteTrack', 'model_sha256': 'c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063', 'device': 'CPUExecutionProvider', 'inference_latency_ms_p50': 157.19, 'inference_latency_ms_p95': 179.34, 'inference_latency_ms_p99': 181.14, 'process_peak_rss_mb': 393.9, 'detection_log': None}
+Trimit evenimentele către http://127.0.0.1:36031
+model: stock-yolox-s (/home/justin7m8/Documents/roadsentinel/models/yolox_s.onnx)
+inference provider: CPUExecutionProvider
+inference provider fallback: CUDAExecutionProvider is not installed in this ONNX Runtime
+/home/justin7m8/Documents/roadsentinel-integration/roadsentinel/detector.py:209: FutureWarning: The `ByteTrack` was deprecated since v0.28.0. It will be removed in v0.31.0.
+  return sv.ByteTrack(frame_rate=max(1, round(frame_rate)))
+[   0.3s] CRITICAL Pieton pe carosabil: Persoană detectată în zona „Synthetic scene geometry”
+[   0.3s] CRITICAL Pieton pe carosabil: Persoană detectată în zona „Synthetic scene geometry”
+[   1.5s] CRITICAL Pieton pe carosabil: Persoană detectată în zona „Synthetic scene geometry”
+  event upload accepted id=4 key=evt-46a177961e960b12f1f679e1c5530544f6bb3f96 type=pedestrian_on_road track=5 source_t=0.300s
+  event upload accepted id=5 key=evt-15525d0be2f2812693d4d2ca027ed2849c738f9b type=pedestrian_on_road track=8 source_t=0.300s
+  event upload accepted id=9 key=evt-3ea4fe7c178b7ebf655043ac6e52aa065b0b5e6e type=pedestrian_on_road track=3 source_t=1.500s
+  control stopped capture (RuntimeError)
+  uploads: {'done': 3, 'failed': 0, 'dropped': 0, 'pending': 0, 'last_errors': []}  suppressed by the alert gate: {'duplicate': 1}
+  annotated previews: {'done': 6, 'failed': 1, 'dropped': 1, 'pending': 0, 'last_errors': ["HTTPStatusError: Client error '409 Conflict' for url 'http://127.0.0.1:36031/api/ingest/cameras/mission-replay/preview?captured_at=2026-11-10T23%3A44%3A20.998071%2B00%3A00&sequence=6&worker_epoch=c3ed"]}
+
+Rezumat: {'frames': 8, 'video_seconds': 7.1, 'processing_fps': 1.05, 'detections': 166, 'unique_tracks': 26, 'events': 3, 'tracks_by_class': {'car': 12, 'person': 4, 'truck': 3, 'bus': 6, 'object': 1}, 'events_by_type': {'pedestrian_on_road': 3}, 'median_vehicle_speed_kmh': None, 'traffic': {'total_crossings': 1, 'counts_by_line_lane_class': [{'line': 'crossing', 'lane': 'test', 'object_class': 'car', 'count': 1}], 'rolling_flow_per_minute': {'window_seconds': 60, 'total': 1.0, 'by_class': {'car': 1}, 'by_direction': {'positive': 1}, 'by_line': {'crossing': 1}}}, 'source': {'kind': 'network', 'transport': 'http_video', 'state': 'healthy', 'last_frame_age_s': 0.84, 'width': 1920, 'height': 1080, 'frames': 8, 'failures': 0, 'reconnects': 0}, 'detector': 'YOLOX-S ONNX / Supervision ByteTrack', 'model_sha256': 'c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063', 'device': 'CPUExecutionProvider', 'inference_latency_ms_p50': 159.76, 'inference_latency_ms_p95': 244.08, 'inference_latency_ms_p99': 265.05, 'process_peak_rss_mb': 415.9, 'detection_log': None}
+Trimit evenimentele către http://127.0.0.1:36031
+model: stock-yolox-s (/home/justin7m8/Documents/roadsentinel/models/yolox_s.onnx)
+inference provider: CPUExecutionProvider
+inference provider fallback: CUDAExecutionProvider is not installed in this ONNX Runtime
+/home/justin7m8/Documents/roadsentinel-integration/roadsentinel/detector.py:209: FutureWarning: The `ByteTrack` was deprecated since v0.28.0. It will be removed in v0.31.0.
+  return sv.ByteTrack(frame_rate=max(1, round(frame_rate)))
+[   0.4s] CRITICAL Pieton pe carosabil: Persoană detectată în zona „Synthetic scene geometry”
+[   0.4s] CRITICAL Pieton pe carosabil: Persoană detectată în zona „Synthetic scene geometry”
+[   1.4s] CRITICAL Pieton pe carosabil: Persoană detectată în zona „Synthetic scene geometry”
+  event upload accepted id=10 key=evt-5bfc08c7949bf9646b027b0313533d4702c30d8d type=pedestrian_on_road track=2 source_t=0.400s
+  event upload accepted id=11 key=evt-c5c8f8d932899ec20cfe821fe67b0a11bf7e1ff4 type=pedestrian_on_road track=21 source_t=0.400s
+  heartbeat failed: Camera stopped, lease lost, or approved revision changed
+[   5.6s] CRITICAL Pieton pe carosabil: Persoană detectată în zona „Synthetic scene geometry”
+  control stopped capture (RuntimeError)
+  uploads: {'done': 2, 'failed': 0, 'dropped': 1, 'pending': 0, 'last_errors': []}  suppressed by the alert gate: {'duplicate': 3}
+  annotated previews: {'done': 9, 'failed': 2, 'dropped': 1, 'pending': 0, 'last_errors': ["HTTPStatusError: Client error '403 Forbidden' for url 'http://127.0.0.1:36031/api/ingest/cameras/mission-replay/preview?captured_at=2026-11-10T23%3A44%3A31.651185%2B00%3A00&sequence=9&worker_epoch=1c9", "HTTPStatusError: Client error '403 Forbidden' for url 'http://127.0.0.1:36031/api/ingest/cameras/mission-replay/preview?captured_at=2026-11-10T23%3A44%3A32.109191%2B00%3A00&sequence=10&worker_epoch=1c"]}
+
+Rezumat: {'frames': 12, 'video_seconds': 6.1, 'processing_fps': 1.79, 'detections': 226, 'unique_tracks': 27, 'events': 2, 'tracks_by_class': {'person': 7, 'car': 10, 'bus': 6, 'truck': 3, 'object': 1}, 'events_by_type': {'pedestrian_on_road': 2}, 'median_vehicle_speed_kmh': None, 'traffic': {'total_crossings': 1, 'counts_by_line_lane_class': [{'line': 'crossing', 'lane': 'test', 'object_class': 'car', 'count': 1}], 'rolling_flow_per_minute': {'window_seconds': 60, 'total': 0.0, 'by_class': {}, 'by_direction': {}, 'by_line': {}}}, 'source': {'kind': 'network', 'transport': 'http_video', 'state': 'healthy', 'last_frame_age_s': 0.96, 'width': 1920, 'height': 1080, 'frames': 12, 'failures': 0, 'reconnects': 0}, 'detector': 'YOLOX-S ONNX / Supervision ByteTrack', 'model_sha256': 'c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063', 'device': 'CPUExecutionProvider', 'inference_latency_ms_p50': 106.28, 'inference_latency_ms_p95': 150.5, 'inference_latency_ms_p99': 161.0, 'process_peak_rss_mb': 439.8, 'detection_log': None}

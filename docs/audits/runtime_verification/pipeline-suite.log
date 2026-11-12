@@ -1,0 +1,773 @@
+............EEEEEEEEEEEEEEEEEE.................FF.F..................... [ 33%]
+..........................F............................................. [ 67%]
+.....................................................................    [100%]
+==================================== ERRORS ====================================
+_______________ ERROR at setup of test_dashboard_requires_login ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-162/test_dashboard_requires_login0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71a68f74eb70>
+
+    @pytest.fixture
+    def client(tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path}/t.db")
+        monkeypatch.setenv("DASHBOARD_PASSWORD", "legacy-test-pw")
+        monkeypatch.setenv("INGEST_TOKEN", "tok")
+        monkeypatch.setenv("COOKIE_SECURE", "0")
+        monkeypatch.delenv("S3_BUCKET", raising=False)
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+>       from roadsentinel import server
+
+/home/justin7m8/Documents/roadsentinel-integration/tests/test_api.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/justin7m8/Documents/roadsentinel-integration/roadsentinel/server.py:20: in <module>
+    from starlette.middleware.sessions import SessionMiddleware
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    from __future__ import annotations
+    
+    import json
+    import typing
+    from base64 import b64decode, b64encode
+    from typing import Literal
+    
+>   import itsdangerous
+E   ModuleNotFoundError: No module named 'itsdangerous'
+
+/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/sessions.py:8: ModuleNotFoundError
+_________________ ERROR at setup of test_ingest_requires_token _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-162/test_ingest_requires_token0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71a68f74ca10>
+
+    @pytest.fixture
+    def client(tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path}/t.db")
+        monkeypatch.setenv("DASHBOARD_PASSWORD", "legacy-test-pw")
+        monkeypatch.setenv("INGEST_TOKEN", "tok")
+        monkeypatch.setenv("COOKIE_SECURE", "0")
+        monkeypatch.delenv("S3_BUCKET", raising=False)
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+>       from roadsentinel import server
+
+/home/justin7m8/Documents/roadsentinel-integration/tests/test_api.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/justin7m8/Documents/roadsentinel-integration/roadsentinel/server.py:20: in <module>
+    from starlette.middleware.sessions import SessionMiddleware
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    from __future__ import annotations
+    
+    import json
+    import typing
+    from base64 import b64decode, b64encode
+    from typing import Literal
+    
+>   import itsdangerous
+E   ModuleNotFoundError: No module named 'itsdangerous'
+
+/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/sessions.py:8: ModuleNotFoundError
+__________ ERROR at setup of test_ingested_event_is_listed_with_media __________
+
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-162/test_ingested_event_is_listed_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71a68f80b830>
+
+    @pytest.fixture
+    def client(tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path}/t.db")
+        monkeypatch.setenv("DASHBOARD_PASSWORD", "legacy-test-pw")
+        monkeypatch.setenv("INGEST_TOKEN", "tok")
+        monkeypatch.setenv("COOKIE_SECURE", "0")
+        monkeypatch.delenv("S3_BUCKET", raising=False)
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+>       from roadsentinel import server
+
+/home/justin7m8/Documents/roadsentinel-integration/tests/test_api.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/justin7m8/Documents/roadsentinel-integration/roadsentinel/server.py:20: in <module>
+    from starlette.middleware.sessions import SessionMiddleware
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    from __future__ import annotations
+    
+    import json
+    import typing
+    from base64 import b64decode, b64encode
+    from typing import Literal
+    
+>   import itsdangerous
+E   ModuleNotFoundError: No module named 'itsdangerous'
+
+/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/sessions.py:8: ModuleNotFoundError
+_____ ERROR at setup of test_decision_is_attributed_to_logged_in_operator ______
+
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-162/test_decision_is_attributed_to0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71a68f80b530>
+
+    @pytest.fixture
+    def client(tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path}/t.db")
+        monkeypatch.setenv("DASHBOARD_PASSWORD", "legacy-test-pw")
+        monkeypatch.setenv("INGEST_TOKEN", "tok")
+        monkeypatch.setenv("COOKIE_SECURE", "0")
+        monkeypatch.delenv("S3_BUCKET", raising=False)
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+>       from roadsentinel import server
+
+/home/justin7m8/Documents/roadsentinel-integration/tests/test_api.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/justin7m8/Documents/roadsentinel-integration/roadsentinel/server.py:20: in <module>
+    from starlette.middleware.sessions import SessionMiddleware
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    from __future__ import annotations
+    
+    import json
+    import typing
+    from base64 import b64decode, b64encode
+    from typing import Literal
+    
+>   import itsdangerous
+E   ModuleNotFoundError: No module named 'itsdangerous'
+
+/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/sessions.py:8: ModuleNotFoundError
+____________________ ERROR at setup of test_search_by_speed ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-162/test_search_by_speed0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71a68f7f2540>
+
+    @pytest.fixture
+    def client(tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path}/t.db")
+        monkeypatch.setenv("DASHBOARD_PASSWORD", "legacy-test-pw")
+        monkeypatch.setenv("INGEST_TOKEN", "tok")
+        monkeypatch.setenv("COOKIE_SECURE", "0")
+        monkeypatch.delenv("S3_BUCKET", raising=False)
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+>       from roadsentinel import server
+
+/home/justin7m8/Documents/roadsentinel-integration/tests/test_api.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/justin7m8/Documents/roadsentinel-integration/roadsentinel/server.py:20: in <module>
+    from starlette.middleware.sessions import SessionMiddleware
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    from __future__ import annotations
+    
+    import json
+    import typing
+    from base64 import b64decode, b64encode
+    from typing import Literal
+    
+>   import itsdangerous
+E   ModuleNotFoundError: No module named 'itsdangerous'
+
+/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/sessions.py:8: ModuleNotFoundError
+_______ ERROR at setup of test_reprocessing_a_camera_replaces_its_events _______
+
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-162/test_reprocessing_a_camera_rep0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71a68f7f3d10>
+
+    @pytest.fixture
+    def client(tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path}/t.db")
+        monkeypatch.setenv("DASHBOARD_PASSWORD", "legacy-test-pw")
+        monkeypatch.setenv("INGEST_TOKEN", "tok")
+        monkeypatch.setenv("COOKIE_SECURE", "0")
+        monkeypatch.delenv("S3_BUCKET", raising=False)
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+>       from roadsentinel import server
+
+/home/justin7m8/Documents/roadsentinel-integration/tests/test_api.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/justin7m8/Documents/roadsentinel-integration/roadsentinel/server.py:20: in <module>
+    from starlette.middleware.sessions import SessionMiddleware
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    from __future__ import annotations
+    
+    import json
+    import typing
+    from base64 import b64decode, b64encode
+    from typing import Literal
+    
+>   import itsdangerous
+E   ModuleNotFoundError: No module named 'itsdangerous'
+
+/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/sessions.py:8: ModuleNotFoundError
+_ ERROR at setup of test_invalid_ingest_is_rejected_and_stores_nothing[patch0] _
+
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-162/test_invalid_ingest_is_rejecte0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71a68f7f30b0>
+
+    @pytest.fixture
+    def client(tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path}/t.db")
+        monkeypatch.setenv("DASHBOARD_PASSWORD", "legacy-test-pw")
+        monkeypatch.setenv("INGEST_TOKEN", "tok")
+        monkeypatch.setenv("COOKIE_SECURE", "0")
+        monkeypatch.delenv("S3_BUCKET", raising=False)
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+>       from roadsentinel import server
+
+/home/justin7m8/Documents/roadsentinel-integration/tests/test_api.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/justin7m8/Documents/roadsentinel-integration/roadsentinel/server.py:20: in <module>
+    from starlette.middleware.sessions import SessionMiddleware
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    from __future__ import annotations
+    
+    import json
+    import typing
+    from base64 import b64decode, b64encode
+    from typing import Literal
+    
+>   import itsdangerous
+E   ModuleNotFoundError: No module named 'itsdangerous'
+
+/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/sessions.py:8: ModuleNotFoundError
+_ ERROR at setup of test_invalid_ingest_is_rejected_and_stores_nothing[patch1] _
+
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-162/test_invalid_ingest_is_rejecte1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71a68f7f1f70>
+
+    @pytest.fixture
+    def client(tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path}/t.db")
+        monkeypatch.setenv("DASHBOARD_PASSWORD", "legacy-test-pw")
+        monkeypatch.setenv("INGEST_TOKEN", "tok")
+        monkeypatch.setenv("COOKIE_SECURE", "0")
+        monkeypatch.delenv("S3_BUCKET", raising=False)
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+>       from roadsentinel import server
+
+/home/justin7m8/Documents/roadsentinel-integration/tests/test_api.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/justin7m8/Documents/roadsentinel-integration/roadsentinel/server.py:20: in <module>
+    from starlette.middleware.sessions import SessionMiddleware
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    from __future__ import annotations
+    
+    import json
+    import typing
+    from base64 import b64decode, b64encode
+    from typing import Literal
+    
+>   import itsdangerous
+E   ModuleNotFoundError: No module named 'itsdangerous'
+
+/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/sessions.py:8: ModuleNotFoundError
+_ ERROR at setup of test_invalid_ingest_is_rejected_and_stores_nothing[patch2] _
+
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-162/test_invalid_ingest_is_rejecte2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71a68f809610>
+
+    @pytest.fixture
+    def client(tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path}/t.db")
+        monkeypatch.setenv("DASHBOARD_PASSWORD", "legacy-test-pw")
+        monkeypatch.setenv("INGEST_TOKEN", "tok")
+        monkeypatch.setenv("COOKIE_SECURE", "0")
+        monkeypatch.delenv("S3_BUCKET", raising=False)
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+>       from roadsentinel import server
+
+/home/justin7m8/Documents/roadsentinel-integration/tests/test_api.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/justin7m8/Documents/roadsentinel-integration/roadsentinel/server.py:20: in <module>
+    from starlette.middleware.sessions import SessionMiddleware
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    from __future__ import annotations
+    
+    import json
+    import typing
+    from base64 import b64decode, b64encode
+    from typing import Literal
+    
+>   import itsdangerous
+E   ModuleNotFoundError: No module named 'itsdangerous'
+
+/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/sessions.py:8: ModuleNotFoundError
+_ ERROR at setup of test_invalid_ingest_is_rejected_and_stores_nothing[patch3] _
+
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-162/test_invalid_ingest_is_rejecte3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71a68f816990>
+
+    @pytest.fixture
+    def client(tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path}/t.db")
+        monkeypatch.setenv("DASHBOARD_PASSWORD", "legacy-test-pw")
+        monkeypatch.setenv("INGEST_TOKEN", "tok")
+        monkeypatch.setenv("COOKIE_SECURE", "0")
+        monkeypatch.delenv("S3_BUCKET", raising=False)
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+>       from roadsentinel import server
+
+/home/justin7m8/Documents/roadsentinel-integration/tests/test_api.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/justin7m8/Documents/roadsentinel-integration/roadsentinel/server.py:20: in <module>
+    from starlette.middleware.sessions import SessionMiddleware
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    from __future__ import annotations
+    
+    import json
+    import typing
+    from base64 import b64decode, b64encode
+    from typing import Literal
+    
+>   import itsdangerous
+E   ModuleNotFoundError: No module named 'itsdangerous'
+
+/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/sessions.py:8: ModuleNotFoundError
+________________ ERROR at setup of test_ingest_rejects_bad_json ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-162/test_ingest_rejects_bad_json0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71a68f801790>
+
+    @pytest.fixture
+    def client(tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path}/t.db")
+        monkeypatch.setenv("DASHBOARD_PASSWORD", "legacy-test-pw")
+        monkeypatch.setenv("INGEST_TOKEN", "tok")
+        monkeypatch.setenv("COOKIE_SECURE", "0")
+        monkeypatch.delenv("S3_BUCKET", raising=False)
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+>       from roadsentinel import server
+
+/home/justin7m8/Documents/roadsentinel-integration/tests/test_api.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/justin7m8/Documents/roadsentinel-integration/roadsentinel/server.py:20: in <module>
+    from starlette.middleware.sessions import SessionMiddleware
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    from __future__ import annotations
+    
+    import json
+    import typing
+    from base64 import b64decode, b64encode
+    from typing import Literal
+    
+>   import itsdangerous
+E   ModuleNotFoundError: No module named 'itsdangerous'
+
+/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/sessions.py:8: ModuleNotFoundError
+____________ ERROR at setup of test_priority_comes_from_event_type _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-162/test_priority_comes_from_event0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71a68f80ad20>
+
+    @pytest.fixture
+    def client(tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path}/t.db")
+        monkeypatch.setenv("DASHBOARD_PASSWORD", "legacy-test-pw")
+        monkeypatch.setenv("INGEST_TOKEN", "tok")
+        monkeypatch.setenv("COOKIE_SECURE", "0")
+        monkeypatch.delenv("S3_BUCKET", raising=False)
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+>       from roadsentinel import server
+
+/home/justin7m8/Documents/roadsentinel-integration/tests/test_api.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/justin7m8/Documents/roadsentinel-integration/roadsentinel/server.py:20: in <module>
+    from starlette.middleware.sessions import SessionMiddleware
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    from __future__ import annotations
+    
+    import json
+    import typing
+    from base64 import b64decode, b64encode
+    from typing import Literal
+    
+>   import itsdangerous
+E   ModuleNotFoundError: No module named 'itsdangerous'
+
+/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/sessions.py:8: ModuleNotFoundError
+__________ ERROR at setup of test_camera_routes_reject_path_traversal __________
+
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-162/test_camera_routes_reject_path0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71a68f80a1e0>
+
+    @pytest.fixture
+    def client(tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path}/t.db")
+        monkeypatch.setenv("DASHBOARD_PASSWORD", "legacy-test-pw")
+        monkeypatch.setenv("INGEST_TOKEN", "tok")
+        monkeypatch.setenv("COOKIE_SECURE", "0")
+        monkeypatch.delenv("S3_BUCKET", raising=False)
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+>       from roadsentinel import server
+
+/home/justin7m8/Documents/roadsentinel-integration/tests/test_api.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/justin7m8/Documents/roadsentinel-integration/roadsentinel/server.py:20: in <module>
+    from starlette.middleware.sessions import SessionMiddleware
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    from __future__ import annotations
+    
+    import json
+    import typing
+    from base64 import b64decode, b64encode
+    from typing import Literal
+    
+>   import itsdangerous
+E   ModuleNotFoundError: No module named 'itsdangerous'
+
+/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/sessions.py:8: ModuleNotFoundError
+_____ ERROR at setup of test_media_does_not_serve_files_outside_media_root _____
+
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-162/test_media_does_not_serve_file0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71a68f7f0950>
+
+    @pytest.fixture
+    def client(tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path}/t.db")
+        monkeypatch.setenv("DASHBOARD_PASSWORD", "legacy-test-pw")
+        monkeypatch.setenv("INGEST_TOKEN", "tok")
+        monkeypatch.setenv("COOKIE_SECURE", "0")
+        monkeypatch.delenv("S3_BUCKET", raising=False)
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+>       from roadsentinel import server
+
+/home/justin7m8/Documents/roadsentinel-integration/tests/test_api.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/justin7m8/Documents/roadsentinel-integration/roadsentinel/server.py:20: in <module>
+    from starlette.middleware.sessions import SessionMiddleware
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    from __future__ import annotations
+    
+    import json
+    import typing
+    from base64 import b64decode, b64encode
+    from typing import Literal
+    
+>   import itsdangerous
+E   ModuleNotFoundError: No module named 'itsdangerous'
+
+/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/sessions.py:8: ModuleNotFoundError
+__________________ ERROR at setup of test_non_ascii_password ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-162/test_non_ascii_password0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71a68f7f1e50>
+
+    @pytest.fixture
+    def client(tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path}/t.db")
+        monkeypatch.setenv("DASHBOARD_PASSWORD", "legacy-test-pw")
+        monkeypatch.setenv("INGEST_TOKEN", "tok")
+        monkeypatch.setenv("COOKIE_SECURE", "0")
+        monkeypatch.delenv("S3_BUCKET", raising=False)
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+>       from roadsentinel import server
+
+/home/justin7m8/Documents/roadsentinel-integration/tests/test_api.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/justin7m8/Documents/roadsentinel-integration/roadsentinel/server.py:20: in <module>
+    from starlette.middleware.sessions import SessionMiddleware
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    from __future__ import annotations
+    
+    import json
+    import typing
+    from base64 import b64decode, b64encode
+    from typing import Literal
+    
+>   import itsdangerous
+E   ModuleNotFoundError: No module named 'itsdangerous'
+
+/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/sessions.py:8: ModuleNotFoundError
+_________ ERROR at setup of test_decided_event_cannot_be_decided_again _________
+
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-162/test_decided_event_cannot_be_d0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71a68f80acc0>
+
+    @pytest.fixture
+    def client(tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path}/t.db")
+        monkeypatch.setenv("DASHBOARD_PASSWORD", "legacy-test-pw")
+        monkeypatch.setenv("INGEST_TOKEN", "tok")
+        monkeypatch.setenv("COOKIE_SECURE", "0")
+        monkeypatch.delenv("S3_BUCKET", raising=False)
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+>       from roadsentinel import server
+
+/home/justin7m8/Documents/roadsentinel-integration/tests/test_api.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/justin7m8/Documents/roadsentinel-integration/roadsentinel/server.py:20: in <module>
+    from starlette.middleware.sessions import SessionMiddleware
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    from __future__ import annotations
+    
+    import json
+    import typing
+    from base64 import b64decode, b64encode
+    from typing import Literal
+    
+>   import itsdangerous
+E   ModuleNotFoundError: No module named 'itsdangerous'
+
+/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/sessions.py:8: ModuleNotFoundError
+____________ ERROR at setup of test_audit_times_are_timezone_aware _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-162/test_audit_times_are_timezone_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71a68f800b00>
+
+    @pytest.fixture
+    def client(tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path}/t.db")
+        monkeypatch.setenv("DASHBOARD_PASSWORD", "legacy-test-pw")
+        monkeypatch.setenv("INGEST_TOKEN", "tok")
+        monkeypatch.setenv("COOKIE_SECURE", "0")
+        monkeypatch.delenv("S3_BUCKET", raising=False)
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+>       from roadsentinel import server
+
+/home/justin7m8/Documents/roadsentinel-integration/tests/test_api.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/justin7m8/Documents/roadsentinel-integration/roadsentinel/server.py:20: in <module>
+    from starlette.middleware.sessions import SessionMiddleware
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    from __future__ import annotations
+    
+    import json
+    import typing
+    from base64 import b64decode, b64encode
+    from typing import Literal
+    
+>   import itsdangerous
+E   ModuleNotFoundError: No module named 'itsdangerous'
+
+/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/sessions.py:8: ModuleNotFoundError
+____ ERROR at setup of test_stream_replays_events_missed_while_disconnected ____
+
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-162/test_stream_replays_events_mis0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71a68f815880>
+
+    @pytest.fixture
+    def client(tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path}/t.db")
+        monkeypatch.setenv("DASHBOARD_PASSWORD", "legacy-test-pw")
+        monkeypatch.setenv("INGEST_TOKEN", "tok")
+        monkeypatch.setenv("COOKIE_SECURE", "0")
+        monkeypatch.delenv("S3_BUCKET", raising=False)
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+>       from roadsentinel import server
+
+/home/justin7m8/Documents/roadsentinel-integration/tests/test_api.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/justin7m8/Documents/roadsentinel-integration/roadsentinel/server.py:20: in <module>
+    from starlette.middleware.sessions import SessionMiddleware
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    from __future__ import annotations
+    
+    import json
+    import typing
+    from base64 import b64decode, b64encode
+    from typing import Literal
+    
+>   import itsdangerous
+E   ModuleNotFoundError: No module named 'itsdangerous'
+
+/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/sessions.py:8: ModuleNotFoundError
+=================================== FAILURES ===================================
+_____________________ test_profile_is_local_and_slug_bound _____________________
+
+    def test_profile_is_local_and_slug_bound():
+        with pytest.raises(ValueError, match="local YAML filename"):
+            workers._profile("../README.md", "local-uvc-camera")
+        with pytest.raises(ValueError, match="slug"):
+            workers._profile("local-uvc.yaml", "another-camera")
+>       profile, config, digest = workers._profile("local-uvc.yaml", "local-uvc-camera")
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_camera_workers.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'local-uvc.yaml', slug = 'local-uvc-camera'
+
+    def _profile(name: str, slug: str) -> tuple[Path, dict[str, Any], str]:
+        if not PROFILE_NAME.fullmatch(name):
+            raise ValueError("config_ref must be a local YAML filename")
+        path = (CAMERA_DIR / name).resolve(strict=True)
+        if path.parent != CAMERA_DIR or not path.is_file():
+            raise ValueError("camera profile must be a regular file directly inside cameras/")
+        try:
+            config = yaml.safe_load(path.read_text(encoding="utf-8"))
+        except (OSError, yaml.YAMLError) as exc:
+            raise ValueError("camera profile could not be parsed") from exc
+        if not isinstance(config, dict) or config.get("id") != slug:
+            raise ValueError("camera profile id must match the tenant camera slug")
+        try:
+            spec = SourceSpec.from_camera(config)
+        except ConsentError:
+            raise ValueError(
+                "camera profile policy validation failed: source processing permission is not recorded"
+            ) from None
+        except (SourceError, KeyError, TypeError, ValueError) as exc:
+            raise ValueError(f"camera profile policy validation failed: {exc}") from None
+        if not spec.live_capture:
+            raise ValueError("worker controls accept only a configured live camera source")
+        model = config.get("model")
+        if not isinstance(model, str) or not model or ".." in Path(model).parts:
+            raise ValueError("camera profile must select a repository-local model")
+        model_path = (ROOT / model).resolve()
+        if ROOT not in model_path.parents or not model_path.is_file():
+>           raise ValueError("configured model is missing or outside the repository")
+E           ValueError: configured model is missing or outside the repository
+
+backend/app/services/camera_workers.py:122: ValueError
+__________ test_supervisor_start_is_idempotent_and_stop_reaps_process __________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71a68f709a90>
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-162/test_supervisor_start_is_idemp0')
+
+    def test_supervisor_start_is_idempotent_and_stop_reaps_process(monkeypatch, tmp_path):
+        real_popen = subprocess.Popen
+        tenant_id, camera_id = str(uuid.uuid4()), str(uuid.uuid4())
+        key = f"{tenant_id}-{camera_id}"
+        monkeypatch.setattr(workers, "STATE_DIR", tmp_path)
+        monkeypatch.setattr(workers, "_children", {})
+        monkeypatch.setenv("RS_API_URL", "http://127.0.0.1:8000")
+        monkeypatch.setenv("RS_INGEST_KEY_ID", "test-key")
+        monkeypatch.setenv("RS_INGEST_SECRET", "test-secret")
+    
+        def launch(_command, **kwargs):
+            return real_popen(
+                [sys.executable, "-c", "import time; time.sleep(30)"], **kwargs
+            )
+    
+        monkeypatch.setattr(workers.subprocess, "Popen", launch)
+>       first = workers.start(tenant_id, camera_id, "local-uvc-camera", "local-uvc.yaml")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_camera_workers.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+backend/app/services/camera_workers.py:232: in start
+    profile, config, version = _profile(config_ref, slug)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'local-uvc.yaml', slug = 'local-uvc-camera'
+
+    def _profile(name: str, slug: str) -> tuple[Path, dict[str, Any], str]:
+        if not PROFILE_NAME.fullmatch(name):
+            raise ValueError("config_ref must be a local YAML filename")
+        path = (CAMERA_DIR / name).resolve(strict=True)
+        if path.parent != CAMERA_DIR or not path.is_file():
+            raise ValueError("camera profile must be a regular file directly inside cameras/")
+        try:
+            config = yaml.safe_load(path.read_text(encoding="utf-8"))
+        except (OSError, yaml.YAMLError) as exc:
+            raise ValueError("camera profile could not be parsed") from exc
+        if not isinstance(config, dict) or config.get("id") != slug:
+            raise ValueError("camera profile id must match the tenant camera slug")
+        try:
+            spec = SourceSpec.from_camera(config)
+        except ConsentError:
+            raise ValueError(
+                "camera profile policy validation failed: source processing permission is not recorded"
+            ) from None
+        except (SourceError, KeyError, TypeError, ValueError) as exc:
+            raise ValueError(f"camera profile policy validation failed: {exc}") from None
+        if not spec.live_capture:
+            raise ValueError("worker controls accept only a configured live camera source")
+        model = config.get("model")
+        if not isinstance(model, str) or not model or ".." in Path(model).parts:
+            raise ValueError("camera profile must select a repository-local model")
+        model_path = (ROOT / model).resolve()
+        if ROOT not in model_path.parents or not model_path.is_file():
+>           raise ValueError("configured model is missing or outside the repository")
+E           ValueError: configured model is missing or outside the repository
+
+backend/app/services/camera_workers.py:122: ValueError
+___________ test_worker_refuses_to_start_without_local_signed_ingest ___________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71a68f6dabd0>
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-162/test_worker_refuses_to_start_w0')
+
+    def test_worker_refuses_to_start_without_local_signed_ingest(monkeypatch, tmp_path):
+        monkeypatch.setattr(workers, "STATE_DIR", tmp_path)
+        for key in ("RS_API_URL", "RS_INGEST_KEY_ID", "RS_INGEST_SECRET"):
+            monkeypatch.delenv(key, raising=False)
+>       with pytest.raises(ValueError, match="localhost RS_API_URL"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'localhost RS_API_URL'
+E         Actual message: 'configured model is missing or outside the repository'
+
+tests/test_camera_workers.py:65: AssertionError
+_______ test_pipeline_fails_loudly_when_the_configured_model_is_missing ________
+
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-162/test_pipeline_fails_loudly_whe0')
+
+    def test_pipeline_fails_loudly_when_the_configured_model_is_missing(tmp_path):
+        cfg = {"id": "cam", "model": str(tmp_path / "missing.pt")}
+        with pytest.raises(ModelError, match="missing"):
+            models.resolve_for_pipeline(cfg, env={})
+>       assert models.resolve_for_pipeline(cfg, env={"RS_ALLOW_MODEL_FALLBACK": "1"})[0] == "yolo11s.pt"
+E       AssertionError: assert 'models/yolox_s.onnx' == 'yolo11s.pt'
+E         
+E         - yolo11s.pt
+E         + models/yolox_s.onnx
+
+tests/test_models.py:140: AssertionError
+=============================== warnings summary ===============================
+.venv.integration/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/test_detector.py::test_supervision_bytetrack_keeps_ids_for_a_moving_detection
+  /home/justin7m8/Documents/roadsentinel-integration/roadsentinel/detector.py:209: FutureWarning: The `ByteTrack` was deprecated since v0.28.0. It will be removed in v0.31.0.
+    return sv.ByteTrack(frame_rate=max(1, round(frame_rate)))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_camera_workers.py::test_profile_is_local_and_slug_bound - V...
+FAILED tests/test_camera_workers.py::test_supervisor_start_is_idempotent_and_stop_reaps_process
+FAILED tests/test_camera_workers.py::test_worker_refuses_to_start_without_local_signed_ingest
+FAILED tests/test_models.py::test_pipeline_fails_loudly_when_the_configured_model_is_missing
+ERROR tests/test_api.py::test_dashboard_requires_login - ModuleNotFoundError:...
+ERROR tests/test_api.py::test_ingest_requires_token - ModuleNotFoundError: No...
+ERROR tests/test_api.py::test_ingested_event_is_listed_with_media - ModuleNot...
+ERROR tests/test_api.py::test_decision_is_attributed_to_logged_in_operator - ...
+ERROR tests/test_api.py::test_search_by_speed - ModuleNotFoundError: No modul...
+ERROR tests/test_api.py::test_reprocessing_a_camera_replaces_its_events - Mod...
+ERROR tests/test_api.py::test_invalid_ingest_is_rejected_and_stores_nothing[patch0]
+ERROR tests/test_api.py::test_invalid_ingest_is_rejected_and_stores_nothing[patch1]
+ERROR tests/test_api.py::test_invalid_ingest_is_rejected_and_stores_nothing[patch2]
+ERROR tests/test_api.py::test_invalid_ingest_is_rejected_and_stores_nothing[patch3]
+ERROR tests/test_api.py::test_ingest_rejects_bad_json - ModuleNotFoundError: ...
+ERROR tests/test_api.py::test_priority_comes_from_event_type - ModuleNotFound...
+ERROR tests/test_api.py::test_camera_routes_reject_path_traversal - ModuleNot...
+ERROR tests/test_api.py::test_media_does_not_serve_files_outside_media_root
+ERROR tests/test_api.py::test_non_ascii_password - ModuleNotFoundError: No mo...
+ERROR tests/test_api.py::test_decided_event_cannot_be_decided_again - ModuleN...
+ERROR tests/test_api.py::test_audit_times_are_timezone_aware - ModuleNotFound...
+ERROR tests/test_api.py::test_stream_replays_events_missed_while_disconnected
+4 failed, 191 passed, 2 warnings, 18 errors in 4.45s

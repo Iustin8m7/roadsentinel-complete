@@ -1,0 +1,590 @@
+;
+; Archive created at 2026-11-12 01:58:25 EET
+;     dbname: rsint_20261110b
+;     TOC Entries: 573
+;     Compression: gzip
+;     Dump Version: 1.16-0
+;     Format: CUSTOM
+;     Integer: 4 bytes
+;     Offset: 8 bytes
+;     Dumped from database version: 18.6
+;     Dumped by pg_dump version: 18.6
+;
+;
+; Selected TOC Entries:
+;
+4257; 0 0 ACL - SCHEMA public pg_database_owner
+924; 1247 16513 TYPE public alert_priority rsint_owner_261110b
+927; 1247 16522 TYPE public alert_status rsint_owner_261110b
+933; 1247 16570 TYPE public approval_kind rsint_owner_261110b
+936; 1247 16576 TYPE public approval_status rsint_owner_261110b
+918; 1247 16476 TYPE public user_role rsint_owner_261110b
+262; 1255 16926 FUNCTION public rs_alert_number() rsint_owner_261110b
+274; 1255 17553 FUNCTION public rs_append_only() rsint_owner_261110b
+258; 1255 16838 FUNCTION public rs_audit_log_immutable() rsint_owner_261110b
+280; 1255 16843 FUNCTION public rs_auth_find_invitation_tenant(text) rsint_app_261110b__lookup
+4258; 0 0 ACL public FUNCTION rs_auth_find_invitation_tenant(p_hash text) rsint_app_261110b__lookup
+279; 1255 16842 FUNCTION public rs_auth_find_refresh_tenant(text) rsint_app_261110b__lookup
+4259; 0 0 ACL public FUNCTION rs_auth_find_refresh_tenant(p_hash text) rsint_app_261110b__lookup
+277; 1255 16841 FUNCTION public rs_auth_find_user(text) rsint_app_261110b__lookup
+4260; 0 0 ACL public FUNCTION rs_auth_find_user(p_email text) rsint_app_261110b__lookup
+267; 1255 17288 FUNCTION public rs_camera_config_guard() rsint_owner_261110b
+257; 1255 16776 FUNCTION public rs_current_tenant() rsint_owner_261110b
+4261; 0 0 ACL public FUNCTION rs_current_tenant() rsint_owner_261110b
+259; 1255 26093 FUNCTION public rs_geo_immutable() rsint_root_261110
+260; 1255 27742 FUNCTION public rs_notification_event_immutable() rsint_root_261110
+276; 1255 16844 FUNCTION public rs_platform_tenant() rsint_app_261110b__lookup
+4262; 0 0 ACL public FUNCTION rs_platform_tenant() rsint_app_261110b__lookup
+281; 1255 16846 FUNCTION public rs_resource_tenant(text, uuid) rsint_app_261110b__lookup
+4263; 0 0 ACL public FUNCTION rs_resource_tenant(p_table text, p_id uuid) rsint_app_261110b__lookup
+261; 1255 16918 FUNCTION public rs_service_key_tenant(text) rsint_owner_261110b
+4264; 0 0 ACL public FUNCTION rs_service_key_tenant(p_key_id text) rsint_owner_261110b
+278; 1255 16845 FUNCTION public rs_tenant_id_by_slug(text) rsint_app_261110b__lookup
+4265; 0 0 ACL public FUNCTION rs_tenant_id_by_slug(p_slug text) rsint_app_261110b__lookup
+219; 1259 16389 TABLE public alembic_version rsint_owner_261110b
+4266; 0 0 ACL public TABLE alembic_version rsint_owner_261110b
+226; 1259 16529 TABLE public alerts rsint_owner_261110b
+4267; 0 0 ACL public TABLE alerts rsint_owner_261110b
+4268; 0 0 ACL public COLUMN alerts.id rsint_owner_261110b
+4269; 0 0 ACL public COLUMN alerts.tenant_id rsint_owner_261110b
+240; 1259 17089 TABLE public analysis_runs rsint_owner_261110b
+4270; 0 0 ACL public TABLE analysis_runs rsint_owner_261110b
+227; 1259 16585 TABLE public approval_requests rsint_owner_261110b
+4271; 0 0 ACL public TABLE approval_requests rsint_owner_261110b
+4272; 0 0 ACL public COLUMN approval_requests.id rsint_owner_261110b
+4273; 0 0 ACL public COLUMN approval_requests.tenant_id rsint_owner_261110b
+222; 1259 16408 TABLE public audit_log rsint_owner_261110b
+4274; 0 0 ACL public TABLE audit_log rsint_owner_261110b
+221; 1259 16407 SEQUENCE public audit_log_id_seq rsint_owner_261110b
+4275; 0 0 SEQUENCE OWNED BY public audit_log_id_seq rsint_owner_261110b
+4276; 0 0 ACL public SEQUENCE audit_log_id_seq rsint_owner_261110b
+242; 1259 17224 TABLE public camera_config_versions rsint_owner_261110b
+4277; 0 0 ACL public TABLE camera_config_versions rsint_owner_261110b
+4278; 0 0 ACL public COLUMN camera_config_versions.id rsint_owner_261110b
+4279; 0 0 ACL public COLUMN camera_config_versions.tenant_id rsint_owner_261110b
+244; 1259 17315 TABLE public camera_health_events rsint_owner_261110b
+4280; 0 0 ACL public TABLE camera_health_events rsint_owner_261110b
+4281; 0 0 ACL public COLUMN camera_health_events.id rsint_owner_261110b
+4282; 0 0 ACL public COLUMN camera_health_events.tenant_id rsint_owner_261110b
+241; 1259 17171 TABLE public camera_source_grants rsint_owner_261110b
+4283; 0 0 ACL public TABLE camera_source_grants rsint_owner_261110b
+4284; 0 0 ACL public COLUMN camera_source_grants.id rsint_owner_261110b
+4285; 0 0 ACL public COLUMN camera_source_grants.tenant_id rsint_owner_261110b
+243; 1259 17290 TABLE public camera_worker_status rsint_owner_261110b
+4286; 0 0 ACL public TABLE camera_worker_status rsint_owner_261110b
+4287; 0 0 ACL public COLUMN camera_worker_status.id rsint_owner_261110b
+4288; 0 0 ACL public COLUMN camera_worker_status.tenant_id rsint_owner_261110b
+223; 1259 16433 TABLE public cameras rsint_owner_261110b
+4289; 0 0 ACL public TABLE cameras rsint_owner_261110b
+4290; 0 0 ACL public COLUMN cameras.id rsint_owner_261110b
+4291; 0 0 ACL public COLUMN cameras.tenant_id rsint_owner_261110b
+247; 1259 17419 TABLE public case_bookmarks rsint_owner_261110b
+4292; 0 0 ACL public TABLE case_bookmarks rsint_owner_261110b
+4293; 0 0 ACL public COLUMN case_bookmarks.id rsint_owner_261110b
+4294; 0 0 ACL public COLUMN case_bookmarks.tenant_id rsint_owner_261110b
+251; 1259 17636 TABLE public case_followup_events rsint_owner_261110b
+4295; 0 0 ACL public TABLE case_followup_events rsint_owner_261110b
+4296; 0 0 ACL public COLUMN case_followup_events.id rsint_owner_261110b
+4297; 0 0 ACL public COLUMN case_followup_events.tenant_id rsint_owner_261110b
+250; 1259 17597 TABLE public case_followups rsint_owner_261110b
+4298; 0 0 ACL public TABLE case_followups rsint_owner_261110b
+4299; 0 0 ACL public COLUMN case_followups.id rsint_owner_261110b
+4300; 0 0 ACL public COLUMN case_followups.tenant_id rsint_owner_261110b
+252; 1259 17673 TABLE public case_legal_holds rsint_owner_261110b
+4301; 0 0 ACL public TABLE case_legal_holds rsint_owner_261110b
+4302; 0 0 ACL public COLUMN case_legal_holds.id rsint_owner_261110b
+4303; 0 0 ACL public COLUMN case_legal_holds.tenant_id rsint_owner_261110b
+249; 1259 17555 TABLE public case_links rsint_owner_261110b
+4304; 0 0 ACL public TABLE case_links rsint_owner_261110b
+4305; 0 0 ACL public COLUMN case_links.id rsint_owner_261110b
+4306; 0 0 ACL public COLUMN case_links.tenant_id rsint_owner_261110b
+248; 1259 17459 TABLE public case_note_revisions rsint_owner_261110b
+4307; 0 0 ACL public TABLE case_note_revisions rsint_owner_261110b
+4308; 0 0 ACL public COLUMN case_note_revisions.id rsint_owner_261110b
+4309; 0 0 ACL public COLUMN case_note_revisions.tenant_id rsint_owner_261110b
+245; 1259 17341 TABLE public case_notes rsint_owner_261110b
+4310; 0 0 ACL public TABLE case_notes rsint_owner_261110b
+4311; 0 0 ACL public COLUMN case_notes.id rsint_owner_261110b
+4312; 0 0 ACL public COLUMN case_notes.tenant_id rsint_owner_261110b
+232; 1259 16721 TABLE public evidence rsint_owner_261110b
+4313; 0 0 ACL public TABLE evidence rsint_owner_261110b
+4314; 0 0 ACL public COLUMN evidence.id rsint_owner_261110b
+4315; 0 0 ACL public COLUMN evidence.tenant_id rsint_owner_261110b
+246; 1259 17377 TABLE public export_jobs rsint_owner_261110b
+4316; 0 0 ACL public TABLE export_jobs rsint_owner_261110b
+4317; 0 0 ACL public COLUMN export_jobs.id rsint_owner_261110b
+4318; 0 0 ACL public COLUMN export_jobs.tenant_id rsint_owner_261110b
+254; 1259 26054 TABLE public incident_geo_sources rsint_root_261110
+4319; 0 0 ACL public TABLE incident_geo_sources rsint_root_261110
+236; 1259 16899 TABLE public ingest_nonces rsint_owner_261110b
+4320; 0 0 ACL public TABLE ingest_nonces rsint_owner_261110b
+228; 1259 16620 TABLE public invitations rsint_owner_261110b
+4321; 0 0 ACL public TABLE invitations rsint_owner_261110b
+4322; 0 0 ACL public COLUMN invitations.token_hash rsint_owner_261110b
+4323; 0 0 ACL public COLUMN invitations.expires_at rsint_owner_261110b
+4324; 0 0 ACL public COLUMN invitations.used_at rsint_owner_261110b
+4325; 0 0 ACL public COLUMN invitations.revoked_at rsint_owner_261110b
+4326; 0 0 ACL public COLUMN invitations.id rsint_owner_261110b
+4327; 0 0 ACL public COLUMN invitations.tenant_id rsint_owner_261110b
+253; 1259 25983 TABLE public location_revisions rsint_root_261110
+4328; 0 0 ACL public TABLE location_revisions rsint_root_261110
+255; 1259 27682 TABLE public notification_events rsint_root_261110
+4329; 0 0 ACL public TABLE notification_events rsint_root_261110
+256; 1259 27712 TABLE public notification_receipts rsint_root_261110
+4330; 0 0 ACL public TABLE notification_receipts rsint_root_261110
+229; 1259 16645 TABLE public push_subscriptions rsint_owner_261110b
+4331; 0 0 ACL public TABLE push_subscriptions rsint_owner_261110b
+239; 1259 17040 TABLE public recordings rsint_owner_261110b
+4332; 0 0 ACL public TABLE recordings rsint_owner_261110b
+230; 1259 16673 TABLE public recovery_codes rsint_owner_261110b
+4333; 0 0 ACL public TABLE recovery_codes rsint_owner_261110b
+233; 1259 16751 TABLE public refresh_tokens rsint_owner_261110b
+4334; 0 0 ACL public TABLE refresh_tokens rsint_owner_261110b
+4335; 0 0 ACL public COLUMN refresh_tokens.token_hash rsint_owner_261110b
+4336; 0 0 ACL public COLUMN refresh_tokens.tenant_id rsint_owner_261110b
+237; 1259 16975 TABLE public retention_policies rsint_owner_261110b
+4337; 0 0 ACL public TABLE retention_policies rsint_owner_261110b
+238; 1259 17010 TABLE public saved_searches rsint_owner_261110b
+4338; 0 0 ACL public TABLE saved_searches rsint_owner_261110b
+4339; 0 0 ACL public COLUMN saved_searches.id rsint_owner_261110b
+4340; 0 0 ACL public COLUMN saved_searches.tenant_id rsint_owner_261110b
+234; 1259 16847 TABLE public service_accounts rsint_owner_261110b
+4341; 0 0 ACL public TABLE service_accounts rsint_owner_261110b
+4342; 0 0 ACL public COLUMN service_accounts.id rsint_owner_261110b
+4343; 0 0 ACL public COLUMN service_accounts.tenant_id rsint_owner_261110b
+235; 1259 16872 TABLE public service_keys rsint_owner_261110b
+4344; 0 0 ACL public TABLE service_keys rsint_owner_261110b
+224; 1259 16452 TABLE public tenant_keys rsint_owner_261110b
+4345; 0 0 ACL public TABLE tenant_keys rsint_owner_261110b
+220; 1259 16395 TABLE public tenants rsint_owner_261110b
+4346; 0 0 ACL public TABLE tenants rsint_owner_261110b
+4347; 0 0 ACL public COLUMN tenants.slug rsint_owner_261110b
+4348; 0 0 ACL public COLUMN tenants.is_platform rsint_owner_261110b
+4349; 0 0 ACL public COLUMN tenants.id rsint_owner_261110b
+4350; 0 0 ACL public COLUMN tenants.created_at rsint_owner_261110b
+231; 1259 16695 TABLE public user_sessions rsint_owner_261110b
+4351; 0 0 ACL public TABLE user_sessions rsint_owner_261110b
+4352; 0 0 ACL public COLUMN user_sessions.id rsint_owner_261110b
+4353; 0 0 ACL public COLUMN user_sessions.tenant_id rsint_owner_261110b
+225; 1259 16487 TABLE public users rsint_owner_261110b
+4354; 0 0 ACL public TABLE users rsint_owner_261110b
+4355; 0 0 ACL public COLUMN users.email rsint_owner_261110b
+4356; 0 0 ACL public COLUMN users.id rsint_owner_261110b
+4357; 0 0 ACL public COLUMN users.tenant_id rsint_owner_261110b
+3533; 2604 16411 DEFAULT public audit_log id rsint_owner_261110b
+4213; 0 16389 TABLE DATA public alembic_version rsint_owner_261110b
+4220; 0 16529 TABLE DATA public alerts rsint_owner_261110b
+4234; 0 17089 TABLE DATA public analysis_runs rsint_owner_261110b
+4221; 0 16585 TABLE DATA public approval_requests rsint_owner_261110b
+4216; 0 16408 TABLE DATA public audit_log rsint_owner_261110b
+4236; 0 17224 TABLE DATA public camera_config_versions rsint_owner_261110b
+4238; 0 17315 TABLE DATA public camera_health_events rsint_owner_261110b
+4235; 0 17171 TABLE DATA public camera_source_grants rsint_owner_261110b
+4237; 0 17290 TABLE DATA public camera_worker_status rsint_owner_261110b
+4217; 0 16433 TABLE DATA public cameras rsint_owner_261110b
+4241; 0 17419 TABLE DATA public case_bookmarks rsint_owner_261110b
+4245; 0 17636 TABLE DATA public case_followup_events rsint_owner_261110b
+4244; 0 17597 TABLE DATA public case_followups rsint_owner_261110b
+4246; 0 17673 TABLE DATA public case_legal_holds rsint_owner_261110b
+4243; 0 17555 TABLE DATA public case_links rsint_owner_261110b
+4242; 0 17459 TABLE DATA public case_note_revisions rsint_owner_261110b
+4239; 0 17341 TABLE DATA public case_notes rsint_owner_261110b
+4226; 0 16721 TABLE DATA public evidence rsint_owner_261110b
+4240; 0 17377 TABLE DATA public export_jobs rsint_owner_261110b
+4248; 0 26054 TABLE DATA public incident_geo_sources rsint_root_261110
+4230; 0 16899 TABLE DATA public ingest_nonces rsint_owner_261110b
+4222; 0 16620 TABLE DATA public invitations rsint_owner_261110b
+4247; 0 25983 TABLE DATA public location_revisions rsint_root_261110
+4249; 0 27682 TABLE DATA public notification_events rsint_root_261110
+4250; 0 27712 TABLE DATA public notification_receipts rsint_root_261110
+4223; 0 16645 TABLE DATA public push_subscriptions rsint_owner_261110b
+4233; 0 17040 TABLE DATA public recordings rsint_owner_261110b
+4224; 0 16673 TABLE DATA public recovery_codes rsint_owner_261110b
+4227; 0 16751 TABLE DATA public refresh_tokens rsint_owner_261110b
+4231; 0 16975 TABLE DATA public retention_policies rsint_owner_261110b
+4232; 0 17010 TABLE DATA public saved_searches rsint_owner_261110b
+4228; 0 16847 TABLE DATA public service_accounts rsint_owner_261110b
+4229; 0 16872 TABLE DATA public service_keys rsint_owner_261110b
+4218; 0 16452 TABLE DATA public tenant_keys rsint_owner_261110b
+4214; 0 16395 TABLE DATA public tenants rsint_owner_261110b
+4225; 0 16695 TABLE DATA public user_sessions rsint_owner_261110b
+4219; 0 16487 TABLE DATA public users rsint_owner_261110b
+4358; 0 0 SEQUENCE SET public audit_log_id_seq rsint_owner_261110b
+3614; 2606 16394 CONSTRAINT public alembic_version alembic_version_pkc rsint_owner_261110b
+3654; 2606 16544 CONSTRAINT public alerts pk_alerts rsint_owner_261110b
+3741; 2606 17128 CONSTRAINT public analysis_runs pk_analysis_runs rsint_owner_261110b
+3666; 2606 16601 CONSTRAINT public approval_requests pk_approval_requests rsint_owner_261110b
+3622; 2606 16423 CONSTRAINT public audit_log pk_audit_log rsint_owner_261110b
+3751; 2606 17246 CONSTRAINT public camera_config_versions pk_camera_config_versions rsint_owner_261110b
+3766; 2606 17324 CONSTRAINT public camera_health_events pk_camera_health_events rsint_owner_261110b
+3747; 2606 17201 CONSTRAINT public camera_source_grants pk_camera_source_grants rsint_owner_261110b
+3760; 2606 17301 CONSTRAINT public camera_worker_status pk_camera_worker_status rsint_owner_261110b
+3627; 2606 16445 CONSTRAINT public cameras pk_cameras rsint_owner_261110b
+3783; 2606 17431 CONSTRAINT public case_bookmarks pk_case_bookmarks rsint_owner_261110b
+3805; 2606 17648 CONSTRAINT public case_followup_events pk_case_followup_events rsint_owner_261110b
+3799; 2606 17613 CONSTRAINT public case_followups pk_case_followups rsint_owner_261110b
+3812; 2606 17685 CONSTRAINT public case_legal_holds pk_case_legal_holds rsint_owner_261110b
+3795; 2606 17567 CONSTRAINT public case_links pk_case_links rsint_owner_261110b
+3787; 2606 17473 CONSTRAINT public case_note_revisions pk_case_note_revisions rsint_owner_261110b
+3770; 2606 17354 CONSTRAINT public case_notes pk_case_notes rsint_owner_261110b
+3695; 2606 16738 CONSTRAINT public evidence pk_evidence rsint_owner_261110b
+3777; 2606 17393 CONSTRAINT public export_jobs pk_export_jobs rsint_owner_261110b
+3832; 2606 26061 CONSTRAINT public incident_geo_sources pk_incident_geo_sources rsint_root_261110
+3718; 2606 16907 CONSTRAINT public ingest_nonces pk_ingest_nonces rsint_owner_261110b
+3671; 2606 16631 CONSTRAINT public invitations pk_invitations rsint_owner_261110b
+3816; 2606 26004 CONSTRAINT public location_revisions pk_location_revisions rsint_root_261110
+3835; 2606 27696 CONSTRAINT public notification_events pk_notification_events rsint_root_261110
+3845; 2606 27721 CONSTRAINT public notification_receipts pk_notification_receipts rsint_root_261110
+3677; 2606 16658 CONSTRAINT public push_subscriptions pk_push_subscriptions rsint_owner_261110b
+3733; 2606 17072 CONSTRAINT public recordings pk_recordings rsint_owner_261110b
+3683; 2606 16682 CONSTRAINT public recovery_codes pk_recovery_codes rsint_owner_261110b
+3701; 2606 16761 CONSTRAINT public refresh_tokens pk_refresh_tokens rsint_owner_261110b
+3721; 2606 16986 CONSTRAINT public retention_policies pk_retention_policies rsint_owner_261110b
+3727; 2606 17024 CONSTRAINT public saved_searches pk_saved_searches rsint_owner_261110b
+3706; 2606 16858 CONSTRAINT public service_accounts pk_service_accounts rsint_owner_261110b
+3712; 2606 16884 CONSTRAINT public service_keys pk_service_keys rsint_owner_261110b
+3636; 2606 16466 CONSTRAINT public tenant_keys pk_tenant_keys rsint_owner_261110b
+3616; 2606 16404 CONSTRAINT public tenants pk_tenants rsint_owner_261110b
+3687; 2606 16708 CONSTRAINT public user_sessions pk_user_sessions rsint_owner_261110b
+3641; 2606 16503 CONSTRAINT public users pk_users rsint_owner_261110b
+3818; 2606 26016 CONSTRAINT public location_revisions uq_alert_geo_revision rsint_root_261110
+3657; 2606 16782 CONSTRAINT public alerts uq_alerts_tenant_id_id rsint_owner_261110b
+3659; 2606 16929 CONSTRAINT public alerts uq_alerts_tenant_number rsint_owner_261110b
+3743; 2606 17130 CONSTRAINT public analysis_runs uq_analysis_runs_tenant_id rsint_owner_261110b
+3668; 2606 17501 CONSTRAINT public approval_requests uq_approval_requests_tenant_id_id rsint_owner_261110b
+3624; 2606 16425 CONSTRAINT public audit_log uq_audit_log_tenant_seq rsint_owner_261110b
+3753; 2606 17248 CONSTRAINT public camera_config_versions uq_camera_config_versions_camera_rev rsint_owner_261110b
+3755; 2606 17250 CONSTRAINT public camera_config_versions uq_camera_config_versions_tenant_id_id rsint_owner_261110b
+3820; 2606 26012 CONSTRAINT public location_revisions uq_camera_geo_revision rsint_root_261110
+3762; 2606 17303 CONSTRAINT public camera_worker_status uq_camera_worker_status_camera_id rsint_owner_261110b
+3629; 2606 16784 CONSTRAINT public cameras uq_cameras_tenant_id_id rsint_owner_261110b
+3631; 2606 16923 CONSTRAINT public cameras uq_cameras_tenant_slug rsint_owner_261110b
+3807; 2606 17650 CONSTRAINT public case_followup_events uq_case_followup_events_rev rsint_owner_261110b
+3801; 2606 17712 CONSTRAINT public case_followups uq_case_followups_tenant_id_id rsint_owner_261110b
+3789; 2606 17475 CONSTRAINT public case_note_revisions uq_case_note_revisions_rev rsint_owner_261110b
+3772; 2606 17503 CONSTRAINT public case_notes uq_case_notes_tenant_id_id rsint_owner_261110b
+3697; 2606 17499 CONSTRAINT public evidence uq_evidence_tenant_id_id rsint_owner_261110b
+3779; 2606 17395 CONSTRAINT public export_jobs uq_export_jobs_idempotency rsint_owner_261110b
+3661; 2606 25978 CONSTRAINT public alerts uq_geo_alerts_tenant_id rsint_owner_261110b
+3757; 2606 25982 CONSTRAINT public camera_config_versions uq_geo_camera_config_versions_tenant_id rsint_owner_261110b
+3633; 2606 25976 CONSTRAINT public cameras uq_geo_cameras_tenant_id rsint_owner_261110b
+3822; 2606 26010 CONSTRAINT public location_revisions uq_geo_config_version rsint_root_261110
+3643; 2606 25980 CONSTRAINT public users uq_geo_users_tenant_id rsint_owner_261110b
+3673; 2606 16633 CONSTRAINT public invitations uq_invitations_token_hash rsint_owner_261110b
+3824; 2606 26008 CONSTRAINT public location_revisions uq_location_request rsint_root_261110
+3826; 2606 26006 CONSTRAINT public location_revisions uq_location_revisions_tenant_id rsint_root_261110
+3837; 2606 27700 CONSTRAINT public notification_events uq_notification_event_dedup rsint_root_261110
+3839; 2606 30928 CONSTRAINT public notification_events uq_notification_event_tenant_seq rsint_root_261110
+3841; 2606 27698 CONSTRAINT public notification_events uq_notification_events_tenant_id rsint_root_261110
+3847; 2606 27723 CONSTRAINT public notification_receipts uq_notification_receipt_user_event rsint_root_261110
+3679; 2606 16660 CONSTRAINT public push_subscriptions uq_push_subscriptions_endpoint rsint_owner_261110b
+3828; 2606 26014 CONSTRAINT public location_revisions uq_recording_geo_revision rsint_root_261110
+3735; 2606 17074 CONSTRAINT public recordings uq_recordings_tenant_id rsint_owner_261110b
+3737; 2606 17076 CONSTRAINT public recordings uq_recordings_tenant_sha256 rsint_owner_261110b
+3703; 2606 16763 CONSTRAINT public refresh_tokens uq_refresh_tokens_token_hash rsint_owner_261110b
+3723; 2606 16988 CONSTRAINT public retention_policies uq_retention_policies_tenant_kind rsint_owner_261110b
+3729; 2606 17026 CONSTRAINT public saved_searches uq_saved_searches_owner_name rsint_owner_261110b
+3708; 2606 16860 CONSTRAINT public service_accounts uq_service_accounts_tenant_id_id rsint_owner_261110b
+3714; 2606 16886 CONSTRAINT public service_keys uq_service_keys_key_id rsint_owner_261110b
+3638; 2606 16468 CONSTRAINT public tenant_keys uq_tenant_keys_tenant_id rsint_owner_261110b
+3618; 2606 16406 CONSTRAINT public tenants uq_tenants_slug rsint_owner_261110b
+3689; 2606 16778 CONSTRAINT public user_sessions uq_user_sessions_tenant_id_id rsint_owner_261110b
+3645; 2606 16505 CONSTRAINT public users uq_users_email rsint_owner_261110b
+3647; 2606 16780 CONSTRAINT public users uq_users_tenant_id_id rsint_owner_261110b
+3648; 1259 16565 INDEX public ix_alerts_assigned_to rsint_owner_261110b
+3649; 1259 16566 INDEX public ix_alerts_camera_id rsint_owner_261110b
+3650; 1259 16567 INDEX public ix_alerts_plate_bidx rsint_owner_261110b
+3651; 1259 16940 INDEX public ix_alerts_queue rsint_owner_261110b
+3652; 1259 16568 INDEX public ix_alerts_tenant_id rsint_owner_261110b
+3738; 1259 17790 INDEX public ix_analysis_runs_tenant_id rsint_owner_261110b
+3739; 1259 17146 INDEX public ix_analysis_runs_tenant_recording rsint_owner_261110b
+3662; 1259 16617 INDEX public ix_approval_requests_requester_id rsint_owner_261110b
+3663; 1259 16618 INDEX public ix_approval_requests_resource_id rsint_owner_261110b
+3664; 1259 16619 INDEX public ix_approval_requests_tenant_id rsint_owner_261110b
+3619; 1259 16431 INDEX public ix_audit_log_action rsint_owner_261110b
+3620; 1259 16432 INDEX public ix_audit_log_tenant_id rsint_owner_261110b
+3748; 1259 17282 INDEX public ix_camera_config_versions_camera_id rsint_owner_261110b
+3749; 1259 17281 INDEX public ix_camera_config_versions_tenant_id rsint_owner_261110b
+3763; 1259 17336 INDEX public ix_camera_health_events_camera_at rsint_owner_261110b
+3764; 1259 17335 INDEX public ix_camera_health_events_tenant_id rsint_owner_261110b
+3744; 1259 17223 INDEX public ix_camera_source_grants_camera_id rsint_owner_261110b
+3745; 1259 17222 INDEX public ix_camera_source_grants_tenant_id rsint_owner_261110b
+3758; 1259 17314 INDEX public ix_camera_worker_status_tenant_id rsint_owner_261110b
+3625; 1259 16451 INDEX public ix_cameras_tenant_id rsint_owner_261110b
+3780; 1259 17457 INDEX public ix_case_bookmarks_alert_id rsint_owner_261110b
+3781; 1259 17458 INDEX public ix_case_bookmarks_tenant_id rsint_owner_261110b
+3802; 1259 17671 INDEX public ix_case_followup_events_followup_id rsint_owner_261110b
+3803; 1259 17672 INDEX public ix_case_followup_events_tenant_id rsint_owner_261110b
+3796; 1259 17634 INDEX public ix_case_followups_alert_id rsint_owner_261110b
+3797; 1259 17635 INDEX public ix_case_followups_tenant_id rsint_owner_261110b
+3808; 1259 17708 INDEX public ix_case_legal_holds_active rsint_owner_261110b
+3809; 1259 17706 INDEX public ix_case_legal_holds_alert_id rsint_owner_261110b
+3810; 1259 17707 INDEX public ix_case_legal_holds_tenant_id rsint_owner_261110b
+3790; 1259 17596 INDEX public ix_case_links_active_pair rsint_owner_261110b
+3791; 1259 17593 INDEX public ix_case_links_alert_a_id rsint_owner_261110b
+3792; 1259 17594 INDEX public ix_case_links_alert_b_id rsint_owner_261110b
+3793; 1259 17595 INDEX public ix_case_links_tenant_id rsint_owner_261110b
+3784; 1259 17496 INDEX public ix_case_note_revisions_note_id rsint_owner_261110b
+3785; 1259 17497 INDEX public ix_case_note_revisions_tenant_id rsint_owner_261110b
+3767; 1259 17375 INDEX public ix_case_notes_alert_id rsint_owner_261110b
+3768; 1259 17376 INDEX public ix_case_notes_tenant_id rsint_owner_261110b
+3690; 1259 16749 INDEX public ix_evidence_alert_id rsint_owner_261110b
+3691; 1259 16953 INDEX public ix_evidence_camera_id rsint_owner_261110b
+3692; 1259 17008 INDEX public ix_evidence_purge_scan rsint_owner_261110b
+3693; 1259 16750 INDEX public ix_evidence_tenant_id rsint_owner_261110b
+3773; 1259 17416 INDEX public ix_export_jobs_alert_id rsint_owner_261110b
+3774; 1259 17417 INDEX public ix_export_jobs_claim rsint_owner_261110b
+3775; 1259 17418 INDEX public ix_export_jobs_tenant_id rsint_owner_261110b
+3813; 1259 26053 INDEX public ix_geo_point rsint_root_261110
+3829; 1259 26083 INDEX public ix_incident_geo_sources_recording_id rsint_root_261110
+3830; 1259 26082 INDEX public ix_incident_geo_sources_tenant_id rsint_root_261110
+3715; 1259 16913 INDEX public ix_ingest_nonces_expires_at rsint_owner_261110b
+3716; 1259 16914 INDEX public ix_ingest_nonces_tenant_id rsint_owner_261110b
+3669; 1259 16644 INDEX public ix_invitations_tenant_id rsint_owner_261110b
+3814; 1259 26052 INDEX public ix_location_revisions_tenant_id rsint_root_261110
+3833; 1259 29333 INDEX public ix_notification_events_tenant_id rsint_root_261110
+3842; 1259 29334 INDEX public ix_notification_receipts_tenant_id rsint_root_261110
+3843; 1259 27739 INDEX public ix_notification_receipts_user rsint_root_261110
+3674; 1259 16671 INDEX public ix_push_subscriptions_tenant_id rsint_owner_261110b
+3675; 1259 16672 INDEX public ix_push_subscriptions_user_id rsint_owner_261110b
+3730; 1259 17087 INDEX public ix_recordings_tenant_created rsint_owner_261110b
+3731; 1259 17789 INDEX public ix_recordings_tenant_id rsint_owner_261110b
+3680; 1259 16693 INDEX public ix_recovery_codes_tenant_id rsint_owner_261110b
+3681; 1259 16694 INDEX public ix_recovery_codes_user_id rsint_owner_261110b
+3698; 1259 16774 INDEX public ix_refresh_tokens_session_id rsint_owner_261110b
+3699; 1259 16775 INDEX public ix_refresh_tokens_tenant_id rsint_owner_261110b
+3719; 1259 16999 INDEX public ix_retention_policies_tenant_id rsint_owner_261110b
+3724; 1259 17038 INDEX public ix_saved_searches_owner_id rsint_owner_261110b
+3725; 1259 17037 INDEX public ix_saved_searches_tenant_id rsint_owner_261110b
+3704; 1259 16871 INDEX public ix_service_accounts_tenant_id rsint_owner_261110b
+3709; 1259 16897 INDEX public ix_service_keys_account_id rsint_owner_261110b
+3710; 1259 16898 INDEX public ix_service_keys_tenant_id rsint_owner_261110b
+3634; 1259 16474 INDEX public ix_tenant_keys_tenant_id rsint_owner_261110b
+3684; 1259 16719 INDEX public ix_user_sessions_tenant_id rsint_owner_261110b
+3685; 1259 16720 INDEX public ix_user_sessions_user_id rsint_owner_261110b
+3639; 1259 16511 INDEX public ix_users_tenant_id rsint_owner_261110b
+3655; 1259 16962 INDEX public uq_alerts_event_key rsint_owner_261110b
+3987; 2620 16927 TRIGGER public alerts alerts_number rsint_owner_261110b
+3985; 2620 16840 TRIGGER public audit_log audit_log_no_truncate rsint_owner_261110b
+3986; 2620 16839 TRIGGER public audit_log audit_log_no_update_delete rsint_owner_261110b
+3988; 2620 17289 TRIGGER public camera_config_versions camera_config_versions_guard rsint_owner_261110b
+3990; 2620 17782 TRIGGER public case_followup_events case_followup_events_append_only rsint_owner_261110b
+3989; 2620 17554 TRIGGER public case_note_revisions case_note_revisions_append_only rsint_owner_261110b
+3992; 2620 26095 TRIGGER public incident_geo_sources geo_immutable rsint_root_261110
+3991; 2620 26094 TRIGGER public location_revisions geo_immutable rsint_root_261110
+3993; 2620 27743 TRIGGER public notification_events notification_event_immutable rsint_root_261110
+3854; 2606 16545 FK CONSTRAINT public alerts fk_alerts_assigned_to_users rsint_owner_261110b
+3855; 2606 16550 FK CONSTRAINT public alerts fk_alerts_camera_id_cameras rsint_owner_261110b
+3856; 2606 16555 FK CONSTRAINT public alerts fk_alerts_decided_by_users rsint_owner_261110b
+3857; 2606 17003 FK CONSTRAINT public alerts fk_alerts_legal_hold_by_users rsint_owner_261110b
+3858; 2606 16790 FK CONSTRAINT public alerts fk_alerts_tenant_assignee rsint_owner_261110b
+3859; 2606 16785 FK CONSTRAINT public alerts fk_alerts_tenant_camera rsint_owner_261110b
+3860; 2606 16560 FK CONSTRAINT public alerts fk_alerts_tenant_id_tenants rsint_owner_261110b
+3896; 2606 17141 FK CONSTRAINT public analysis_runs fk_analysis_runs_actor_id_users rsint_owner_261110b
+3897; 2606 17136 FK CONSTRAINT public analysis_runs fk_analysis_runs_recording_tenant rsint_owner_261110b
+3898; 2606 17131 FK CONSTRAINT public analysis_runs fk_analysis_runs_tenant_id_tenants rsint_owner_261110b
+3861; 2606 16602 FK CONSTRAINT public approval_requests fk_approval_requests_decided_by_users rsint_owner_261110b
+3862; 2606 16607 FK CONSTRAINT public approval_requests fk_approval_requests_requester_id_users rsint_owner_261110b
+3863; 2606 16612 FK CONSTRAINT public approval_requests fk_approval_requests_tenant_id_tenants rsint_owner_261110b
+3864; 2606 16815 FK CONSTRAINT public approval_requests fk_approval_requests_tenant_requester rsint_owner_261110b
+3848; 2606 16426 FK CONSTRAINT public audit_log fk_audit_log_tenant_id_tenants rsint_owner_261110b
+3903; 2606 17276 FK CONSTRAINT public camera_config_versions fk_camera_config_versions_activated_by_users rsint_owner_261110b
+3904; 2606 17261 FK CONSTRAINT public camera_config_versions fk_camera_config_versions_created_by_users rsint_owner_261110b
+3905; 2606 17271 FK CONSTRAINT public camera_config_versions fk_camera_config_versions_decided_by_users rsint_owner_261110b
+3906; 2606 17266 FK CONSTRAINT public camera_config_versions fk_camera_config_versions_submitted_by_users rsint_owner_261110b
+3907; 2606 17256 FK CONSTRAINT public camera_config_versions fk_camera_config_versions_tenant_camera rsint_owner_261110b
+3908; 2606 17251 FK CONSTRAINT public camera_config_versions fk_camera_config_versions_tenant_id_tenants rsint_owner_261110b
+3911; 2606 17330 FK CONSTRAINT public camera_health_events fk_camera_health_events_tenant_camera rsint_owner_261110b
+3912; 2606 17325 FK CONSTRAINT public camera_health_events fk_camera_health_events_tenant_id_tenants rsint_owner_261110b
+3899; 2606 17212 FK CONSTRAINT public camera_source_grants fk_camera_source_grants_reviewed_by_users rsint_owner_261110b
+3900; 2606 17217 FK CONSTRAINT public camera_source_grants fk_camera_source_grants_revoked_by_users rsint_owner_261110b
+3901; 2606 17207 FK CONSTRAINT public camera_source_grants fk_camera_source_grants_tenant_camera rsint_owner_261110b
+3902; 2606 17202 FK CONSTRAINT public camera_source_grants fk_camera_source_grants_tenant_id_tenants rsint_owner_261110b
+3909; 2606 17309 FK CONSTRAINT public camera_worker_status fk_camera_worker_status_tenant_camera rsint_owner_261110b
+3910; 2606 17304 FK CONSTRAINT public camera_worker_status fk_camera_worker_status_tenant_id_tenants rsint_owner_261110b
+3849; 2606 17162 FK CONSTRAINT public cameras fk_cameras_enable_requested_by_users rsint_owner_261110b
+3850; 2606 17283 FK CONSTRAINT public cameras fk_cameras_tenant_active_config rsint_owner_261110b
+3851; 2606 16446 FK CONSTRAINT public cameras fk_cameras_tenant_id_tenants rsint_owner_261110b
+3926; 2606 17432 FK CONSTRAINT public case_bookmarks fk_case_bookmarks_alert_id_alerts rsint_owner_261110b
+3927; 2606 17437 FK CONSTRAINT public case_bookmarks fk_case_bookmarks_author_id_users rsint_owner_261110b
+3928; 2606 17442 FK CONSTRAINT public case_bookmarks fk_case_bookmarks_evidence_id_evidence rsint_owner_261110b
+3929; 2606 17447 FK CONSTRAINT public case_bookmarks fk_case_bookmarks_removed_by_users rsint_owner_261110b
+3930; 2606 17524 FK CONSTRAINT public case_bookmarks fk_case_bookmarks_tenant_alert rsint_owner_261110b
+3931; 2606 17529 FK CONSTRAINT public case_bookmarks fk_case_bookmarks_tenant_evidence rsint_owner_261110b
+3932; 2606 17452 FK CONSTRAINT public case_bookmarks fk_case_bookmarks_tenant_id_tenants rsint_owner_261110b
+3955; 2606 17656 FK CONSTRAINT public case_followup_events fk_case_followup_events_actor_id_users rsint_owner_261110b
+3956; 2606 17661 FK CONSTRAINT public case_followup_events fk_case_followup_events_assignee_id_users rsint_owner_261110b
+3957; 2606 17651 FK CONSTRAINT public case_followup_events fk_case_followup_events_followup_id_case_followups rsint_owner_261110b
+3958; 2606 17753 FK CONSTRAINT public case_followup_events fk_case_followup_events_tenant_actor rsint_owner_261110b
+3959; 2606 17758 FK CONSTRAINT public case_followup_events fk_case_followup_events_tenant_assignee rsint_owner_261110b
+3960; 2606 17748 FK CONSTRAINT public case_followup_events fk_case_followup_events_tenant_fu rsint_owner_261110b
+3961; 2606 17666 FK CONSTRAINT public case_followup_events fk_case_followup_events_tenant_id_tenants rsint_owner_261110b
+3948; 2606 17614 FK CONSTRAINT public case_followups fk_case_followups_alert_id_alerts rsint_owner_261110b
+3949; 2606 17624 FK CONSTRAINT public case_followups fk_case_followups_assignee_id_users rsint_owner_261110b
+3950; 2606 17619 FK CONSTRAINT public case_followups fk_case_followups_author_id_users rsint_owner_261110b
+3951; 2606 17733 FK CONSTRAINT public case_followups fk_case_followups_tenant_alert rsint_owner_261110b
+3952; 2606 17743 FK CONSTRAINT public case_followups fk_case_followups_tenant_assignee rsint_owner_261110b
+3953; 2606 17738 FK CONSTRAINT public case_followups fk_case_followups_tenant_author rsint_owner_261110b
+3954; 2606 17629 FK CONSTRAINT public case_followups fk_case_followups_tenant_id_tenants rsint_owner_261110b
+3962; 2606 17686 FK CONSTRAINT public case_legal_holds fk_case_legal_holds_alert_id_alerts rsint_owner_261110b
+3963; 2606 17691 FK CONSTRAINT public case_legal_holds fk_case_legal_holds_placed_by_users rsint_owner_261110b
+3964; 2606 17696 FK CONSTRAINT public case_legal_holds fk_case_legal_holds_released_by_users rsint_owner_261110b
+3965; 2606 17763 FK CONSTRAINT public case_legal_holds fk_case_legal_holds_tenant_alert rsint_owner_261110b
+3966; 2606 17701 FK CONSTRAINT public case_legal_holds fk_case_legal_holds_tenant_id_tenants rsint_owner_261110b
+3967; 2606 17768 FK CONSTRAINT public case_legal_holds fk_case_legal_holds_tenant_placer rsint_owner_261110b
+3968; 2606 17773 FK CONSTRAINT public case_legal_holds fk_case_legal_holds_tenant_releaser rsint_owner_261110b
+3939; 2606 17568 FK CONSTRAINT public case_links fk_case_links_alert_a_id_alerts rsint_owner_261110b
+3940; 2606 17573 FK CONSTRAINT public case_links fk_case_links_alert_b_id_alerts rsint_owner_261110b
+3941; 2606 17578 FK CONSTRAINT public case_links fk_case_links_created_by_users rsint_owner_261110b
+3942; 2606 17583 FK CONSTRAINT public case_links fk_case_links_removed_by_users rsint_owner_261110b
+3943; 2606 17713 FK CONSTRAINT public case_links fk_case_links_tenant_alert_a rsint_owner_261110b
+3944; 2606 17718 FK CONSTRAINT public case_links fk_case_links_tenant_alert_b rsint_owner_261110b
+3945; 2606 17723 FK CONSTRAINT public case_links fk_case_links_tenant_creator rsint_owner_261110b
+3946; 2606 17588 FK CONSTRAINT public case_links fk_case_links_tenant_id_tenants rsint_owner_261110b
+3947; 2606 17728 FK CONSTRAINT public case_links fk_case_links_tenant_remover rsint_owner_261110b
+3933; 2606 17476 FK CONSTRAINT public case_note_revisions fk_case_note_revisions_author_id_users rsint_owner_261110b
+3934; 2606 17481 FK CONSTRAINT public case_note_revisions fk_case_note_revisions_evidence_id_evidence rsint_owner_261110b
+3935; 2606 17486 FK CONSTRAINT public case_note_revisions fk_case_note_revisions_note_id_case_notes rsint_owner_261110b
+3936; 2606 17519 FK CONSTRAINT public case_note_revisions fk_case_note_revisions_tenant_evidence rsint_owner_261110b
+3937; 2606 17491 FK CONSTRAINT public case_note_revisions fk_case_note_revisions_tenant_id_tenants rsint_owner_261110b
+3938; 2606 17514 FK CONSTRAINT public case_note_revisions fk_case_note_revisions_tenant_note rsint_owner_261110b
+3913; 2606 17355 FK CONSTRAINT public case_notes fk_case_notes_alert_id_alerts rsint_owner_261110b
+3914; 2606 17360 FK CONSTRAINT public case_notes fk_case_notes_author_id_users rsint_owner_261110b
+3915; 2606 17365 FK CONSTRAINT public case_notes fk_case_notes_retracted_by_users rsint_owner_261110b
+3916; 2606 17504 FK CONSTRAINT public case_notes fk_case_notes_tenant_alert rsint_owner_261110b
+3917; 2606 17509 FK CONSTRAINT public case_notes fk_case_notes_tenant_author rsint_owner_261110b
+3918; 2606 17370 FK CONSTRAINT public case_notes fk_case_notes_tenant_id_tenants rsint_owner_261110b
+3877; 2606 16739 FK CONSTRAINT public evidence fk_evidence_alert_id_alerts rsint_owner_261110b
+3878; 2606 16943 FK CONSTRAINT public evidence fk_evidence_camera_id_cameras rsint_owner_261110b
+3879; 2606 16795 FK CONSTRAINT public evidence fk_evidence_tenant_alert rsint_owner_261110b
+3880; 2606 16948 FK CONSTRAINT public evidence fk_evidence_tenant_camera rsint_owner_261110b
+3881; 2606 16744 FK CONSTRAINT public evidence fk_evidence_tenant_id_tenants rsint_owner_261110b
+3919; 2606 17396 FK CONSTRAINT public export_jobs fk_export_jobs_alert_id_alerts rsint_owner_261110b
+3920; 2606 17401 FK CONSTRAINT public export_jobs fk_export_jobs_approval_id_approval_requests rsint_owner_261110b
+3921; 2606 17406 FK CONSTRAINT public export_jobs fk_export_jobs_requester_id_users rsint_owner_261110b
+3922; 2606 17534 FK CONSTRAINT public export_jobs fk_export_jobs_tenant_alert rsint_owner_261110b
+3923; 2606 17544 FK CONSTRAINT public export_jobs fk_export_jobs_tenant_approval rsint_owner_261110b
+3924; 2606 17411 FK CONSTRAINT public export_jobs fk_export_jobs_tenant_id_tenants rsint_owner_261110b
+3925; 2606 17539 FK CONSTRAINT public export_jobs fk_export_jobs_tenant_requester rsint_owner_261110b
+3969; 2606 26032 FK CONSTRAINT public location_revisions fk_geo_actor_id rsint_root_261110
+3970; 2606 26027 FK CONSTRAINT public location_revisions fk_geo_alert_id rsint_root_261110
+3971; 2606 26017 FK CONSTRAINT public location_revisions fk_geo_camera_id rsint_root_261110
+3972; 2606 26042 FK CONSTRAINT public location_revisions fk_geo_config_version_id rsint_root_261110
+3973; 2606 26022 FK CONSTRAINT public location_revisions fk_geo_recording_id rsint_root_261110
+3974; 2606 26037 FK CONSTRAINT public location_revisions fk_geo_source_location_id rsint_root_261110
+3976; 2606 26062 FK CONSTRAINT public incident_geo_sources fk_incident_geo_sources_tenant_id_alerts rsint_root_261110
+3977; 2606 26072 FK CONSTRAINT public incident_geo_sources fk_incident_geo_sources_tenant_id_location_revisions rsint_root_261110
+3978; 2606 26067 FK CONSTRAINT public incident_geo_sources fk_incident_geo_sources_tenant_id_recordings rsint_root_261110
+3979; 2606 26077 FK CONSTRAINT public incident_geo_sources fk_incident_geo_sources_tenant_id_tenants rsint_root_261110
+3889; 2606 16908 FK CONSTRAINT public ingest_nonces fk_ingest_nonces_tenant_id_tenants rsint_owner_261110b
+3865; 2606 16634 FK CONSTRAINT public invitations fk_invitations_invited_by_users rsint_owner_261110b
+3866; 2606 16639 FK CONSTRAINT public invitations fk_invitations_tenant_id_tenants rsint_owner_261110b
+3867; 2606 16970 FK CONSTRAINT public invitations fk_invitations_user_id_users rsint_owner_261110b
+3975; 2606 26047 FK CONSTRAINT public location_revisions fk_location_revisions_tenant_id_tenants rsint_root_261110
+3980; 2606 27701 FK CONSTRAINT public notification_events fk_notification_events_tenant_id_alerts rsint_root_261110
+3981; 2606 27706 FK CONSTRAINT public notification_events fk_notification_events_tenant_id_tenants rsint_root_261110
+3982; 2606 27729 FK CONSTRAINT public notification_receipts fk_notification_receipts_tenant_id_notification_events rsint_root_261110
+3983; 2606 27734 FK CONSTRAINT public notification_receipts fk_notification_receipts_tenant_id_tenants rsint_root_261110
+3984; 2606 27724 FK CONSTRAINT public notification_receipts fk_notification_receipts_tenant_id_users rsint_root_261110
+3868; 2606 16661 FK CONSTRAINT public push_subscriptions fk_push_subscriptions_tenant_id_tenants rsint_owner_261110b
+3869; 2606 16820 FK CONSTRAINT public push_subscriptions fk_push_subscriptions_tenant_user rsint_owner_261110b
+3870; 2606 16666 FK CONSTRAINT public push_subscriptions fk_push_subscriptions_user_id_users rsint_owner_261110b
+3894; 2606 17082 FK CONSTRAINT public recordings fk_recordings_owner_user_id_users rsint_owner_261110b
+3895; 2606 17077 FK CONSTRAINT public recordings fk_recordings_tenant_id_tenants rsint_owner_261110b
+3871; 2606 16683 FK CONSTRAINT public recovery_codes fk_recovery_codes_tenant_id_tenants rsint_owner_261110b
+3872; 2606 16810 FK CONSTRAINT public recovery_codes fk_recovery_codes_tenant_user rsint_owner_261110b
+3873; 2606 16688 FK CONSTRAINT public recovery_codes fk_recovery_codes_user_id_users rsint_owner_261110b
+3882; 2606 16764 FK CONSTRAINT public refresh_tokens fk_refresh_tokens_session_id_user_sessions rsint_owner_261110b
+3883; 2606 16769 FK CONSTRAINT public refresh_tokens fk_refresh_tokens_tenant_id_tenants rsint_owner_261110b
+3884; 2606 16805 FK CONSTRAINT public refresh_tokens fk_refresh_tokens_tenant_session rsint_owner_261110b
+3890; 2606 16989 FK CONSTRAINT public retention_policies fk_retention_policies_tenant_id_tenants rsint_owner_261110b
+3891; 2606 16994 FK CONSTRAINT public retention_policies fk_retention_policies_updated_by_users rsint_owner_261110b
+3892; 2606 17027 FK CONSTRAINT public saved_searches fk_saved_searches_tenant_id_tenants rsint_owner_261110b
+3893; 2606 17032 FK CONSTRAINT public saved_searches fk_saved_searches_tenant_owner rsint_owner_261110b
+3885; 2606 16861 FK CONSTRAINT public service_accounts fk_service_accounts_created_by_users rsint_owner_261110b
+3886; 2606 16866 FK CONSTRAINT public service_accounts fk_service_accounts_tenant_id_tenants rsint_owner_261110b
+3887; 2606 16887 FK CONSTRAINT public service_keys fk_service_keys_tenant_account rsint_owner_261110b
+3888; 2606 16892 FK CONSTRAINT public service_keys fk_service_keys_tenant_id_tenants rsint_owner_261110b
+3852; 2606 16469 FK CONSTRAINT public tenant_keys fk_tenant_keys_tenant_id_tenants rsint_owner_261110b
+3874; 2606 16709 FK CONSTRAINT public user_sessions fk_user_sessions_tenant_id_tenants rsint_owner_261110b
+3875; 2606 16800 FK CONSTRAINT public user_sessions fk_user_sessions_tenant_user rsint_owner_261110b
+3876; 2606 16714 FK CONSTRAINT public user_sessions fk_user_sessions_user_id_users rsint_owner_261110b
+3853; 2606 16506 FK CONSTRAINT public users fk_users_tenant_id_tenants rsint_owner_261110b
+4146; 0 16529 ROW SECURITY public alerts rsint_owner_261110b
+4160; 0 17089 ROW SECURITY public analysis_runs rsint_owner_261110b
+4147; 0 16585 ROW SECURITY public approval_requests rsint_owner_261110b
+4142; 0 16408 ROW SECURITY public audit_log rsint_owner_261110b
+4162; 0 17224 ROW SECURITY public camera_config_versions rsint_owner_261110b
+4164; 0 17315 ROW SECURITY public camera_health_events rsint_owner_261110b
+4161; 0 17171 ROW SECURITY public camera_source_grants rsint_owner_261110b
+4163; 0 17290 ROW SECURITY public camera_worker_status rsint_owner_261110b
+4143; 0 16433 ROW SECURITY public cameras rsint_owner_261110b
+4167; 0 17419 ROW SECURITY public case_bookmarks rsint_owner_261110b
+4171; 0 17636 ROW SECURITY public case_followup_events rsint_owner_261110b
+4170; 0 17597 ROW SECURITY public case_followups rsint_owner_261110b
+4172; 0 17673 ROW SECURITY public case_legal_holds rsint_owner_261110b
+4169; 0 17555 ROW SECURITY public case_links rsint_owner_261110b
+4168; 0 17459 ROW SECURITY public case_note_revisions rsint_owner_261110b
+4165; 0 17341 ROW SECURITY public case_notes rsint_owner_261110b
+4152; 0 16721 ROW SECURITY public evidence rsint_owner_261110b
+4166; 0 17377 ROW SECURITY public export_jobs rsint_owner_261110b
+4174; 0 26054 ROW SECURITY public incident_geo_sources rsint_root_261110
+4156; 0 16899 ROW SECURITY public ingest_nonces rsint_owner_261110b
+4148; 0 16620 ROW SECURITY public invitations rsint_owner_261110b
+4173; 0 25983 ROW SECURITY public location_revisions rsint_root_261110
+4175; 0 27682 ROW SECURITY public notification_events rsint_root_261110
+4176; 0 27712 ROW SECURITY public notification_receipts rsint_root_261110
+4149; 0 16645 ROW SECURITY public push_subscriptions rsint_owner_261110b
+4159; 0 17040 ROW SECURITY public recordings rsint_owner_261110b
+4150; 0 16673 ROW SECURITY public recovery_codes rsint_owner_261110b
+4153; 0 16751 ROW SECURITY public refresh_tokens rsint_owner_261110b
+4157; 0 16975 ROW SECURITY public retention_policies rsint_owner_261110b
+4158; 0 17010 ROW SECURITY public saved_searches rsint_owner_261110b
+4154; 0 16847 ROW SECURITY public service_accounts rsint_owner_261110b
+4155; 0 16872 ROW SECURITY public service_keys rsint_owner_261110b
+4185; 3256 16833 POLICY public alerts tenant_isolation rsint_owner_261110b
+4196; 3256 17147 POLICY public analysis_runs tenant_isolation rsint_owner_261110b
+4187; 3256 16835 POLICY public approval_requests tenant_isolation rsint_owner_261110b
+4189; 3256 16837 POLICY public audit_log tenant_isolation rsint_owner_261110b
+4198; 3256 17338 POLICY public camera_config_versions tenant_isolation rsint_owner_261110b
+4200; 3256 17340 POLICY public camera_health_events tenant_isolation rsint_owner_261110b
+4197; 3256 17337 POLICY public camera_source_grants tenant_isolation rsint_owner_261110b
+4199; 3256 17339 POLICY public camera_worker_status tenant_isolation rsint_owner_261110b
+4184; 3256 16832 POLICY public cameras tenant_isolation rsint_owner_261110b
+4203; 3256 17551 POLICY public case_bookmarks tenant_isolation rsint_owner_261110b
+4207; 3256 17780 POLICY public case_followup_events tenant_isolation rsint_owner_261110b
+4206; 3256 17779 POLICY public case_followups tenant_isolation rsint_owner_261110b
+4208; 3256 17781 POLICY public case_legal_holds tenant_isolation rsint_owner_261110b
+4205; 3256 17778 POLICY public case_links tenant_isolation rsint_owner_261110b
+4202; 3256 17550 POLICY public case_note_revisions tenant_isolation rsint_owner_261110b
+4201; 3256 17549 POLICY public case_notes tenant_isolation rsint_owner_261110b
+4186; 3256 16834 POLICY public evidence tenant_isolation rsint_owner_261110b
+4204; 3256 17552 POLICY public export_jobs tenant_isolation rsint_owner_261110b
+4210; 3256 26092 POLICY public incident_geo_sources tenant_isolation rsint_root_261110
+4192; 3256 16917 POLICY public ingest_nonces tenant_isolation rsint_owner_261110b
+4180; 3256 16828 POLICY public invitations tenant_isolation rsint_owner_261110b
+4209; 3256 26091 POLICY public location_revisions tenant_isolation rsint_root_261110
+4211; 3256 27740 POLICY public notification_events tenant_isolation rsint_root_261110
+4212; 3256 27741 POLICY public notification_receipts tenant_isolation rsint_root_261110
+4188; 3256 16836 POLICY public push_subscriptions tenant_isolation rsint_owner_261110b
+4195; 3256 17088 POLICY public recordings tenant_isolation rsint_owner_261110b
+4181; 3256 16829 POLICY public recovery_codes tenant_isolation rsint_owner_261110b
+4183; 3256 16831 POLICY public refresh_tokens tenant_isolation rsint_owner_261110b
+4193; 3256 17000 POLICY public retention_policies tenant_isolation rsint_owner_261110b
+4194; 3256 17039 POLICY public saved_searches tenant_isolation rsint_owner_261110b
+4190; 3256 16915 POLICY public service_accounts tenant_isolation rsint_owner_261110b
+4191; 3256 16916 POLICY public service_keys tenant_isolation rsint_owner_261110b
+4178; 3256 16826 POLICY public tenant_keys tenant_isolation rsint_owner_261110b
+4177; 3256 16825 POLICY public tenants tenant_isolation rsint_owner_261110b
+4182; 3256 16830 POLICY public user_sessions tenant_isolation rsint_owner_261110b
+4179; 3256 16827 POLICY public users tenant_isolation rsint_owner_261110b
+4144; 0 16452 ROW SECURITY public tenant_keys rsint_owner_261110b
+4141; 0 16395 ROW SECURITY public tenants rsint_owner_261110b
+4151; 0 16695 ROW SECURITY public user_sessions rsint_owner_261110b
+4145; 0 16487 ROW SECURITY public users rsint_owner_261110b
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 0027 -> 0028, Per-user opt-in for audible in-app incident cues.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 0027 -> 0028, Per-user opt-in for audible in-app incident cues.

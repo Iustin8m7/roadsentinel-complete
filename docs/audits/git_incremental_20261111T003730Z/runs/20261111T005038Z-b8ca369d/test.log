@@ -1,0 +1,66 @@
+
+> roadsentinel-web@0.1.0 test
+> vitest run
+
+
+ RUN  v5.0.5 /home/justin7m8/Documents/roadsentinel-integration/frontend
+
+ ❯ src/lib/api.test.ts (12 tests | 1 failed) 66ms
+   × treats a camera with a recent heartbeat as live; the external public stream stays off unless VITE_LIVE_STREAM=1 7ms
+ ❯ src/lib/cases.test.ts (11 tests | 1 failed) 50ms
+   ❯ archive runs (3)
+     × always excludes hidden types and numeric ids, and never saves them 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/api.test.ts > treats a camera with a recent heartbeat as live; the external public stream stays off unless VITE_LIVE_STREAM=1
+AssertionError: expected { id: 'iasi-piata-unirii', …(31) } to match object { status: 'online', live: true, …(1) }
+(29 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "live": true,
++   "live": false,
+    "liveUrl": undefined,
+    "status": "online",
+  }
+
+ ❯ src/lib/api.test.ts:102:83
+    100|   const stale = new Date(Date.now() - 10 * 60_000).toISOString()
+    101|   const base = { name: 'P', location: null, video_url: null, is_active…
+    102|   expect(adaptCamera({ ...base, id: 'iasi-piata-unirii', last_seen_at:…
+       |                                                                                   ^
+    103|   expect(adaptCamera({ ...base, id: 'iasi-piata-unirii', last_seen_at:…
+    104|   expect(adaptCamera({ ...base, id: 'x', last_seen_at: null })).toMatc…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/lib/cases.test.ts > archive runs > always excludes hidden types and numeric ids, and never saves them
+AssertionError: expected [] to deeply equal [ 'pedestrian_on_road' ]
+
+- Expected
++ Received
+
+- [
+-   "pedestrian_on_road",
+- ]
++ []
+
+ ❯ src/lib/cases.test.ts:46:42
+     44|     await saveSearch('nume', { has_evidence: true })
+     45|     const [search, saved] = bodies()
+     46|     expect(search.filters.exclude_types).toEqual(['pedestrian_on_road'…
+       |                                          ^
+     47|     // The demo tenant's curation is a production build flag: off here…
+     48|     expect(DEMO_CURATION).toBe(false)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 8 passed (10)
+      Tests  2 failed | 95 passed (97)
+   Start at  02:50:39
+   Duration  1.80s (import 52%, tests 32%, transform 15%, worker 1%)
+

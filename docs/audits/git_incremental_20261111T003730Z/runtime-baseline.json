@@ -1,0 +1,255 @@
+{
+  "utc": "2026-11-11T00:54:25.135524+00:00",
+  "runtime": "A existing integration",
+  "processes": [
+    {
+      "pid": 2033731,
+      "cwd": "/home/justin7m8/Documents/roadsentinel-integration/backend",
+      "argv": [
+        "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/bin/python",
+        "-m",
+        "uvicorn",
+        "app.main:create_app",
+        "--factory",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8003",
+        "--no-access-log"
+      ],
+      "settings": {
+        "RS_API_ORIGIN": null,
+        "RS_PUBLIC_ORIGIN": "http://127.0.0.1:5175",
+        "RS_ENV": "development",
+        "RS_MFA_EXEMPTION_ENABLED": "false"
+      }
+    },
+    {
+      "pid": 1671183,
+      "cwd": "/home/justin7m8/Documents/roadsentinel-integration/frontend",
+      "argv": [
+        "node",
+        "/home/justin7m8/Documents/roadsentinel-integration/frontend/node_modules/.bin/vite",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "5175",
+        "--strictPort"
+      ],
+      "settings": {
+        "RS_API_ORIGIN": "http://127.0.0.1:8003",
+        "RS_PUBLIC_ORIGIN": null,
+        "RS_ENV": null,
+        "RS_MFA_EXEMPTION_ENABLED": null
+      }
+    }
+  ],
+  "http": [
+    {
+      "port": 8003,
+      "path": "/api/health/live",
+      "status": 200
+    },
+    {
+      "port": 8003,
+      "path": "/api/health/ready",
+      "status": 200
+    },
+    {
+      "port": 8003,
+      "path": "/api/auth/me",
+      "status": 401
+    },
+    {
+      "port": 5175,
+      "path": "/api/health/live",
+      "status": 200
+    },
+    {
+      "port": 5175,
+      "path": "/api/health/ready",
+      "status": 200
+    },
+    {
+      "port": 5175,
+      "path": "/api/auth/me",
+      "status": 401
+    }
+  ],
+  "database": {
+    "identity": [
+      "rsint_20261110b",
+      "127.0.0.1",
+      55446,
+      "rsint_app_261110b"
+    ],
+    "head": "0022",
+    "rls_tables": [
+      [
+        "alerts",
+        true,
+        true
+      ],
+      [
+        "analysis_runs",
+        true,
+        true
+      ],
+      [
+        "approval_requests",
+        true,
+        true
+      ],
+      [
+        "audit_log",
+        true,
+        true
+      ],
+      [
+        "camera_config_versions",
+        true,
+        true
+      ],
+      [
+        "camera_health_events",
+        true,
+        true
+      ],
+      [
+        "camera_source_grants",
+        true,
+        true
+      ],
+      [
+        "camera_worker_status",
+        true,
+        true
+      ],
+      [
+        "cameras",
+        true,
+        true
+      ],
+      [
+        "case_bookmarks",
+        true,
+        true
+      ],
+      [
+        "case_followup_events",
+        true,
+        true
+      ],
+      [
+        "case_followups",
+        true,
+        true
+      ],
+      [
+        "case_legal_holds",
+        true,
+        true
+      ],
+      [
+        "case_links",
+        true,
+        true
+      ],
+      [
+        "case_note_revisions",
+        true,
+        true
+      ],
+      [
+        "case_notes",
+        true,
+        true
+      ],
+      [
+        "evidence",
+        true,
+        true
+      ],
+      [
+        "export_jobs",
+        true,
+        true
+      ],
+      [
+        "ingest_nonces",
+        true,
+        true
+      ],
+      [
+        "invitations",
+        true,
+        true
+      ],
+      [
+        "push_subscriptions",
+        true,
+        true
+      ],
+      [
+        "recordings",
+        true,
+        true
+      ],
+      [
+        "recovery_codes",
+        true,
+        true
+      ],
+      [
+        "refresh_tokens",
+        true,
+        true
+      ],
+      [
+        "retention_policies",
+        true,
+        true
+      ],
+      [
+        "saved_searches",
+        true,
+        true
+      ],
+      [
+        "service_accounts",
+        true,
+        true
+      ],
+      [
+        "service_keys",
+        true,
+        true
+      ],
+      [
+        "tenant_keys",
+        true,
+        true
+      ],
+      [
+        "tenants",
+        true,
+        true
+      ],
+      [
+        "user_sessions",
+        true,
+        true
+      ],
+      [
+        "users",
+        true,
+        true
+      ]
+    ],
+    "role": [
+      "rsint_app_261110b",
+      false,
+      false
+    ]
+  }
+}

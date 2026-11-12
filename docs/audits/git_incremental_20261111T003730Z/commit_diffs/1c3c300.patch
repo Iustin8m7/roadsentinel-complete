@@ -1,0 +1,132 @@
+diff --git a/API.md b/API.md
+index 063babf..7bb0cba 100644
+--- a/API.md
++++ b/API.md
+@@ -190,3 +190,17 @@ Media (`/api/media/{id}`, `/api/evidence/{id}/content`) now answers byte ranges
+ CLI: `python -m app.cli verify-package <zip> [--manifest-sha256 HEX]` (offline: no database or
+ keys), `run-export-jobs --tenant <slug>...` (one worker pass), `purge-evidence` (manual, refused
+ in production because no retention policy is defined).
++
++## Case work (`backend/app/api/casework.py`, migration 0010)
++
++All routes need a session; the case is addressed by its alert number and must be visible to the caller.
++
++| Route | Purpose |
++|---|---|
++| `GET /api/events/{number}/related` | Linked cases |
++| `POST /api/events/{number}/links`, `DELETE /api/events/{number}/links/{link_id}` | Link or unlink two cases, with a reason |
++| `GET /api/events/{number}/followups`, `POST .../followups`, `PATCH .../followups/{followup_id}` | Follow-up tasks; every change is appended to a history that cannot be edited |
++| `GET /api/events/{number}/followup-assignees`, `GET /api/archive/assignees` | People a task or an archive filter can name |
++| `GET /api/events/{number}/legal-hold`, `POST .../legal-hold`, `POST .../legal-hold/release` | Manual legal hold; while active, the case's evidence cannot be purged |
++| `POST /api/exports/verify` | Upload a downloaded export package and check it against its manifest |
++| `GET /api/audit/evidence` | Auditor view: stored evidence with its integrity state |
+diff --git a/HANDOFF.md b/HANDOFF.md
+index 859f610..b379a2a 100644
+--- a/HANDOFF.md
++++ b/HANDOFF.md
+@@ -56,7 +56,7 @@ Serviciile: `secure-api` (backend), `web` (gateway UI), `Postgres`, bucket-ul `e
+ 4. **Apoi UI-ul:** `scripts/deploy_web_gateway.sh`, și așteaptă `SUCCESS`. Păstrează scurt intervalul dintre cele două (UI-ul nou cheamă rute pe care API-ul vechi nu le are).
+ 5. Verifică `/api/health/ready` delogat (trebuie `{"status": "ready"}`), apoi loghează-te.
+ 
+-**Rollback:** `scripts/deploy_secure_backend.sh rollback <git-ref>` pornește codul vechi **fără** `migrate` (codul vechi nu cunoaște revizii noi; migrările 0007/0008 sunt aditive), apoi deploy pe `web` din aceeași referință. Nu folosi „redeploy previous” din Railway: imaginea aceea rulează `migrate` și iese cu `Can't locate revision`. Detalii: `docs/RUNBOOK.md`.
++**Rollback:** `scripts/deploy_secure_backend.sh rollback <git-ref>` pornește codul vechi **fără** `migrate` (codul vechi nu cunoaște revizii noi; migrările 0007–0010 sunt aditive). Sub 0009/0010, întoarce și workerii de cameră la aceeași versiune (API-ul vechi răspunde `422` la heartbeat-urile noi), iar API-ul vechi nu cunoaște reținerile legale: șterge sau expiră dovezi și pachete reținute, apoi deploy pe `web` din aceeași referință. Nu folosi „redeploy previous” din Railway: imaginea aceea rulează `migrate` și iese cu `Can't locate revision`. Detalii: `docs/RUNBOOK.md`.
+ 
+ **Variabile importante pe `secure-api`:** `RS_ENV=production`, `RS_DATABASE_URL` (rolul restricționat), `RS_JWT_SECRET`, `RS_URL_SIGNING_KEY`, `RS_MASTER_KEYS`, `RS_MASTER_KEY_CURRENT`, `RS_PUBLIC_ORIGIN` (exact originea publică), `RS_TRUST_PROXY=true`, `RS_EVIDENCE_S3_{BUCKET,ENDPOINT,REGION,ACCESS_KEY_ID,SECRET_ACCESS_KEY}` (din bucket-ul `evidence`), opțional `RS_METRICS_TOKEN` (minimum 32 de caractere aleatoare). În producție API-ul refuză să pornească cu secrete slabe, cookie-uri nesigure, `RS_ADMIN_DATABASE_URL` setat sau un rol de bază de date care ocolește RLS. Pe Windows/Git Bash setează variabile cu `MSYS_NO_PATHCONV=1 railway variables --service secure-api --set "K=V"`.
+ 
+diff --git a/backend/app/services/casework.py b/backend/app/services/casework.py
+index f5cb9c8..13c81d1 100644
+--- a/backend/app/services/casework.py
++++ b/backend/app/services/casework.py
+@@ -449,7 +449,7 @@ def add_followup(
+     _check_assignee(db, alert, body.assignee_id, actor_id, role)
+     _check_due(body.due_date, new=True)
+     count = db.scalar(
+-        select(CaseFollowup.id).where(CaseFollowup.alert_id == alert.id).offset(MAX_FOLLOWUPS)
++        select(CaseFollowup.id).where(CaseFollowup.alert_id == alert.id).offset(MAX_FOLLOWUPS - 1)
+     )
+     if count is not None:
+         raise CaseError(422, "Prea multe sarcini pe acest caz.", "too_many_followups")
+diff --git a/backend/app/services/package_verify.py b/backend/app/services/package_verify.py
+index 4b2c387..b05f49b 100644
+--- a/backend/app/services/package_verify.py
++++ b/backend/app/services/package_verify.py
+@@ -132,6 +132,9 @@ def _check_entries(
+         if not isinstance(entry_name, str) or not _safe(entry_name):
+             report.fail("manifest has an invalid file path")
+             continue
++        if entry_name in listed:  # reading a file once per repeated row would be unbounded work
++            report.fail(f"file listed more than once: {entry_name}")
++            continue
+         listed.add(entry_name)
+         if entry_name not in names:
+             report.fail(f"listed file missing: {entry_name}")
+diff --git a/backend/tests/test_casework.py b/backend/tests/test_casework.py
+index 7f088cd..d4c4cfc 100644
+--- a/backend/tests/test_casework.py
++++ b/backend/tests/test_casework.py
+@@ -388,8 +388,21 @@ class TestFollowups:
+         assert patrol.patch(url, {"revision": 1, "status": "done"}).status_code == 200
+         assert patrol.patch(url, {"revision": 2}).status_code == 422  # no change given
+ 
++    # --------------------------------------------------------------------------- references
+ 
+-# --------------------------------------------------------------------------- references
++    def test_the_limit_refuses_the_next_task_instead_of_hiding_it(
++        self, login: Any, world: World, pipe: Any, monkeypatch: Any
++    ) -> None:
++        from app.services import casework
++
++        monkeypatch.setattr(casework, "MAX_FOLLOWUPS", 2)
++        n = new_case(pipe)
++        op = login(world.a.operator)
++        for body in ("prima sarcină", "a doua sarcină"):
++            assert op.post(f"/api/events/{n}/followups", {"body": body}).status_code == 201
++        r = op.post(f"/api/events/{n}/followups", {"body": "a treia sarcină"})
++        assert r.status_code == 422 and r.json()["code"] == "too_many_followups"
++        assert len(op.get(f"/api/events/{n}/followups").json()) == 2
+ 
+ 
+ class TestDetectionReferences:
+diff --git a/backend/tests/test_exports.py b/backend/tests/test_exports.py
+index aec76c2..44ae706 100644
+--- a/backend/tests/test_exports.py
++++ b/backend/tests/test_exports.py
+@@ -657,3 +657,22 @@ class TestStorageOutage:
+         self._s3(monkeypatch, missing)
+         assert op.get(url).status_code == 410
+         assert "evidence.missing" in audit_actions(world.a.id)
++
++
++def test_package_verify_reads_each_file_once(tmp_path: Path) -> None:
++    """A manifest that lists one file many times must not make the verifier hash it many times:
++    a few kilobytes of upload would otherwise buy unbounded work."""
++    data = b"\0" * 4096
++    row = {
++        "path": "evidence/a.bin",
++        "size_bytes": len(data),
++        "sha256": hashlib.sha256(data).hexdigest(),
++    }
++    manifest = {"schema": "roadsentinel.evidence-package", "schema_version": 1, "files": [row] * 50}
++    path = tmp_path / "amplified.zip"
++    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as zf:
++        zf.writestr("manifest.json", canonical_json(manifest))
++        zf.writestr("evidence/a.bin", data)
++    report = verify_package(path)
++    assert not report.ok and report.files_checked == 1
++    assert any("listed more than once" in e for e in report.errors)
+diff --git a/docs/RUNBOOK.md b/docs/RUNBOOK.md
+index 71fac19..445a315 100644
+--- a/docs/RUNBOOK.md
++++ b/docs/RUNBOOK.md
+@@ -140,7 +140,10 @@ start a new export.
+ 3. Then the UI: `scripts/deploy_web_gateway.sh`, and wait for `SUCCESS`.
+ 4. Check `/api/health/ready` while logged out (status only), then log in.
+ 
+-To roll back, deploy the previous release without migrating: `scripts/deploy_secure_backend.sh rollback <git-ref>`, then the matching web gateway. Do not use the platform's plain "redeploy previous", because that image runs `migrate` at start and exits with `Can't locate revision`. Migrations 0007 and 0008 are additive and the previous API runs on them. A restored backup is the only way back to an older schema.
++To roll back, deploy the previous release without migrating: `scripts/deploy_secure_backend.sh rollback <git-ref>`, then the matching web gateway. Do not use the platform's plain "redeploy previous", because that image runs `migrate` at start and exits with `Can't locate revision`. Migrations 0007 to 0010 are additive and the previous API runs on them. Two things change when the API is rolled back below 0009/0010: roll the camera workers back with it, because an older API answers `422` to the newer workers' heartbeats and managed cameras go stale; and an older API does not know legal holds, so it purges or expires held evidence and export packages as if no hold existed. A restored backup is the only way back to an older schema.
++
++### Camera failure notifications are not active in production
++The API records a failure notice in the camera history and the audit log, but nobody receives a push: no VAPID keys are set, the police UI has no push subscription, and nothing schedules `python -m app.cli notify-camera-failures --tenant <slug>` (the only way a silent worker is noticed). Until those three exist, watch the camera panel.
+ 
+ ### Four-eyes actions need two administrators
+ Config approval, re-enabling a camera and export approval all refuse a single person. Create a second MFA-enrolled administrator before using them, and do not rerun `demo-accounts` or `scripts/deploy_demo.sh` afterwards. With one administrator these actions stay refused: that is the intended fail-closed behaviour.

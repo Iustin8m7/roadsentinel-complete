@@ -1,0 +1,2341 @@
+...........................FF..FFF...................................... [ 97%]
+..                                                                       [100%]
+=================================== FAILURES ===================================
+____________ TestInvitations.test_accept_then_mandatory_enrollment _____________
+
+self = <tests.test_auth.TestInvitations object at 0x7f6fc716b9e0>
+world = World(platform=Unit(id=UUID('e7c4da67-2e7c-44b7-81c2-fec670b53c9e'), users={<Role.system_admin: 'system_admin'>: TUser...0-cc43b32bb8e6'), 'evidence': UUID('a446ec2f-9c36-4ed8-9234-a636f6a6e858'), 'plates': ['B00XYZ', 'B10XYZ', 'B20XYZ']}})
+login = <function login.<locals>._login at 0x7f6ee32ebe20>
+
+    def test_accept_then_mandatory_enrollment(self, world: World, login: object) -> None:
+        inv = self._invite(world, login)
+        c = ApiClient()
+        info = c.post("/api/auth/invitations/inspect", {"token": inv["token"]}).json()
+        assert info["email"] == "invitee@test.local" and info["tenant_name"] == "Unit A"
+        r = c.post(
+            "/api/auth/invitations/accept",
+            {
+                "token": inv["token"],
+                "display_name": "New Person",
+                "password=<REDACTED>",
+            },
+        )
+>       assert r.status_code == 200 and r.json()["enrollment_required"] is True
+E       assert (500 == 200)
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/test_auth.py:326: AssertionError
+----------------------------- Captured stderr call -----------------------------
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-faxmqua0 is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-faxmqua0 is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+ERROR [app] unhandled error
+  + Exception Group Traceback (most recent call last):
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_utils.py", line 104, in create_collapsing_task_group
+  |     async with anyio.create_task_group() as tg:
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 847, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    |     return await call_next(request)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    |     await route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    |     await self.original_router.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    |     await included_router._handle_selected(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    |     await original_route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    |     await effective_context.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    |     return await run_in_threadpool(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    |     return await anyio.to_thread.run_sync(func)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    |     return await get_async_backend().run_sync_in_worker_thread(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    |     return await future
+    |            ^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    |     result = context.run(func, *args)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    |     return function(**arguments)
+    |            ^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/auth.py", line 199, in accept_invitation
+    |     user = auth_service.accept_invitation(db, body.token, body.display_name, body.password)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/auth.py", line 533, in accept_invitation
+    |     errors = password_policy_errors(password, email=inv.email)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 72, in password_policy_errors
+    |     if lowered in common_passwords():
+    |                   ^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 60, in common_passwords
+    |     text = resources.files("app.core").joinpath("common_passwords.txt").read_text("utf-8")
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    |     with self.open(mode='r', encoding=encoding, errors=errors) as f:
+    |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    |     return io.open(self, mode, buffering, encoding, errors, newline)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | FileNotFoundError: [Errno 2] No such file or directory: '/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/common_passwords.txt'
+    +------------------------------------
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    await route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    await effective_context.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    return await run_in_threadpool(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    return function(**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/auth.py", line 199, in accept_invitation
+    user = auth_service.accept_invitation(db, body.token, body.display_name, body.password)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/auth.py", line 533, in accept_invitation
+    errors = password_policy_errors(password, email=inv.email)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 72, in password_policy_errors
+    if lowered in common_passwords():
+                  ^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 60, in common_passwords
+    text = resources.files("app.core").joinpath("common_passwords.txt").read_text("utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/common_passwords.txt'
+------------------------------ Captured log call -------------------------------
+WARNING  app:main.py:63 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-faxmqua0 is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNING  app:main.py:63 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-faxmqua0 is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+ERROR    app:main.py:155 unhandled error
+  + Exception Group Traceback (most recent call last):
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_utils.py", line 104, in create_collapsing_task_group
+  |     async with anyio.create_task_group() as tg:
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 847, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    |     return await call_next(request)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    |     await route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    |     await self.original_router.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    |     await included_router._handle_selected(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    |     await original_route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    |     await effective_context.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    |     return await run_in_threadpool(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    |     return await anyio.to_thread.run_sync(func)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    |     return await get_async_backend().run_sync_in_worker_thread(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    |     return await future
+    |            ^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    |     result = context.run(func, *args)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    |     return function(**arguments)
+    |            ^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/auth.py", line 199, in accept_invitation
+    |     user = auth_service.accept_invitation(db, body.token, body.display_name, body.password)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/auth.py", line 533, in accept_invitation
+    |     errors = password_policy_errors(password, email=inv.email)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 72, in password_policy_errors
+    |     if lowered in common_passwords():
+    |                   ^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 60, in common_passwords
+    |     text = resources.files("app.core").joinpath("common_passwords.txt").read_text("utf-8")
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    |     with self.open(mode='r', encoding=encoding, errors=errors) as f:
+    |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    |     return io.open(self, mode, buffering, encoding, errors, newline)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | FileNotFoundError: [Errno 2] No such file or directory: '/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/common_passwords.txt'
+    +------------------------------------
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    await route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    await effective_context.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    return await run_in_threadpool(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    return function(**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/auth.py", line 199, in accept_invitation
+    user = auth_service.accept_invitation(db, body.token, body.display_name, body.password)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/auth.py", line 533, in accept_invitation
+    errors = password_policy_errors(password, email=inv.email)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 72, in password_policy_errors
+    if lowered in common_passwords():
+                  ^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 60, in common_passwords
+    text = resources.files("app.core").joinpath("common_passwords.txt").read_text("utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/common_passwords.txt'
+_______________________ TestInvitations.test_single_use ________________________
+
+self = <tests.test_auth.TestInvitations object at 0x7f6fc716bdd0>
+world = World(platform=Unit(id=UUID('29b2321f-e1f5-4e30-9de9-60801bf6c092'), users={<Role.system_admin: 'system_admin'>: TUser...d-3edf918bf3c7'), 'evidence': UUID('986c8f48-b211-4f89-b807-e1963d94c586'), 'plates': ['B00XYZ', 'B10XYZ', 'B20XYZ']}})
+login = <function login.<locals>._login at 0x7f6ee35516c0>
+
+    def test_single_use(self, world: World, login: object) -> None:
+        inv = self._invite(world, login)
+        body = {
+            "token": inv["token"],
+            "display_name": "X Y",
+            "password=<REDACTED>",
+        }
+>       assert ApiClient().post("/api/auth/invitations/accept", body).status_code == 200
+E       AssertionError: assert 500 == 200
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+E        +    where <Response [500 Internal Server Error]> = post('/api/auth/invitations/accept', {'token': 'e5waW8OP5oVP9goPoLav39VUo6kblmXpTxDv46gdEJ0', 'display_name': 'X Y', 'password=<REDACTED>'})
+E        +      where post = <tests.conftest.ApiClient object at 0x7f6ee3479460>.post
+E        +        where <tests.conftest.ApiClient object at 0x7f6ee3479460> = ApiClient()
+
+tests/test_auth.py:344: AssertionError
+----------------------------- Captured stderr call -----------------------------
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-faxmqua0 is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-faxmqua0 is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+ERROR [app] unhandled error
+  + Exception Group Traceback (most recent call last):
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_utils.py", line 104, in create_collapsing_task_group
+  |     async with anyio.create_task_group() as tg:
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 847, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    |     return await call_next(request)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    |     await route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    |     await self.original_router.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    |     await included_router._handle_selected(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    |     await original_route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    |     await effective_context.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    |     return await run_in_threadpool(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    |     return await anyio.to_thread.run_sync(func)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    |     return await get_async_backend().run_sync_in_worker_thread(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    |     return await future
+    |            ^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    |     result = context.run(func, *args)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    |     return function(**arguments)
+    |            ^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/auth.py", line 199, in accept_invitation
+    |     user = auth_service.accept_invitation(db, body.token, body.display_name, body.password)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/auth.py", line 533, in accept_invitation
+    |     errors = password_policy_errors(password, email=inv.email)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 72, in password_policy_errors
+    |     if lowered in common_passwords():
+    |                   ^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 60, in common_passwords
+    |     text = resources.files("app.core").joinpath("common_passwords.txt").read_text("utf-8")
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    |     with self.open(mode='r', encoding=encoding, errors=errors) as f:
+    |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    |     return io.open(self, mode, buffering, encoding, errors, newline)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | FileNotFoundError: [Errno 2] No such file or directory: '/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/common_passwords.txt'
+    +------------------------------------
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    await route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    await effective_context.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    return await run_in_threadpool(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    return function(**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/auth.py", line 199, in accept_invitation
+    user = auth_service.accept_invitation(db, body.token, body.display_name, body.password)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/auth.py", line 533, in accept_invitation
+    errors = password_policy_errors(password, email=inv.email)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 72, in password_policy_errors
+    if lowered in common_passwords():
+                  ^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 60, in common_passwords
+    text = resources.files("app.core").joinpath("common_passwords.txt").read_text("utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/common_passwords.txt'
+------------------------------ Captured log call -------------------------------
+WARNING  app:main.py:63 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-faxmqua0 is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNING  app:main.py:63 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-faxmqua0 is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+ERROR    app:main.py:155 unhandled error
+  + Exception Group Traceback (most recent call last):
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_utils.py", line 104, in create_collapsing_task_group
+  |     async with anyio.create_task_group() as tg:
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 847, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    |     return await call_next(request)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    |     await route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    |     await self.original_router.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    |     await included_router._handle_selected(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    |     await original_route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    |     await effective_context.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    |     return await run_in_threadpool(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    |     return await anyio.to_thread.run_sync(func)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    |     return await get_async_backend().run_sync_in_worker_thread(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    |     return await future
+    |            ^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    |     result = context.run(func, *args)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    |     return function(**arguments)
+    |            ^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/auth.py", line 199, in accept_invitation
+    |     user = auth_service.accept_invitation(db, body.token, body.display_name, body.password)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/auth.py", line 533, in accept_invitation
+    |     errors = password_policy_errors(password, email=inv.email)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 72, in password_policy_errors
+    |     if lowered in common_passwords():
+    |                   ^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 60, in common_passwords
+    |     text = resources.files("app.core").joinpath("common_passwords.txt").read_text("utf-8")
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    |     with self.open(mode='r', encoding=encoding, errors=errors) as f:
+    |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    |     return io.open(self, mode, buffering, encoding, errors, newline)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | FileNotFoundError: [Errno 2] No such file or directory: '/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/common_passwords.txt'
+    +------------------------------------
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    await route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    await effective_context.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    return await run_in_threadpool(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    return function(**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/auth.py", line 199, in accept_invitation
+    user = auth_service.accept_invitation(db, body.token, body.display_name, body.password)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/auth.py", line 533, in accept_invitation
+    errors = password_policy_errors(password, email=inv.email)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 72, in password_policy_errors
+    if lowered in common_passwords():
+                  ^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 60, in common_passwords
+    text = resources.files("app.core").joinpath("common_passwords.txt").read_text("utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/common_passwords.txt'
+_______________ TestInvitations.test_password_policy[short-pw-1] _______________
+
+self = <tests.test_auth.TestInvitations object at 0x7f6fc7176ae0>
+world = World(platform=Unit(id=UUID('ec415c1c-dff0-44f5-a623-aaa2caf2de19'), users={<Role.system_admin: 'system_admin'>: TUser...2-f118a05a5c02'), 'evidence': UUID('aef4413a-b24c-4732-a78b-c22e3fdd3a3a'), 'plates': ['B00XYZ', 'B10XYZ', 'B20XYZ']}})
+login = <function login.<locals>._login at 0x7f6ee478e3e0>
+password=<REDACTED>'
+
+    @pytest.mark.parametrize("password", ["short-pw-1", "password1234", "qwertyuiop123"])
+    def test_password_policy(self, world: World, login: object, password: str) -> None:
+        inv = self._invite(world, login)
+        r = ApiClient().post(
+            "/api/auth/invitations/accept",
+            {"token": inv["token"], "display_name": "X Y", "password": password},
+        )
+>       assert r.status_code == 422
+E       assert 500 == 422
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/test_auth.py:374: AssertionError
+----------------------------- Captured stderr call -----------------------------
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-faxmqua0 is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-faxmqua0 is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+ERROR [app] unhandled error
+  + Exception Group Traceback (most recent call last):
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_utils.py", line 104, in create_collapsing_task_group
+  |     async with anyio.create_task_group() as tg:
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 847, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    |     return await call_next(request)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    |     await route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    |     await self.original_router.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    |     await included_router._handle_selected(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    |     await original_route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    |     await effective_context.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    |     return await run_in_threadpool(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    |     return await anyio.to_thread.run_sync(func)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    |     return await get_async_backend().run_sync_in_worker_thread(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    |     return await future
+    |            ^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    |     result = context.run(func, *args)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    |     return function(**arguments)
+    |            ^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/auth.py", line 199, in accept_invitation
+    |     user = auth_service.accept_invitation(db, body.token, body.display_name, body.password)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/auth.py", line 533, in accept_invitation
+    |     errors = password_policy_errors(password, email=inv.email)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 72, in password_policy_errors
+    |     if lowered in common_passwords():
+    |                   ^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 60, in common_passwords
+    |     text = resources.files("app.core").joinpath("common_passwords.txt").read_text("utf-8")
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    |     with self.open(mode='r', encoding=encoding, errors=errors) as f:
+    |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    |     return io.open(self, mode, buffering, encoding, errors, newline)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | FileNotFoundError: [Errno 2] No such file or directory: '/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/common_passwords.txt'
+    +------------------------------------
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    await route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    await effective_context.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    return await run_in_threadpool(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    return function(**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/auth.py", line 199, in accept_invitation
+    user = auth_service.accept_invitation(db, body.token, body.display_name, body.password)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/auth.py", line 533, in accept_invitation
+    errors = password_policy_errors(password, email=inv.email)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 72, in password_policy_errors
+    if lowered in common_passwords():
+                  ^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 60, in common_passwords
+    text = resources.files("app.core").joinpath("common_passwords.txt").read_text("utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/common_passwords.txt'
+------------------------------ Captured log call -------------------------------
+WARNING  app:main.py:63 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-faxmqua0 is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNING  app:main.py:63 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-faxmqua0 is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+ERROR    app:main.py:155 unhandled error
+  + Exception Group Traceback (most recent call last):
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_utils.py", line 104, in create_collapsing_task_group
+  |     async with anyio.create_task_group() as tg:
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 847, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    |     return await call_next(request)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    |     await route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    |     await self.original_router.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    |     await included_router._handle_selected(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    |     await original_route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    |     await effective_context.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    |     return await run_in_threadpool(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    |     return await anyio.to_thread.run_sync(func)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    |     return await get_async_backend().run_sync_in_worker_thread(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    |     return await future
+    |            ^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    |     result = context.run(func, *args)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    |     return function(**arguments)
+    |            ^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/auth.py", line 199, in accept_invitation
+    |     user = auth_service.accept_invitation(db, body.token, body.display_name, body.password)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/auth.py", line 533, in accept_invitation
+    |     errors = password_policy_errors(password, email=inv.email)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 72, in password_policy_errors
+    |     if lowered in common_passwords():
+    |                   ^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 60, in common_passwords
+    |     text = resources.files("app.core").joinpath("common_passwords.txt").read_text("utf-8")
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    |     with self.open(mode='r', encoding=encoding, errors=errors) as f:
+    |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    |     return io.open(self, mode, buffering, encoding, errors, newline)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | FileNotFoundError: [Errno 2] No such file or directory: '/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/common_passwords.txt'
+    +------------------------------------
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    await route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    await effective_context.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    return await run_in_threadpool(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    return function(**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/auth.py", line 199, in accept_invitation
+    user = auth_service.accept_invitation(db, body.token, body.display_name, body.password)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/auth.py", line 533, in accept_invitation
+    errors = password_policy_errors(password, email=inv.email)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 72, in password_policy_errors
+    if lowered in common_passwords():
+                  ^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 60, in common_passwords
+    text = resources.files("app.core").joinpath("common_passwords.txt").read_text("utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/common_passwords.txt'
+______________ TestInvitations.test_password_policy[password1234] ______________
+
+self = <tests.test_auth.TestInvitations object at 0x7f6fc7175be0>
+world = World(platform=Unit(id=UUID('4b195947-0602-42d0-9b7e-d0df9972073d'), users={<Role.system_admin: 'system_admin'>: TUser...5-3cc3235e2b47'), 'evidence': UUID('70b06e33-50ea-4445-9516-eeccf3c34799'), 'plates': ['B00XYZ', 'B10XYZ', 'B20XYZ']}})
+login = <function login.<locals>._login at 0x7f6ee4726020>
+password=<REDACTED>'
+
+    @pytest.mark.parametrize("password", ["short-pw-1", "password1234", "qwertyuiop123"])
+    def test_password_policy(self, world: World, login: object, password: str) -> None:
+        inv = self._invite(world, login)
+        r = ApiClient().post(
+            "/api/auth/invitations/accept",
+            {"token": inv["token"], "display_name": "X Y", "password": password},
+        )
+>       assert r.status_code == 422
+E       assert 500 == 422
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/test_auth.py:374: AssertionError
+----------------------------- Captured stderr call -----------------------------
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-faxmqua0 is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-faxmqua0 is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+ERROR [app] unhandled error
+  + Exception Group Traceback (most recent call last):
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_utils.py", line 104, in create_collapsing_task_group
+  |     async with anyio.create_task_group() as tg:
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 847, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    |     return await call_next(request)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    |     await route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    |     await self.original_router.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    |     await included_router._handle_selected(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    |     await original_route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    |     await effective_context.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    |     return await run_in_threadpool(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    |     return await anyio.to_thread.run_sync(func)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    |     return await get_async_backend().run_sync_in_worker_thread(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    |     return await future
+    |            ^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    |     result = context.run(func, *args)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    |     return function(**arguments)
+    |            ^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/auth.py", line 199, in accept_invitation
+    |     user = auth_service.accept_invitation(db, body.token, body.display_name, body.password)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/auth.py", line 533, in accept_invitation
+    |     errors = password_policy_errors(password, email=inv.email)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 72, in password_policy_errors
+    |     if lowered in common_passwords():
+    |                   ^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 60, in common_passwords
+    |     text = resources.files("app.core").joinpath("common_passwords.txt").read_text("utf-8")
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    |     with self.open(mode='r', encoding=encoding, errors=errors) as f:
+    |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    |     return io.open(self, mode, buffering, encoding, errors, newline)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | FileNotFoundError: [Errno 2] No such file or directory: '/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/common_passwords.txt'
+    +------------------------------------
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    await route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    await effective_context.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    return await run_in_threadpool(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    return function(**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/auth.py", line 199, in accept_invitation
+    user = auth_service.accept_invitation(db, body.token, body.display_name, body.password)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/auth.py", line 533, in accept_invitation
+    errors = password_policy_errors(password, email=inv.email)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 72, in password_policy_errors
+    if lowered in common_passwords():
+                  ^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 60, in common_passwords
+    text = resources.files("app.core").joinpath("common_passwords.txt").read_text("utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/common_passwords.txt'
+------------------------------ Captured log call -------------------------------
+WARNING  app:main.py:63 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-faxmqua0 is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNING  app:main.py:63 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-faxmqua0 is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+ERROR    app:main.py:155 unhandled error
+  + Exception Group Traceback (most recent call last):
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_utils.py", line 104, in create_collapsing_task_group
+  |     async with anyio.create_task_group() as tg:
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 847, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    |     return await call_next(request)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    |     await route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    |     await self.original_router.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    |     await included_router._handle_selected(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    |     await original_route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    |     await effective_context.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    |     return await run_in_threadpool(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    |     return await anyio.to_thread.run_sync(func)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    |     return await get_async_backend().run_sync_in_worker_thread(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    |     return await future
+    |            ^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    |     result = context.run(func, *args)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    |     return function(**arguments)
+    |            ^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/auth.py", line 199, in accept_invitation
+    |     user = auth_service.accept_invitation(db, body.token, body.display_name, body.password)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/auth.py", line 533, in accept_invitation
+    |     errors = password_policy_errors(password, email=inv.email)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 72, in password_policy_errors
+    |     if lowered in common_passwords():
+    |                   ^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 60, in common_passwords
+    |     text = resources.files("app.core").joinpath("common_passwords.txt").read_text("utf-8")
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    |     with self.open(mode='r', encoding=encoding, errors=errors) as f:
+    |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    |     return io.open(self, mode, buffering, encoding, errors, newline)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | FileNotFoundError: [Errno 2] No such file or directory: '/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/common_passwords.txt'
+    +------------------------------------
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    await route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    await effective_context.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    return await run_in_threadpool(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    return function(**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/auth.py", line 199, in accept_invitation
+    user = auth_service.accept_invitation(db, body.token, body.display_name, body.password)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/auth.py", line 533, in accept_invitation
+    errors = password_policy_errors(password, email=inv.email)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 72, in password_policy_errors
+    if lowered in common_passwords():
+                  ^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 60, in common_passwords
+    text = resources.files("app.core").joinpath("common_passwords.txt").read_text("utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/common_passwords.txt'
+_____________ TestInvitations.test_password_policy[qwertyuiop123] ______________
+
+self = <tests.test_auth.TestInvitations object at 0x7f6fc7175070>
+world = World(platform=Unit(id=UUID('abcb2f3d-01c9-42ab-bc42-a907cc6c7119'), users={<Role.system_admin: 'system_admin'>: TUser...5-11cd8d7956e5'), 'evidence': UUID('c193eeeb-d497-4327-9308-ceb55aa70457'), 'plates': ['B00XYZ', 'B10XYZ', 'B20XYZ']}})
+login = <function login.<locals>._login at 0x7f6ee363d120>
+password=<REDACTED>'
+
+    @pytest.mark.parametrize("password", ["short-pw-1", "password1234", "qwertyuiop123"])
+    def test_password_policy(self, world: World, login: object, password: str) -> None:
+        inv = self._invite(world, login)
+        r = ApiClient().post(
+            "/api/auth/invitations/accept",
+            {"token": inv["token"], "display_name": "X Y", "password": password},
+        )
+>       assert r.status_code == 422
+E       assert 500 == 422
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/test_auth.py:374: AssertionError
+----------------------------- Captured stderr call -----------------------------
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-faxmqua0 is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-faxmqua0 is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+ERROR [app] unhandled error
+  + Exception Group Traceback (most recent call last):
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_utils.py", line 104, in create_collapsing_task_group
+  |     async with anyio.create_task_group() as tg:
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 847, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    |     return await call_next(request)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    |     await route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    |     await self.original_router.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    |     await included_router._handle_selected(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    |     await original_route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    |     await effective_context.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    |     return await run_in_threadpool(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    |     return await anyio.to_thread.run_sync(func)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    |     return await get_async_backend().run_sync_in_worker_thread(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    |     return await future
+    |            ^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    |     result = context.run(func, *args)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    |     return function(**arguments)
+    |            ^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/auth.py", line 199, in accept_invitation
+    |     user = auth_service.accept_invitation(db, body.token, body.display_name, body.password)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/auth.py", line 533, in accept_invitation
+    |     errors = password_policy_errors(password, email=inv.email)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 72, in password_policy_errors
+    |     if lowered in common_passwords():
+    |                   ^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 60, in common_passwords
+    |     text = resources.files("app.core").joinpath("common_passwords.txt").read_text("utf-8")
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    |     with self.open(mode='r', encoding=encoding, errors=errors) as f:
+    |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    |     return io.open(self, mode, buffering, encoding, errors, newline)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | FileNotFoundError: [Errno 2] No such file or directory: '/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/common_passwords.txt'
+    +------------------------------------
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    await route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    await effective_context.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    return await run_in_threadpool(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    return function(**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/auth.py", line 199, in accept_invitation
+    user = auth_service.accept_invitation(db, body.token, body.display_name, body.password)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/auth.py", line 533, in accept_invitation
+    errors = password_policy_errors(password, email=inv.email)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 72, in password_policy_errors
+    if lowered in common_passwords():
+                  ^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 60, in common_passwords
+    text = resources.files("app.core").joinpath("common_passwords.txt").read_text("utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/common_passwords.txt'
+------------------------------ Captured log call -------------------------------
+WARNING  app:main.py:63 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-faxmqua0 is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNING  app:main.py:63 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-faxmqua0 is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+ERROR    app:main.py:155 unhandled error
+  + Exception Group Traceback (most recent call last):
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_utils.py", line 104, in create_collapsing_task_group
+  |     async with anyio.create_task_group() as tg:
+  |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 847, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    |     return await call_next(request)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    |     await route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    |     await self.original_router.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    |     await included_router._handle_selected(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    |     await original_route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    |     await effective_context.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    |     return await run_in_threadpool(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    |     return await anyio.to_thread.run_sync(func)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    |     return await get_async_backend().run_sync_in_worker_thread(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    |     return await future
+    |            ^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    |     result = context.run(func, *args)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    |     return function(**arguments)
+    |            ^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/auth.py", line 199, in accept_invitation
+    |     user = auth_service.accept_invitation(db, body.token, body.display_name, body.password)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/auth.py", line 533, in accept_invitation
+    |     errors = password_policy_errors(password, email=inv.email)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 72, in password_policy_errors
+    |     if lowered in common_passwords():
+    |                   ^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 60, in common_passwords
+    |     text = resources.files("app.core").joinpath("common_passwords.txt").read_text("utf-8")
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    |     with self.open(mode='r', encoding=encoding, errors=errors) as f:
+    |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    |     return io.open(self, mode, buffering, encoding, errors, newline)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | FileNotFoundError: [Errno 2] No such file or directory: '/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/common_passwords.txt'
+    +------------------------------------
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    await route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1837, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2892, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1863, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1326, in handle
+    await effective_context.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    return await run_in_threadpool(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel/.venv/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    return function(**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/api/auth.py", line 199, in accept_invitation
+    user = auth_service.accept_invitation(db, body.token, body.display_name, body.password)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/services/auth.py", line 533, in accept_invitation
+    errors = password_policy_errors(password, email=inv.email)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 72, in password_policy_errors
+    if lowered in common_passwords():
+                  ^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/security.py", line 60, in common_passwords
+    text = resources.files("app.core").joinpath("common_passwords.txt").read_text("utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/common_passwords.txt'
+=========================== short test summary info ============================
+FAILED tests/test_auth.py::TestInvitations::test_accept_then_mandatory_enrollment
+FAILED tests/test_auth.py::TestInvitations::test_single_use - AssertionError:...
+FAILED tests/test_auth.py::TestInvitations::test_password_policy[short-pw-1]
+FAILED tests/test_auth.py::TestInvitations::test_password_policy[password1234]
+FAILED tests/test_auth.py::TestInvitations::test_password_policy[qwertyuiop123]

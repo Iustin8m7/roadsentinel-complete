@@ -1,0 +1,728 @@
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001, Initial schema: tenants, users, auth state, cameras, alerts, evidence, approvals, audit.
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 0002, Security layer: Row-Level Security, app-role grants, append-only audit log, auth lookups.
+INFO  [alembic.runtime.migration] Running upgrade 0002 -> 0003, Service accounts for signed pipeline ingestion; tighter grants on tenants.
+INFO  [alembic.runtime.migration] Running upgrade 0003 -> 0004, Fields of the API.md contract: camera slugs and timezones, public alert numbers, detection
+details, VLM verdicts, operator actions, and camera-level evidence (annotated recordings).
+INFO  [alembic.runtime.migration] Running upgrade 0004 -> 0005, Per-user MFA exemption (demo accounts): users.mfa_exempt, default false.
+INFO  [alembic.runtime.migration] Running upgrade 0005 -> 0006, Camera heartbeat: cameras.last_seen_at, set by the live pipeline.
+INFO  [alembic.runtime.migration] Running upgrade 0006 -> 0007, Evidence integrity: record whether a distinct original exists.
+INFO  [alembic.runtime.migration] Running upgrade 0007 -> 0008, New rule types, idempotent ingestion, camera rate status.
+INFO  [alembic.runtime.migration] Running upgrade 0008 -> 0009, Account recovery: four-eyes reset requests and single-use reset tokens.
+INFO  [alembic.runtime.migration] Running upgrade 0009 -> 0010, Retention: per-tenant policy per evidence kind, legal hold on alerts, purge marker on evidence.
+INFO  [alembic.runtime.migration] Running upgrade 0010 -> 0011, Patrol workflow status and first-view timestamp (for response-time statistics).
+INFO  [alembic.runtime.migration] Running upgrade 0011 -> 0012, Let the runtime role read alembic_version so /api/ready can tell whether the schema is migrated.
+INFO  [alembic.runtime.migration] Running upgrade 0012 -> 0013, User-owned saved archive searches with tenant RLS.
+INFO  [alembic.runtime.migration] Running upgrade 0013 -> 0014, Tenant-scoped offline recordings and durable analysis runs.
+INFO  [alembic.runtime.migration] Running upgrade 0014 -> 0015, Persist structured vehicle-observation artifact metadata.
+INFO  [alembic.runtime.migration] Running upgrade 0015 -> rsint_cam1, Camera control plane: lifecycle/source columns on cameras, processing grants, immutable
+config versions, worker status (lease) and a bounded health-event history.
+INFO  [alembic.runtime.migration] Running upgrade rsint_cam1 -> rsint_case1, Investigation workspace (Workstream B): case notes with append-only revisions, timeline
+bookmarks, evidence-package export jobs, user-owned saved archive filters; evidence gets
+``duration_s`` (from the MP4 header) and ``purged_at``/``purge_reason`` (explicit purge state).
+INFO  [alembic.runtime.migration] Running upgrade rsint_case1 -> rsint_run1, Camera runtime telemetry (Workstream D): bounded latency/memory/frozen-image metrics on the
+worker status row, a source identity fingerprint on cameras (what the backend registered) and on
+the worker status (what the lease holder reports it opened), and the per-camera, per-state
+failure-notification throttle marks.
+INFO  [alembic.runtime.migration] Running upgrade rsint_run1 -> rsint_case2, Investigation completion (Workstream B, lane E): explicit case links, structured follow-up
+items with an append-only history, manual legal holds; note revisions may carry the recorded
+detection box; export jobs count storage outages separately from attempts. The cross-tenant
+probe allow-list (``rs_resource_tenant``) is extended to every tenant table that the API looks
+up by id, including those of 0007, 0008 and this revision.
+INFO  [alembic.runtime.migration] Running upgrade rsint_case2 -> 0020, Require an RLS-bypassing owner for pre-tenant lookup functions.
+INFO  [alembic.runtime.migration] Running upgrade 0020 -> 0021, Align offline tenant indexes with ORM; additive only.
+INFO  [alembic.runtime.migration] Running upgrade 0021 -> 0022, Identifier-only lookup functions get a dedicated NOLOGIN column-limited owner.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+Disposable test PostgreSQL identity: ('postgres', '127.0.0.1', 52807, 'rsverify_root') target: rsmission_verify_d0254b8460
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+......................WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.PASS complete browser recorded upload/crop/actual model/candidate/first promotion/decision/note/independent approval/package download
+PASS real process restart: persisted session/case/decision/note/media, archive search and logout
+PASS real browser ZIP hash verification/tamper rejection and unchanged ciphertext after process restart
+..WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+...WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+...WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+operator.a@test.local: mfa_exempt=true
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+operator.a@test.local: mfa_exempt=true
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+operator.a@test.local: mfa_exempt=true
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+operator.a@test.local: mfa_exempt=true
+operator.a@test.local: mfa_exempt=false
+..WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+operator.a@test.local: mfa_exempt=true
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+operator.a@test.local: mfa_exempt=true
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+..WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+..........................................WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+..INFO  [app.test] login password=[REDACTED] for x
+INFO  [app.test] args login password=[REDACTED] for x
+.INFO  [app.test] payload {"password": "[REDACTED]"}
+INFO  [app.test] args payload {"password": "[REDACTED]"}
+.INFO  [app.test] Authorization: [REDACTED] [REDACTED]
+INFO  [app.test] args Authorization: [REDACTED] [REDACTED]
+.INFO  [app.test] token [REDACTED]
+INFO  [app.test] args token [REDACTED]
+.INFO  [app.test] Cookie: [REDACTED]; other=1
+INFO  [app.test] args Cookie: [REDACTED]; other=1
+.INFO  [app.test] plate=[REDACTED] detected
+INFO  [app.test] args plate=[REDACTED] detected
+.INFO  [app.test] RS_MASTER_KEYS=[REDACTED]
+INFO  [app.test] args RS_MASTER_KEYS=[REDACTED]
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+...WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+....WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+...WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+......WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.........WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.........WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.schemas
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.tables
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.types
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.constraints
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.defaults
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.comments
+INFO  [alembic.ddl.postgresql] Detected sequence named 'audit_log_id_seq' as owned by integer column 'audit_log(id)', assuming SERIAL and omitting
+........WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+PASS actual camera browser register
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+PASS actual camera browser draft
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+PASS actual camera browser approve
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+PASS actual camera browser start
+PASS duplicate real worker denied before source open
+PASS actual camera browser preview
+PASS actual camera browser event
+PASS actual model -> synthetic-zone candidate -> signed managed ingest -> encrypted media -> browser rejection
+PASS managed model-derived synthetic-zone case note, independent export and ZIP hash verification
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+PASS actual camera browser draft
+PASS actual camera browser approve
+PASS actual camera browser start
+PASS actual configuration API: independent approval, revision 1 -> 2, old worker stopped, fresh lease + ACK revision 2
+PASS actual camera browser health
+PASS actual camera browser health
+PASS controlled source disconnect: reconnecting, stale preview expired, recovered actual frames
+Testing owned worker SIGKILL and real lease expiry; no policy/time shortcuts
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+PASS actual camera browser start
+PASS actual worker SIGKILL -> stale/expired preview -> natural lease expiry -> fresh epoch/ACK/frames
+PASS actual camera browser start
+PASS actual camera browser rollback
+PASS actual camera browser start
+PASS actual camera browser disable
+PASS independent re-enable -> new lease/ACK -> real processing -> final pause
+LOCAL RECORDED REPLAY: actual YOLOX/ByteTrack -> managed lease + ACK revision 1 -> changing authenticated preview -> stop on disable
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+PASS actual Chromium: password + TOTP, recorded synthetic alert, actual UI rejection and note, protected playable evidence
+PASS actual HTTP case note, source license grant, four-eyes export, download, SHA-256 manifest verification
+REAL HTTP: YOLOX/ByteTrack frozen licensed-frame fixture -> candidate -> encrypted media -> idempotent recorded review -> rejection; frames= 72 candidates= 8
+.sWARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+..WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+...WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.sWARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+....................................WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+ERROR [app] unhandled error
+  + Exception Group Traceback (most recent call last):
+  |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/_utils.py", line 104, in create_collapsing_task_group
+  |     async with anyio.create_task_group() as tg:
+  |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 847, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    |     return await call_next(request)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    |     await route.handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/routing.py", line 1328, in handle
+    |     await super().handle(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/routing.py", line 282, in handle
+    |     await self.app(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    |     return await run_in_threadpool(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    |     return await anyio.to_thread.run_sync(func)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    |     return await get_async_backend().run_sync_in_worker_thread(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    |     return await future
+    |            ^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    |     result = context.run(func, *args)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    |     return function(**arguments)
+    |            ^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/justin7m8/Documents/roadsentinel-integration/backend/tests/test_startup.py", line 163, in boom
+    |     raise RuntimeError(
+    | RuntimeError: psycopg.errors.UndefinedTable: SELECT * FROM secret_table at C:/srv/app/db.py
+    +------------------------------------
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 85, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 157, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/app/core/http.py", line 128, in dispatch
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/routing.py", line 2809, in app
+    await route.handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/routing.py", line 1328, in handle
+    await super().handle(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/routing.py", line 282, in handle
+    await self.app(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/routing.py", line 166, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/routing.py", line 152, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/routing.py", line 745, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/routing.py", line 374, in run_endpoint_function
+    return await run_in_threadpool(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/telemetry/_api.py", line 244, in _run_sync_endpoint
+    return function(**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/justin7m8/Documents/roadsentinel-integration/backend/tests/test_startup.py", line 163, in boom
+    raise RuntimeError(
+RuntimeError: psycopg.errors.UndefinedTable: SELECT * FROM secret_table at C:/srv/app/db.py
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-dbzo5z0z is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+.....
+=============================== warnings summary ===============================
+tests/test_ingest_auth.py::TestLimits::test_oversized_body_is_refused_before_hashing
+  /home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/dependencies/utils.py:674: StarletteDeprecationWarning: 'HTTP_413_REQUEST_ENTITY_TOO_LARGE' is deprecated. Use 'HTTP_413_CONTENT_TOO_LARGE' instead.
+    solved = await call(**solved_result.values)
+
+tests/test_ingest_auth.py::TestManagementApi::test_camera_scope_must_belong_to_the_tenant
+  /home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/telemetry/_api.py:244: StarletteDeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    return function(**arguments)
+
+tests/test_managed_live_runtime.py: 4 warnings
+tests/test_mission_vertical.py: 8 warnings
+  /home/justin7m8/Documents/roadsentinel-integration/backend/app/services/casework.py:190: SADeprecationWarning: The Result.tuples() method is deprecated, Row now behaves like a tuple and can unpack types directly. (deprecated since: 2.1.0)
+    ).tuples()
+
+tests/test_managed_live_runtime.py: 4 warnings
+tests/test_mission_vertical.py: 8 warnings
+  /home/justin7m8/Documents/roadsentinel-integration/backend/app/services/casework.py:202: SADeprecationWarning: The Result.tuples() method is deprecated, Row now behaves like a tuple and can unpack types directly. (deprecated since: 2.1.0)
+    ).tuples()
+
+tests/test_mission_vertical.py::test_real_inference_recorded_candidate_to_encrypted_review
+  /home/justin7m8/Documents/roadsentinel-integration/roadsentinel/detector.py:209: FutureWarning: The `ByteTrack` was deprecated since v0.28.0. It will be removed in v0.31.0.
+    return sv.ByteTrack(frame_rate=max(1, round(frame_rate)))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+423 passed, 2 skipped, 27 warnings in 343.10s (0:05:43)

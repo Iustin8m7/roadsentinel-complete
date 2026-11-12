@@ -1,0 +1,33 @@
+{
+  "runtime": "A",
+  "utc": "2026-11-10T23:34:09.275618+00:00",
+  "pid": 1828918,
+  "identity": [
+    "rsint_20261110b",
+    "127.0.0.1",
+    55446,
+    "rsint_app_261110b"
+  ],
+  "head": [
+    [
+      "0022"
+    ]
+  ],
+  "active": [
+    {
+      "tenant": "platform",
+      "jobs": 0,
+      "worker_leases": 0
+    },
+    {
+      "tenant": "unit-a",
+      "jobs": 0,
+      "worker_leases": 0
+    },
+    {
+      "tenant": "unit-b",
+      "jobs": 0,
+      "worker_leases": 0
+    }
+  ]
+}

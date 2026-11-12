@@ -1,0 +1,13 @@
+
+> roadsentinel-web@0.1.0 test
+> vitest run
+
+
+ RUN  v5.0.5 /home/justin7m8/Documents/roadsentinel-integration/frontend
+
+
+ Test Files  11 passed (11)
+      Tests  109 passed (109)
+   Start at  14:04:59
+   Duration  2.03s (import 70%, tests 28%, transform 1%, worker 1%)
+

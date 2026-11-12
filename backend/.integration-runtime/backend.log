@@ -1,0 +1,152 @@
+2026-11-10 14:44:15,686 WARNING app EVIDENCE STORAGE: evidence storage /tmp/roadsentinel-integration-runtime/evidence is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+INFO:     Started server process [1814984]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8003 (Press CTRL+C to quit)
+2026-11-10 14:45:01,144 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.schemas
+2026-11-10 14:45:01,144 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.tables
+2026-11-10 14:45:01,144 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.types
+2026-11-10 14:45:01,144 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.constraints
+2026-11-10 14:45:01,144 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.defaults
+2026-11-10 14:45:01,144 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.comments
+2026-11-10 14:45:01,144 INFO alembic.runtime.plugins setup plugin alembic.ext.checkconstraint_byname
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1814984]
+2026-11-10 14:53:46,273 WARNING app EVIDENCE STORAGE: evidence storage /tmp/roadsentinel-integration-runtime/evidence is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+INFO:     Started server process [1828918]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8003 (Press CTRL+C to quit)
+2026-11-10 15:06:44,881 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.schemas
+2026-11-10 15:06:44,881 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.tables
+2026-11-10 15:06:44,881 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.types
+2026-11-10 15:06:44,881 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.constraints
+2026-11-10 15:06:44,881 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.defaults
+2026-11-10 15:06:44,881 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.comments
+2026-11-10 15:06:44,881 INFO alembic.runtime.plugins setup plugin alembic.ext.checkconstraint_byname
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1828918]
+2026-11-11 01:35:35,880 WARNING app EVIDENCE STORAGE: evidence storage /tmp/roadsentinel-integration-runtime/evidence is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+INFO:     Started server process [1993271]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8003 (Press CTRL+C to quit)
+2026-11-11 01:38:25,232 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.schemas
+2026-11-11 01:38:25,233 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.tables
+2026-11-11 01:38:25,233 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.types
+2026-11-11 01:38:25,233 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.constraints
+2026-11-11 01:38:25,233 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.defaults
+2026-11-11 01:38:25,233 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.comments
+2026-11-11 01:38:25,233 INFO alembic.runtime.plugins setup plugin alembic.ext.checkconstraint_byname
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1993271]
+2026-11-11 01:47:38,721 WARNING app EVIDENCE STORAGE: evidence storage /tmp/roadsentinel-integration-runtime/evidence is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+INFO:     Started server process [2033731]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8003 (Press CTRL+C to quit)
+2026-11-11 01:48:15,724 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.schemas
+2026-11-11 01:48:15,724 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.tables
+2026-11-11 01:48:15,724 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.types
+2026-11-11 01:48:15,724 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.constraints
+2026-11-11 01:48:15,724 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.defaults
+2026-11-11 01:48:15,724 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.comments
+2026-11-11 01:48:15,724 INFO alembic.runtime.plugins setup plugin alembic.ext.checkconstraint_byname
+/home/justin7m8/Documents/roadsentinel-integration/roadsentinel/detector.py:209: FutureWarning: The `ByteTrack` was deprecated since v0.28.0. It will be removed in v0.31.0.
+  return sv.ByteTrack(frame_rate=max(1, round(frame_rate)))
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [2033731]
+2026-11-11 14:01:45,220 WARNING app EVIDENCE STORAGE: evidence storage /tmp/roadsentinel-integration-runtime/evidence is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+INFO:     Started server process [2107404]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8003 (Press CTRL+C to quit)
+2026-11-11 14:02:46,964 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.schemas
+2026-11-11 14:02:46,964 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.tables
+2026-11-11 14:02:46,964 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.types
+2026-11-11 14:02:46,964 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.constraints
+2026-11-11 14:02:46,964 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.defaults
+2026-11-11 14:02:46,964 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.comments
+2026-11-11 14:02:46,964 INFO alembic.runtime.plugins setup plugin alembic.ext.checkconstraint_byname
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [2107404]
+2026-11-11 14:19:31,440 WARNING app EVIDENCE STORAGE: evidence storage /tmp/roadsentinel-integration-runtime/evidence is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+INFO:     Started server process [2150043]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8003 (Press CTRL+C to quit)
+2026-11-11 14:25:43,289 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.schemas
+2026-11-11 14:25:43,289 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.tables
+2026-11-11 14:25:43,290 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.types
+2026-11-11 14:25:43,290 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.constraints
+2026-11-11 14:25:43,290 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.defaults
+2026-11-11 14:25:43,290 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.comments
+2026-11-11 14:25:43,290 INFO alembic.runtime.plugins setup plugin alembic.ext.checkconstraint_byname
+2026-11-12 01:45:56,139 WARNING app EVIDENCE STORAGE: evidence storage /tmp/roadsentinel-integration-runtime/evidence is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+INFO:     Started server process [2476390]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8003 (Press CTRL+C to quit)
+2026-11-12 01:45:59,522 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.schemas
+2026-11-12 01:45:59,522 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.tables
+2026-11-12 01:45:59,522 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.types
+2026-11-12 01:45:59,522 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.constraints
+2026-11-12 01:45:59,522 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.defaults
+2026-11-12 01:45:59,522 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.comments
+2026-11-12 01:45:59,522 INFO alembic.runtime.plugins setup plugin alembic.ext.checkconstraint_byname
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [2476390]
+INFO:     Started server process [2476791]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8003 (Press CTRL+C to quit)
+2026-11-12 01:48:18,870 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.schemas
+2026-11-12 01:48:18,872 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.tables
+2026-11-12 01:48:18,872 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.types
+2026-11-12 01:48:18,872 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.constraints
+2026-11-12 01:48:18,872 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.defaults
+2026-11-12 01:48:18,872 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.comments
+2026-11-12 01:48:18,872 INFO alembic.runtime.plugins setup plugin alembic.ext.checkconstraint_byname
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [2476791]
+INFO:     Started server process [2480290]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8003 (Press CTRL+C to quit)
+2026-11-12 01:50:36,124 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.schemas
+2026-11-12 01:50:36,124 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.tables
+2026-11-12 01:50:36,124 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.types
+2026-11-12 01:50:36,124 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.constraints
+2026-11-12 01:50:36,125 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.defaults
+2026-11-12 01:50:36,125 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.comments
+2026-11-12 01:50:36,125 INFO alembic.runtime.plugins setup plugin alembic.ext.checkconstraint_byname
+INFO:     Shutting down
+INFO:     Waiting for connections to close. (CTRL+C to force quit)
+INFO:     Started server process [2486646]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8003 (Press CTRL+C to quit)
+2026-11-12 01:58:50,091 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.schemas
+2026-11-12 01:58:50,091 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.tables
+2026-11-12 01:58:50,091 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.types
+2026-11-12 01:58:50,091 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.constraints
+2026-11-12 01:58:50,091 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.defaults
+2026-11-12 01:58:50,091 INFO alembic.runtime.plugins setup plugin alembic.autogenerate.comments
+2026-11-12 01:58:50,091 INFO alembic.runtime.plugins setup plugin alembic.ext.checkconstraint_byname
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [2480290]

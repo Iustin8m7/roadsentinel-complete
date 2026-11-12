@@ -1,0 +1,41 @@
+
+> roadsentinel-frontend@0.1.0 build
+> tsc -b && vite build --outDir /home/justin7m8/Documents/roadsentinel-integration/docs/audits/runtime_verification/runs/20261112T001018Z-e31b1483/build
+
+vite v8.3.4 building client environment for production...
+transforming...
+✓ 43 modules transformed.
+
+(!) outDir /home/justin7m8/Documents/roadsentinel-integration/docs/audits/runtime_verification/runs/20261112T001018Z-e31b1483/build is not inside project root and will not be emptied.
+Use --emptyOutDir to override.
+
+rendering chunks...
+computing gzip size...
+../docs/audits/runtime_verification/runs/20261112T001018Z-e31b1483/build/manifest.webmanifest                          0.47 kB
+../docs/audits/runtime_verification/runs/20261112T001018Z-e31b1483/build/index.html                                    1.01 kB │ gzip:  0.45 kB
+../docs/audits/runtime_verification/runs/20261112T001018Z-e31b1483/build/assets/index-Coq3BrVe.css                    17.57 kB │ gzip:  4.65 kB
+../docs/audits/runtime_verification/runs/20261112T001018Z-e31b1483/build/assets/workbox-window.prod.es5-Bd17z0YL.js    5.65 kB │ gzip:  2.20 kB
+../docs/audits/runtime_verification/runs/20261112T001018Z-e31b1483/build/assets/index-DNR2kuJw.js                    315.77 kB │ gzip: 97.82 kB
+
+✓ built in 396ms
+
+PWA v2.0.0
+Building src/pwa/sw.ts service worker ("es" format)...
+vite v8.3.4 building client environment for production...
+
+ WARN  inlineDynamicImports option is deprecated, please use codeSplitting: false instead.
+
+transforming...
+✓ 55 modules transformed.
+rendering chunks...
+computing gzip size...
+../docs/audits/runtime_verification/runs/20261112T001018Z-e31b1483/build/sw.mjs  17.05 kB │ gzip: 5.76 kB
+
+✓ built in 48ms
+
+PWA v2.0.0
+mode      injectManifest
+format:   es
+precache  16 entries (378.38 KiB)
+files generated
+  ../docs/audits/runtime_verification/runs/20261112T001018Z-e31b1483/build/sw.js

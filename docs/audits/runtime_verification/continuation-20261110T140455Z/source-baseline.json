@@ -1,0 +1,138 @@
+{
+  "INTEGRATION_MANIFEST.json": {
+    "sha256": "d56bcc8618ddda2e0104459c37aa7beddcbfd2ef2e164061f5e861e3a90dac12",
+    "bytes": 168927
+  },
+  "INTEGRATION_HANDOFF.md": {
+    "sha256": "684b20f2b3167ae522ec5ea0962cf798ba06725828963ebf7efe90d28329af1b",
+    "bytes": 6520
+  },
+  "README.md": {
+    "sha256": "9c2fbda70e308389c86aaed021f7581e169d39c98c3d555886064a3c3dc228c2",
+    "bytes": 15358
+  },
+  "API.md": {
+    "sha256": "e70aa6270fd79a04dec0bc2f6242a362a8e508244550f4c2e6553eb516232dbd",
+    "bytes": 17759
+  },
+  "backend/app/services/seed.py": {
+    "sha256": "2bd3c83ef0fa8dcd11c15bb89502a3afc2c2d83d8c18bb78d5e7a4f9a54ac6c5",
+    "bytes": 9955
+  },
+  "backend/app/services/tenants.py": {
+    "sha256": "fde6b7eb46a281037d5c0a3242361578f43813bf346e8f31e0a9f364324661e6",
+    "bytes": 689
+  },
+  "backend/app/db.py": {
+    "sha256": "5ce107e80ed2c9c679abfc9a1fe4af84301f8eda865069188ca7938fc863cdfb",
+    "bytes": 2423
+  },
+  "backend/app/main.py": {
+    "sha256": "f4839482579da5e0a98a0708b2c536349bb21f4749677c81d41498a7f72b8e57",
+    "bytes": 5715
+  },
+  "frontend/vite.config.ts": {
+    "sha256": "dc1d5b5b42a8c20f85bb79155ffa1bf21c7d99662aa2741ee7c75d01552ee73d",
+    "bytes": 488
+  },
+  "backend/tests/test_mission_vertical.py": {
+    "sha256": "28ab58c13b4092c188c38b39f0dba3c328b3c6c8280d9c32e38da1091244ad0e",
+    "bytes": 14937
+  },
+  "backend/tests/test_managed_live_runtime.py": {
+    "sha256": "43356de30b438421e7192f19e613c8034cf095190fdaf616d5e1e5f02d72adb0",
+    "bytes": 16552
+  },
+  "frontend/e2e/mission-review.mjs": {
+    "sha256": "055fa2f4c6471a182245b977677b8f8b846acdfe49f9666802e3b5cc2018b1fe",
+    "bytes": 2649
+  },
+  "frontend/e2e/live-login-recovery.mjs": {
+    "sha256": "81ddd5fa7d45d902c1c0cfc4fe71161d2e2ab5a127c1d9838d152d045ae88a4e",
+    "bytes": 8381
+  },
+  "frontend/src/components/OfflinePromotion.tsx": {
+    "sha256": "111a8a0b5b46c8341ad1b47c49156a4d9192361e4b0baa39702767e30daa268f",
+    "bytes": 1377
+  },
+  "docs/audits/PRE-FLIGHT.md": {
+    "sha256": "4e403979d2dfaf4cd16b2566cdef3f5c9ed6ea415c0c1de8576deb138836c81f",
+    "bytes": 1889
+  },
+  "docs/audits/POST_INTEGRATION_RUNTIME_VERIFICATION.md": {
+    "sha256": "2abf4f0c6ef4b5aea99a9eee2afa5aa790352c4fc95d566b019c72fe9b3c92a7",
+    "bytes": 4786
+  },
+  "docs/audits/MISSION_CHECKPOINT.md": {
+    "sha256": "50275bde712cbac54b08c18fa0783587fc1607fe1194593a5d3852332958dfe0",
+    "bytes": 822
+  },
+  "docs/audits/TEST_EXECUTION_LEDGER.md": {
+    "sha256": "c28927f379932a7cac1dcaa6c9bc1f1d5ffcf98e8770623b5511a390459f155e",
+    "bytes": 20968
+  },
+  "docs/audits/SECURITY_PRIVACY_REGRESSION.md": {
+    "sha256": "013611a7329dded47085052e73f01150f14410dfc1fe473d3a35070b5993f795",
+    "bytes": 7169
+  },
+  "docs/audits/FINAL_LOGIN_HANDOFF.md": {
+    "sha256": "37ada52f6ab8b557390f5bf9bc3b5504baf6475eddf0d7dbfd069181f42b6686",
+    "bytes": 1476
+  },
+  "docs/audits/BASELINE_FAILURE_REPRODUCTIONS.md": {
+    "sha256": "7705538d81083f2098cd312e7ea4ba290a60287b6a5ab9fd7e2747bcd988f8fd",
+    "bytes": 783
+  },
+  "docs/audits/ARCHITECTURE_AND_CONTRACT_MAP.md": {
+    "sha256": "cd209d2dd7cab9e863a6aa7cfbaf7772882c8a15a464c2b40c3f5d1c9c9eeb22",
+    "bytes": 25363
+  },
+  "docs/audits/ACTUAL_BROWSER_LOGIN_EVIDENCE.md": {
+    "sha256": "a0189c75102993fa9aba184dd59fac40e341a2ed36b58fb37451398eba9c4353",
+    "bytes": 3460
+  },
+  "docs/audits/ISSUES_AND_UNVERIFIED_EVIDENCE.md": {
+    "sha256": "25fc6ad13eda29f8a583c37787fff4e548202a06d4ed26f8a054243af27522e7",
+    "bytes": 6556
+  },
+  "docs/audits/OPERATOR_DEMO_QUICKSTART.md": {
+    "sha256": "45ea8a83ae6e4b7a23aae0ea1e1279b1b342fd976af121f1269e8e899d7abd06",
+    "bytes": 4285
+  },
+  "docs/audits/POST_INTEGRATION_README_AUDIT_AFTER.md": {
+    "sha256": "3b733dd44593ab24d839a3cefa793da08fbd93d9618f2db56b787d9f60d8d06a",
+    "bytes": 112699
+  },
+  "docs/audits/FULL_INTEGRATION_E2E_VALIDATION.md": {
+    "sha256": "00c8d72fae0a4f4524d81f5bbcc202e2f310d582b8fb88e9c999afea44565e38",
+    "bytes": 7955
+  },
+  "docs/audits/TOP_TWO_FEATURE_ACCEPTANCE.md": {
+    "sha256": "67abd668aad55b8e26d68474f90e74ebfb832bd8c89c1f9581724c72fe80102c",
+    "bytes": 4090
+  },
+  "docs/audits/FINAL_ENGINEERING_HANDOFF.md": {
+    "sha256": "8a8b0faff764f04cb130fdc5cfe9236e18698d0b165ff215253f6601170bba74",
+    "bytes": 4186
+  },
+  "docs/audits/INTEGRATED_BROWSER_DEMO_RUNBOOK.md": {
+    "sha256": "87bca4710a10c6d870142e7624c65745c9cb4da55a34cda1eb2dd979b7c30900",
+    "bytes": 5703
+  },
+  "docs/audits/INTEGRATED_LOGIN_RECOVERY_REPORT.md": {
+    "sha256": "aeee2f377784937db4754894627936194e5defcc502357c53276c55684f1418b",
+    "bytes": 8533
+  },
+  "docs/audits/REMAINING_FEATURES_MASTER_BACKLOG.md": {
+    "sha256": "4797d3cef556999f3e9d067422242a6f35bbdc17bec37001a2f1962b862bfef3",
+    "bytes": 29027
+  },
+  "docs/audits/FUTURE_FEATURE_IMPLEMENTATION_PROMPTS.md": {
+    "sha256": "ef0164370f77cb587d333e46ff98b4a430c02c57df76e3fd0d4f1e1ebc303d54",
+    "bytes": 15171
+  },
+  "docs/audits/POST_INTEGRATION_README_AUDIT_BEFORE.md": {
+    "sha256": "f8acbd9cd7735c50fac78c99401e58b69409c9996aab9b0a93578cde903e4a4c",
+    "bytes": 121884
+  }
+}

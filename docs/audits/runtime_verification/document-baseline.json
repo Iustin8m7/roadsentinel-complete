@@ -1,0 +1,54 @@
+{
+  "INTEGRATION_MANIFEST.json": {
+    "sha256": "d56bcc8618ddda2e0104459c37aa7beddcbfd2ef2e164061f5e861e3a90dac12",
+    "lines": 4621
+  },
+  "INTEGRATION_HANDOFF.md": {
+    "sha256": "684b20f2b3167ae522ec5ea0962cf798ba06725828963ebf7efe90d28329af1b",
+    "lines": 39
+  },
+  "README.md": {
+    "sha256": "8774d733b1339a5696329b209b067789dfbfa5148014d0d63a8aeeb575d5fe17",
+    "lines": 226
+  },
+  "API.md": {
+    "sha256": "997d425e112a3738650d24b75ecc5954110845e70a8b87aa51fbec42717d7ce7",
+    "lines": 176
+  },
+  "docs/audits/POST_INTEGRATION_README_AUDIT_BEFORE.md": {
+    "sha256": "f8acbd9cd7735c50fac78c99401e58b69409c9996aab9b0a93578cde903e4a4c",
+    "lines": 942
+  },
+  "docs/audits/POST_INTEGRATION_README_AUDIT_AFTER.md": {
+    "sha256": "38abd4b566269437fa05f4d1202a4d391e65ac92abfb27d01a4e9ef9491a7123",
+    "lines": 958
+  },
+  "docs/audits/README_COVERAGE_MATRIX.csv": {
+    "sha256": "48f66403ba84a831f3ae4264b7ee244541bfef1d46aa49383b3b1cd4c4473eb4",
+    "lines": 186
+  },
+  "docs/audits/TEST_EXECUTION_LEDGER.md": {
+    "sha256": "c4431b8e1934dc61f4dee6bf61dd1470851c201849ba129673113cc6608f2d84",
+    "lines": 159
+  },
+  "docs/audits/INTEGRATED_BROWSER_DEMO_RUNBOOK.md": {
+    "sha256": "b1b38d65012e54c7d4f8e36e6218e2e1d412ec3e9678b97f2e82e9ff6fbcb05f",
+    "lines": 58
+  },
+  "docs/audits/FINAL_ENGINEERING_HANDOFF.md": {
+    "sha256": "3e6014b0a7e9d6c81f671cdefb5ca664eddf92d3e81becac7c5bdb7939c4b203",
+    "lines": 52
+  },
+  "docs/audits/REMAINING_FEATURES_MASTER_BACKLOG.md": {
+    "sha256": "d8bbbd25a4ef3a7073e3d7610c6aabd6815ea1c6fc070d70c5c8ff0c3f45ec7c",
+    "lines": 124
+  },
+  "docs/implementation/FEATURE_01_AI_INCIDENT_TO_OPERATOR.md": {
+    "sha256": "bb526f16dcf42d2b9c263b9c2f8d4c3e4174238f1630aaf210ac8720226a3b76",
+    "lines": 23
+  },
+  "docs/implementation/FEATURE_02_AUTHORIZED_LIVE_CAMERA.md": {
+    "sha256": "6621413a549eb4a51cfdf978d20fef122e9a890c8d5d4f5d9ebdeedc4e99d0ee",
+    "lines": 21
+  }
+}

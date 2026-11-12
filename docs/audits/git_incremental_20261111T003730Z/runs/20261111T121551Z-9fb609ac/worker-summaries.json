@@ -1,0 +1,160 @@
+{
+  "note": "Actual closing worker reports from this controlled run; not camera freshness or accuracy certification.",
+  "reports": [
+    {
+      "frames": 49,
+      "video_seconds": 23.9,
+      "processing_fps": 2.04,
+      "detections": 1004,
+      "unique_tracks": 36,
+      "events": 4,
+      "tracks_by_class": {
+        "car": 13,
+        "person": 7,
+        "truck": 8,
+        "bus": 7,
+        "object": 1
+      },
+      "events_by_type": {
+        "pedestrian_on_road": 4
+      },
+      "traffic": {
+        "total_crossings": 1,
+        "counts_by_line_lane_class": [
+          {
+            "line": "linie",
+            "lane": "unassigned",
+            "object_class": "car",
+            "count": 1
+          }
+        ],
+        "rolling_flow_per_minute": {
+          "window_seconds": 60,
+          "total": 0.0,
+          "by_class": {},
+          "by_direction": {},
+          "by_line": {}
+        }
+      },
+      "model_sha256": "c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063",
+      "device": "CPUExecutionProvider",
+      "inference_latency_ms_p50": 94.13,
+      "inference_latency_ms_p95": 116.59,
+      "process_peak_rss_mb": 433.8
+    },
+    {
+      "frames": 7,
+      "video_seconds": 3.1,
+      "processing_fps": 2.01,
+      "detections": 129,
+      "unique_tracks": 21,
+      "events": 0,
+      "tracks_by_class": {
+        "person": 2,
+        "bus": 6,
+        "car": 11,
+        "object": 1,
+        "truck": 1
+      },
+      "events_by_type": {},
+      "traffic": {
+        "total_crossings": 0,
+        "counts_by_line_lane_class": [],
+        "rolling_flow_per_minute": {
+          "window_seconds": 60,
+          "total": 0.0,
+          "by_class": {},
+          "by_direction": {},
+          "by_line": {}
+        }
+      },
+      "model_sha256": "c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063",
+      "device": "CPUExecutionProvider",
+      "inference_latency_ms_p50": 83.57,
+      "inference_latency_ms_p95": 88.64,
+      "process_peak_rss_mb": 364.1
+    },
+    {
+      "frames": 14,
+      "video_seconds": 6.2,
+      "processing_fps": 2.13,
+      "detections": 280,
+      "unique_tracks": 29,
+      "events": 3,
+      "tracks_by_class": {
+        "car": 12,
+        "person": 6,
+        "truck": 3,
+        "bus": 7,
+        "object": 1
+      },
+      "events_by_type": {
+        "pedestrian_on_road": 3
+      },
+      "traffic": {
+        "total_crossings": 1,
+        "counts_by_line_lane_class": [
+          {
+            "line": "crossing",
+            "lane": "test",
+            "object_class": "car",
+            "count": 1
+          }
+        ],
+        "rolling_flow_per_minute": {
+          "window_seconds": 60,
+          "total": 0.0,
+          "by_class": {},
+          "by_direction": {},
+          "by_line": {}
+        }
+      },
+      "model_sha256": "c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063",
+      "device": "CPUExecutionProvider",
+      "inference_latency_ms_p50": 94.43,
+      "inference_latency_ms_p95": 118.43,
+      "process_peak_rss_mb": 434.4
+    },
+    {
+      "frames": 16,
+      "video_seconds": 7.2,
+      "processing_fps": 2.14,
+      "detections": 323,
+      "unique_tracks": 27,
+      "events": 2,
+      "tracks_by_class": {
+        "car": 12,
+        "person": 4,
+        "truck": 4,
+        "bus": 6,
+        "object": 1
+      },
+      "events_by_type": {
+        "pedestrian_on_road": 2
+      },
+      "traffic": {
+        "total_crossings": 1,
+        "counts_by_line_lane_class": [
+          {
+            "line": "linie",
+            "lane": "unassigned",
+            "object_class": "car",
+            "count": 1
+          }
+        ],
+        "rolling_flow_per_minute": {
+          "window_seconds": 60,
+          "total": 0.0,
+          "by_class": {},
+          "by_direction": {},
+          "by_line": {}
+        }
+      },
+      "model_sha256": "c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063",
+      "device": "CPUExecutionProvider",
+      "inference_latency_ms_p50": 90.17,
+      "inference_latency_ms_p95": 115.82,
+      "process_peak_rss_mb": 434.0
+    }
+  ]
+}

@@ -1,0 +1,3278 @@
+{
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/login",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/mfa/enroll/start",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/mfa/enroll/confirm",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/0d5d4d2b-3d5e-4a65-a04a-2d197e0ce8de",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/recordings",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/recordings",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/recordings",
+      "status": 415
+    },
+    {
+      "method": "POST",
+      "path": "/api/recordings",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/recording/a92fbc23-f2ae-4550-916c-299139bedeaa",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/recording/a92fbc23-f2ae-4550-916c-299139bedeaa",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/recordings/a92fbc23-f2ae-4550-916c-299139bedeaa/analyses",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/recording/a92fbc23-f2ae-4550-916c-299139bedeaa",
+      "status": 200
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/locations/recording/a92fbc23-f2ae-4550-916c-299139bedeaa",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/recordings/a92fbc23-f2ae-4550-916c-299139bedeaa/thumbnail",
+      "status": 200
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/recordings/a92fbc23-f2ae-4550-916c-299139bedeaa/crop",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/recordings/a92fbc23-f2ae-4550-916c-299139bedeaa/thumbnail",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/recordings/a92fbc23-f2ae-4550-916c-299139bedeaa/analyses",
+      "status": 202
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb/preview",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb/preview",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb/preview",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb/preview",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb/preview",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb/preview",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb/preview",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb/preview",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb/preview",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb/video",
+      "status": 206
+    },
+    {
+      "method": "GET",
+      "path": "/api/recordings/a92fbc23-f2ae-4550-916c-299139bedeaa/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb/analytics/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/recordings/a92fbc23-f2ae-4550-916c-299139bedeaa/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb/analytics/timeline",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/recordings/a92fbc23-f2ae-4550-916c-299139bedeaa/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb/analytics/heatmap",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/recordings",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/recordings",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/recording/a92fbc23-f2ae-4550-916c-299139bedeaa",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/recordings/a92fbc23-f2ae-4550-916c-299139bedeaa/analyses",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/recording/a92fbc23-f2ae-4550-916c-299139bedeaa",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/31c84c28-5ee0-44cd-9277-7f17b88fc9eb/video",
+      "status": 206
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/recordings/a92fbc23-f2ae-4550-916c-299139bedeaa/thumbnail",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/recordings",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/recording/9f039293-779b-4a3a-afe3-f184848f4be2",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/recordings/9f039293-779b-4a3a-afe3-f184848f4be2/analyses",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/recording/9f039293-779b-4a3a-afe3-f184848f4be2",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/recordings/9f039293-779b-4a3a-afe3-f184848f4be2/thumbnail",
+      "status": 200
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/locations/recording/9f039293-779b-4a3a-afe3-f184848f4be2",
+      "status": 200
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/recordings/9f039293-779b-4a3a-afe3-f184848f4be2/crop",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/recordings/9f039293-779b-4a3a-afe3-f184848f4be2/thumbnail",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/recordings/9f039293-779b-4a3a-afe3-f184848f4be2/analyses",
+      "status": 202
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/43f4a368-6bdf-4ba8-833d-7fb5fb0ed25c",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/43f4a368-6bdf-4ba8-833d-7fb5fb0ed25c",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/43f4a368-6bdf-4ba8-833d-7fb5fb0ed25c",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/43f4a368-6bdf-4ba8-833d-7fb5fb0ed25c/preview",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/43f4a368-6bdf-4ba8-833d-7fb5fb0ed25c",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/43f4a368-6bdf-4ba8-833d-7fb5fb0ed25c/preview",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/43f4a368-6bdf-4ba8-833d-7fb5fb0ed25c",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/43f4a368-6bdf-4ba8-833d-7fb5fb0ed25c/preview",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/43f4a368-6bdf-4ba8-833d-7fb5fb0ed25c",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/43f4a368-6bdf-4ba8-833d-7fb5fb0ed25c/preview",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/43f4a368-6bdf-4ba8-833d-7fb5fb0ed25c",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/analyses/43f4a368-6bdf-4ba8-833d-7fb5fb0ed25c/video",
+      "status": 206
+    },
+    {
+      "method": "POST",
+      "path": "/api/recordings/9f039293-779b-4a3a-afe3-f184848f4be2/analyses/43f4a368-6bdf-4ba8-833d-7fb5fb0ed25c/candidates/0/promote",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/reference",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/incidents/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/map/incidents/query",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/reference",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/map/incidents/query",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/incidents/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/cameras/280513b8-1887-46c3-bc98-bad5a56058bf/location-history",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742/history",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/map/incidents/query",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/cameras/280513b8-1887-46c3-bc98-bad5a56058bf/location-history",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742/history",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/reference",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/incidents/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/map/incidents/query",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/reference",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/map/incidents/query",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/incidents/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/cameras/280513b8-1887-46c3-bc98-bad5a56058bf/location-history",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/map/incidents/query",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742/history",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/cameras/280513b8-1887-46c3-bc98-bad5a56058bf/location-history",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742/history",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742/history",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/map/incidents/query",
+      "status": 200
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 409
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742/history",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/login",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/mfa/verify",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/reference",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/incidents/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/map/incidents/query",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/reference",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/map/incidents/query",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/incidents/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/map/incidents/query",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/cameras/280513b8-1887-46c3-bc98-bad5a56058bf/location-history",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742/history",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/cameras/280513b8-1887-46c3-bc98-bad5a56058bf/location-history",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742/history",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/location-proposals/156405f8-186f-4673-a7ed-d49f02f355bb/decision",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742/history",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/map/incidents/query",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/incidents/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/reference",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/map/incidents/query",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/incidents/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stream",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/map/incidents/query",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/reference",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/cameras/280513b8-1887-46c3-bc98-bad5a56058bf/location-history",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742/history",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/map/incidents/query",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/cameras/280513b8-1887-46c3-bc98-bad5a56058bf/location-history",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742/history",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/cameras/280513b8-1887-46c3-bc98-bad5a56058bf/location-history",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/cameras/280513b8-1887-46c3-bc98-bad5a56058bf/location-history",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742/history",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742/history",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/login",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/mfa/verify",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/reference",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/map/incidents/query",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/reference",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/map/incidents/query",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/81fa98a2-a3a2-48e9-85d8-47086d39f86d",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/events/4/view",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/case",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/30e819b6-7b28-4471-8755-d404f8a92fd4",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/events/4/view",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/81fa98a2-a3a2-48e9-85d8-47086d39f86d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/30e819b6-7b28-4471-8755-d404f8a92fd4",
+      "status": 206
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/case",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/followup-assignees",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/exports",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/exports",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/30e819b6-7b28-4471-8755-d404f8a92fd4",
+      "status": 206
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/events/4/decision",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/81fa98a2-a3a2-48e9-85d8-47086d39f86d",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/events/4/notes",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/case",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/30e819b6-7b28-4471-8755-d404f8a92fd4",
+      "status": 206
+    },
+    {
+      "method": "POST",
+      "path": "/api/events/4/bookmarks",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/case",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/events/4/exports",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/exports",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/events/4/view",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/events/4/view",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/81fa98a2-a3a2-48e9-85d8-47086d39f86d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/30e819b6-7b28-4471-8755-d404f8a92fd4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/case",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/events/4/view",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/30e819b6-7b28-4471-8755-d404f8a92fd4",
+      "status": 206
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/case",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/followup-assignees",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/exports",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/exports",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/81fa98a2-a3a2-48e9-85d8-47086d39f86d",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/approvals/5500d532-ae32-432d-b408-4056c5296f7a/approve",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/exports",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/81fa98a2-a3a2-48e9-85d8-47086d39f86d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/events/4/view",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/events/4/view",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/30e819b6-7b28-4471-8755-d404f8a92fd4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/events/4/view",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/81fa98a2-a3a2-48e9-85d8-47086d39f86d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/case",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/case",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/followup-assignees",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/exports",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/30e819b6-7b28-4471-8755-d404f8a92fd4",
+      "status": 206
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/exports",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/exports/92284c10-5d6d-432b-a390-c72e2b0d3e6a/run",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/exports",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/exports/92284c10-5d6d-432b-a390-c72e2b0d3e6a/link",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/exports/92284c10-5d6d-432b-a390-c72e2b0d3e6a/download",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/81fa98a2-a3a2-48e9-85d8-47086d39f86d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats/response",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats/response",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/0d5d4d2b-3d5e-4a65-a04a-2d197e0ce8de",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/81fa98a2-a3a2-48e9-85d8-47086d39f86d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/incidents/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/reference",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/map/incidents/query",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/incidents/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/map/incidents/query",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/reference",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/cameras/280513b8-1887-46c3-bc98-bad5a56058bf/location-history",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/map/incidents/query",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742/history",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/map/cameras/280513b8-1887-46c3-bc98-bad5a56058bf/location-history",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742/history",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/locations/alert/d79fbac0-c81d-4aa3-b429-34044d9df742",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/events/4/view",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/events/4/view",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/30e819b6-7b28-4471-8755-d404f8a92fd4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/81fa98a2-a3a2-48e9-85d8-47086d39f86d",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/events/4/view",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/case",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/case",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/30e819b6-7b28-4471-8755-d404f8a92fd4",
+      "status": 206
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/followup-assignees",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/exports",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/exports",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/saved-searches",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/saved-searches",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications/stream",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/81fa98a2-a3a2-48e9-85d8-47086d39f86d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/0d5d4d2b-3d5e-4a65-a04a-2d197e0ce8de",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/search",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/30e819b6-7b28-4471-8755-d404f8a92fd4",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/events/4/view",
+      "status": 204
+    },
+    {
+      "method": "POST",
+      "path": "/api/events/4/view",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/case",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/media/30e819b6-7b28-4471-8755-d404f8a92fd4",
+      "status": 206
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/case",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/followup-assignees",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/exports",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/4/exports",
+      "status": 200
+    }
+  ],
+  "errors": [],
+  "publicLandingResponsive": true,
+  "publicSimulationOnly": true,
+  "browserQrEnrollment": true,
+  "recoveryAcknowledged": true,
+  "moving": {
+    "recording": "a92fbc23-f2ae-4550-916c-299139bedeaa",
+    "run": "31c84c28-5ee0-44cd-9277-7f17b88fc9eb",
+    "frames": 90,
+    "modelSha256": "c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063",
+    "counts": {
+      "output_fps": 3,
+      "flow_events": [
+        {
+          "type": "line_crossing",
+          "class": "truck",
+          "pts_ms": 3400,
+          "reason": "ByteTrack center crossed the operator-drawn counting line.",
+          "track_id": 2,
+          "direction": "a_to_b",
+          "confidence": 0.689,
+          "output_time_s": 3.3333333333333335
+        },
+        {
+          "type": "line_crossing",
+          "class": "truck",
+          "pts_ms": 6000,
+          "reason": "ByteTrack center crossed the operator-drawn counting line.",
+          "track_id": 14,
+          "direction": "a_to_b",
+          "confidence": 0.848,
+          "output_time_s": 6
+        },
+        {
+          "type": "line_crossing",
+          "class": "car",
+          "pts_ms": 11400,
+          "reason": "ByteTrack center crossed the operator-drawn counting line.",
+          "track_id": 22,
+          "direction": "a_to_b",
+          "confidence": 0.754,
+          "output_time_s": 11.333333333333334
+        },
+        {
+          "type": "line_crossing",
+          "class": "car",
+          "pts_ms": 20700,
+          "reason": "ByteTrack center crossed the operator-drawn counting line.",
+          "track_id": 40,
+          "direction": "a_to_b",
+          "confidence": 0.9,
+          "output_time_s": 20.666666666666668
+        }
+      ],
+      "output_mode": "sampled_timeline",
+      "output_audio": "not_preserved",
+      "line_crossings": {
+        "a_to_b": 4
+      },
+      "model_provider": "CPUExecutionProvider",
+      "candidate_events": [],
+      "track_count_note": "Unique tracker IDs are observed tracks, not ground-truth unique vehicles.",
+      "event_rule_summary": {
+        "queue": {
+          "count": 0,
+          "status": "disabled",
+          "enabled": false,
+          "threshold_s": 60,
+          "minimum_vehicles": 5
+        },
+        "crossing": {
+          "count": 4,
+          "enabled": true,
+          "priority": "flow_analytics_only"
+        },
+        "stationary": {
+          "count": 0,
+          "status": "evaluated",
+          "enabled": true,
+          "threshold_s": 30
+        },
+        "unsupported": {
+          "speed_distance_ttc_signal": "Requires calibrated scene geometry and validated signal/source timing."
+        }
+      },
+      "source_nominal_fps": 10,
+      "line_crossing_status": "configured_unvalidated_geometry",
+      "p95_model_latency_ms": 98.69210626929998,
+      "mean_model_latency_ms": 85.32152921543457,
+      "model_provider_fallback": "CUDAExecutionProvider is not installed in this ONNX Runtime",
+      "unique_track_ids_by_class": {
+        "bus": 20,
+        "car": 37,
+        "truck": 8
+      },
+      "detection_observations_by_class": {
+        "bus": 378,
+        "car": 480,
+        "truck": 155
+      },
+      "line_crossings_by_class_direction": {
+        "car:a_to_b": 2,
+        "truck:a_to_b": 2
+      }
+    },
+    "heatmapObservations": 1013,
+    "heatmapMax": 1.4031254572682497
+  },
+  "corruptUploadRejected": true,
+  "disconnectedUploadRejected": true,
+  "movingReloadPersisted": true,
+  "recording": "9f039293-779b-4a3a-afe3-f184848f4be2",
+  "run": "43f4a368-6bdf-4ba8-833d-7fb5fb0ed25c",
+  "candidates": 8,
+  "processedFrames": 72,
+  "number": 4,
+  "incidentId": "d79fbac0-c81d-4aa3-b429-34044d9df742",
+  "locationRevision": 2,
+  "staleLocationDenied": true,
+  "otherTenantHidden": true,
+  "evidencePlayback": {
+    "rate": 1,
+    "duration": 6,
+    "advanced": 1.1077000000000001,
+    "elapsed": 1.1077999999523163
+  },
+  "evidenceEventOffset": 0,
+  "browserBookmark": true,
+  "export": "92284c10-5d6d-432b-a390-c72e2b0d3e6a",
+  "manifestSha256": "51389f19388f0093e9603d69a9d3ba173462d0028322e0583f07b8b816769783",
+  "activityReportLoadedCount": 4,
+  "activityReportPrint": true,
+  "rejectedExcludedFromOpen": true,
+  "browserUpload": true,
+  "browserFirstPromotion": true,
+  "browserDecision": true,
+  "browserNote": true,
+  "browserIndependentApproval": true,
+  "browserPackageDownload": true,
+  "restartSession": true,
+  "restartCase": true,
+  "restartMap": true,
+  "archiveSearch": true,
+  "logoutRevoked": true,
+  "packageHashesVerified": true,
+  "tamperedPackageRejected": true,
+  "encryptedEvidenceUnchanged": true,
+  "backendPidChanged": true,
+  "source": "SYNTHETIC TEST frozen licensed frame; not a real incident"
+}

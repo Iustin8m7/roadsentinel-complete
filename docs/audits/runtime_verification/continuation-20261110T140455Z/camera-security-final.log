@@ -1,0 +1,4 @@
+initdb exit 0 log /home/justin7m8/Documents/roadsentinel-integration/docs/audits/runtime_verification/runs/20261110T142923Z-8164cdf4/initdb.log
+start exit 0 log /home/justin7m8/Documents/roadsentinel-integration/docs/audits/runtime_verification/runs/20261110T142923Z-8164cdf4/start.log
+camera exit 0 log /home/justin7m8/Documents/roadsentinel-integration/docs/audits/runtime_verification/runs/20261110T142923Z-8164cdf4/camera.log
+stop exit 0 log /home/justin7m8/Documents/roadsentinel-integration/docs/audits/runtime_verification/runs/20261110T142923Z-8164cdf4/stop.log

@@ -1,0 +1,257 @@
+[
+  {
+    "artifact": "docs/audits/runtime_verification/alembic-heads.log",
+    "completed_mtime_utc": "2026-11-10T13:14:17.177355+00:00",
+    "observed_summaries": []
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/backend-restart.log",
+    "completed_mtime_utc": "2026-11-10T12:44:15.748290+00:00",
+    "observed_summaries": []
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/backend-suite-final.log",
+    "completed_mtime_utc": "2026-11-10T13:04:29.030698+00:00",
+    "observed_summaries": [
+      "422 passed, 2 skipped, 19 warnings in 138.45s (0:02:18)"
+    ]
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/backend-suite.log",
+    "completed_mtime_utc": "2026-11-10T12:49:56.402062+00:00",
+    "observed_summaries": [
+      "422 passed, 2 skipped, 15 warnings in 115.95s (0:01:55)"
+    ]
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/camera-browser.log",
+    "completed_mtime_utc": "2026-11-10T12:57:48.765933+00:00",
+    "observed_summaries": [
+      "1 passed in 29.21s"
+    ]
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/camera-control-api.log",
+    "completed_mtime_utc": "2026-11-10T12:54:08.183764+00:00",
+    "observed_summaries": [
+      "1 passed in 21.18s"
+    ]
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/compile.log",
+    "completed_mtime_utc": "2026-11-10T13:07:08.025677+00:00",
+    "observed_summaries": []
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/dependency-install.log",
+    "completed_mtime_utc": "2026-11-10T12:40:45.744599+00:00",
+    "observed_summaries": []
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/docs-check-final.log",
+    "completed_mtime_utc": "2026-11-10T13:17:56.601397+00:00",
+    "observed_summaries": [
+      "0 broken link(s) in 93 markdown files"
+    ]
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/docs-check.log",
+    "completed_mtime_utc": "2026-11-10T13:13:26.931745+00:00",
+    "observed_summaries": [
+      "12 broken link(s) in 113 markdown files"
+    ]
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/flows-reproducible.log",
+    "completed_mtime_utc": "2026-11-10T13:07:16.950638+00:00",
+    "observed_summaries": []
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/frontend-build.log",
+    "completed_mtime_utc": "2026-11-10T13:02:17.596667+00:00",
+    "observed_summaries": []
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/frontend-final-run.log",
+    "completed_mtime_utc": "2026-11-10T13:14:00.736202+00:00",
+    "observed_summaries": []
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/frontend-lint.log",
+    "completed_mtime_utc": "2026-11-10T13:02:42.575425+00:00",
+    "observed_summaries": []
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/frontend-tests-final.log",
+    "completed_mtime_utc": "2026-11-10T13:07:12.387814+00:00",
+    "observed_summaries": [
+      "      Tests  19 passed (19)"
+    ]
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/frontend-tests.log",
+    "completed_mtime_utc": "2026-11-10T12:48:42.973713+00:00",
+    "observed_summaries": [
+      "      Tests  19 passed (19)"
+    ]
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/frontend-typecheck.log",
+    "completed_mtime_utc": "2026-11-10T12:44:08.821376+00:00",
+    "observed_summaries": []
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/full-feature-journeys.log",
+    "completed_mtime_utc": "2026-11-10T13:00:38.682717+00:00",
+    "observed_summaries": [
+      "2 passed, 17 warnings in 47.21s"
+    ]
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/legacy-test-dependency.log",
+    "completed_mtime_utc": "2026-11-10T12:50:08.643235+00:00",
+    "observed_summaries": []
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/live-browser-enrollment.log",
+    "completed_mtime_utc": "2026-11-10T13:07:48.356170+00:00",
+    "observed_summaries": [
+      "PASS existing integration: operator, MFA, dashboard/role destination, refresh, RBAC and logout",
+      "PASS existing integration: tenant_admin, MFA, dashboard/role destination, refresh, RBAC and logout",
+      "PASS existing integration: patrol, MFA, dashboard/role destination, refresh, RBAC and logout",
+      "PASS existing integration: auditor, MFA, dashboard/role destination, refresh, RBAC and logout",
+      "PASS existing integration: operator, MFA, dashboard/role destination, refresh, RBAC and logout"
+    ]
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/live-browser-loaded.log",
+    "completed_mtime_utc": "2026-11-10T13:08:01.988383+00:00",
+    "observed_summaries": [
+      "PASS existing integration: operator, MFA, dashboard/role destination, refresh, RBAC and logout",
+      "PASS existing integration: tenant_admin, MFA, dashboard/role destination, refresh, RBAC and logout",
+      "PASS existing integration: patrol, MFA, dashboard/role destination, refresh, RBAC and logout",
+      "PASS existing integration: auditor, MFA, dashboard/role destination, refresh, RBAC and logout",
+      "PASS existing integration: operator, MFA, dashboard/role destination, refresh, RBAC and logout"
+    ]
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/live-browser.log",
+    "completed_mtime_utc": "2026-11-10T12:46:31.896275+00:00",
+    "observed_summaries": [
+      "PASS existing integration: operator, MFA, dashboard/role destination, refresh, RBAC and logout",
+      "PASS existing integration: tenant_admin, MFA, dashboard/role destination, refresh, RBAC and logout",
+      "PASS existing integration: patrol, MFA, dashboard/role destination, refresh, RBAC and logout",
+      "PASS existing integration: auditor, MFA, dashboard/role destination, refresh, RBAC and logout",
+      "PASS existing integration: operator, MFA, dashboard/role destination, refresh, RBAC and logout"
+    ]
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/pipeline-suite-complete.log",
+    "completed_mtime_utc": "2026-11-10T12:57:23.637270+00:00",
+    "observed_summaries": [
+      "213 passed, 2 warnings in 5.74s"
+    ]
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/pipeline-suite-current-fixed.log",
+    "completed_mtime_utc": "2026-11-10T13:04:01.766854+00:00",
+    "observed_summaries": [
+      "213 passed, 2 warnings in 5.67s"
+    ]
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/pipeline-suite-current.log",
+    "completed_mtime_utc": "2026-11-10T13:03:10.749285+00:00",
+    "observed_summaries": [
+      "3 failed, 210 passed, 2 warnings in 5.44s"
+    ]
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/pipeline-suite-final.log",
+    "completed_mtime_utc": "2026-11-10T12:53:20.509914+00:00",
+    "observed_summaries": [
+      "213 passed, 2 warnings in 5.51s"
+    ]
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/pipeline-suite-verified.log",
+    "completed_mtime_utc": "2026-11-10T12:50:15.902230+00:00",
+    "observed_summaries": [
+      "1 failed, 212 passed, 2 warnings in 5.66s"
+    ]
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/pipeline-suite.log",
+    "completed_mtime_utc": "2026-11-10T12:48:46.415446+00:00",
+    "observed_summaries": [
+      "4 failed, 191 passed, 2 warnings, 18 errors in 4.45s"
+    ]
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/pwa-build.log",
+    "completed_mtime_utc": "2026-11-10T13:02:46.201535+00:00",
+    "observed_summaries": []
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/pwa-lint-final.log",
+    "completed_mtime_utc": "2026-11-10T13:04:21.602467+00:00",
+    "observed_summaries": []
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/pwa-lint.log",
+    "completed_mtime_utc": "2026-11-10T13:03:08.675221+00:00",
+    "observed_summaries": []
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/pwa-tests.log",
+    "completed_mtime_utc": "2026-11-10T13:02:11.206474+00:00",
+    "observed_summaries": [
+      "      Tests  9 passed (9)"
+    ]
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/python-autofix.log",
+    "completed_mtime_utc": "2026-11-10T13:03:46.532384+00:00",
+    "observed_summaries": []
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/python-quality.log",
+    "completed_mtime_utc": "2026-11-10T13:16:04.834808+00:00",
+    "observed_summaries": []
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/recovery-apply-verified.log",
+    "completed_mtime_utc": "2026-11-10T12:40:14.601893+00:00",
+    "observed_summaries": []
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/recovery-apply.log",
+    "completed_mtime_utc": "2026-11-10T12:39:27.184723+00:00",
+    "observed_summaries": []
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/recovery-final-inspection.log",
+    "completed_mtime_utc": "2026-11-10T13:06:45.508967+00:00",
+    "observed_summaries": []
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/recovery-idempotent-rehearsal.log",
+    "completed_mtime_utc": "2026-11-10T13:19:18.230422+00:00",
+    "observed_summaries": []
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/recovery-inspection.log",
+    "completed_mtime_utc": "2026-11-10T12:39:06.244786+00:00",
+    "observed_summaries": []
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/restart-session.log",
+    "completed_mtime_utc": "2026-11-10T12:53:46.338358+00:00",
+    "observed_summaries": []
+  },
+  {
+    "artifact": "docs/audits/runtime_verification/test-cluster-stop.log",
+    "completed_mtime_utc": "2026-11-10T13:14:37.350001+00:00",
+    "observed_summaries": []
+  }
+]

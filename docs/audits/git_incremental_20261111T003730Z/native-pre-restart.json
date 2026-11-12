@@ -1,0 +1,32 @@
+{
+  "pid": 2033731,
+  "cwd": "/home/justin7m8/Documents/roadsentinel-integration/backend",
+  "identity": [
+    "rsint_20261110b",
+    "127.0.0.1",
+    55446,
+    "rsint_app_261110b"
+  ],
+  "revision": [
+    [
+      "0022"
+    ]
+  ],
+  "dev_tenant_activity": [
+    {
+      "tenant": "platform",
+      "active_camera_leases": 0,
+      "active_analysis_runs": 0
+    },
+    {
+      "tenant": "unit-a",
+      "active_camera_leases": 0,
+      "active_analysis_runs": 0
+    },
+    {
+      "tenant": "unit-b",
+      "active_camera_leases": 0,
+      "active_analysis_runs": 0
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+diff --git a/frontend/src/pages/LoginPage.tsx b/frontend/src/pages/LoginPage.tsx
+index 42f7ba6..aa8dfcf 100644
+--- a/frontend/src/pages/LoginPage.tsx
++++ b/frontend/src/pages/LoginPage.tsx
+@@ -18,7 +18,6 @@ export default function LoginPage() {
+ 
+   const [username, setUsername] = useState('')
+   const [password, setPassword] = useState('')
+-  const [remember, setRemember] = useState(true)
+   const [error, setError] = useState<string | null>(null)
+   const [loading, setLoading] = useState(false)
+   // Second factor for accounts that are not MFA-exempt (exempt demo accounts skip it).
+@@ -65,7 +64,7 @@ export default function LoginPage() {
+     }
+     if (!username.trim() || !password) return setError('Completați utilizatorul și parola.')
+     setLoading(true)
+-    const res = await login(username, password, remember)
++    const res = await login(username, password, false)
+     if (res.ok && res.mfaRequired) {
+       setMfa(true)
+       if (res.enrollment) {
+@@ -93,7 +92,7 @@ export default function LoginPage() {
+             Autentificare dispecerat
+           </h1>
+           <p className="text-[12px] text-[#9AA1A8]">
+-            Poliția Rutieră Iași · Sistem operativ
++            Dispecerat rutier asistat de AI · prototip demonstrativ
+           </p>
+         </div>
+ 
+@@ -129,16 +128,6 @@ export default function LoginPage() {
+                 placeholder="••••••••"
+               />
+             </div>
+-
+-            <label className="flex items-center gap-2 text-[12px] text-[#9AA1A8] cursor-pointer select-none">
+-              <input
+-                type="checkbox"
+-                checked={remember}
+-                onChange={(e) => setRemember(e.target.checked)}
+-                className="w-3.5 h-3.5 rounded-[2px] border-[#2A2F34] bg-surface-2 text-accent focus:ring-0 cursor-pointer"
+-              />
+-              <span>Ține-mă minte</span>
+-            </label>
+             </>
+           )}
+ 
+@@ -234,9 +223,9 @@ export default function LoginPage() {
+           </div>
+         </div>}
+ 
+-        {/* Discrete bottom legal text */}
++        {/* Discrete bottom note */}
+         <div className="text-[11px] text-text-faint text-center pt-1">
+-          Acces auditat · Directiva UE 2016/680
++          Acces auditat
+         </div>
+       </div>
+     </div>

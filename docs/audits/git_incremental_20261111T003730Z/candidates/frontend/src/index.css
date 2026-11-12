@@ -1,0 +1,333 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/space-grotesk/index.css';
+@import './styles/tokens.css';
+
+@font-face {
+  font-family: 'Geist';
+  src: url('/fonts/Geist-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('/fonts/GeistMono-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Tailwind names map onto the shared tokens (src/styles/tokens.css). */
+@theme inline {
+  --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
+  --font-display: 'Space Grotesk Variable', 'Geist', ui-sans-serif, system-ui, sans-serif;
+
+  --color-void: var(--bg-void);
+  --color-panel: var(--bg-panel);
+  --color-elevation: var(--bg-elevation);
+  --color-border: var(--border-line);
+  --color-border-subtle: var(--border-subtle);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-action: var(--action);
+  --color-accent: var(--action);
+  --color-accent-2: var(--accent-2);
+  --color-on-accent: var(--on-action);
+  --color-critical: var(--sev-critical);
+  --color-warning: var(--sev-high);
+  --color-caution: var(--sev-medium);
+  --color-info: var(--sev-info);
+  --color-ok: var(--ok);
+  --color-danger: var(--danger-bg);
+  --color-focus: var(--focus-ring);
+  /* login page names */
+  --color-bg: var(--bg-void);
+  --color-surface: var(--bg-panel);
+  --color-surface-2: var(--bg-elevation);
+  --color-text: var(--text-primary);
+  --color-text-faint: var(--text-muted);
+  --color-crit: var(--sev-critical);
+  --color-high: var(--sev-high);
+  --color-med: var(--sev-medium);
+}
+
+/* ---------- global ---------- */
+::selection { background: color-mix(in srgb, var(--action) 38%, transparent); color: var(--text-primary); }
+* { scrollbar-width: thin; scrollbar-color: var(--border-line) transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-line); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); background-clip: padding-box; border: 2px solid transparent; }
+
+html, body {
+  background-color: var(--bg-void);
+  color: var(--text-primary);
+  font-family: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'tnum' 1, 'cv11' 1;
+}
+html { transition: background-color var(--motion-slow) var(--ease-out); }
+h1, h2, h3, .font-display { font-family: var(--font-display); letter-spacing: -0.01em; }
+
+/* Stage: aurora + faint grid on the page void; grain above it. Decorative only, off in calm mode. */
+body {
+  background-image:
+    radial-gradient(60rem 38rem at 88% -12%, var(--aurora-a), transparent 70%),
+    radial-gradient(50rem 34rem at -8% 112%, var(--aurora-b), transparent 70%),
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: auto, auto, 48px 48px, 48px 48px;
+  background-attachment: fixed;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url('/img/grain.svg');
+  opacity: var(--grain-opacity);
+  mix-blend-mode: overlay;
+}
+#root { position: relative; z-index: 1; }
+
+/* ---------- surfaces ---------- */
+.card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+}
+.card-raised { background: var(--bg-elevation); border: 1px solid var(--border-line); border-radius: var(--radius-lg); }
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-line);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  backdrop-filter: blur(18px) saturate(1.3);
+  box-shadow: var(--shadow-2);
+}
+:root[data-calm='on'] .glass { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--bg-panel); }
+.text-gradient { background: var(--grad-brand); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.eyebrow { font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+.num { font-family: var(--font-display); font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1; letter-spacing: -0.02em; }
+
+/* severity edge: the strongest visual signal in the work screens */
+.sev-edge { position: relative; }
+.sev-edge::before { content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 3px; border-radius: 3px; background: var(--edge, transparent); }
+.sev-edge-critical { --edge: var(--sev-critical); box-shadow: var(--glow-crit); }
+.sev-edge-high { --edge: var(--sev-high); box-shadow: var(--glow-high); }
+.sev-edge-medium { --edge: var(--sev-medium); }
+.sev-edge-info { --edge: var(--sev-info); }
+
+/* primary button sheen + press feedback */
+.btn-primary { background-image: linear-gradient(180deg, color-mix(in srgb, white 14%, transparent), transparent 60%); box-shadow: var(--glow-signal); }
+:root[data-theme='light'] .btn-primary { box-shadow: var(--shadow-1); }
+button, a, [role='button'] { transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), box-shadow var(--motion-base) var(--ease-out), transform var(--motion-fast) var(--ease-out), filter var(--motion-fast) var(--ease-out); }
+.press:active:not(:disabled) { transform: scale(0.97); }
+
+.hero-layer { transform: translate3d(calc(var(--px, 0) * -10px), calc(var(--py, 0) * -8px), 0); transition: transform 600ms var(--ease-out); }
+:root[data-calm='on'] .hero-layer { transform: none; }
+
+.hero-scrim { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(70rem 46rem at 22% 50%, color-mix(in srgb, var(--bg-void) 94%, transparent) 20%, color-mix(in srgb, var(--bg-void) 70%, transparent) 55%, transparent 80%); }
+@media (max-width: 1023px) { .hero-scrim { background: linear-gradient(180deg, color-mix(in srgb, var(--bg-void) 85%, transparent), color-mix(in srgb, var(--bg-void) 55%, transparent)); } }
+h1 { text-wrap: balance; }
+
+/* nav active marker */
+.nav-active::before { content: ''; position: absolute; left: -8px; top: 8px; bottom: 8px; width: 3px; border-radius: 3px; background: var(--grad-brand); box-shadow: var(--glow-signal); }
+
+/* ---------- motion ---------- */
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes shimmer { from { background-position: -200% 0; } to { background-position: 200% 0; } }
+@keyframes critEdge { 0%, 100% { box-shadow: var(--glow-crit); } 50% { box-shadow: 0 0 0 1px var(--sev-critical), 0 0 36px color-mix(in srgb, var(--sev-critical) 45%, transparent); } }
+@keyframes drift { to { stroke-dashoffset: -400; } }
+@keyframes nodePulse { 0%, 100% { opacity: 0.35; transform: scale(1); } 50% { opacity: 1; transform: scale(1.5); } }
+@keyframes scan { from { transform: translateY(-10%); } to { transform: translateY(110%); } }
+@keyframes pageIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.rise { animation: rise var(--motion-slow) var(--ease-out) both; }
+.fade { animation: fade var(--motion-slow) var(--ease-out) both; }
+.page-in { animation: pageIn var(--motion-base) var(--ease-out) both; }
+.stagger > * { animation: rise var(--motion-slow) var(--ease-out) both; }
+.stagger > *:nth-child(1) { animation-delay: 0ms; } .stagger > *:nth-child(2) { animation-delay: 40ms; }
+.stagger > *:nth-child(3) { animation-delay: 80ms; } .stagger > *:nth-child(4) { animation-delay: 120ms; }
+.stagger > *:nth-child(5) { animation-delay: 160ms; } .stagger > *:nth-child(6) { animation-delay: 200ms; }
+.stagger > *:nth-child(n + 7) { animation-delay: 240ms; }
+.shimmer { background: linear-gradient(100deg, var(--bg-elevation) 30%, color-mix(in srgb, var(--text-primary) 9%, var(--bg-elevation)) 50%, var(--bg-elevation) 70%); background-size: 200% 100%; animation: shimmer 1.6s linear infinite; }
+.crit-pulse { animation: critEdge 2.4s ease-in-out 3; }
+.hero-edge { stroke-dasharray: 6 14; animation: drift 24s linear infinite; }
+.hero-node { transform-box: fill-box; transform-origin: center; animation: nodePulse 4s ease-in-out infinite; }
+.hero-scan { animation: scan 9s linear infinite; }
+.live-dot { position: relative; }
+.live-dot::after { content: ''; position: absolute; inset: -3px; border-radius: 50%; border: 1px solid currentColor; animation: nodePulse 2.4s ease-in-out infinite; }
+
+/* calm mode and reduced motion: no ambient or entrance animation */
+:root[data-calm='on'] .rise, :root[data-calm='on'] .fade, :root[data-calm='on'] .page-in, :root[data-calm='on'] .stagger > *,
+:root[data-calm='on'] .crit-pulse, :root[data-calm='on'] .hero-edge, :root[data-calm='on'] .hero-node, :root[data-calm='on'] .hero-scan,
+:root[data-calm='on'] .live-dot::after, :root[data-calm='on'] .shimmer { animation: none; }
+:root[data-calm='on'] .shimmer { background: var(--bg-elevation); }
+:root[data-calm='on'] .btn-primary { background-image: none; box-shadow: none; }
+@media (prefers-reduced-motion: reduce) {
+  .shimmer { background: var(--bg-elevation); }
+}
+
+<<<<<<< INTEGRATION
+/* Video Player HUD bracket corners */
+.cctv-hud-frame { position: relative; }
+.cctv-hud-frame::before, .cctv-hud-frame::after, .cctv-hud-bottom-left, .cctv-hud-bottom-right {
+  content: ''; position: absolute; width: 18px; height: 18px; pointer-events: none; z-index: 10; border: 0 solid var(--action);
+}
+.cctv-hud-frame::before { top: 10px; left: 10px; border-top-width: 2px; border-left-width: 2px; }
+.cctv-hud-frame::after { top: 10px; right: 10px; border-top-width: 2px; border-right-width: 2px; }
+.cctv-hud-bottom-left { bottom: 10px; left: 10px; border-bottom-width: 2px; border-left-width: 2px; }
+.cctv-hud-bottom-right { bottom: 10px; right: 10px; border-bottom-width: 2px; border-right-width: 2px; }
+
+@keyframes redPulse { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.15); opacity: 0.4; } }
+.animate-red-pulse { animation: redPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+@keyframes mapPing { 0% { transform: scale(0.7); opacity: 1; } 100% { transform: scale(2.4); opacity: 0; } }
+.animate-map-ping { animation: mapPing 2.2s cubic-bezier(0, 0, 0.2, 1) infinite; }
+:root[data-calm='on'] .animate-red-pulse, :root[data-calm='on'] .animate-map-ping { animation: none; }
+
+/* MAP (self-hosted, no tiles). Markers are built with classes only: no inline styles, CSP-safe. */
+.leaflet-container { background-color: var(--bg-void); font-family: inherit; }
+.leaflet-control-zoom a { background: var(--bg-panel) !important; color: var(--text-primary) !important; border-color: var(--border-line) !important; }
+.leaflet-control-attribution { background: color-mix(in srgb, var(--bg-panel) 85%, transparent) !important; color: var(--text-secondary) !important; font-size: 12px; }
+.leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--bg-panel); color: var(--text-primary); border: 1px solid var(--border-line); }
+.leaflet-popup-content { margin: 0; }
+.leaflet-container a.leaflet-popup-close-button { color: var(--text-secondary); }
+
+.rs-marker { position: relative; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+.rs-marker-shape { width: 26px; height: 26px; display: block; background: var(--rs-c, var(--sev-info)); }
+.rs-marker.sev-critical { --rs-c: var(--sev-critical); }
+.rs-marker.sev-high { --rs-c: var(--sev-high); }
+.rs-marker.sev-medium { --rs-c: var(--sev-medium); }
+.rs-marker.sev-info { --rs-c: var(--sev-info); }
+.rs-marker.offline { --rs-c: var(--text-muted); }
+.rs-marker.sev-critical .rs-marker-shape { clip-path: polygon(50% 4%, 96% 92%, 4% 92%); }
+.rs-marker.sev-high .rs-marker-shape { clip-path: polygon(50% 2%, 98% 50%, 50% 98%, 2% 50%); }
+.rs-marker.sev-medium .rs-marker-shape { border-radius: 50%; }
+.rs-marker.sev-info .rs-marker-shape, .rs-marker.offline .rs-marker-shape { border-radius: 50%; background: var(--bg-panel); border: 3px solid var(--rs-c); box-sizing: border-box; }
+.rs-marker.offline .rs-marker-shape { border-style: dashed; }
+.rs-marker-count { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 9px; background: var(--bg-panel); color: var(--text-primary); border: 1px solid var(--rs-c); font-size: 12px; font-weight: 600; line-height: 16px; text-align: center; box-sizing: border-box; }
+.rs-marker:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; border-radius: 6px; }
+
+/* map art direction: glowing road graph on ink, pulsing severity halos (decorative motion off in calm mode) */
+.rs-map .leaflet-container { background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px); background-size: 32px 32px; }
+.rs-road { stroke: var(--action); stroke-opacity: 0.4; stroke-dasharray: 2 7; stroke-linecap: round; }
+.rs-marker-shape { filter: drop-shadow(0 0 6px var(--rs-c, transparent)); }
+:root[data-theme='light'] .rs-marker-shape { filter: none; }
+.rs-marker.sev-critical::after { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--sev-critical); animation: mapPing 2.2s cubic-bezier(0, 0, 0.2, 1) infinite; pointer-events: none; }
+:root[data-calm='on'] .rs-marker.sev-critical::after, :root[data-calm='on'] .rs-marker-shape { animation: none; filter: none; }
+@media (prefers-reduced-motion: reduce) { .rs-marker.sev-critical::after { animation: none; opacity: 0.5; } }
+
+/* evidence scrubber */
+.rs-range { -webkit-appearance: none; appearance: none; height: 6px; border-radius: 6px; background: linear-gradient(90deg, var(--action) var(--p, 0%), var(--border-line) var(--p, 0%)); outline-offset: 6px; }
+.rs-range::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--text-primary); border: 3px solid var(--action); box-shadow: var(--glow-signal); }
+.rs-range::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--text-primary); border: 3px solid var(--action); }
+.rs-range:disabled { opacity: 0.4; }
+.rs-scrub-mark { position: absolute; left: 50%; top: 2px; bottom: 2px; width: 2px; margin-left: -1px; background: var(--sev-high); pointer-events: none; border-radius: 2px; }
+.rs-scrub-label { position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%); font: 600 10px 'Geist Mono', monospace; color: var(--sev-high); pointer-events: none; display: none; }
+
+/* charts: grow-in on mount only, no ambient motion */
+@keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes sweep { from { opacity: 0; } to { opacity: 1; } }
+.bar-grow { transform-box: fill-box; transform-origin: left center; animation: grow var(--motion-slow) var(--ease-out) both; }
+.donut-arc { animation: sweep var(--motion-slow) var(--ease-out) both; transition: stroke-width var(--motion-fast); }
+.donut-arc:hover { stroke-width: 19; }
+:root[data-calm='on'] .bar-grow, :root[data-calm='on'] .donut-arc { animation: none; }
+=======
+.iasi-ring-2 {
+  width: 48px;
+  height: 48px;
+  animation-delay: 0.4s;
+}
+
+.iasi-ring-3 {
+  width: 64px;
+  height: 64px;
+  animation-delay: 0.8s;
+}
+
+@keyframes iasiPulseRing {
+  0% {
+    transform: translate(-50%, -50%) scale(0.6);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.6);
+    opacity: 0;
+  }
+}
+
+.iasi-pulse-label {
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 59, 59, 0.92);
+  color: #FFFFFF;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 10px rgba(255, 59, 59, 0.6);
+  z-index: 15;
+}
+
+/* OSM standard tiles turned into a dark tactical basemap */
+.rs-dark-tiles {
+  filter: invert(1) hue-rotate(195deg) brightness(0.78) contrast(0.95) saturate(0.35);
+}
+
+/* OSM standard tiles turned into a dark basemap (see IasiMap) */
+.rs-dark-tiles {
+  filter: invert(1) hue-rotate(195deg) brightness(0.78) contrast(0.95) saturate(0.35);
+}
+
+/* Printable activity report (StatsPage -> components/ActivityReport). When the report is in the
+   page, print keeps only the report: everything under #root that is neither the report nor one
+   of its ancestors is removed, and the ancestors lose the app-shell sizing and dark backgrounds.
+   No AppLayout class name is involved, so the sidebar and header go whatever they are called. */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 14mm;
+  }
+  html:has(.rs-print-report),
+  html:has(.rs-print-report) body,
+  html:has(.rs-print-report) #root {
+    height: auto !important;
+    overflow: visible !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+  #root:has(.rs-print-report) *:not(.rs-print-report):not(.rs-print-report *):not(:has(.rs-print-report)) {
+    display: none !important;
+  }
+  #root *:has(.rs-print-report) {
+    display: block !important;
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: #fff !important;
+  }
+  .rs-print-report {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+>>>>>>> GITHUB_TARGET

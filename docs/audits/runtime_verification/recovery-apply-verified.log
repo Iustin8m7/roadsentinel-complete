@@ -1,0 +1,5 @@
+Verified integration identity: ('rsint_20261110b', '127.0.0.1', 55446, 'rsint_root_261110') system identifier: 7706309627307635180
+Current lookup owner: rsint_owner_261110b tenant/user counts: (3, 9)
+Private backup restored and row digests verified; additive migrations rehearsed: /home/justin7m8/Documents/roadsentinel-integration/backend/.integration-backups/20261110T124010Z-e07b2253
+Narrow NOLOGIN lookup ownership and rehearsed migrations applied; all pre-existing row digests preserved.
+Runtime app and original migration owner remain NOBYPASSRLS. No passwords or MFA records changed.

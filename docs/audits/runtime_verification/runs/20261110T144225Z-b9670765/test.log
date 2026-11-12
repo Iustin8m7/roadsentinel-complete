@@ -1,0 +1,13 @@
+
+> roadsentinel-frontend@0.1.0 test
+> vitest run
+
+
+ RUN  v5.0.5 /home/justin7m8/Documents/roadsentinel-integration/secure-pwa
+
+
+ Test Files  2 passed (2)
+      Tests  9 passed (9)
+   Start at  16:42:26
+   Duration  1.09s (environment 92%, import 4%, tests 2%, transform 2%, worker 1%)
+

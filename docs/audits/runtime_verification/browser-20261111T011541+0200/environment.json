@@ -1,0 +1,25 @@
+{
+  "utc": "2026-11-10T23:38:49.920266+00:00",
+  "packages": {
+    "onnxruntime": "1.23.2",
+    "supervision": "0.30.7",
+    "opencv-python-headless": "4.12.0.88",
+    "SQLAlchemy": "2.1.5",
+    "fastapi": "0.143.3",
+    "pytest": "9.2.0",
+    "psycopg": "3.3.6"
+  },
+  "cpu_count": 20,
+  "disk_free_bytes": 69046067200,
+  "memory": {
+    "MemTotal": "       24302124 kB",
+    "MemAvailable": "    7879304 kB",
+    "SwapFree": "          89796 kB"
+  },
+  "tools": {
+    "ffmpeg": "/usr/bin/ffmpeg",
+    "ffprobe": "/usr/bin/ffprobe",
+    "node": "/home/justin7m8/.nvm/versions/node/v20.20.2/bin/node",
+    "psql": null
+  }
+}

@@ -1,0 +1,73 @@
+[
+  {
+    "name": "initdb",
+    "command": [
+      "/home/justin7m8/miniconda3/envs/rs-pg/bin/initdb",
+      "-D",
+      "/tmp/rsverify-m6vzyt6s/pg",
+      "-U",
+      "rsverify_root",
+      "-A",
+      "trust",
+      "--encoding=UTF8",
+      "--no-locale"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration",
+    "start": "2026-11-11T11:48:36.783770+00:00",
+    "end": "2026-11-11T11:48:37.750288+00:00",
+    "duration_s": 0.967,
+    "exit_code": 0
+  },
+  {
+    "name": "start",
+    "command": [
+      "/home/justin7m8/miniconda3/envs/rs-pg/bin/pg_ctl",
+      "-D",
+      "/tmp/rsverify-m6vzyt6s/pg",
+      "-l",
+      "/tmp/rsverify-m6vzyt6s/postgres.log",
+      "-o",
+      "-h 127.0.0.1 -p 46345 -k /tmp/rsverify-m6vzyt6s",
+      "start"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration",
+    "start": "2026-11-11T11:48:37.750707+00:00",
+    "end": "2026-11-11T11:48:37.915677+00:00",
+    "duration_s": 0.165,
+    "exit_code": 0
+  },
+  {
+    "name": "camera",
+    "command": [
+      "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/bin/python",
+      "-m",
+      "pytest",
+      "tests/test_managed_live_runtime.py",
+      "-o",
+      "addopts=",
+      "-q",
+      "-s"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration/backend",
+    "start": "2026-11-11T11:48:37.916169+00:00",
+    "end": "2026-11-11T11:49:20.646504+00:00",
+    "duration_s": 42.73,
+    "exit_code": 1
+  },
+  {
+    "name": "stop",
+    "command": [
+      "/home/justin7m8/miniconda3/envs/rs-pg/bin/pg_ctl",
+      "-D",
+      "/tmp/rsverify-m6vzyt6s/pg",
+      "stop",
+      "-m",
+      "fast"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration",
+    "start": "2026-11-11T11:49:20.646791+00:00",
+    "end": "2026-11-11T11:49:21.262279+00:00",
+    "duration_s": 0.616,
+    "exit_code": 0
+  }
+]

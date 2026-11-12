@@ -1,0 +1,462 @@
+E501 Line too long (106 > 100)
+   --> backend/app/api/ingest.py:101:101
+    |
+ 99 |     from app.services.camera_control import active_version, runnable
+100 |     ok, _, _ = runnable(principal.db, camera)
+101 |     row = principal.db.scalar(select(CameraWorkerStatus).where(CameraWorkerStatus.camera_id == camera.id))
+    |                                                                                                     ^^^^^^
+102 |     version = active_version(principal.db, camera)
+103 |     if not ok:
+    |
+
+E501 Line too long (110 > 100)
+   --> backend/app/api/ingest.py:149:101
+    |
+147 |     db = principal.db
+148 |     camera = _camera(principal, event.camera_id)
+149 |     _managed_fence(principal, camera, event.details.get("worker_epoch"), event.details.get("config_revision"))
+    |                                                                                                     ^^^^^^^^^^
+150 |     camera.last_seen_at = datetime.now(UTC)
+151 |     if event.event_key:
+    |
+
+E501 Line too long (121 > 100)
+   --> backend/app/api/ingest.py:349:101
+    |
+347 |         result = record_heartbeat(principal.db, camera, hb.model_dump())
+348 |         principal.db.commit()
+349 |         return JSONResponse(result.__dict__ if hasattr(result, '__dict__') else __import__('dataclasses').asdict(result))
+    |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^
+350 |     status_info: dict[str, Any] | None = None
+351 |     if body.strip():
+    |
+
+E501 Line too long (140 > 100)
+  --> backend/app/api/offline_analytics.py:43:101
+   |
+41 | …
+42 | …
+43 | …OX_MODEL_PATH", str(Path(__file__).resolve().parents[3] / "models" / "yolox_s.onnx")))
+   |                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+44 | …
+45 | …
+   |
+
+E501 Line too long (115 > 100)
+   --> backend/app/api/offline_analytics.py:396:101
+    |
+396 | @router.get("/api/recordings/{recording_id}/analyses/{run_id}/candidates", response_model=OfflineCandidateResponse)
+    |                                                                                                     ^^^^^^^^^^^^^^^
+397 | def offline_candidates(recording_id: UUID, run_id: UUID, principal: Principal = Depends(require(Permission.videos_read))) -> OfflineC…
+398 |     recording, run = _scoped_run(principal, recording_id, run_id)
+    |
+
+E501 Line too long (150 > 100)
+   --> backend/app/api/offline_analytics.py:397:101
+    |
+396 | …d}/candidates", response_model=OfflineCandidateResponse)
+397 | …incipal: Principal = Depends(require(Permission.videos_read))) -> OfflineCandidateResponse:
+    |                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+398 | …un_id)
+399 | …
+    |
+
+E501 Line too long (133 > 100)
+   --> backend/app/api/offline_analytics.py:406:101
+    |
+404 |             continue
+405 |         kind = str(item.get("type", "observation"))
+406 |         thresholds = {"rule_configuration": rules, "observed_reason": item.get("reason"), "output_time_s": item.get("output_time_s")}
+    |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+407 |         candidates.append(OfflineCandidateProvenance(
+408 |             tenant_id=principal.tenant_id, source_video_id=recording.id, analysis_run_id=run.id,
+    |
+
+E501 Line too long (106 > 100)
+   --> backend/app/api/offline_analytics.py:411:101
+    |
+409 | …     source_pts_ms=max(0, int(item.get("pts_ms", 0))), end_pts_ms=item.get("end_pts_ms"),
+410 | …     rule_id=kind, rule_version="offline-rules-v1", threshold_evidence=thresholds,
+411 | …     track_id=item.get("track_id"), class_ref=item.get("class"), confidence=item.get("confidence"),
+    |                                                                                               ^^^^^^
+412 | …     evidence_ref=f"/api/recordings/{recording.id}/analyses/{run.id}/video" if run.output_storage_key else None,
+413 | …     label=str(item.get("label", kind))[:160], limitations=str(item.get("limitations", "Candidate observation; requires human verifi…
+    |
+
+E501 Line too long (119 > 100)
+   --> backend/app/api/offline_analytics.py:412:101
+    |
+410 |             rule_id=kind, rule_version="offline-rules-v1", threshold_evidence=thresholds,
+411 |             track_id=item.get("track_id"), class_ref=item.get("class"), confidence=item.get("confidence"),
+412 |             evidence_ref=f"/api/recordings/{recording.id}/analyses/{run.id}/video" if run.output_storage_key else None,
+    |                                                                                                     ^^^^^^^^^^^^^^^^^^^
+413 |             label=str(item.get("label", kind))[:160], limitations=str(item.get("limitations", "Candidate observation; requires human …
+414 |     principal.audit(AuditAction.analysis_analytics_viewed, resource_type="analysis_runs", resource_id=run.id)
+    |
+
+E501 Line too long (205 > 100)
+   --> backend/app/api/offline_analytics.py:413:101
+    |
+411 | ….get("confidence"),
+412 | …un.output_storage_key else None,
+413 | …ions", "Candidate observation; requires human verification and does not establish an enforcement violation."))[:500]))
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+414 | …", resource_id=run.id)
+415 | …d, tenant_id=principal.tenant_id, candidates=candidates, flow_analytics=(run.counts or {}).get("flow_events", []))
+    |
+
+E501 Line too long (109 > 100)
+   --> backend/app/api/offline_analytics.py:414:101
+    |
+412 |             evidence_ref=f"/api/recordings/{recording.id}/analyses/{run.id}/video" if run.output_storage_key else None,
+413 |             label=str(item.get("label", kind))[:160], limitations=str(item.get("limitations", "Candidate observation; requires human …
+414 |     principal.audit(AuditAction.analysis_analytics_viewed, resource_type="analysis_runs", resource_id=run.id)
+    |                                                                                                     ^^^^^^^^^
+415 |     return OfflineCandidateResponse(source_video_id=recording.id, analysis_run_id=run.id, tenant_id=principal.tenant_id, candidates=c…
+    |
+
+E501 Line too long (201 > 100)
+   --> backend/app/api/offline_analytics.py:415:101
+    |
+413 | …ations", "Candidate observation; requires human verification and does not establish an enforcement violation."))[:500]))
+414 | …ns", resource_id=run.id)
+415 | ….id, tenant_id=principal.tenant_id, candidates=candidates, flow_analytics=(run.counts or {}).get("flow_events", []))
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+E501 Line too long (114 > 100)
+   --> backend/app/api/offline_analytics.py:425:101
+    |
+423 | @router.post('/api/recordings/{recording_id}/analyses/{run_id}/candidates/{index}/promote')
+424 | def promote_candidate(recording_id: UUID, run_id: UUID, index: int = ApiPath(ge=0),
+425 |                       body: PromotionIn = ..., principal: Principal = Depends(require(Permission.alerts_create))):
+    |                                                                                                     ^^^^^^^^^^^^^^
+426 |     from app.core.policy import has_permission
+427 |     from app.services.offline_promotion import promote
+    |
+
+E501 Line too long (113 > 100)
+  --> backend/app/services/offline_promotion.py:49:101
+   |
+47 |     if camera is None:
+48 |         camera = Camera(tenant_id=principal.tenant_id, slug=slug,
+49 |                         name="RECORDED · uploaded evidence", location="Recorded upload; capture time unverified",
+   |                                                                                                     ^^^^^^^^^^^^^
+50 |                         source_kind="recorded_replay", lifecycle_state="disabled",
+51 |                         desired_enabled=False, is_active=False)
+   |
+
+S603 `subprocess` call: check for execution of untrusted input
+  --> backend/app/services/offline_promotion.py:76:17
+   |
+74 |             clip = Path(folder) / 'clip.mp4'
+75 |             try:
+76 |                 subprocess.run(['ffmpeg', '-nostdin', '-loglevel', 'error', '-ss', str(start),
+   |                 ^^^^^^^^^^^^^^
+77 |                                 '-i', str(source), '-t', str(duration), '-an', '-c:v', 'libx264',
+78 |                                 '-preset', 'veryfast', '-pix_fmt', 'yuv420p', '-movflags', '+faststart',
+   |
+
+S607 Starting a process with a partial executable path
+  --> backend/app/services/offline_promotion.py:76:32
+   |
+74 |               clip = Path(folder) / 'clip.mp4'
+75 |               try:
+76 |                   subprocess.run(['ffmpeg', '-nostdin', '-loglevel', 'error', '-ss', str(start),
+   |  ________________________________^
+77 | |                                 '-i', str(source), '-t', str(duration), '-an', '-c:v', 'libx264',
+78 | |                                 '-preset', 'veryfast', '-pix_fmt', 'yuv420p', '-movflags', '+faststart',
+79 | |                                 str(clip)], check=True, timeout=30, capture_output=True)
+   | |__________________________________________^
+80 |               except (OSError, subprocess.SubprocessError):
+81 |                   raise HTTPException(503, "Bounded evidence encoder unavailable") from None
+   |
+
+E501 Line too long (104 > 100)
+  --> backend/app/services/offline_promotion.py:78:101
+   |
+76 |                 subprocess.run(['ffmpeg', '-nostdin', '-loglevel', 'error', '-ss', str(start),
+77 |                                 '-i', str(source), '-t', str(duration), '-an', '-c:v', 'libx264',
+78 |                                 '-preset', 'veryfast', '-pix_fmt', 'yuv420p', '-movflags', '+faststart',
+   |                                                                                                     ^^^^
+79 |                                 str(clip)], check=True, timeout=30, capture_output=True)
+80 |             except (OSError, subprocess.SubprocessError):
+   |
+
+E501 Line too long (102 > 100)
+  --> backend/app/services/offline_promotion.py:95:101
+   |
+93 |                            "model_id": run.model_id, "model_sha256": run.model_sha256,
+94 |                            "rule_version": "offline-rules-v1", "redaction": "full",
+95 |                            "review_only": True, "limitations": str(item.get('limitations', ''))[:500],
+   |                                                                                                     ^^
+96 |                            "clip_start_output_s": start, "clip_duration_s": duration})
+97 |     db.add(alert)
+   |
+
+E501 Line too long (131 > 100)
+  --> backend/tests/conftest.py:90:101
+   |
+88 | def database() -> Iterator[None]:
+89 |     with psycopg.connect(_plain(ADMIN_URL), autocommit=True) as conn:
+90 |         identity = conn.execute("SELECT current_database(), host(inet_server_addr()), inet_server_port(), current_user").fetchone()
+   |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+91 |         if os.environ.get("RS_TEST_ALLOW_DATABASE_RESET") != TEST_DB:
+92 |             raise RuntimeError("Set RS_TEST_ALLOW_DATABASE_RESET to the exact disposable test DB name")
+   |
+
+E501 Line too long (103 > 100)
+  --> backend/tests/conftest.py:92:101
+   |
+90 |         identity = conn.execute("SELECT current_database(), host(inet_server_addr()), inet_server_port(), current_user").fetchone()
+91 |         if os.environ.get("RS_TEST_ALLOW_DATABASE_RESET") != TEST_DB:
+92 |             raise RuntimeError("Set RS_TEST_ALLOW_DATABASE_RESET to the exact disposable test DB name")
+   |                                                                                                     ^^^
+93 |         if str(identity[2]) != os.environ.get("RS_TEST_EXPECTED_PORT"):
+94 |             raise RuntimeError("Disposable PostgreSQL port identity mismatch")
+   |
+
+E501 Line too long (105 > 100)
+  --> backend/tests/test_mission_vertical.py:17:101
+   |
+17 | @pytest.mark.skipif(os.getenv('RS_MISSION_REAL') != '1', reason='explicit licensed fixture/model opt-in')
+   |                                                                                                     ^^^^^
+18 | def test_real_inference_recorded_candidate_to_encrypted_review(world, tmp_path, monkeypatch):
+19 |     from sqlalchemy import select
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/tests/test_mission_vertical.py:29:27
+   |
+28 |     cap = cv2.VideoCapture('/tmp/Street_traffic.webm')
+29 |     ok, frame = cap.read(); cap.release()
+   |                           ^
+30 |     assert ok
+31 |     frame = cv2.resize(frame, (640,360))
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/tests/test_mission_vertical.py:35:24
+   |
+33 |     writer = cv2.VideoWriter(str(clip), cv2.VideoWriter_fourcc(*'mp4v'), 5, (640,360))
+34 |     assert writer.isOpened()
+35 |     for _ in range(180): writer.write(frame)
+   |                        ^
+36 |     writer.release()
+37 |     with socket.socket() as sock:
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/tests/test_mission_vertical.py:38:35
+   |
+36 |     writer.release()
+37 |     with socket.socket() as sock:
+38 |         sock.bind(('127.0.0.1',0)); port=sock.getsockname()[1]
+   |                                   ^
+39 |     origin=f'http://127.0.0.1:{port}'
+40 |     monkeypatch.setenv('RS_PUBLIC_ORIGIN',origin)
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/tests/test_mission_vertical.py:44:59
+   |
+42 |     get_settings.cache_clear()
+43 |     server=uvicorn.Server(uvicorn.Config(create_app(),host='127.0.0.1',port=port,log_level='error'))
+44 |     thread=threading.Thread(target=server.run,daemon=True);thread.start()
+   |                                                           ^
+45 |     try:
+46 |         deadline=time.monotonic()+15
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/tests/test_mission_vertical.py:47:63
+   |
+45 |     try:
+46 |         deadline=time.monotonic()+15
+47 |         while not server.started and time.monotonic()<deadline:time.sleep(.05)
+   |                                                               ^
+48 |         assert server.started
+49 |         with httpx.Client(base_url=origin,timeout=60) as client:
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/tests/test_mission_vertical.py:53:96
+   |
+51 |             client.headers.update({'Origin':origin,'X-CSRF-Token':client.cookies.get(cookie_name(CSRF))})
+52 |             user=world.a.operator
+53 |             r=client.post('/api/auth/login',json={'email':user.email,'password':user.password});assert r.status_code==200,r.text
+   |                                                                                                ^
+54 |             r=client.post('/api/auth/mfa/verify',json={'code':user.totp()});assert r.status_code==204,r.text
+55 |             with clip.open('rb') as src:
+   |
+
+E501 Line too long (128 > 100)
+  --> backend/tests/test_mission_vertical.py:53:101
+   |
+51 |             client.headers.update({'Origin':origin,'X-CSRF-Token':client.cookies.get(cookie_name(CSRF))})
+52 |             user=world.a.operator
+53 |             r=client.post('/api/auth/login',json={'email':user.email,'password':user.password});assert r.status_code==200,r.text
+   |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+54 |             r=client.post('/api/auth/mfa/verify',json={'code':user.totp()});assert r.status_code==204,r.text
+55 |             with clip.open('rb') as src:
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/tests/test_mission_vertical.py:54:76
+   |
+52 |             user=world.a.operator
+53 |             r=client.post('/api/auth/login',json={'email':user.email,'password':user.password});assert r.status_code==200,r.text
+54 |             r=client.post('/api/auth/mfa/verify',json={'code':user.totp()});assert r.status_code==204,r.text
+   |                                                                            ^
+55 |             with clip.open('rb') as src:
+56 |                 r=client.post('/api/recordings',files={'file':(clip.name,src,'video/mp4')})
+   |
+
+E501 Line too long (108 > 100)
+  --> backend/tests/test_mission_vertical.py:54:101
+   |
+52 |             user=world.a.operator
+53 |             r=client.post('/api/auth/login',json={'email':user.email,'password':user.password});assert r.status_code==200,r.text
+54 |             r=client.post('/api/auth/mfa/verify',json={'code':user.totp()});assert r.status_code==204,r.text
+   |                                                                                                     ^^^^^^^^
+55 |             with clip.open('rb') as src:
+56 |                 r=client.post('/api/recordings',files={'file':(clip.name,src,'video/mp4')})
+   |
+
+E501 Line too long (169 > 100)
+  --> backend/tests/test_mission_vertical.py:59:101
+   |
+57 | …
+58 | …
+59 | …,'y':0,'width':1,'height':1,'confirmed':True,'expected_revision':0});assert r.status_code==200,r.text
+   |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+60 | …ample_fps':2,'confidence':.3,'crop_revision':1,'stationary_duration_s':30,'queue_enabled':False})
+61 | …
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/tests/test_mission_vertical.py:59:137
+   |
+57 | …
+58 | …
+59 | …y':0,'width':1,'height':1,'confirmed':True,'expected_revision':0});assert r.status_code==200,r.text
+   |                                                                    ^
+60 | …ple_fps':2,'confidence':.3,'crop_revision':1,'stationary_duration_s':30,'queue_enabled':False})
+61 | …
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/tests/test_mission_vertical.py:62:31
+   |
+60 | …     r=client.post(f'/api/recordings/{rid}/analyses',json={'sample_fps':2,'confidence':.3,'crop_revision':1,'stationary_duration_s':3…
+61 | …     assert r.status_code==202,r.text
+62 | …     run=r.json()['id'];deadline=time.monotonic()+180
+   |                         ^
+63 | …     while time.monotonic()<deadline:
+64 | …         result=client.get(f'/api/analyses/{run}').json()
+   |
+
+E701 Multiple statements on one line (colon)
+  --> backend/tests/test_mission_vertical.py:65:64
+   |
+63 |             while time.monotonic()<deadline:
+64 |                 result=client.get(f'/api/analyses/{run}').json()
+65 |                 if result['status'] not in ('queued','running'):break
+   |                                                                ^
+66 |                 time.sleep(.5)
+67 |             assert result['status']=='completed',result
+   |
+
+E501 Line too long (105 > 100)
+  --> backend/tests/test_mission_vertical.py:73:101
+   |
+71 |             assert candidates.json()['candidates'],result['counts']
+72 |             path=f'/api/recordings/{rid}/analyses/{run}/candidates/0/promote'
+73 |             r=client.post(path,json={'reason':'SYNTHETIC TEST: verify recorded-source review mechanics'})
+   |                                                                                                     ^^^^^
+74 |             assert r.status_code==200,r.text
+75 |             number=r.json()['id']
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/tests/test_mission_vertical.py:77:55
+   |
+75 |             number=r.json()['id']
+76 |             assert client.post(path,json={'reason':'Repeated test submission'}).json()['id']==number
+77 |             detail=client.get(f'/api/events/{number}');assert detail.status_code==200,detail.text
+   |                                                       ^
+78 |             data=detail.json();assert data['details']['origin']=='recorded_upload'
+79 |             for key in ('keyframe_url','clip_url'):
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/tests/test_mission_vertical.py:78:31
+   |
+76 |             assert client.post(path,json={'reason':'Repeated test submission'}).json()['id']==number
+77 |             detail=client.get(f'/api/events/{number}');assert detail.status_code==200,detail.text
+78 |             data=detail.json();assert data['details']['origin']=='recorded_upload'
+   |                               ^
+79 |             for key in ('keyframe_url','clip_url'):
+80 |                 response=client.get(data[key]);assert response.status_code==200,response.text[:200]
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/tests/test_mission_vertical.py:80:47
+   |
+78 |             data=detail.json();assert data['details']['origin']=='recorded_upload'
+79 |             for key in ('keyframe_url','clip_url'):
+80 |                 response=client.get(data[key]);assert response.status_code==200,response.text[:200]
+   |                                               ^
+81 |                 assert len(response.content)>200
+82 |             r=client.post(f'/api/events/{number}/decision',json={'decision':'reject','note':'Synthetic fixture; no real incident'})
+   |
+
+E501 Line too long (131 > 100)
+  --> backend/tests/test_mission_vertical.py:82:101
+   |
+80 |                 response=client.get(data[key]);assert response.status_code==200,response.text[:200]
+81 |                 assert len(response.content)>200
+82 |             r=client.post(f'/api/events/{number}/decision',json={'decision':'reject','note':'Synthetic fixture; no real incident'})
+   |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+83 |             assert r.status_code==200,r.text
+84 |             assert client.get(f'/api/events/{number}').json()['status']=='rejected'
+   |
+
+E501 Line too long (102 > 100)
+  --> backend/tests/test_mission_vertical.py:89:101
+   |
+87 |                 media=db.scalars(select(Evidence).where(Evidence.alert_id==alert.id)).all()
+88 |                 assert len(media)==2
+89 |                 assert all(file_path(e,'redacted').read_bytes()[:3] != b'\xff\xd8\xff' for e in media)
+   |                                                                                                     ^^
+90 |             print('REAL HTTP: YOLOX/ByteTrack frozen licensed-frame fixture -> candidate -> encrypted media -> idempotent recorded rev…
+91 |     finally:
+   |
+
+E501 Line too long (239 > 100)
+  --> backend/tests/test_mission_vertical.py:90:101
+   |
+88 | …
+89 | … media)
+90 | …rypted media -> idempotent recorded review -> rejection; frames=',result['processed_frames'],'candidates=',len(candidates.json()['candidates']))
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+91 | …
+92 | …
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/tests/test_mission_vertical.py:92:32
+   |
+90 |             print('REAL HTTP: YOLOX/ByteTrack frozen licensed-frame fixture -> candidate -> encrypted media -> idempotent recorded rev…
+91 |     finally:
+92 |         server.should_exit=True;thread.join(15);get_settings.cache_clear()
+   |                                ^
+
+E702 Multiple statements on one line (semicolon)
+  --> backend/tests/test_mission_vertical.py:92:48
+   |
+90 |             print('REAL HTTP: YOLOX/ByteTrack frozen licensed-frame fixture -> candidate -> encrypted media -> idempotent recorded rev…
+91 |     finally:
+92 |         server.should_exit=True;thread.join(15);get_settings.cache_clear()
+   |                                                ^
+
+Found 47 errors (4 fixed, 43 remaining).

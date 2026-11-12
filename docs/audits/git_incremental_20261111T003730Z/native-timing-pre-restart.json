@@ -1,0 +1,20 @@
+{
+  "pid": 2107404,
+  "activity": [
+    {
+      "tenant": "platform",
+      "active_analysis_runs": 0,
+      "active_camera_leases": 0
+    },
+    {
+      "tenant": "unit-a",
+      "active_analysis_runs": 0,
+      "active_camera_leases": 0
+    },
+    {
+      "tenant": "unit-b",
+      "active_analysis_runs": 0,
+      "active_camera_leases": 0
+    }
+  ]
+}

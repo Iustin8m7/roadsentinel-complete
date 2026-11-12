@@ -1,0 +1,1 @@
+import{c as a}from"./index-Bq9eMSHS.js";const o={name:"bookmark",size:24,node:[["path",{d:"M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z",key:"oz39mx"}]]};o.node;const c=a(o);export{c as B};

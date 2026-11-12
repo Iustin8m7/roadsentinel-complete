@@ -1,0 +1,749 @@
+invalid-syntax: Expected a statement
+ --> frontend/src/lib/evidenceTiming.ts:1:1
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+  | ^
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |
+
+invalid-syntax: Expected an expression
+ --> frontend/src/lib/evidenceTiming.ts:1:2
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+  |  ^^
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |
+
+invalid-syntax: Simple statements must be separated by newlines or semicolons
+ --> frontend/src/lib/evidenceTiming.ts:1:10
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+  |          ^^^^^^^^
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |
+
+invalid-syntax: Simple statements must be separated by newlines or semicolons
+ --> frontend/src/lib/evidenceTiming.ts:1:19
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+  |                   ^^^^^
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |
+
+invalid-syntax: Simple statements must be separated by newlines or semicolons
+ --> frontend/src/lib/evidenceTiming.ts:1:25
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+  |                         ^^^^^^^^
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |
+
+invalid-syntax: Simple statements must be separated by newlines or semicolons
+ --> frontend/src/lib/evidenceTiming.ts:1:34
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+  |                                  ^^^
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |
+
+invalid-syntax: Simple statements must be separated by newlines or semicolons
+ --> frontend/src/lib/evidenceTiming.ts:1:38
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+  |                                      ^^^^^
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |
+
+invalid-syntax: Simple statements must be separated by newlines or semicolons
+ --> frontend/src/lib/evidenceTiming.ts:1:44
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+  |                                            ^^
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |
+
+invalid-syntax: Simple statements must be separated by newlines or semicolons
+ --> frontend/src/lib/evidenceTiming.ts:1:47
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+  |                                               ^^^^^
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |
+
+invalid-syntax: Simple statements must be separated by newlines or semicolons
+ --> frontend/src/lib/evidenceTiming.ts:1:58
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+  |                                                          ^^^^
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |
+
+invalid-syntax: Simple statements must be separated by newlines or semicolons
+ --> frontend/src/lib/evidenceTiming.ts:1:67
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+  |                                                                   ^^^^^^^^
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |
+
+invalid-syntax: Simple statements must be separated by newlines or semicolons
+ --> frontend/src/lib/evidenceTiming.ts:1:76
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+  |                                                                            ^^^^^
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |
+
+invalid-syntax: Expected an identifier
+ --> frontend/src/lib/evidenceTiming.ts:1:83
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+  |                                                                                   ^
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |
+
+invalid-syntax: Expected an expression
+ --> frontend/src/lib/evidenceTiming.ts:1:84
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+  |                                                                                    ^
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |
+
+invalid-syntax: Expected an expression
+ --> frontend/src/lib/evidenceTiming.ts:1:85
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+  |                                                                                     ^
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |
+
+invalid-syntax: Simple statements must be separated by newlines or semicolons
+ --> frontend/src/lib/evidenceTiming.ts:2:8
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+  |        ^^^^^^^^
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+4 |   const explicit = details.clip_event_offset_s
+  |
+
+invalid-syntax: Simple statements must be separated by newlines or semicolons
+ --> frontend/src/lib/evidenceTiming.ts:2:17
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+  |                 ^^^^^^^^^^^^^^
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+4 |   const explicit = details.clip_event_offset_s
+  |
+
+invalid-syntax: Expected `,`, found `:`
+ --> frontend/src/lib/evidenceTiming.ts:2:42
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+  |                                          ^
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+4 |   const explicit = details.clip_event_offset_s
+  |
+
+invalid-syntax: Expected `,`, found `:`
+ --> frontend/src/lib/evidenceTiming.ts:2:59
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+  |                                                           ^
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+4 |   const explicit = details.clip_event_offset_s
+  |
+
+invalid-syntax: Expected an expression
+ --> frontend/src/lib/evidenceTiming.ts:2:84
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+  |                                                                                    ^
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+4 |   const explicit = details.clip_event_offset_s
+  |
+
+invalid-syntax: Simple statements must be separated by newlines or semicolons
+ --> frontend/src/lib/evidenceTiming.ts:2:86
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+  |                                                                                      ^
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+4 |   const explicit = details.clip_event_offset_s
+  |
+
+invalid-syntax: Expected `,`, found identifier
+ --> frontend/src/lib/evidenceTiming.ts:3:9
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |         ^^^^^^
+4 |   const explicit = details.clip_event_offset_s
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+  |
+
+invalid-syntax: Expected `,`, found `=`
+ --> frontend/src/lib/evidenceTiming.ts:3:16
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |                ^
+4 |   const explicit = details.clip_event_offset_s
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+  |
+
+invalid-syntax: Expected `)`, found `:`
+ --> frontend/src/lib/evidenceTiming.ts:3:24
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |                        ^
+4 |   const explicit = details.clip_event_offset_s
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+  |
+
+invalid-syntax: Expected `,`, found `)`
+ --> frontend/src/lib/evidenceTiming.ts:3:33
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |                                 ^
+4 |   const explicit = details.clip_event_offset_s
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+  |
+
+invalid-syntax: Expected `,`, found `:`
+ --> frontend/src/lib/evidenceTiming.ts:3:34
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |                                  ^
+4 |   const explicit = details.clip_event_offset_s
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+  |
+
+invalid-syntax: Expected `,`, found `=`
+ --> frontend/src/lib/evidenceTiming.ts:3:52
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |                                                    ^
+4 |   const explicit = details.clip_event_offset_s
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+  |
+
+invalid-syntax: Expected `,`, found `>`
+ --> frontend/src/lib/evidenceTiming.ts:3:53
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |                                                     ^
+4 |   const explicit = details.clip_event_offset_s
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+  |
+
+invalid-syntax: Expected `,`, found identifier
+ --> frontend/src/lib/evidenceTiming.ts:3:62
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |                                                              ^^^^^
+4 |   const explicit = details.clip_event_offset_s
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+  |
+
+invalid-syntax: Expected an expression
+ --> frontend/src/lib/evidenceTiming.ts:3:70
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |                                                                      ^
+4 |   const explicit = details.clip_event_offset_s
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+  |
+
+invalid-syntax: Expected an expression
+ --> frontend/src/lib/evidenceTiming.ts:3:82
+  |
+1 | /** Only recorded media metadata may place an event in a clip; no midpoint guess. */
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+  |                                                                                  ^
+4 |   const explicit = details.clip_event_offset_s
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+  |
+
+invalid-syntax: Expected `,`, found identifier
+ --> frontend/src/lib/evidenceTiming.ts:4:3
+  |
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+4 |   const explicit = details.clip_event_offset_s
+  |   ^^^^^
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+  |
+
+invalid-syntax: Expected `,`, found identifier
+ --> frontend/src/lib/evidenceTiming.ts:4:9
+  |
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+4 |   const explicit = details.clip_event_offset_s
+  |         ^^^^^^^^
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+  |
+
+invalid-syntax: Expected `,`, found `=`
+ --> frontend/src/lib/evidenceTiming.ts:4:18
+  |
+2 | export function evidenceTiming(sourceTime: number, details: Record<string, unknown>) {
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+4 |   const explicit = details.clip_event_offset_s
+  |                  ^
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+  |
+
+invalid-syntax: Expected `,`, found identifier
+ --> frontend/src/lib/evidenceTiming.ts:5:3
+  |
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+4 |   const explicit = details.clip_event_offset_s
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+  |   ^^^^^
+6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+7 |   const value = finite(explicit) ? explicit : derived
+  |
+
+invalid-syntax: Expected `,`, found identifier
+ --> frontend/src/lib/evidenceTiming.ts:5:9
+  |
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+4 |   const explicit = details.clip_event_offset_s
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+  |         ^^^^^
+6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+7 |   const value = finite(explicit) ? explicit : derived
+  |
+
+invalid-syntax: Expected `,`, found `=`
+ --> frontend/src/lib/evidenceTiming.ts:5:15
+  |
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+4 |   const explicit = details.clip_event_offset_s
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+  |               ^
+6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+7 |   const value = finite(explicit) ? explicit : derived
+  |
+
+invalid-syntax: Got unexpected token ?
+ --> frontend/src/lib/evidenceTiming.ts:5:45
+  |
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+4 |   const explicit = details.clip_event_offset_s
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+  |                                             ^
+6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+7 |   const value = finite(explicit) ? explicit : derived
+  |
+
+invalid-syntax: Got unexpected token ?
+ --> frontend/src/lib/evidenceTiming.ts:5:46
+  |
+3 |   const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+4 |   const explicit = details.clip_event_offset_s
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+  |                                              ^
+6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+7 |   const value = finite(explicit) ? explicit : derived
+  |
+
+invalid-syntax: Expected `,`, found identifier
+ --> frontend/src/lib/evidenceTiming.ts:6:3
+  |
+4 |   const explicit = details.clip_event_offset_s
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+  |   ^^^^^
+7 |   const value = finite(explicit) ? explicit : derived
+8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+  |
+
+invalid-syntax: Expected `,`, found identifier
+ --> frontend/src/lib/evidenceTiming.ts:6:9
+  |
+4 |   const explicit = details.clip_event_offset_s
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+  |         ^^^^^^^
+7 |   const value = finite(explicit) ? explicit : derived
+8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+  |
+
+invalid-syntax: Expected `,`, found `=`
+ --> frontend/src/lib/evidenceTiming.ts:6:17
+  |
+4 |   const explicit = details.clip_event_offset_s
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+  |                 ^
+7 |   const value = finite(explicit) ? explicit : derived
+8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+  |
+
+invalid-syntax: Expected an expression
+ --> frontend/src/lib/evidenceTiming.ts:6:34
+  |
+4 |   const explicit = details.clip_event_offset_s
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+  |                                  ^
+7 |   const value = finite(explicit) ? explicit : derived
+8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+  |
+
+invalid-syntax: Got unexpected token ?
+ --> frontend/src/lib/evidenceTiming.ts:6:64
+  |
+4 |   const explicit = details.clip_event_offset_s
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+  |                                                                ^
+7 |   const value = finite(explicit) ? explicit : derived
+8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+  |
+
+invalid-syntax: Expected `,`, found `:`
+ --> frontend/src/lib/evidenceTiming.ts:6:85
+  |
+4 |   const explicit = details.clip_event_offset_s
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+  |                                                                                     ^
+7 |   const value = finite(explicit) ? explicit : derived
+8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+  |
+
+invalid-syntax: Expected `,`, found identifier
+ --> frontend/src/lib/evidenceTiming.ts:7:3
+  |
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+7 |   const value = finite(explicit) ? explicit : derived
+  |   ^^^^^
+8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+9 |   const rawFps = details.clip_encoded_fps
+  |
+
+invalid-syntax: Expected `,`, found identifier
+ --> frontend/src/lib/evidenceTiming.ts:7:9
+  |
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+7 |   const value = finite(explicit) ? explicit : derived
+  |         ^^^^^
+8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+9 |   const rawFps = details.clip_encoded_fps
+  |
+
+invalid-syntax: Expected `,`, found `=`
+ --> frontend/src/lib/evidenceTiming.ts:7:15
+  |
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+7 |   const value = finite(explicit) ? explicit : derived
+  |               ^
+8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+9 |   const rawFps = details.clip_encoded_fps
+  |
+
+invalid-syntax: Got unexpected token ?
+ --> frontend/src/lib/evidenceTiming.ts:7:34
+  |
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+7 |   const value = finite(explicit) ? explicit : derived
+  |                                  ^
+8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+9 |   const rawFps = details.clip_encoded_fps
+  |
+
+invalid-syntax: Expected `,`, found `:`
+ --> frontend/src/lib/evidenceTiming.ts:7:45
+  |
+5 |   const start = details.clip_start_output_s ?? details.clip_start_source_s
+6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+7 |   const value = finite(explicit) ? explicit : derived
+  |                                             ^
+8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+9 |   const rawFps = details.clip_encoded_fps
+  |
+
+invalid-syntax: Expected `,`, found identifier
+  --> frontend/src/lib/evidenceTiming.ts:8:3
+   |
+ 6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+ 7 |   const value = finite(explicit) ? explicit : derived
+ 8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+   |   ^^^^^
+ 9 |   const rawFps = details.clip_encoded_fps
+10 |   const fps = finite(rawFps) && rawFps > 0 && rawFps <= 240 ? rawFps : undefined
+   |
+
+invalid-syntax: Expected `,`, found identifier
+  --> frontend/src/lib/evidenceTiming.ts:8:9
+   |
+ 6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+ 7 |   const value = finite(explicit) ? explicit : derived
+ 8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+   |         ^^^^^^
+ 9 |   const rawFps = details.clip_encoded_fps
+10 |   const fps = finite(rawFps) && rawFps > 0 && rawFps <= 240 ? rawFps : undefined
+   |
+
+invalid-syntax: Expected `,`, found `=`
+  --> frontend/src/lib/evidenceTiming.ts:8:16
+   |
+ 6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+ 7 |   const value = finite(explicit) ? explicit : derived
+ 8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+   |                ^
+ 9 |   const rawFps = details.clip_encoded_fps
+10 |   const fps = finite(rawFps) && rawFps > 0 && rawFps <= 240 ? rawFps : undefined
+   |
+
+invalid-syntax: Expected an expression
+  --> frontend/src/lib/evidenceTiming.ts:8:33
+   |
+ 6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+ 7 |   const value = finite(explicit) ? explicit : derived
+ 8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+   |                                 ^
+ 9 |   const rawFps = details.clip_encoded_fps
+10 |   const fps = finite(rawFps) && rawFps > 0 && rawFps <= 240 ? rawFps : undefined
+   |
+
+invalid-syntax: Expected an expression
+  --> frontend/src/lib/evidenceTiming.ts:8:47
+   |
+ 6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+ 7 |   const value = finite(explicit) ? explicit : derived
+ 8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+   |                                               ^
+ 9 |   const rawFps = details.clip_encoded_fps
+10 |   const fps = finite(rawFps) && rawFps > 0 && rawFps <= 240 ? rawFps : undefined
+   |
+
+invalid-syntax: Got unexpected token ?
+  --> frontend/src/lib/evidenceTiming.ts:8:61
+   |
+ 6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+ 7 |   const value = finite(explicit) ? explicit : derived
+ 8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+   |                                                             ^
+ 9 |   const rawFps = details.clip_encoded_fps
+10 |   const fps = finite(rawFps) && rawFps > 0 && rawFps <= 240 ? rawFps : undefined
+   |
+
+invalid-syntax: Expected `,`, found `:`
+  --> frontend/src/lib/evidenceTiming.ts:8:69
+   |
+ 6 |   const derived = finite(start) && Number.isFinite(sourceTime) ? sourceTime - start : undefined
+ 7 |   const value = finite(explicit) ? explicit : derived
+ 8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+   |                                                                     ^
+ 9 |   const rawFps = details.clip_encoded_fps
+10 |   const fps = finite(rawFps) && rawFps > 0 && rawFps <= 240 ? rawFps : undefined
+   |
+
+invalid-syntax: Expected `,`, found identifier
+  --> frontend/src/lib/evidenceTiming.ts:9:3
+   |
+ 7 |   const value = finite(explicit) ? explicit : derived
+ 8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+ 9 |   const rawFps = details.clip_encoded_fps
+   |   ^^^^^
+10 |   const fps = finite(rawFps) && rawFps > 0 && rawFps <= 240 ? rawFps : undefined
+11 |   return { eventOffsetSec: offset, fps }
+   |
+
+invalid-syntax: Expected `,`, found identifier
+  --> frontend/src/lib/evidenceTiming.ts:9:9
+   |
+ 7 |   const value = finite(explicit) ? explicit : derived
+ 8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+ 9 |   const rawFps = details.clip_encoded_fps
+   |         ^^^^^^
+10 |   const fps = finite(rawFps) && rawFps > 0 && rawFps <= 240 ? rawFps : undefined
+11 |   return { eventOffsetSec: offset, fps }
+   |
+
+invalid-syntax: Expected `,`, found `=`
+  --> frontend/src/lib/evidenceTiming.ts:9:16
+   |
+ 7 |   const value = finite(explicit) ? explicit : derived
+ 8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+ 9 |   const rawFps = details.clip_encoded_fps
+   |                ^
+10 |   const fps = finite(rawFps) && rawFps > 0 && rawFps <= 240 ? rawFps : undefined
+11 |   return { eventOffsetSec: offset, fps }
+   |
+
+invalid-syntax: Expected `,`, found identifier
+  --> frontend/src/lib/evidenceTiming.ts:10:3
+   |
+ 8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+ 9 |   const rawFps = details.clip_encoded_fps
+10 |   const fps = finite(rawFps) && rawFps > 0 && rawFps <= 240 ? rawFps : undefined
+   |   ^^^^^
+11 |   return { eventOffsetSec: offset, fps }
+12 | }
+   |
+
+invalid-syntax: Expected `,`, found identifier
+  --> frontend/src/lib/evidenceTiming.ts:10:9
+   |
+ 8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+ 9 |   const rawFps = details.clip_encoded_fps
+10 |   const fps = finite(rawFps) && rawFps > 0 && rawFps <= 240 ? rawFps : undefined
+   |         ^^^
+11 |   return { eventOffsetSec: offset, fps }
+12 | }
+   |
+
+invalid-syntax: Expected `,`, found `=`
+  --> frontend/src/lib/evidenceTiming.ts:10:13
+   |
+ 8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+ 9 |   const rawFps = details.clip_encoded_fps
+10 |   const fps = finite(rawFps) && rawFps > 0 && rawFps <= 240 ? rawFps : undefined
+   |             ^
+11 |   return { eventOffsetSec: offset, fps }
+12 | }
+   |
+
+invalid-syntax: Expected an expression
+  --> frontend/src/lib/evidenceTiming.ts:10:31
+   |
+ 8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+ 9 |   const rawFps = details.clip_encoded_fps
+10 |   const fps = finite(rawFps) && rawFps > 0 && rawFps <= 240 ? rawFps : undefined
+   |                               ^
+11 |   return { eventOffsetSec: offset, fps }
+12 | }
+   |
+
+invalid-syntax: Expected an expression
+  --> frontend/src/lib/evidenceTiming.ts:10:45
+   |
+ 8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+ 9 |   const rawFps = details.clip_encoded_fps
+10 |   const fps = finite(rawFps) && rawFps > 0 && rawFps <= 240 ? rawFps : undefined
+   |                                             ^
+11 |   return { eventOffsetSec: offset, fps }
+12 | }
+   |
+
+invalid-syntax: Got unexpected token ?
+  --> frontend/src/lib/evidenceTiming.ts:10:61
+   |
+ 8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+ 9 |   const rawFps = details.clip_encoded_fps
+10 |   const fps = finite(rawFps) && rawFps > 0 && rawFps <= 240 ? rawFps : undefined
+   |                                                             ^
+11 |   return { eventOffsetSec: offset, fps }
+12 | }
+   |
+
+invalid-syntax: Expected `,`, found `:`
+  --> frontend/src/lib/evidenceTiming.ts:10:70
+   |
+ 8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+ 9 |   const rawFps = details.clip_encoded_fps
+10 |   const fps = finite(rawFps) && rawFps > 0 && rawFps <= 240 ? rawFps : undefined
+   |                                                                      ^
+11 |   return { eventOffsetSec: offset, fps }
+12 | }
+   |
+
+invalid-syntax: Expected `}`, found newline
+  --> frontend/src/lib/evidenceTiming.ts:10:81
+   |
+ 8 |   const offset = finite(value) && value >= 0 && value <= 90 ? value : undefined
+ 9 |   const rawFps = details.clip_encoded_fps
+10 |   const fps = finite(rawFps) && rawFps > 0 && rawFps <= 240 ? rawFps : undefined
+   |                                                                                 ^
+11 |   return { eventOffsetSec: offset, fps }
+12 | }
+   |
+
+invalid-syntax: Unexpected indentation
+  --> frontend/src/lib/evidenceTiming.ts:11:1
+   |
+ 9 |   const rawFps = details.clip_encoded_fps
+10 |   const fps = finite(rawFps) && rawFps > 0 && rawFps <= 240 ? rawFps : undefined
+11 |   return { eventOffsetSec: offset, fps }
+   | ^^
+12 | }
+   |
+
+invalid-syntax: Expected `:`, found `}`
+  --> frontend/src/lib/evidenceTiming.ts:11:40
+   |
+ 9 |   const rawFps = details.clip_encoded_fps
+10 |   const fps = finite(rawFps) && rawFps > 0 && rawFps <= 240 ? rawFps : undefined
+11 |   return { eventOffsetSec: offset, fps }
+   |                                        ^
+12 | }
+   |
+
+invalid-syntax: Expected a statement
+  --> frontend/src/lib/evidenceTiming.ts:12:1
+   |
+10 |   const fps = finite(rawFps) && rawFps > 0 && rawFps <= 240 ? rawFps : undefined
+11 |   return { eventOffsetSec: offset, fps }
+12 | }
+   | ^
+
+invalid-syntax: Expected a statement
+  --> frontend/src/lib/evidenceTiming.ts:12:2
+   |
+10 |   const fps = finite(rawFps) && rawFps > 0 && rawFps <= 240 ? rawFps : undefined
+11 |   return { eventOffsetSec: offset, fps }
+12 | }
+   |  ^
+
+Found 72 errors.

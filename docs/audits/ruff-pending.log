@@ -1,0 +1,75 @@
+S603 `subprocess` call: check for execution of untrusted input
+   --> backend/tests/test_managed_live_runtime.py:153:16
+    |
+151 |             time.sleep(0.05)
+152 |         log = (tmp_path / "worker.log").open("w+")
+153 |         proc = subprocess.Popen(
+    |                ^^^^^^^^^^^^^^^^
+154 |             [
+155 |                 sys.executable,
+    |
+
+E501 Line too long (146 > 100)
+   --> backend/tests/test_managed_live_runtime.py:201:101
+    |
+199 | …tart; restart cannot acquire after disable
+200 | …
+201 | …k -> managed lease + ACK revision 1 -> changing authenticated preview -> stop on disable"
+    |                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+202 | …
+203 | …
+    |
+
+S603 `subprocess` call: check for execution of untrusted input
+   --> backend/tests/test_mission_vertical.py:157:24
+    |
+155 |             root = Path(__file__).resolve().parents[2]
+156 |             browser_log = (tmp_path / "vite.log").open("wb")
+157 |             frontend = subprocess.Popen(
+    |                        ^^^^^^^^^^^^^^^^
+158 |                 [
+159 |                     "node",
+    |
+
+S607 Starting a process with a partial executable path
+   --> backend/tests/test_mission_vertical.py:158:17
+    |
+156 |               browser_log = (tmp_path / "vite.log").open("wb")
+157 |               frontend = subprocess.Popen(
+158 | /                 [
+159 | |                     "node",
+160 | |                     "node_modules/vite/bin/vite.js",
+161 | |                     "--host",
+162 | |                     "127.0.0.1",
+163 | |                     "--port",
+164 | |                     str(ui_port),
+165 | |                     "--strictPort",
+166 | |                 ],
+    | |_________________^
+167 |                   cwd=root / "frontend",
+168 |                   env={**os.environ, "RS_API_ORIGIN": origin, "VITE_USE_MOCKS": "0"},
+    |
+
+S607 Starting a process with a partial executable path
+   --> backend/tests/test_mission_vertical.py:184:21
+    |
+182 |                 shot.parent.mkdir(exist_ok=True)
+183 |                 result_browser = subprocess.run(
+184 |                     ["node", "e2e/mission-review.mjs"],
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+185 |                     cwd=root / "frontend",
+186 |                     env={
+    |
+
+E501 Line too long (159 > 100)
+   --> backend/tests/test_mission_vertical.py:206:101
+    |
+204 | …
+205 | …
+206 | …e fixture -> candidate -> encrypted media -> idempotent recorded review -> rejection; frames=",
+    |                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+207 | …
+208 | …
+    |
+
+Found 8 errors (2 fixed, 6 remaining).

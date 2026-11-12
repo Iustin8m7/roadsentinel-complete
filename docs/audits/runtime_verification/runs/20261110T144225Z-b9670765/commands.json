@@ -1,0 +1,44 @@
+[
+  {
+    "name": "test",
+    "command": [
+      "npm",
+      "run",
+      "test"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration/secure-pwa",
+    "start": "2026-11-10T14:42:25.877629+00:00",
+    "end": "2026-11-10T14:42:27.997834+00:00",
+    "duration_s": 2.12,
+    "exit_code": 0
+  },
+  {
+    "name": "lint",
+    "command": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration/secure-pwa",
+    "start": "2026-11-10T14:42:27.998130+00:00",
+    "end": "2026-11-10T14:42:32.721623+00:00",
+    "duration_s": 4.724,
+    "exit_code": 0
+  },
+  {
+    "name": "build",
+    "command": [
+      "npm",
+      "run",
+      "build",
+      "--",
+      "--outDir",
+      "/home/justin7m8/Documents/roadsentinel-integration/docs/audits/runtime_verification/runs/20261110T144225Z-b9670765/build"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration/secure-pwa",
+    "start": "2026-11-10T14:42:32.721964+00:00",
+    "end": "2026-11-10T14:42:36.743204+00:00",
+    "duration_s": 4.021,
+    "exit_code": 0
+  }
+]

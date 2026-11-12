@@ -1,0 +1,39 @@
+diff --git a/frontend/src/pages/LandingPage.css b/frontend/src/pages/LandingPage.css
+index d69baa3..7bf317b 100644
+--- a/frontend/src/pages/LandingPage.css
++++ b/frontend/src/pages/LandingPage.css
+@@ -256,10 +256,6 @@
+   box-sizing: content-box;
+   width: 44px;
+   height: 56px;
+-  padding-right: 16px;
+-  background: var(--asfalt);
+-  /* a gap in the dashes on the near side too */
+-  box-shadow: -14px 0 0 var(--asfalt);
+ }
+ .rs-landing-steps h3 {
+   margin: 16px 0 0;
+@@ -279,15 +275,18 @@
+     grid-template-columns: repeat(4, minmax(0, 1fr));
+     gap: 32px;
+   }
+-  /* Centre-line dashes running from the first stone to the last. */
+-  .rs-landing-steps::before {
++  /* Centre-line dashes from each stone to the next: five whole dashes, never a cut one. */
++  .rs-landing-steps li {
++    position: relative;
++  }
++  .rs-landing-steps li::before {
+     content: '';
+     position: absolute;
+-    left: 0;
+-    right: 0;
++    left: 62px;
++    right: -18px;
+     top: 36px;
+     height: 4px;
+-    background: repeating-linear-gradient(90deg, #fff 0 34px, transparent 34px 60px);
++    background: linear-gradient(90deg, #fff 58%, transparent 0) 0 0 / 20% 100% repeat-x;
+     opacity: 0.85;
+   }
+ }

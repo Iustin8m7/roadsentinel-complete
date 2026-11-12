@@ -1,0 +1,1 @@
+import{f as l,l as c,w as r,a as o}from"./leaflet-D8Dbd4bo.js";function u(i,n,a){const{opacity:e,zIndex:t}=n;e!=null&&e!==a.opacity&&i.setOpacity(e),t!=null&&t!==a.zIndex&&i.setZIndex(t)}const f=l(function({url:n,...a},e){const t=new c.TileLayer(n,r(a,e));return o(t,e)},function(n,a,e){u(n,a,e);const{url:t}=a;t!=null&&t!==e.url&&n.setUrl(t)});export{f as T};

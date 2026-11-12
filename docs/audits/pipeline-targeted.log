@@ -1,0 +1,102 @@
+........................F............................................... [ 81%]
+.............FF.                                                         [100%]
+=================================== FAILURES ===================================
+____________ test_local_uvc_profile_requires_no_fabricated_geometry ____________
+
+    def test_local_uvc_profile_requires_no_fabricated_geometry():
+        from roadsentinel.pipeline import load_camera
+    
+>       cfg, calibration, zones = load_camera("cameras/local-uvc.yaml")
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_sources.py:258: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+roadsentinel/pipeline.py:43: in load_camera
+    cfg = configuration if configuration is not None else yaml.safe_load(Path(path).read_text())
+                                                                         ^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/pathlib.py:1029: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('cameras/local-uvc.yaml'), mode = 'r', buffering = -1
+encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'cameras/local-uvc.yaml'
+
+/usr/lib/python3.12/pathlib.py:1015: FileNotFoundError
+___ test_the_shipped_iasi_camera_is_off_until_someone_records_the_permission ___
+
+    def test_the_shipped_iasi_camera_is_off_until_someone_records_the_permission():
+>       cfg = yaml.safe_load((Path(__file__).resolve().parent.parent / "cameras" / "iasi-piata-unirii.yaml").read_text())
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_consent.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/pathlib.py:1029: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/justin7m8/Documents/roadsentinel-integration/cameras/iasi-piata-unirii.yaml')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/justin7m8/Documents/roadsentinel-integration/cameras/iasi-piata-unirii.yaml'
+
+/usr/lib/python3.12/pathlib.py:1015: FileNotFoundError
+___ test_the_shipped_iasi_config_reports_what_it_can_do_at_its_measured_rate ___
+
+    def test_the_shipped_iasi_config_reports_what_it_can_do_at_its_measured_rate():
+        from roadsentinel.rules import rule_capabilities
+    
+>       cfg = yaml.safe_load((Path(__file__).resolve().parent.parent / "cameras" / "iasi-piata-unirii.yaml").read_text())
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_consent.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/pathlib.py:1029: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/justin7m8/Documents/roadsentinel-integration/cameras/iasi-piata-unirii.yaml')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/justin7m8/Documents/roadsentinel-integration/cameras/iasi-piata-unirii.yaml'
+
+/usr/lib/python3.12/pathlib.py:1015: FileNotFoundError
+=========================== short test summary info ============================
+FAILED tests/test_sources.py::test_local_uvc_profile_requires_no_fabricated_geometry
+FAILED tests/test_consent.py::test_the_shipped_iasi_camera_is_off_until_someone_records_the_permission
+FAILED tests/test_consent.py::test_the_shipped_iasi_config_reports_what_it_can_do_at_its_measured_rate
+3 failed, 85 passed in 2.31s

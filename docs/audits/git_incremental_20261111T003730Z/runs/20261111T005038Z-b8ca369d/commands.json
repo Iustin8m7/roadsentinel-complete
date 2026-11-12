@@ -1,0 +1,15 @@
+[
+  {
+    "name": "test",
+    "command": [
+      "npm",
+      "run",
+      "test"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration/frontend",
+    "start": "2026-11-11T00:50:38.734656+00:00",
+    "end": "2026-11-11T00:50:41.307503+00:00",
+    "duration_s": 2.573,
+    "exit_code": 1
+  }
+]

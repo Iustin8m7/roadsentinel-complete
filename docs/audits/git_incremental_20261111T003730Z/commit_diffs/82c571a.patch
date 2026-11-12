@@ -1,0 +1,17 @@
+diff --git a/frontend/src/components/EvidencePlayer.tsx b/frontend/src/components/EvidencePlayer.tsx
+index 443e3d5..6fd715e 100644
+--- a/frontend/src/components/EvidencePlayer.tsx
++++ b/frontend/src/components/EvidencePlayer.tsx
+@@ -3,8 +3,10 @@ import { getClip, cachedClip, unsubscribeClip } from '@/lib/demo'
+ import { AlertTriangle, BookmarkPlus, ChevronLeft, ChevronRight, Download, Loader2, Maximize2, Pause, Play, RotateCcw, RotateCw, Crosshair } from 'lucide-react'
+ 
+ const FPS = 30
+-const SPEEDS = [0.25, 0.5, 1]
+-const DEFAULT_SPEED = 0.25 // slow by default so the manoeuvre is visible
++// Real speed first: a clip that opens in slow motion reads as a stuttering recording.
++// The button steps down to 0.5× and 0.25× for a close look at the manoeuvre.
++const SPEEDS = [1, 0.5, 0.25]
++const DEFAULT_SPEED = 1
+ const THUMBS = 6
+ 
+ /** Evidence clip as a blob URL from the shared cache (preloaded in the background). */

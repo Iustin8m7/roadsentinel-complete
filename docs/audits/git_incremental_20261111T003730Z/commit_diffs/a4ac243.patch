@@ -1,0 +1,72 @@
+diff --git a/frontend/src/pages/CamerasPage.tsx b/frontend/src/pages/CamerasPage.tsx
+index 84c9484..2af0124 100644
+--- a/frontend/src/pages/CamerasPage.tsx
++++ b/frontend/src/pages/CamerasPage.tsx
+@@ -29,10 +29,15 @@ interface CameraExtended {
+   live?: boolean;
+ }
+ 
+-/** Latest key frame, then the bundled still; a neutral placeholder when neither loads. */
++/** Latest key frame, then the bundled still, then a frame of the camera's recording; a neutral placeholder when none loads. */
+ function CameraThumb({ cam }: { cam: CameraExtended }) {
+   const [failed, setFailed] = useState<string[]>([]);
+   const src = [cam.image_url, `/cams/${cam.id}.jpg`].find((u) => u && !failed.includes(u));
++  if (!src && cam.video_url && !failed.includes(cam.video_url)) {
++    const recording = cam.video_url;
++    // "#t=3" makes the browser show the frame at 3 s instead of a black first frame.
++    return <video src={`${recording}#t=3`} muted playsInline preload="metadata" className="w-full h-full object-cover" data-testid="camera-recording-frame" onError={() => setFailed((f) => [...f, recording])} />;
++  }
+   if (!src) {
+     return (
+       <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 px-3 text-center bg-elevation text-text-secondary" data-testid="camera-placeholder">
+@@ -59,6 +64,7 @@ export default function CamerasPage() {
+   const [hoveredCam, setHoveredCam] = useState<string | null>(null);
+   const [playerClips, setPlayerClips] = useState<ModalClip[] | null>(null);
+   const [liveCam, setLiveCam] = useState<CameraExtended | null>(null);
++  const [recordingCam, setRecordingCam] = useState<CameraExtended | null>(null);
+   // Control plane status (real API only): truthful runtime state per camera slug.
+   const isAdmin = useAuthStore((st) => st.user?.role === "admin");
+   const [controls, setControls] = useState<Record<string, ControlSummary>>({});
+@@ -245,6 +251,16 @@ export default function CamerasPage() {
+                                 <span>{cam.live ? "Live" : "Flux video"}</span>
+                               </button>
+                             )}
++                            {cam.video_url && (
++                              <button
++                                type="button"
++                                onClick={() => setRecordingCam(cam)}
++                                className="flex-1 cursor-pointer flex items-center justify-center gap-1.5 py-1.5 bg-elevation hover:bg-border text-text-primary text-xs font-semibold rounded border border-border transition-colors"
++                              >
++                                <Video className="w-3.5 h-3.5" />
++                                <span>Înregistrare</span>
++                              </button>
++                            )}
+                             <button
+                               type="button"
+                               onClick={() => openPlayer(cam.id)}
+@@ -318,6 +334,25 @@ export default function CamerasPage() {
+ 
+       {playerClips && <ClipModal clips={playerClips} onClose={() => setPlayerClips(null)} />}
+       {controlCam && <CameraControlPanel cameraId={controlCam} isAdmin={isAdmin} onClose={() => setControlCam(null)} />}
++      {recordingCam?.video_url && (
++        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6" onClick={() => setRecordingCam(null)} data-testid="camera-recording">
++          <div className="w-full max-w-6xl flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
++            <div className="flex items-center justify-between text-sm text-text-primary">
++              <div className="flex items-center gap-3">
++                <span className="font-semibold">{recordingCam.name}</span>
++                <span className="text-text-secondary text-xs">{recordingCam.location}</span>
++              </div>
++              <button type="button" onClick={() => setRecordingCam(null)} className="p-1 rounded hover:bg-elevation" aria-label="Închide">
++                <X className="w-5 h-5" />
++              </button>
++            </div>
++            <video src={recordingCam.video_url} className="w-full aspect-video rounded-md border border-border bg-black" controls autoPlay muted loop playsInline />
++            <p className="text-[11px] text-text-secondary font-mono">
++              Înregistrare analizată de program. Chenarele arată vehiculele și persoanele urmărite, nu alerte.
++            </p>
++          </div>
++        </div>
++      )}
+       {liveCam?.live_url && (
+         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6" onClick={() => setLiveCam(null)}>
+           <div className="w-full max-w-6xl flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>

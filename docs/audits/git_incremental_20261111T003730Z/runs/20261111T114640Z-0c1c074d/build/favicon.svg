@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Navy Shield -->
+  <path d="M32 3 L57 12 C57 38 46 52 32 61 C18 52 7 38 7 12 Z" fill="#1E2B4A" stroke="#F5B82E" stroke-width="2.5"/>
+  <path d="M32 7 L53 15 C53 36 43 48 32 56 C21 48 11 36 11 15 Z" fill="#233358" stroke="#2E4170" stroke-width="1"/>
+  <!-- Gold 6-point star -->
+  <polygon points="32,16 35,25 44,22 39,29 45,36 36,36 32,45 28,36 19,36 25,29 20,22 29,25" fill="#F5B82E" stroke="#E9A21B" stroke-width="0.8"/>
+  <circle cx="32" cy="30" r="4.5" fill="#1E2B4A" />
+  <text x="32" y="32.5" font-family="'Oswald', sans-serif" font-size="5" font-weight="bold" fill="#F5B82E" text-anchor="middle">RS</text>
+</svg>

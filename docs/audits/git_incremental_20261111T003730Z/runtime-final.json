@@ -1,0 +1,163 @@
+{
+  "utc": "2026-11-11T12:25:43.097037+00:00",
+  "backend_pid": 2150043,
+  "backend_cwd": "/home/justin7m8/Documents/roadsentinel-integration/backend",
+  "frontend_pid": 1671183,
+  "proxy": "http://127.0.0.1:8003",
+  "http": [
+    {
+      "port": 8003,
+      "path": "/api/health/live",
+      "status": 200
+    },
+    {
+      "port": 8003,
+      "path": "/api/health/ready",
+      "status": 200
+    },
+    {
+      "port": 8003,
+      "path": "/api/camera-control/catalog",
+      "status": 401
+    },
+    {
+      "port": 5175,
+      "path": "/api/health/live",
+      "status": 200
+    },
+    {
+      "port": 5175,
+      "path": "/api/health/ready",
+      "status": 200
+    },
+    {
+      "port": 5175,
+      "path": "/api/camera-control/catalog",
+      "status": 401
+    }
+  ],
+  "database": [
+    "rsint_20261110b",
+    "127.0.0.1",
+    55446,
+    "rsint_app_261110b"
+  ],
+  "revision": [
+    [
+      "0022"
+    ]
+  ],
+  "app_role": [
+    false,
+    false
+  ],
+  "forced_rls_tables": [
+    [
+      "alerts"
+    ],
+    [
+      "analysis_runs"
+    ],
+    [
+      "approval_requests"
+    ],
+    [
+      "audit_log"
+    ],
+    [
+      "camera_config_versions"
+    ],
+    [
+      "camera_health_events"
+    ],
+    [
+      "camera_source_grants"
+    ],
+    [
+      "camera_worker_status"
+    ],
+    [
+      "cameras"
+    ],
+    [
+      "case_bookmarks"
+    ],
+    [
+      "case_followup_events"
+    ],
+    [
+      "case_followups"
+    ],
+    [
+      "case_legal_holds"
+    ],
+    [
+      "case_links"
+    ],
+    [
+      "case_note_revisions"
+    ],
+    [
+      "case_notes"
+    ],
+    [
+      "evidence"
+    ],
+    [
+      "export_jobs"
+    ],
+    [
+      "ingest_nonces"
+    ],
+    [
+      "invitations"
+    ],
+    [
+      "push_subscriptions"
+    ],
+    [
+      "recordings"
+    ],
+    [
+      "recovery_codes"
+    ],
+    [
+      "refresh_tokens"
+    ],
+    [
+      "retention_policies"
+    ],
+    [
+      "saved_searches"
+    ],
+    [
+      "service_accounts"
+    ],
+    [
+      "service_keys"
+    ],
+    [
+      "tenant_keys"
+    ],
+    [
+      "tenants"
+    ],
+    [
+      "user_sessions"
+    ],
+    [
+      "users"
+    ]
+  ],
+  "source_sha256": {
+    "backend/app/api/camera_control.py": "a49c1006513446fa52dfd77650a74d5ce313911b80fb72735f1fb7baf3a9ab95",
+    "backend/app/api/contract.py": "a2ab4f1477aa5856948e33d741318b67875fa30df2e229bcd02a5f362850c19f",
+    "backend/app/api/ingest.py": "c96cc39f9ed55d16251e2acf9147b55e9af8431882ed6965bde20885e616ca00",
+    "backend/app/services/offline_promotion.py": "7d8a0d30f51436dd207d81433db5d95528921f1f8a8f54b729d6b6c2b19da261",
+    "frontend/src/App.tsx": "5420c2a595abb58c29be55ea3a6916c6544402ae8a4cfc8e2384f2de1c769a9c",
+    "frontend/src/components/ConfigEditor.tsx": "d0c22c7b213d9e5d3edb5bfa360fc004e55f7e6e0615d64dea224ae1ec953910",
+    "frontend/src/components/EvidencePlayer.tsx": "4ad996004f68ff2e716472027578bf0e0648b0152140b99bc124b1b5db3f8086",
+    "roadsentinel/pipeline.py": "35b4a8df46994c1cf7a6c5e5a39ef4c0cddc7db8cd0db938124cf77806eb29dd"
+  },
+  "worker_note": "No native worker was started by this mission. The final managed-stop source is used by future worker starts; controlled workers ran in disposable B."
+}

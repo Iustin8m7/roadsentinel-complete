@@ -1,0 +1,39 @@
+........................................................................ [ 16%]
+........................................................................ [ 33%]
+........................................................................ [ 50%]
+........................................................................ [ 67%]
+......................................................s................. [ 84%]
+..........s.....................................................         [100%]
+=============================== warnings summary ===============================
+tests/test_ingest_auth.py::TestLimits::test_oversized_body_is_refused_before_hashing
+  /home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/dependencies/utils.py:674: StarletteDeprecationWarning: 'HTTP_413_REQUEST_ENTITY_TOO_LARGE' is deprecated. Use 'HTTP_413_CONTENT_TOO_LARGE' instead.
+    solved = await call(**solved_result.values)
+
+tests/test_ingest_auth.py::TestManagementApi::test_camera_scope_must_belong_to_the_tenant
+  /home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/telemetry/_api.py:244: StarletteDeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    return function(**arguments)
+
+tests/test_mission_vertical.py::test_real_inference_recorded_candidate_to_encrypted_review
+  /home/justin7m8/Documents/roadsentinel-integration/roadsentinel/detector.py:209: FutureWarning: The `ByteTrack` was deprecated since v0.28.0. It will be removed in v0.31.0.
+    return sv.ByteTrack(frame_rate=max(1, round(frame_rate)))
+
+tests/test_mission_vertical.py::test_real_inference_recorded_candidate_to_encrypted_review
+tests/test_mission_vertical.py::test_real_inference_recorded_candidate_to_encrypted_review
+tests/test_mission_vertical.py::test_real_inference_recorded_candidate_to_encrypted_review
+tests/test_mission_vertical.py::test_real_inference_recorded_candidate_to_encrypted_review
+tests/test_mission_vertical.py::test_real_inference_recorded_candidate_to_encrypted_review
+tests/test_mission_vertical.py::test_real_inference_recorded_candidate_to_encrypted_review
+  /home/justin7m8/Documents/roadsentinel-integration/backend/app/services/casework.py:190: SADeprecationWarning: The Result.tuples() method is deprecated, Row now behaves like a tuple and can unpack types directly. (deprecated since: 2.1.0)
+    ).tuples()
+
+tests/test_mission_vertical.py::test_real_inference_recorded_candidate_to_encrypted_review
+tests/test_mission_vertical.py::test_real_inference_recorded_candidate_to_encrypted_review
+tests/test_mission_vertical.py::test_real_inference_recorded_candidate_to_encrypted_review
+tests/test_mission_vertical.py::test_real_inference_recorded_candidate_to_encrypted_review
+tests/test_mission_vertical.py::test_real_inference_recorded_candidate_to_encrypted_review
+tests/test_mission_vertical.py::test_real_inference_recorded_candidate_to_encrypted_review
+  /home/justin7m8/Documents/roadsentinel-integration/backend/app/services/casework.py:202: SADeprecationWarning: The Result.tuples() method is deprecated, Row now behaves like a tuple and can unpack types directly. (deprecated since: 2.1.0)
+    ).tuples()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+422 passed, 2 skipped, 15 warnings in 115.95s (0:01:55)

@@ -1,0 +1,802 @@
+{
+  "runtime": "A: existing 5175 -> 8003 -> rsint_20261110b:55446",
+  "accounts": [
+    {
+      "email": "operator.a@roadsentinel.local",
+      "role": "operator",
+      "passwordAccepted": true,
+      "enrolledInThisRun": false,
+      "refreshPreservedSession": true,
+      "dashboardDataLoaded": true,
+      "logoutRevokedSession": true,
+      "destination": "/app"
+    },
+    {
+      "email": "admin.a@roadsentinel.local",
+      "role": "tenant_admin",
+      "passwordAccepted": true,
+      "enrolledInThisRun": false,
+      "refreshPreservedSession": true,
+      "dashboardDataLoaded": true,
+      "logoutRevokedSession": true,
+      "destination": "/app"
+    },
+    {
+      "email": "patrol.a@roadsentinel.local",
+      "role": "patrol",
+      "passwordAccepted": true,
+      "enrolledInThisRun": false,
+      "refreshPreservedSession": true,
+      "dashboardDataLoaded": true,
+      "logoutRevokedSession": true,
+      "destination": "/app"
+    },
+    {
+      "email": "auditor.a@roadsentinel.local",
+      "role": "auditor",
+      "passwordAccepted": true,
+      "enrolledInThisRun": false,
+      "refreshPreservedSession": true,
+      "dashboardDataLoaded": true,
+      "logoutRevokedSession": true,
+      "destination": "/app/audit"
+    },
+    {
+      "email": "operator.a@roadsentinel.local",
+      "role": "operator",
+      "passwordAccepted": true,
+      "enrolledInThisRun": false,
+      "refreshPreservedSession": true,
+      "dashboardDataLoaded": true,
+      "logoutRevokedSession": true,
+      "destination": "/app"
+    }
+  ],
+  "requests": [
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "POST",
+      "path": "/api/login",
+      "status": 401
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "POST",
+      "path": "/api/login",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "POST",
+      "path": "/api/auth/mfa/verify",
+      "status": 204
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/stream",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "POST",
+      "path": "/api/logout",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "POST",
+      "path": "/api/login",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "POST",
+      "path": "/api/auth/mfa/verify",
+      "status": 204
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/stream",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "POST",
+      "path": "/api/logout",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "role": "Administrator",
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "role": "Patrol",
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "role": "Patrol",
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "role": "Patrol",
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "role": "Patrol",
+      "method": "POST",
+      "path": "/api/login",
+      "status": 200
+    },
+    {
+      "role": "Patrol",
+      "method": "POST",
+      "path": "/api/auth/mfa/verify",
+      "status": 204
+    },
+    {
+      "role": "Patrol",
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "role": "Patrol",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "role": "Patrol",
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "role": "Patrol",
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "role": "Patrol",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "role": "Patrol",
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "role": "Patrol",
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "role": "Patrol",
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "role": "Patrol",
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "role": "Patrol",
+      "method": "GET",
+      "path": "/api/stream",
+      "status": 200
+    },
+    {
+      "role": "Patrol",
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "role": "Patrol",
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "role": "Patrol",
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "role": "Patrol",
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "role": "Patrol",
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "role": "Patrol",
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "role": "Patrol",
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "role": "Patrol",
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "role": "Patrol",
+      "method": "POST",
+      "path": "/api/logout",
+      "status": 200
+    },
+    {
+      "role": "Auditor",
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "role": "Auditor",
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "role": "Auditor",
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "role": "Auditor",
+      "method": "POST",
+      "path": "/api/login",
+      "status": 200
+    },
+    {
+      "role": "Auditor",
+      "method": "POST",
+      "path": "/api/auth/mfa/verify",
+      "status": 204
+    },
+    {
+      "role": "Auditor",
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "role": "Auditor",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "role": "Auditor",
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "role": "Auditor",
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "role": "Auditor",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "role": "Auditor",
+      "method": "GET",
+      "path": "/api/audit/chain",
+      "status": 200
+    },
+    {
+      "role": "Auditor",
+      "method": "GET",
+      "path": "/api/audit/chain",
+      "status": 200
+    },
+    {
+      "role": "Auditor",
+      "method": "POST",
+      "path": "/api/logout",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "POST",
+      "path": "/api/login",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "POST",
+      "path": "/api/auth/mfa/verify",
+      "status": 204
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/me",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/stream",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/cameras",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/meta",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "GET",
+      "path": "/api/stats",
+      "status": 200
+    },
+    {
+      "role": "Operator",
+      "method": "POST",
+      "path": "/api/logout",
+      "status": 200
+    }
+  ],
+  "errors": []
+}

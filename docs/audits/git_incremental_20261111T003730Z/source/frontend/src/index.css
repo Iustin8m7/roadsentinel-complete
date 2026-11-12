@@ -1,0 +1,428 @@
+@import 'tailwindcss';
+
+@font-face {
+  font-family: 'Geist';
+  src: url('/fonts/Geist-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('/fonts/GeistMono-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*
+ * ROADSENTINEL CYBERNETIC DISPATCH DESIGN SYSTEM
+ * Deep Void (#0A0E14) · Panel (#111821) · Elevation (#17202B) · Border (#1E2A36)
+ * Text: Primary (#E6EDF3) · Secondary (#7D8A9B)
+ * States: Critical (#FF3B3B) · Warning (#FF8A1F) · Caution (#FFC23D) · Action (#3DA5FF) · OK (#2ED47A)
+ */
+
+@theme {
+  --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-condensed: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
+
+  /* Login page tokens (names that do not clash with the dispatch theme) */
+  --color-bg: #0F1113;
+  --color-surface: #16191C;
+  --color-surface-2: #1D2125;
+  --color-text: #E8EAEC;
+  --color-text-faint: #6B7278;
+  --color-accent: #D8DEE4;
+  --color-focus: #7FA7D9;
+  --color-crit: #E5484D;
+  --color-high: #E58A3A;
+  --color-med: #D9B23F;
+  --color-info: #6E8FB8;
+
+  --color-void: #0A0E14;
+  --color-panel: #111821;
+  --color-elevation: #17202B;
+  --color-border: #1E2A36;
+  --color-border-subtle: #19232D;
+
+  --color-text-primary: #E6EDF3;
+  --color-text-secondary: #7D8A9B;
+  --color-text-muted: #536070;
+
+  --color-critical: #FF3B3B;
+  --color-warning: #FF8A1F;
+  --color-caution: #FFC23D;
+  --color-action: #3DA5FF;
+  --color-ok: #2ED47A;
+}
+
+:root {
+  --bg-void: #0A0E14;
+  --bg-panel: #111821;
+  --bg-elevation: #17202B;
+  --border-line: #1E2A36;
+  --text-primary: #E6EDF3;
+  --text-secondary: #7D8A9B;
+  --c-critical: #FF3B3B;
+  --c-warning: #FF8A1F;
+  --c-caution: #FFC23D;
+  --c-action: #3DA5FF;
+  --c-ok: #2ED47A;
+}
+
+/* Custom Scrollbar for sleek dark panels */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0A0E14;
+}
+::-webkit-scrollbar-thumb {
+  background: #1E2A36;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2E3E50;
+}
+
+/* Base styles */
+html, body {
+  background-color: #0A0E14;
+  color: #E6EDF3;
+  font-family: 'Geist', sans-serif;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Glow Utilities */
+.glow-primary {
+  box-shadow: 0 0 16px rgba(61, 165, 255, 0.4);
+}
+.glow-critical {
+  box-shadow: 0 0 18px rgba(255, 59, 59, 0.45);
+}
+.glow-warning {
+  box-shadow: 0 0 15px rgba(255, 138, 31, 0.35);
+}
+
+/* Video Player HUD bracket corners */
+.cctv-hud-frame {
+  position: relative;
+}
+.cctv-hud-frame::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 18px;
+  height: 18px;
+  border-top: 2px solid #3DA5FF;
+  border-left: 2px solid #3DA5FF;
+  pointer-events: none;
+  z-index: 10;
+}
+.cctv-hud-frame::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 18px;
+  height: 18px;
+  border-top: 2px solid #3DA5FF;
+  border-right: 2px solid #3DA5FF;
+  pointer-events: none;
+  z-index: 10;
+}
+.cctv-hud-bottom-left {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  width: 18px;
+  height: 18px;
+  border-bottom: 2px solid #3DA5FF;
+  border-left: 2px solid #3DA5FF;
+  pointer-events: none;
+  z-index: 10;
+}
+.cctv-hud-bottom-right {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 18px;
+  height: 18px;
+  border-bottom: 2px solid #3DA5FF;
+  border-right: 2px solid #3DA5FF;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Pulse animations */
+@keyframes redPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.4;
+  }
+}
+.animate-red-pulse {
+  animation: redPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes mapPing {
+  0% {
+    transform: scale(0.7);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+.animate-map-ping {
+  animation: mapPing 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* LEAFLET & IASI MAP TACTICAL STYLING */
+.leaflet-container {
+  background-color: #0A0E14 !important;
+  font-family: 'Geist', sans-serif !important;
+}
+
+.leaflet-control-zoom {
+  border: 1px solid #1E2A36 !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+}
+
+.leaflet-control-zoom a {
+  background-color: #111821 !important;
+  color: #E6EDF3 !important;
+  border-bottom: 1px solid #1E2A36 !important;
+  transition: all 0.2s ease !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background-color: #17202B !important;
+  color: #3DA5FF !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(10, 14, 20, 0.85) !important;
+  color: #7D8A9B !important;
+  font-family: 'Geist Mono', monospace !important;
+  font-size: 10px !important;
+  border-top-left-radius: 6px;
+  border: 1px solid #1E2A36;
+}
+
+.leaflet-control-attribution a {
+  color: #3DA5FF !important;
+  text-decoration: none !important;
+}
+
+.iasi-custom-popup .leaflet-popup-content-wrapper {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border-radius: 12px !important;
+}
+
+.iasi-custom-popup .leaflet-popup-content {
+  margin: 0 !important;
+  line-height: inherit !important;
+}
+
+.iasi-custom-popup .leaflet-popup-tip {
+  background: #111821 !important;
+  border: 1px solid #1E2A36 !important;
+  box-shadow: none !important;
+}
+
+/* Custom Marker Styling */
+.iasi-custom-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+.iasi-marker-wrapper {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iasi-camera-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #111821;
+  border: 2px solid #3DA5FF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.iasi-marker-wrapper:hover .iasi-camera-circle {
+  transform: scale(1.2);
+}
+
+.iasi-camera-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 14px;
+  height: 14px;
+  border-radius: 7px;
+  font-size: 9px;
+  font-weight: 700;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  border: 1px solid #111821;
+  z-index: 10;
+}
+
+.iasi-camera-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  padding: 2px 6px;
+  background: rgba(17, 24, 33, 0.95);
+  border: 1px solid #1E2A36;
+  border-radius: 4px;
+  color: #E6EDF3;
+  font-size: 10px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 20;
+}
+
+.iasi-marker-wrapper:hover .iasi-camera-tooltip {
+  opacity: 1;
+}
+
+/* 3 Concentric Pulsing Rings for Active Alert */
+.iasi-pulse-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  border: 2px solid #FF3B3B;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: iasiPulseRing 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+
+.iasi-ring-1 {
+  width: 32px;
+  height: 32px;
+  animation-delay: 0s;
+}
+
+.iasi-ring-2 {
+  width: 48px;
+  height: 48px;
+  animation-delay: 0.4s;
+}
+
+.iasi-ring-3 {
+  width: 64px;
+  height: 64px;
+  animation-delay: 0.8s;
+}
+
+@keyframes iasiPulseRing {
+  0% {
+    transform: translate(-50%, -50%) scale(0.6);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.6);
+    opacity: 0;
+  }
+}
+
+.iasi-pulse-label {
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 59, 59, 0.92);
+  color: #FFFFFF;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 10px rgba(255, 59, 59, 0.6);
+  z-index: 15;
+}
+
+/* OSM standard tiles turned into a dark tactical basemap */
+.rs-dark-tiles {
+  filter: invert(1) hue-rotate(195deg) brightness(0.78) contrast(0.95) saturate(0.35);
+}
+
+/* OSM standard tiles turned into a dark basemap (see IasiMap) */
+.rs-dark-tiles {
+  filter: invert(1) hue-rotate(195deg) brightness(0.78) contrast(0.95) saturate(0.35);
+}
+
+/* Printable activity report (StatsPage -> components/ActivityReport). When the report is in the
+   page, print keeps only the report: everything under #root that is neither the report nor one
+   of its ancestors is removed, and the ancestors lose the app-shell sizing and dark backgrounds.
+   No AppLayout class name is involved, so the sidebar and header go whatever they are called. */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 14mm;
+  }
+  html:has(.rs-print-report),
+  html:has(.rs-print-report) body,
+  html:has(.rs-print-report) #root {
+    height: auto !important;
+    overflow: visible !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+  #root:has(.rs-print-report) *:not(.rs-print-report):not(.rs-print-report *):not(:has(.rs-print-report)) {
+    display: none !important;
+  }
+  #root *:has(.rs-print-report) {
+    display: block !important;
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: #fff !important;
+  }
+  .rs-print-report {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

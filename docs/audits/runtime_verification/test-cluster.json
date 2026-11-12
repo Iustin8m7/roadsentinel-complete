@@ -1,0 +1,7 @@
+{
+  "root": "/tmp/rslogin-tests-e7z6iko0",
+  "port": 55481,
+  "user": "rslogin_testroot",
+  "stopped_at": "2026-11-10T13:14:37.364939+00:00",
+  "stopped_after_data_directory_identity_check": true
+}

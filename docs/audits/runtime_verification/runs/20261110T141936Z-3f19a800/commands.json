@@ -1,0 +1,19 @@
+[
+  {
+    "name": "pipeline",
+    "command": [
+      "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/bin/python",
+      "-m",
+      "pytest",
+      "tests",
+      "-o",
+      "addopts=",
+      "-q"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration",
+    "start": "2026-11-10T14:19:36.854058+00:00",
+    "end": "2026-11-10T14:19:44.338953+00:00",
+    "duration_s": 7.485,
+    "exit_code": 0
+  }
+]

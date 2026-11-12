@@ -1,0 +1,15 @@
+# Owned, physical UVC webcam profile. No URL, credentials, replay fallback or guessed geometry.
+# Enable only after connecting a camera and confirming local privacy/location requirements.
+id: local-uvc-camera
+name: "Local USB camera (operator configured)"
+video: device:0
+enabled: true
+start_time: "2026-11-07T00:00:00+02:00"
+location: "Operator configured"
+model: models/yolox_s.onnx
+source_timeout_s: 5
+source_fps: 30  # Capture pacing fallback only; observed source cadence is measured at runtime.
+rules: []       # Detection/tracking only until calibrated geometry and rules are configured.
+zones: []
+counting_lines: []
+thresholds: {}

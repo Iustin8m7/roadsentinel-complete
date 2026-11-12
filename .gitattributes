@@ -1,0 +1,12 @@
+* text=auto eol=lf
+*.png binary
+*.ico binary
+frontend/node_modules/@next/swc-linux-x64-musl/next-swc.linux-x64-musl.node filter=lfs diff=lfs merge=lfs -text
+frontend/node_modules/@next/swc-linux-x64-gnu/next-swc.linux-x64-gnu.node filter=lfs diff=lfs merge=lfs -text
+backend/.integration-evidence/offline-analysis/1376c728-c374-4e2f-997d-0d831da4cd04/12eea277-ce37-4a6e-9b8f-cac247c5e03a/source.rse filter=lfs diff=lfs merge=lfs -text
+backend/.integration-backups/notifications-20261111T234343Z-34c3fa1c/evidence/offline-analysis/1376c728-c374-4e2f-997d-0d831da4cd04/12eea277-ce37-4a6e-9b8f-cac247c5e03a/source.rse filter=lfs diff=lfs merge=lfs -text
+backend/.integration-backups/notifications-20261111T235006Z-8262212b/evidence/offline-analysis/1376c728-c374-4e2f-997d-0d831da4cd04/12eea277-ce37-4a6e-9b8f-cac247c5e03a/source.rse filter=lfs diff=lfs merge=lfs -text
+backend/.integration-backups/notifications-20261111T234520Z-3f74f147/evidence/offline-analysis/1376c728-c374-4e2f-997d-0d831da4cd04/12eea277-ce37-4a6e-9b8f-cac247c5e03a/source.rse filter=lfs diff=lfs merge=lfs -text
+backend/.integration-backups/notifications-20261111T235825Z-e3a81153/evidence/offline-analysis/1376c728-c374-4e2f-997d-0d831da4cd04/12eea277-ce37-4a6e-9b8f-cac247c5e03a/source.rse filter=lfs diff=lfs merge=lfs -text
+_runtime_snapshot/evidence/offline-analysis/1376c728-c374-4e2f-997d-0d831da4cd04/12eea277-ce37-4a6e-9b8f-cac247c5e03a/source.rse filter=lfs diff=lfs merge=lfs -text
+.venv.integration/lib/python3.12/site-packages/cv2/cv2.abi3.so filter=lfs diff=lfs merge=lfs -text

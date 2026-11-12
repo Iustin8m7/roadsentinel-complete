@@ -1,0 +1,434 @@
+[
+  {
+    "source_log": "/tmp/pytest-of-justin7m8/pytest-171/test_managed_replay_ack_previe0/worker.log",
+    "summary": {
+      "frames": 20,
+      "video_seconds": 9.8,
+      "processing_fps": 2.02,
+      "detections": 129,
+      "unique_tracks": 11,
+      "events": 0,
+      "tracks_by_class": {
+        "bus": 3,
+        "car": 4,
+        "truck": 4
+      },
+      "events_by_type": {},
+      "median_vehicle_speed_kmh": null,
+      "traffic": {
+        "total_crossings": 0,
+        "counts_by_line_lane_class": [],
+        "rolling_flow_per_minute": {
+          "window_seconds": 60,
+          "total": 0.0,
+          "by_class": {},
+          "by_direction": {},
+          "by_line": {}
+        }
+      },
+      "source": {
+        "kind": "network",
+        "transport": "http_video",
+        "state": "healthy",
+        "last_frame_age_s": 0.47,
+        "width": 1920,
+        "height": 1080,
+        "frames": 20,
+        "failures": 0,
+        "reconnects": 0
+      },
+      "detector": "YOLOX-S ONNX / Supervision ByteTrack",
+      "model_sha256": "c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063",
+      "device": "CPUExecutionProvider",
+      "inference_latency_ms_p50": 91.7,
+      "inference_latency_ms_p95": 116.83,
+      "inference_latency_ms_p99": 126.59,
+      "process_peak_rss_mb": 344.0,
+      "detection_log": null
+    }
+  },
+  {
+    "source_log": "/tmp/pytest-of-justin7m8/pytest-171/test_managed_replay_ack_previe0/worker.log",
+    "summary": {
+      "frames": 15,
+      "video_seconds": 5.2,
+      "processing_fps": 1.2,
+      "detections": 122,
+      "unique_tracks": 13,
+      "events": 0,
+      "tracks_by_class": {
+        "bus": 4,
+        "car": 4,
+        "truck": 5
+      },
+      "events_by_type": {},
+      "median_vehicle_speed_kmh": null,
+      "traffic": {
+        "total_crossings": 0,
+        "counts_by_line_lane_class": [],
+        "rolling_flow_per_minute": {
+          "window_seconds": 60,
+          "total": 0.0,
+          "by_class": {},
+          "by_direction": {},
+          "by_line": {}
+        }
+      },
+      "source": {
+        "kind": "network",
+        "transport": "http_video",
+        "state": "healthy",
+        "last_frame_age_s": 0.53,
+        "width": 1920,
+        "height": 1080,
+        "frames": 15,
+        "failures": 3,
+        "reconnects": 3
+      },
+      "detector": "YOLOX-S ONNX / Supervision ByteTrack",
+      "model_sha256": "c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063",
+      "device": "CPUExecutionProvider",
+      "inference_latency_ms_p50": 83.09,
+      "inference_latency_ms_p95": 94.62,
+      "inference_latency_ms_p99": 95.75,
+      "process_peak_rss_mb": 345.4,
+      "detection_log": null
+    }
+  },
+  {
+    "source_log": "/tmp/pytest-of-justin7m8/pytest-171/test_managed_replay_ack_previe0/worker.log",
+    "summary": {
+      "frames": 9,
+      "video_seconds": 3.6,
+      "processing_fps": 2.35,
+      "detections": 67,
+      "unique_tracks": 12,
+      "events": 0,
+      "tracks_by_class": {
+        "bus": 3,
+        "car": 4,
+        "truck": 5
+      },
+      "events_by_type": {},
+      "median_vehicle_speed_kmh": null,
+      "traffic": {
+        "total_crossings": 0,
+        "counts_by_line_lane_class": [],
+        "rolling_flow_per_minute": {
+          "window_seconds": 60,
+          "total": 0.0,
+          "by_class": {},
+          "by_direction": {},
+          "by_line": {}
+        }
+      },
+      "source": {
+        "kind": "network",
+        "transport": "http_video",
+        "state": "healthy",
+        "last_frame_age_s": 0.53,
+        "width": 1920,
+        "height": 1080,
+        "frames": 9,
+        "failures": 0,
+        "reconnects": 0
+      },
+      "detector": "YOLOX-S ONNX / Supervision ByteTrack",
+      "model_sha256": "c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063",
+      "device": "CPUExecutionProvider",
+      "inference_latency_ms_p50": 85.26,
+      "inference_latency_ms_p95": 95.14,
+      "inference_latency_ms_p99": 96.3,
+      "process_peak_rss_mb": 344.2,
+      "detection_log": null
+    }
+  },
+  {
+    "source_log": "/tmp/pytest-of-justin7m8/pytest-current/test_managed_replay_ack_previe0/worker.log",
+    "summary": {
+      "frames": 20,
+      "video_seconds": 10.0,
+      "processing_fps": 2.05,
+      "detections": 124,
+      "unique_tracks": 11,
+      "events": 0,
+      "tracks_by_class": {
+        "bus": 5,
+        "truck": 5,
+        "car": 1
+      },
+      "events_by_type": {},
+      "median_vehicle_speed_kmh": null,
+      "traffic": {
+        "total_crossings": 0,
+        "counts_by_line_lane_class": [],
+        "rolling_flow_per_minute": {
+          "window_seconds": 60,
+          "total": 0.0,
+          "by_class": {},
+          "by_direction": {},
+          "by_line": {}
+        }
+      },
+      "source": {
+        "kind": "network",
+        "transport": "http_video",
+        "state": "healthy",
+        "last_frame_age_s": 0.53,
+        "width": 1920,
+        "height": 1080,
+        "frames": 20,
+        "failures": 0,
+        "reconnects": 0
+      },
+      "detector": "YOLOX-S ONNX / Supervision ByteTrack",
+      "model_sha256": "c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063",
+      "device": "CPUExecutionProvider",
+      "inference_latency_ms_p50": 89.56,
+      "inference_latency_ms_p95": 119.49,
+      "inference_latency_ms_p99": 135.29,
+      "process_peak_rss_mb": 346.6,
+      "detection_log": null
+    }
+  },
+  {
+    "source_log": "/tmp/pytest-of-justin7m8/pytest-current/test_managed_replay_ack_previe0/worker.log",
+    "summary": {
+      "frames": 13,
+      "video_seconds": 4.8,
+      "processing_fps": 0.65,
+      "detections": 105,
+      "unique_tracks": 13,
+      "events": 0,
+      "tracks_by_class": {
+        "bus": 6,
+        "car": 2,
+        "truck": 5
+      },
+      "events_by_type": {},
+      "median_vehicle_speed_kmh": null,
+      "traffic": {
+        "total_crossings": 0,
+        "counts_by_line_lane_class": [],
+        "rolling_flow_per_minute": {
+          "window_seconds": 60,
+          "total": 0.0,
+          "by_class": {},
+          "by_direction": {},
+          "by_line": {}
+        }
+      },
+      "source": {
+        "kind": "network",
+        "transport": "http_video",
+        "state": "healthy",
+        "last_frame_age_s": 0.57,
+        "width": 1920,
+        "height": 1080,
+        "frames": 13,
+        "failures": 4,
+        "reconnects": 4
+      },
+      "detector": "YOLOX-S ONNX / Supervision ByteTrack",
+      "model_sha256": "c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063",
+      "device": "CPUExecutionProvider",
+      "inference_latency_ms_p50": 83.75,
+      "inference_latency_ms_p95": 106.76,
+      "inference_latency_ms_p99": 116.65,
+      "process_peak_rss_mb": 340.9,
+      "detection_log": null
+    }
+  },
+  {
+    "source_log": "/tmp/pytest-of-justin7m8/pytest-current/test_managed_replay_ack_previe0/worker.log",
+    "summary": {
+      "frames": 10,
+      "video_seconds": 3.9,
+      "processing_fps": 2.49,
+      "detections": 71,
+      "unique_tracks": 12,
+      "events": 0,
+      "tracks_by_class": {
+        "bus": 3,
+        "car": 4,
+        "truck": 5
+      },
+      "events_by_type": {},
+      "median_vehicle_speed_kmh": null,
+      "traffic": {
+        "total_crossings": 0,
+        "counts_by_line_lane_class": [],
+        "rolling_flow_per_minute": {
+          "window_seconds": 60,
+          "total": 0.0,
+          "by_class": {},
+          "by_direction": {},
+          "by_line": {}
+        }
+      },
+      "source": {
+        "kind": "network",
+        "transport": "http_video",
+        "state": "healthy",
+        "last_frame_age_s": 0.41,
+        "width": 1920,
+        "height": 1080,
+        "frames": 10,
+        "failures": 0,
+        "reconnects": 0
+      },
+      "detector": "YOLOX-S ONNX / Supervision ByteTrack",
+      "model_sha256": "c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063",
+      "device": "CPUExecutionProvider",
+      "inference_latency_ms_p50": 84.75,
+      "inference_latency_ms_p95": 98.46,
+      "inference_latency_ms_p99": 102.29,
+      "process_peak_rss_mb": 336.5,
+      "detection_log": null
+    }
+  },
+  {
+    "source_log": "/tmp/pytest-of-justin7m8/pytest-173/test_managed_replay_ack_previe0/worker.log",
+    "summary": {
+      "frames": 20,
+      "video_seconds": 10.0,
+      "processing_fps": 2.05,
+      "detections": 124,
+      "unique_tracks": 11,
+      "events": 0,
+      "tracks_by_class": {
+        "bus": 5,
+        "truck": 5,
+        "car": 1
+      },
+      "events_by_type": {},
+      "median_vehicle_speed_kmh": null,
+      "traffic": {
+        "total_crossings": 0,
+        "counts_by_line_lane_class": [],
+        "rolling_flow_per_minute": {
+          "window_seconds": 60,
+          "total": 0.0,
+          "by_class": {},
+          "by_direction": {},
+          "by_line": {}
+        }
+      },
+      "source": {
+        "kind": "network",
+        "transport": "http_video",
+        "state": "healthy",
+        "last_frame_age_s": 0.53,
+        "width": 1920,
+        "height": 1080,
+        "frames": 20,
+        "failures": 0,
+        "reconnects": 0
+      },
+      "detector": "YOLOX-S ONNX / Supervision ByteTrack",
+      "model_sha256": "c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063",
+      "device": "CPUExecutionProvider",
+      "inference_latency_ms_p50": 89.56,
+      "inference_latency_ms_p95": 119.49,
+      "inference_latency_ms_p99": 135.29,
+      "process_peak_rss_mb": 346.6,
+      "detection_log": null
+    }
+  },
+  {
+    "source_log": "/tmp/pytest-of-justin7m8/pytest-173/test_managed_replay_ack_previe0/worker.log",
+    "summary": {
+      "frames": 13,
+      "video_seconds": 4.8,
+      "processing_fps": 0.65,
+      "detections": 105,
+      "unique_tracks": 13,
+      "events": 0,
+      "tracks_by_class": {
+        "bus": 6,
+        "car": 2,
+        "truck": 5
+      },
+      "events_by_type": {},
+      "median_vehicle_speed_kmh": null,
+      "traffic": {
+        "total_crossings": 0,
+        "counts_by_line_lane_class": [],
+        "rolling_flow_per_minute": {
+          "window_seconds": 60,
+          "total": 0.0,
+          "by_class": {},
+          "by_direction": {},
+          "by_line": {}
+        }
+      },
+      "source": {
+        "kind": "network",
+        "transport": "http_video",
+        "state": "healthy",
+        "last_frame_age_s": 0.57,
+        "width": 1920,
+        "height": 1080,
+        "frames": 13,
+        "failures": 4,
+        "reconnects": 4
+      },
+      "detector": "YOLOX-S ONNX / Supervision ByteTrack",
+      "model_sha256": "c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063",
+      "device": "CPUExecutionProvider",
+      "inference_latency_ms_p50": 83.75,
+      "inference_latency_ms_p95": 106.76,
+      "inference_latency_ms_p99": 116.65,
+      "process_peak_rss_mb": 340.9,
+      "detection_log": null
+    }
+  },
+  {
+    "source_log": "/tmp/pytest-of-justin7m8/pytest-173/test_managed_replay_ack_previe0/worker.log",
+    "summary": {
+      "frames": 10,
+      "video_seconds": 3.9,
+      "processing_fps": 2.49,
+      "detections": 71,
+      "unique_tracks": 12,
+      "events": 0,
+      "tracks_by_class": {
+        "bus": 3,
+        "car": 4,
+        "truck": 5
+      },
+      "events_by_type": {},
+      "median_vehicle_speed_kmh": null,
+      "traffic": {
+        "total_crossings": 0,
+        "counts_by_line_lane_class": [],
+        "rolling_flow_per_minute": {
+          "window_seconds": 60,
+          "total": 0.0,
+          "by_class": {},
+          "by_direction": {},
+          "by_line": {}
+        }
+      },
+      "source": {
+        "kind": "network",
+        "transport": "http_video",
+        "state": "healthy",
+        "last_frame_age_s": 0.41,
+        "width": 1920,
+        "height": 1080,
+        "frames": 10,
+        "failures": 0,
+        "reconnects": 0
+      },
+      "detector": "YOLOX-S ONNX / Supervision ByteTrack",
+      "model_sha256": "c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063",
+      "device": "CPUExecutionProvider",
+      "inference_latency_ms_p50": 84.75,
+      "inference_latency_ms_p95": 98.46,
+      "inference_latency_ms_p99": 102.29,
+      "process_peak_rss_mb": 336.5,
+      "detection_log": null
+    }
+  }
+]

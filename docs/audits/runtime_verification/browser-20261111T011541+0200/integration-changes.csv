@@ -1,0 +1,87 @@
+file,status,purpose,sha256
+.gitignore,modified,"Exclude private runtime, credentials/authenticators/backups and dedicated virtualenv",83b5e8ff6395c102895b763679144bd2ae30be5c11f71840cb5cca3afed55acf
+.venv.integration/,new dedicated dependency environment,new dedicated dependency environment,private or generated tree; omitted
+API.md,modified,Canonical auth/promotion and approved counting-line/worker privilege contracts,d0232f68ac26ad926533f7be9a4b85096ee87f199b1cc2b1b43c9fff794d7700
+README.md,modified,Replace stale native login/managed-flow assertions with fresh scoped browser evidence,8216c7a74527c46be2563513e65e486787e6f5af7ca2954b280b69d06ab31362
+backend/.integration-authenticators/,new private real MFA enrollment/phone QR/recovery artifacts;0700/0600,new private real MFA enrollment/phone QR/recovery artifacts;0700/0600,private or generated tree; omitted
+backend/.integration-backups/,new private verified backup/restore/rollback evidence;0700/0600,new private verified backup/restore/rollback evidence;0700/0600,private or generated tree; omitted
+backend/.integration-runtime/,new private integration-owned process state/logs,new private integration-owned process state/logs,private or generated tree; omitted
+backend/.integration-test-credentials.json,verification metadata updated; password unchanged;0600,Regression or actual browser/model journey coverage,a0bdb84b57557a8e5063220b415ad393ee4b302a7422e1983263cdc9b6a15158
+backend/alembic/versions/0022_narrow_lookup_owner.py,created,Additive narrow NOLOGIN lookup-owner migration,edf730324cacb705bcf46ebc4de882319cea1dbe9847f2900a900a2df3e3c79a
+backend/app/cli.py,modified,Partial/idempotent dev initialization; preserve existing account credentials/MFA,2b036e8c9cea58f896845a9ba98fba0580260e7f9e5096e1efea64c650a0ffd2
+backend/app/core/audit.py,modified,Audit action for authenticated security configuration repair,e3fc68f73ce0817bfedc438899157597fba9191d1b4d7dc18b59f5cab3c17594
+backend/app/services/camera_config.py,added or updated in browser mission,Validate approved count lines and maintain legacy omission semantics,ef6eb643eff8487d031154b1f78c8d7a0ae1efd1cf16c4484f76601ee649795b
+backend/app/services/camera_workers.py,modified,Allowlist inference child environment; private scratch; real supervised Start/Stop,db0f210d85799302798f189a07aac7d68bbeaa121a6d633e827e49ec8a18d030
+backend/app/services/lookup_roles.py,created,Identifier-only pre-tenant lookup ownership with column-limited grants,2cd1b769b72d8c0916f93497920a4b14e3d8ff04ba2bf817fb89911eb089e299
+backend/app/services/offline_analysis.py,added or updated in browser mission,Anchor sampling to source PTS slots; preserve requested cadence/output duration,ae6d27df1fe46b4bf9020cbba2080b07b48db8612f2a6f09e9fd26c9ce04f286
+backend/app/services/seed.py,modified,Partial/idempotent dev initialization; preserve existing account credentials/MFA,2bd3c83ef0fa8dcd11c15bb89502a3afc2c2d83d8c18bb78d5e7a4f9a54ac6c5
+backend/tests/camera_browser.py,created,Owned browser harness with private per-role authenticated session reuse,5b81817170788b8e84ff3109ec4370db8122849bbe8938c5f80ca457724da7ad
+backend/tests/conftest.py,added or updated in browser mission,Hide fixture MFA/password from failure repr; preserve genuine auth fixtures,70ccebe0644bfdadc9becff778fd088df391584a50aed4caeaf266c2fa269ff5
+backend/tests/test_browser_complete_journey.py,added or updated in browser mission,"Actual browser moving upload, synthetic promotion, case/export and OS restart",3a8397c64c7a44e07256a2df5afdcea7a74d1f3eaeb045c9e19ae8ce87848f0c
+backend/tests/test_lookup_ownership.py,created,Regression or actual browser/model journey coverage,f18699b5075b8a6e9368e4346417121b19b87b5dad939ccb21a8a0b3800d41a3
+backend/tests/test_managed_live_runtime.py,modified,Browser config/reviewer/Start/ACK/event/recovery/rollback/disable real worker,9302c653b7d6eac3f6bc5286da4b4f23a091b045ac8cdff71a33ed703459c5b2
+backend/tests/test_mission_vertical.py,modified,Regression or actual browser/model journey coverage,28ab58c13b4092c188c38b39f0dba3c328b3c6c8280d9c32e38da1091244ad0e
+docs/audits/ACTUAL_BROWSER_LOGIN_EVIDENCE.md,created,Actual existing-browser login evidence — PASS,9fd73e5a2c053ba15e2d71d8bba5e2a38fe06635f1f2c9e61d00755cce99ec82
+docs/audits/ARCHITECTURE_AND_CONTRACT_MAP.md,modified,Architecture and contract map,cd209d2dd7cab9e863a6aa7cfbaf7772882c8a15a464c2b40c3f5d1c9c9eeb22
+docs/audits/FEATURE_1_REAL_BROWSER_E2E.md,added or updated in browser mission,"Dated current browser acceptance, commands, honest scope or residual implementation handoff",708334e4d86a400a54ddb2f6c26e48af34ea5060372b43696b29e147ba647a0c
+docs/audits/FEATURE_2_REAL_BROWSER_E2E.md,added or updated in browser mission,"Dated current browser acceptance, commands, honest scope or residual implementation handoff",eb2ef97564c22ff900e48216b2d98bae40d2aed42cacd30cfa1e544ef10a812a
+docs/audits/FINAL_BROWSER_HANDOFF.md,added or updated in browser mission,"Dated current browser acceptance, commands, honest scope or residual implementation handoff",9d78cd0f396afdd4db9aad01936c345582c5777bf1edfc0f1ada48c5525f80c3
+docs/audits/FINAL_ENGINEERING_HANDOFF.md,modified,Final engineering handoff — existing login recovered,7397d4906073ea99ff51e2b73615bd6c8785871ac58b47b6b9fe8a0a71143927
+docs/audits/FINAL_LOGIN_HANDOFF.md,created,Verified existing login — YES,37fb3c1dcb74953d8836f893f8250573a4978a950a5ccf16834641be7a076014
+docs/audits/FULL_INTEGRATION_E2E_VALIDATION.md,created,Full integration E2E validation — observed scope,9edf060f30f3318582c2056276c379972bcd490b2072c486120cedcc05f637c0
+docs/audits/FUTURE_FEATURE_IMPLEMENTATION_PROMPTS.md,modified,"Dated current browser acceptance, commands, honest scope or residual implementation handoff",52b72184cf36b7ab05ea0c09cc82eb050a130e2d063ef1a743a6d401e691d93d
+docs/audits/INTEGRATED_BROWSER_DEMO_RUNBOOK.md,modified,Isolated native runbook,87bca4710a10c6d870142e7624c65745c9cb4da55a34cda1eb2dd979b7c30900
+docs/audits/INTEGRATED_LOGIN_RECOVERY_REPORT.md,created,Existing integration login recovery — VERIFIED,aeee2f377784937db4754894627936194e5defcc502357c53276c55684f1418b
+docs/audits/ISSUES_AND_UNVERIFIED_EVIDENCE.md,modified,"Dated current browser acceptance, commands, honest scope or residual implementation handoff",3f34e57afe9efa1bc91fc18ae563b57b59f8cb3d7eb9e8342a80561e76980129
+docs/audits/MISSION_CHECKPOINT.md,modified,Execution documentation,50275bde712cbac54b08c18fa0783587fc1607fe1194593a5d3852332958dfe0
+docs/audits/OPERATOR_DEMO_QUICKSTART.md,created,Operator demo quickstart — existing login verified,d0d3150169f991c4d643b1eb7f1fd3c1ae1cd5129db7cb28a96ba182f0ea5c43
+docs/audits/POST_INTEGRATION_README_AUDIT_AFTER.md,modified,Post-integration README audit — after runtime recovery,dd47c63eb83c8677a6087239e74178c7a54f43626855313d4786456890f08152
+docs/audits/POST_INTEGRATION_RUNTIME_VERIFICATION.md,created,Existing integration runtime verification,778801f13bdf0e121f3740a608fd5cee68eb7c16e627bda04e45edf7eccf5dc5
+docs/audits/PRE-FLIGHT.md,modified,Pre-flight,4e403979d2dfaf4cd16b2566cdef3f5c9ed6ea415c0c1de8576deb138836c81f
+docs/audits/README_COVERAGE_MATRIX.csv,modified,modified,8011a31ac4712c1e2db9bbfc32ca8226dbd8980cad49b2338458b89dced9b811
+docs/audits/README_COVERAGE_UPDATE.md,added or updated in browser mission,"Dated current browser acceptance, commands, honest scope or residual implementation handoff",d40affa5dc23e679f9e8aa00a004b3fe01c833b17032bb6a2526bee13efe4d83
+docs/audits/REAL_BROWSER_AUTH_MFA_VERIFICATION.md,added or updated in browser mission,"Dated current browser acceptance, commands, honest scope or residual implementation handoff",a3761021df4771f465ef7b7daac02e928d6bbf070f47c7d71cd700098b64bd18
+docs/audits/REMAINING_FEATURES_MASTER_BACKLOG.md,modified,"Dated current browser acceptance, commands, honest scope or residual implementation handoff",327fd4edba177969a117425e2ba4eb4ca0574c7dab0372e1f0b344fc073d532e
+docs/audits/SECURITY_PRIVACY_REGRESSION.md,modified,"Dated current browser acceptance, commands, honest scope or residual implementation handoff",8de9a4c7de85d508438b34a40f8df40af7ce23f563348243fa5ec48feb7f2094
+docs/audits/TEST_EXECUTION_LEDGER.md,modified,"Current execution — existing login recovered, 2026-11-10",674d8f3d668f9326cc7838a83b7b388279ace2933f9e52a5f10c969c97ccc70a
+docs/audits/TEST_EXECUTION_LEDGER_UPDATED.md,added or updated in browser mission,"Dated current browser acceptance, commands, honest scope or residual implementation handoff",2870656a51d9db134d5723f3812f5be7e29368f32a4da8f09737ef5f02b0ac64
+docs/audits/TOP_TWO_FEATURE_ACCEPTANCE.md,modified,"Dated current browser acceptance, commands, honest scope or residual implementation handoff",53b8313bb994399dcc187e5228a91287dc30354033338e9809046ee436d6dff7
+docs/audits/runtime_verification/,new nonsecret execution evidence/logs/screenshots/builds/checkpoint,new nonsecret execution evidence/logs/screenshots/builds/checkpoint,private or generated tree; omitted
+docs/implementation/FEATURE_01_AI_INCIDENT_TO_OPERATOR.md,modified,Recorded AI candidate to operator review,1328e0a69a7fdecc589119f0e2e8055b8b1ef076f1cfecf972b2e3b41ee81cec
+docs/implementation/FEATURE_02_AUTHORIZED_LIVE_CAMERA.md,modified,Authorized camera control to real inference,1843d733231c19a23210f64df306d2d14bb2ee0357201b21a9746932fbcff0a5
+frontend/e2e/camera-control-runtime.mjs,created,"Real admin/reviewer camera control, Start, preview, health, rollback, disable",23da132771ce1ce98c810870a50d83e0f6156f49e80d6039fddd58539427cc2e
+frontend/e2e/complete-recorded.mjs,added or updated in browser mission,Real two-role recorded upload-to-package/browser persistence assertions,8a4af58e923116eb8a89b584699a22fed69749661c357b37ee65e50940514ded
+frontend/e2e/live-login-recovery.mjs,created,Native integration four-role MFA/RBAC/refresh/logout proof without secrets,09eb3140011801603b73738421a30b7d85c09e979841eae9ab13fa69d76eaf85
+frontend/e2e/mission-review.mjs,modified,Regression or actual browser/model journey coverage,055fa2f4c6471a182245b977677b8f8b846acdfe49f9666802e3b5cc2018b1fe
+frontend/src/components/OfflinePromotion.tsx,added or updated in browser mission,Explicit synthetic-positive operator promotion checkbox,3edb32a44e0e2135e11278737a6f69fd945d949d7b01f1dbd90aad74b59414a4
+frontend/src/components/guards.tsx,modified,Correct role/permission navigation and protected request behavior,e60cbd36b4833e5f0919137720ff52ef4e4dc88c749e41a26296e052121f9a35
+frontend/src/hooks/index.ts,modified,Correct role/permission navigation and protected request behavior,548a84d775121267aa2949b494eed9ffe2123da5b491bf43cfccd4bca2cbbac9
+frontend/src/lib/adapters.test.ts,added or updated in browser mission,Provenance and honest redaction/source badge regressions,0ad6f1a7995f81a8e1db9edafdbc5f21448f00d922573a78fcd1a1cc412b3e00
+frontend/src/lib/adapters.ts,added or updated in browser mission,Preserve independent source/synthetic/redaction labels,547d2456f70d7bfd2437d21e30b02be4ad1dacec6b68971907b187e80e9a5587
+frontend/src/lib/constants.ts,modified,Correct role/permission navigation and protected request behavior,fc9235f7ed75554d643fa4a02dc8b466ea17ed2eba5c35e7491e5d309ba1c636
+frontend/src/lib/permissions.test.ts,created,Regression or actual browser/model journey coverage,50e522b4de05a5b19da6b9bff5b3d7da0ce7a5a677de75abde3e73bab5e541ee
+frontend/src/lib/permissions.ts,modified,Correct role/permission navigation and protected request behavior,fe942d2c65b2e5a38c2982a81a37e1b3d28220c8a335b31d77bccea743d50d38
+frontend/src/pages/DashboardPage.tsx,modified,Role-appropriate API loading and correct empty-tenant dashboard completion,98a6bd7bcfcf3f44a6517a4280b8b75447701df7cad008d9901b7633142bb432
+frontend/src/pages/LoginPage.tsx,modified,"Real backend identity, MFA enrollment recovery acknowledgement and session transition",c3563516778524cb0ba405d7c55e4edc102ccbd20feb49d62eb06582446218b4
+frontend/src/store/auth.test.ts,modified,Regression or actual browser/model journey coverage,a8aea9000d64e47bd27346f049ee87272c819e45b1262e051bc425dfcf62d689
+frontend/src/store/auth.ts,modified,"Real backend identity, MFA enrollment recovery acknowledgement and session transition",3f2625e1d442f03f487e61730c2dafe2c65f0a47668c8bff1e8167ad92ce3db8
+frontend/src/store/data.ts,modified,Role-appropriate API loading and correct empty-tenant dashboard completion,4521a08a3e27f2b026c8626389624c6d5581a3eb68d5dbab29154ed8a99c4904
+frontend/src/store/mock-auth.ts,modified,"Real backend identity, MFA enrollment recovery acknowledgement and session transition",35451a451deca76a54498129affa7f98e69de21331f42d3ef563693264f9aaf9
+frontend/src/types/index.ts,modified,Correct role/permission navigation and protected request behavior,3bb7e0b02e4c1ccf6fa7f9c5011c02386c634b6b5304261a70a1b046d58a3cdf
+requirements.integration-test.txt,modified,Regression or actual browser/model journey coverage,066565ce334eb75d4b7c3a6ae4e7a30dccae1303402b607b5ce1750e225a3d18
+roadsentinel/live.py,added or updated in browser mission,Bounded queue shutdown cancels queued retries on control loss,39111f11120815d5853f36b3e5d0d5b57a40c70624ea0801723dac9a820c3e06
+roadsentinel/media.py,added or updated in browser mission,Resolve media keys within private pipeline work directory,00c04dbbdab62cb586b6d659677a7498b623e2e0d5a37cce629f61e500978a8a
+roadsentinel/models.py,modified,Explicit verified readonly stock-model location without download/fallback,7fe72f108e20ff36d1a2e453db49a3af7f14ceb00bac5d27a68e23052d4e14b8
+roadsentinel/pipeline.py,modified,"Synthetic disclosure, managed count lines and private staging root; immediate control stop",4ba9344be11fca1069057d196223048bfb30f1f9404be91e4097fbc52cfadea5
+roadsentinel/remote_config.py,modified,Apply approved counting lines; bounded heartbeat and lease release,802f068977991dc51144ea779c30341b7f6bbf1d6dbcd05b2128304410868457
+scripts/check_docs.py,modified,Validate archived report links using their preserved original base,ecbfb2e4e8d1d4cb055bb2f3ca44b0795f9979c933180e4a8e5fb3608e781167
+scripts/integration-dev.py,created,Loopback integration startup/verified PID restart with explicit proxy and isolated Python,97d3d3141abb514b829cfec1516f4eb65d6978459606899808b27580ebb7008d
+scripts/integration_totp.py,created,Compute actual enrolled development TOTP from private0600 authenticator,3416991d8e3e73809aa558debac8618cf0065aaf6594082b30e9f75626cd8090
+scripts/prepare-browser-fixtures.py,added or updated in browser mission,Hash-verified licensed moving/synthetic small fixtures; idempotent no replacement,ee8c876c2bd7444816c2440a5a8f3068fefda5532d8bd9c8325582f7cbd19a36
+scripts/recover_integration_login.py,created,Guarded native recovery inspection/backup/isolated restore/rehearsal/apply,763d5978d0674987643023c220cce6fd78ad9456f89a2fb0740e886f64445aba
+scripts/repair-integration-dev-auth.sh,modified,Guarded native recovery inspection/backup/isolated restore/rehearsal/apply,9b518454408f9754ec9342decd9fdde748acfbcdc650a122c6595377ec00e507
+scripts/verify-integration.py,created,Owned guarded disposable suite orchestration including focused auth,10347c881c7c93120b3c77899306b546eb2adb8be6d9a7e2a536d3f67b2031db
+secure-pwa/vite.config.ts,modified,Existing PWA Vite configuration formatting correction,e881c5e5d81350e1e040910af0c38efb58ef298ce4dd31f2d04757d6d2d811e2
+tests/test_camera_workers.py,added or updated in browser mission,Assert idempotent real process lifecycle and no backend secrets inherited,463d175e64cba636172d13750694baac70cb8f696aefa9c9992ffc1623724886
+tests/test_counting_config.py,added or updated in browser mission,Validate/reconcile approved count lines and malformed geometry,9eebb5eefd4760174105650490721d1541b3dcdf74bff4133a892818707637ee
+tests/test_models.py,modified,Regression or actual browser/model journey coverage,e0b7b244444ed3c36cf2718585459d444d07ee71d4bf5b21d71b8a6c6bd0844a

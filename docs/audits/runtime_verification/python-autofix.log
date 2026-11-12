@@ -1,0 +1,22 @@
+backend/app/services/lookup_roles.py:39:101: E501 Line too long (108 > 100)
+backend/app/services/lookup_roles.py:46:101: E501 Line too long (110 > 100)
+backend/app/services/lookup_roles.py:52:101: E501 Line too long (151 > 100)
+backend/app/services/lookup_roles.py:104:101: E501 Line too long (125 > 100)
+backend/tests/test_lookup_ownership.py:15:101: E501 Line too long (176 > 100)
+backend/tests/test_lookup_ownership.py:20:101: E501 Line too long (122 > 100)
+backend/tests/test_lookup_ownership.py:25:101: E501 Line too long (112 > 100)
+backend/tests/test_lookup_ownership.py:40:101: E501 Line too long (110 > 100)
+backend/tests/test_managed_live_runtime.py:213:16: S603 `subprocess` call: check for execution of untrusted input
+backend/tests/test_managed_live_runtime.py:256:21: S603 `subprocess` call: check for execution of untrusted input
+backend/tests/test_managed_live_runtime.py:287:16: S603 `subprocess` call: check for execution of untrusted input
+backend/tests/test_managed_live_runtime.py:321:101: E501 Line too long (132 > 100)
+backend/tests/test_managed_live_runtime.py:326:13: SIM105 Use `contextlib.suppress(OSError)` instead of `try`-`except`-`pass`
+backend/tests/test_managed_live_runtime.py:359:101: E501 Line too long (109 > 100)
+backend/tests/test_managed_live_runtime.py:388:16: S603 `subprocess` call: check for execution of untrusted input
+backend/tests/test_managed_live_runtime.py:430:101: E501 Line too long (146 > 100)
+scripts/integration-dev.py:1:1: EXE001 Shebang is present but file is not executable
+scripts/recover_integration_login.py:1:1: EXE001 Shebang is present but file is not executable
+scripts/recover_integration_login.py:82:17: PLW1510 `subprocess.run` without explicit `check` argument
+scripts/recover_integration_login.py:93:18: RUF059 Unpacked variable `creds` is never used
+Found 29 errors (9 fixed, 20 remaining).
+2 unsafe fixes available with `--fix --unsafe-fixes`.

@@ -1,0 +1,3 @@
+Verified integration identity: ('rsint_20261110b', '127.0.0.1', 55446, 'rsint_root_261110') system identifier: 7706309627307635180
+Current lookup owner: rsint_app_261110b__lookup tenant/user counts: (3, 9)
+INSPECTION ONLY. --apply first creates and verifies a backup by isolated restore.

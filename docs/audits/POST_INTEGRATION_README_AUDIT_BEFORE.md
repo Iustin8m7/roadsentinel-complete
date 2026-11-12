@@ -1,0 +1,942 @@
+# Post-integration README audit — before
+
+Inventory timestamp: 2026-11-10T00:14:14.631160+00:00. Every paragraph/table/command block in the current README and its directly linked local documents is retained below. An inventory entry is not a passed acceptance test. Historical performance statements are unverified in this execution.
+
+## Confirmed integration gaps
+
+- Offline candidates: backend/app/api/offline_analytics.py:388 returns review-only provenance; no promotion route.
+- Worker: roadsentinel/pipeline.py has no control-plane desired-config/ACK calls; backend/app/api/camera_worker.py exposes these but no matching pipeline adapter.
+- Historical auth repair exists in app/services/seed.py and LoginPage.tsx. Its privileged owner-role repair has not been run by this mission.
+- Vite runtime proxy is correct on port 5175; default fallback 8000 remains intended for generic development.
+- Existing integration service identity: cwd backend under this workspace; app database rsint_20261110b on loopback 55446. No write authorization is inferred from a health response.
+
+## Source inventory and individual criteria
+
+### REQ-0001 — README.md:3-3
+RoadSentinel: AI traffic-camera monitoring that sends evidence-backed alerts to police operators and patrols. Hackathon project / prototype: see [docs/LIMITS.md](../LIMITS.md) for what is and is not validated.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0002 — README.md:7-10
+What it does: 1. **Camera processing.** A YOLO detector with tracking can process configured camera sources and compute speed, hard braking, lane changes, and following distance. The code path exists, but the model has not been validated on representative authorized footage; see [docs/LIMITS.md](../LIMITS.md). 2. **Configurable rules.** Each police unit defines zones (emergency lane, crosswalk, one-way street) and thresholds (speed, dwell time). A matched rule produces a typed, explainable, repeatable event. 3. **VLM verification (optional, off by default).** When enabled (`RS_EXTERNAL_AI=frames` + API key; frames then leave the server) a vision-language model can add a description. It is not part of the default product and nothing in the UI claims an AI confirmation. 4. **Operator alert.** Alerts reach the dispatch dashboard and the patrol app, sorted by severity.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0003 — README.md:14-19
+Alert types: | Priority | Event | |---|---| | Critical | Wrong-way driving, pedestrian on road, probable crash, object on roadway | | High | Very high speed, vehicle stopped in emergency lane / on the road, near-miss | | Medium | Hard braking, tailgating, dangerous lane changes | | Info | Congestion |
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0004 — README.md:21-21
+Alert types: Definitions and sampling-rate limits: [docs/RULES.md](../RULES.md). All rules are tested on synthetic tracks only. **Not implemented:** road conditions (fog, ice).
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0005 — README.md:25-28
+Alert flow: - The system detects the event and attaches the clip, key frames, location, time, and the rule that fired. - The operator reviews the case and confirms or rejects it. - On confirmation the operator records the action (dispatch patrol, warning sign, enforcement). Only *patrol assignment with status updates* has a workflow behind it; signs and enforcement are labels in the audit log. - Everything goes to an audit log: who saw it, what they decided, when.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0006 — README.md:32-32
+Archive search: Investigators can use a Romanian/English keyword parser to create structured archive filters and save named searches to their own account. Saved searches retain normalized filters, not the original query text. This is not semantic natural-language understanding; review the query interpretation before relying on the results.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0007 — README.md:36-40
+Safeguards and limits: - A human makes the decision. The system alerts and prepares evidence; it never issues fines automatically. - Video-measured speed is unvalidated and camera-dependent; treat it as orientative triage only. Fines require metrologically certified equipment. - No facial recognition and no tracking of people. The system works with vehicles and events. - GDPR and the Police Directive (EU 2016/680) require a legal basis, limited purpose, role-based access and short retention. This repository provides role-based access, tenant isolation, audited access, configurable retention with legal hold and heuristic redaction **on by default**. It makes **no compliance claim**: no DPIA, legal basis or retention schedule has been approved (docs/LIMITS.md). - Field validation: accuracy must be measured on real cameras at night, in rain, and in dense traffic before operational use.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0008 — README.md:44-44
+Benefits: Faster response, fewer false alarms for operators, evidence prepared automatically, and statistics on where interventions are needed (speed cameras, traffic lights, patrols).
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0009 — README.md:54-60
+Architecture: The secure backend owns sessions, MFA (mandatory), tenant isolation, audit and evidence access. `frontend/` is the separate operator client, `secure-pwa/` is the bundled patrol/auditor/admin client, and Compose currently serves the PWA at `https://localhost`; run the operator client separately. Both supported clients use the secure backend's compatibility contract. `web/` and `roadsentinel/server.py` are deprecated legacy demo code and must not be used for operational data. The root `Dockerfile` and `railway.json` still describe that legacy demo. See [API.md](../../API.md), [HANDOFF.md](../../HANDOFF.md) and [docs/SETUP.md](../SETUP.md).
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0010 — README.md:64-64
+Start the secure backend and PWA locally: From the repository root, with Docker Compose v2.20+ and Python 3.12:
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0011 — README.md:71-73
+Start the secure backend and PWA locally: *(The Docker stack was not built or run when this branch was prepared; the supported verified path is [docs/SETUP.md](../SETUP.md).)* Open **https://localhost** and trust Caddy's local development certificate. Compose starts PostgreSQL 16, migrations, FastAPI (`backend/`), the secure PWA (`secure-pwa/`, service name `frontend`) and Caddy. Seed accounts in a second terminal:
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0012 — README.md:79-80
+Start the secure backend and PWA locally: Use `RS_SEED_PASSWORD` from the generated, git-ignored `.env`. First login requires TOTP enrollment (mandatory); new users come from invitations. Never use the seeded accounts in production. For a laptop demo with synthetic data run `python scripts/demo.py`.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0013 — README.md:82-85
+Start the secure backend and PWA locally: For host development, the backend entrypoint is `uvicorn app.main:create_app --factory` from `backend/` with dependencies in `requirements.lock`. It requires a migrated PostgreSQL database, restricted runtime role and the `RS_*` settings described in [security docs](../SECURITY.md). The Compose setup above supplies these automatically and keeps the database internal.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0014 — README.md:89-89
+Start each interface in development: Use Node.js 22 (vitest 5 needs >= 22.12). Run each command from the repository root in a separate terminal:
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0015 — README.md:93-96
+Police operator UI (real backend; VITE_USE_MOCKS=1 gives labelled demo data): cd frontend npm ci npm run dev -- --port 5173 ```
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0016 — README.md:100-103
+Secure PWA: host development API on http://127.0.0.1:8000: cd secure-pwa npm ci npm run dev -- --port 5174 ```
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0017 — README.md:105-109
+Secure PWA: host development API on http://127.0.0.1:8000: The PWA development server serves the UI shell over HTTP. Secure session cookies require a trusted HTTPS origin: use the Compose-served PWA at https://localhost for the ready-to-run secure login flow, or configure a trusted TLS proxy for host development. `secure-pwa/vite.config.ts` proxies `/api` to port 8000 for a separately configured host backend; Compose does not publish that port.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0018 — README.md:120-120
+Start the detector: For secure remote ingestion create a tenant service account and register its camera, then:
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0019 — README.md:130-134
+or one camera in the foreground: .venv/bin/python -m roadsentinel.pipeline cameras/demo-highway.yaml --live --no-wandb: Trust the local TLS CA on the pipeline machine; do not disable certificate validation. The endpoint is `POST /api/ingest/events`, HMAC-SHA256 over the exact multipart bytes. Redaction is **on** (`full`); to store unblurred frames you must set `RS_REDACTION=off` **and** `RS_ALLOW_UNREDACTED=1`, and the evidence is then labelled FĂRĂ REDACTARE. A camera whose `video` is a network URL refuses to run until `source_consent` is filled in its yaml. Detector weights come from the model registry: [docs/MODEL_INTEGRATION.md](../MODEL_INTEGRATION.md).
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0020 — README.md:138-146
+Legacy standalone demo: `roadsentinel/server.py` and `web/` form a separate demo with a local event store, not the secure platform. Leave `RS_API_URL` unset and run `scripts/run_demo.sh` after installing the detector dependencies above; it downloads clips and serves http://localhost:8000. For only its API/dashboard on this baseline, run `.venv/bin/uvicorn roadsentinel.server:app`. The legacy `web/` code is frozen and is not part of the supported secure platform. Batch processing in this legacy demo replaces the camera's events, decisions and audit trail. Keep it separate from operational data. Optional VLM/search credentials and the legacy Railway deployment settings are described in [API.md](../../API.md); the root Dockerfile and `railway.json` deploy this legacy server, not `backend/`.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0021 — README.md:150-160
+How the prototype is built: | Step | Code | What it does | |---|---|---| | Detection + tracking | `roadsentinel/pipeline.py`, `roadsentinel/detector.py` | YOLOX-S ONNX + ByteTrack; CPU inference and sampled-frame replay are supported. The checked local model produced real vehicle boxes, class labels, tracks and line counts on licensed recorded traffic footage; see [the inference report](../YOLO_REAL_INFERENCE_REPORT.md). Do not interpret this as external live-camera or incident-accuracy validation. | | Speed | `roadsentinel/geometry.py`, `rules.py` | Homography from 4 road points to metres; speed = least-squares slope over 1 s | | Rules | `roadsentinel/rules.py`, `cameras/*.yaml` | Zones, thresholds and enabled rules per camera; each alert records the exact threshold crossed | | Evidence | `data/media/<camera>/` | Keyframe with the vehicle boxed, ±3 s clip, annotated full video (pipeline frames are redacted before they are written) | | VLM check (off by default) | `roadsentinel/vlm.py` | Optional: Claude looks at the clip frames and writes a one-line Romanian description; never enabled implicitly | | Search | `backend/app/services/search.py` | Keyword parser (Romanian/English) → structured filter → SQL; not language understanding | | API + dashboard | `roadsentinel/server.py`, `schemas.py`, `web/index.html` | Login, alert queue, case view, confirm/reject + action, audit log, live stream, ingestion | | Storage | `roadsentinel/store.py`, `media.py`, `sink.py` | SQLAlchemy (SQLite or Postgres), media on disk or S3 bucket, local or remote ingestion | | Experiment log | `roadsentinel/tracking.py` | Every pipeline run goes to W&B (project `roadsentinel`) with config, metrics, alert table, git commit |
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0022 — README.md:162-163
+How the prototype is built: Demo data: Roboflow `supervision` sample clips (`scripts/download_data.sh`). The urban camera's calibration is approximate, so only rules that don't need an exact speed are enabled there.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0023 — README.md:167-170
+Security foundation: Security details: [docs/SECURITY.md](../SECURITY.md) · [docs/THREAT_MODEL.md](../THREAT_MODEL.md) · [docs/ARCHITECTURE_TARGET.md](../ARCHITECTURE_TARGET.md) (roadmap) · [demo script](../../scripts/demo_security.md).
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0024 — README.md:174-175
+Development logins (DEV ONLY): All seeded accounts share the password in `RS_SEED_PASSWORD` from your `.env` (random per machine). Every account must enroll TOTP on first login (QR code + 8 recovery codes).
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0025 — README.md:177-181
+Development logins (DEV ONLY): | Tenant | Accounts | |---|---| | RoadSentinel Platform | `sysadmin@roadsentinel.local` (system admin: creates police units) | | Unit A – Highway Patrol North | `admin.a@`, `operator.a@`, `patrol.a@`, `auditor.a@roadsentinel.local` | | Unit B – City Traffic South | `admin.b@`, `operator.b@`, `patrol.b@`, `auditor.b@roadsentinel.local` |
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0026 — README.md:183-184
+Development logins (DEV ONLY): New accounts are created only through invitations (Users API, tenant admin) – there is no public registration.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0027 — README.md:200-206
+Backend: needs a PostgreSQL 16 superuser URL; creates a throwaway database "rs_test": cd backend python -m venv .venv && . .venv/bin/activate        # Windows: .venv\Scripts\activate pip install -r requirements.lock pytest httpx ruff black mypy export RS_TEST_ADMIN_DATABASE_URL=postgresql+psycopg://postgres:<password>@localhost:5432/postgres pytest                     # isolation, encryption, audit, four-eyes, auth, headers ruff check app alembic tests && black --check app alembic tests && mypy ```
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0028 — README.md:208-208
+Backend: needs a PostgreSQL 16 superuser URL; creates a throwaway database "rs_test": In a new terminal, from the repository root:
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0029 — README.md:212-214
+Secure PWA: cd secure-pwa npm ci && npm run lint && npm run typecheck && npm test && npm run build ```
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0030 — README.md:216-218
+Secure PWA: CI (`.github/workflows/ci.yml`) defines jobs for the backend (real PostgreSQL), `secure-pwa/`, `frontend/`, the pipeline tests, repo checks (secret scan, docs links), gitleaks and a Docker stack smoke test. **This branch's CI has not been run on GitHub** (see docs/FINAL_STATUS.md for what was run locally). Deploys are manual and gated on a green run. CodeQL runs separately in `.github/workflows/codeql.yml` and retains SARIF as artifacts; code scanning upload is disabled for compatibility with this private repository's settings.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0031 — API.md:3-6
+RoadSentinel API contracts: This page documents two distinct contracts. The secure backend in `backend/` is authoritative for supported operation. Its contract schemas are in `backend/app/schemas/contract.py`, its native endpoints are in `backend/app/api/`, and development-only interactive docs are at `/api/docs`. The legacy implementation uses `roadsentinel/schemas.py` and is not suitable for operational data.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0032 — API.md:8-9
+RoadSentinel API contracts: All dashboard endpoints use a session cookie set by `POST /api/login`. A `401` means "show the login screen". Errors return `{"detail": "<message in Romanian>"}`, ready to show to the user.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0033 — API.md:11-13
+RoadSentinel API contracts: Two servers implement portions of this compatibility contract. **`backend/` is authoritative**; `roadsentinel/server.py` (prototype, shared password) is legacy offline-demo code. Differences on the secure backend are listed in [§ Secure backend](#secure-backend-backend) at the end; shapes are identical, new fields are additive.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0034 — API.md:15-17
+RoadSentinel API contracts: The API descriptions through **Server configuration** below describe the legacy implementation unless a secure-backend note says otherwise. Do not use the legacy shared-password or bearer-token configuration with the secure stack.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0035 — API.md:21-25
+Auth: | Method | Path | Body | Returns | |---|---|---|---| | POST | `/api/login` | `{"operator": "ag. Popescu", "password": "..."}` | `Me` | | POST | `/api/logout` | – | `Me` | | GET | `/api/me` | – | `Me` = `{"operator": str \| null, "auth_required": bool}` |
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0036 — API.md:27-27
+Auth: The operator name from the session is what the audit log records for every view and decision.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0037 — API.md:31-37
+Alerts: | Method | Path | Notes | |---|---|---| | GET | `/api/events?status=new&camera_id=demo-highway` | `Event[]`, undecided first, then by priority (critical → info), then oldest first | | GET | `/api/events/{id}` | `EventDetail` = `Event` + `audit[]` | | POST | `/api/events/{id}/view` | Body `{}`. Records "who looked at this case". Call when a case is opened. `204` | | POST | `/api/events/{id}/decision` | `{"decision": "confirm" \| "reject", "action": "dispatch_patrol", "note": "..."}`. `action` is required to confirm and ignored on reject. Returns `EventDetail`. `409` if the event was already decided (refetch and show the existing decision) | | GET | `/api/meta` | Event type labels/priorities and the list of actions, so the UI never hardcodes them |
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0038 — API.md:39-39
+Alerts: `Event`:
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0039 — API.md:57-61
+Alerts: - `priority`: `critical` | `high` | `medium` | `info` - `status`: `new` | `confirmed` | `rejected` - `vlm_status`: `pending` | `confirmed` | `rejected` | `uncertain` | `skipped` (no API key). `vlm_text` is a one-line Romanian description. - `object_class` is `null` for scene-level alerts (congestion). - Media URLs need the session cookie; use them directly in `<img>` / `<video>`.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0040 — API.md:63-63
+Alerts: `AuditEntry`:
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0041 — API.md:69-70
+Alerts: `action` is one of `login`, `detected`, `viewed`, `confirmed`, `rejected`, `vlm_confirmed`, `vlm_rejected`, `vlm_uncertain`. `at` is always UTC with an offset; `event_id` is `null` for logins.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0042 — API.md:74-74
+Live updates: `GET /api/stream` is a Server-Sent Events stream:
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0043 — API.md:83-84
+Live updates: Alerts carry an SSE `id`, so on reconnect the browser sends `Last-Event-ID` and alerts created in the gap are replayed. A `401` on the stream means the session expired: call `GET /api/me` and show the login screen.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0044 — API.md:88-100
+Search, stats, cameras, audit: | Method | Path | Notes | |---|---|---| | POST | `/api/search` | Body `{"q": "camioane oprite pe acostament ieri între 14 și 18", "limit": 50, "cursor": null}`; returns `{"filter": {...}, "results": Event[], "next_cursor": "..."}`. Page size is 1–100. Cursors are signed, tenant/filter-bound, and expire after one hour. Preferred because it avoids putting query text in URLs/access logs | | GET (deprecated) | `/api/search?q=...&limit=50&cursor=...` | Compatibility endpoint with the same cursor response. The query is not stored or put in the audit chain, but intermediaries may log URL query strings; new clients should use POST | | GET | `/api/saved-searches` | List the caller's saved searches (up to 100); filters are tenant-scoped and user-owned | | POST | `/api/saved-searches` | `{"name": "...", "query": "..."}`; stores normalized filters only, not the query text | | PUT | `/api/saved-searches/{uuid}` | Replace that caller's saved search name and parsed filters | | POST | `/api/saved-searches/{uuid}/run` | Execute saved filters using the caller's current alert visibility and return `SearchResponse`; optional body `{"limit": 50, "cursor": "..."}` continues the signed filter-bound cursor | | DELETE | `/api/saved-searches/{uuid}` | Delete that caller's saved search; create/update/delete/run are audited | | GET | `/api/stats` | Counts by priority, status and type; `vlm_available` | | GET | `/api/cameras` | Camera registry and health fields (`id` is slug; additive `uuid`, coordinates, timezone, active state, heartbeat); `video_url` is an annotated recording, not a live source | | GET | `/api/cameras/discovery` | Requires `cameras:read`; 35 public Romanian scene records with canonical provider pages, presentation/player descriptors, source kind and separate ingestion/authorization fields. The Iași HLS URL is documented but browser playback is not asserted; candidates remain ingestion-disabled until per-source analysis permission is recorded | | GET | `/api/audit?limit=50` | Latest audit entries, newest first |
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0045 — API.md:102-105
+Search, stats, cameras, audit: `filter` fields: `event_types[]`, `object_classes[]`, `priorities[]`, `date_from`/`date_to` (local ISO time), `hour_from`/`hour_to` (time-of-day window on any date), `min_speed_kmh`, `status`, `text`, `explanation`. The parser is keyword-based, not semantic or LLM-backed. Audit records retain only query length and the parsed filter, never the raw query text.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0046 — API.md:109-110
+Ingestion (pipeline → API, not for the UI): HMAC per service account; the pipeline uses `RS_API_URL`, `RS_INGEST_KEY_ID`, and `RS_INGEST_SECRET`. Secrets are never sent as bearer tokens and must not be embedded in camera URLs.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0047 — API.md:112-116
+Ingestion (pipeline → API, not for the UI): | Method | Path | Body | |---|---|---| | POST | `/api/ingest/events` | multipart: `event` (JSON, see `IngestEvent` in `schemas.py`), `keyframe` (jpg), `clip` (mp4). `422` with field errors if invalid; nothing is stored. Priority is derived from `type` on the server | | PUT | `/api/ingest/cameras/{id}/video` | multipart: `video` (annotated mp4) | | DELETE | `/api/ingest/cameras/{id}` | Removes a camera's events and media before reprocessing |
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0048 — API.md:120-126
+Server configuration: | Variable | Purpose | |---|---| | `DATABASE_URL` | `postgresql+psycopg://...`; defaults to SQLite in `data/` | | `DASHBOARD_PASSWORD` | Shared operator password; unset = no login (local dev only) | | `SECRET_KEY` | Signs the session cookie | | `INGEST_TOKEN` | Token the pipeline uses to post events | | `COOKIE_SECURE` | `1` = session cookie only over HTTPS (default when a password is set) |
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0049 — API.md:128-131
+Server configuration: On Railway (`RAILWAY_ENVIRONMENT` is set) the server refuses to start without `DASHBOARD_PASSWORD`, `SECRET_KEY` and `INGEST_TOKEN`. | `S3_BUCKET`, `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_REGION` | Media bucket; unset = local `data/media/` | | `ANTHROPIC_API_KEY` | Optional: LLM search parsing (and VLM on the pipeline machine) |
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0050 — API.md:135-135
+Secure backend (`backend/`): Same paths and JSON. What changes for a client:
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0051 — API.md:137-155
+Secure backend (`backend/`): | Topic | Secure backend | |---|---| | CSRF | Every `POST`/`PATCH`/`DELETE` needs header `X-CSRF-Token` = value of cookie `__Secure-rs_csrf`. Call `GET /api/auth/csrf` once at startup to get the cookie. Ingestion (`/api/ingest/*`) is exempt | | Login | `POST /api/login {"operator": "<e-mail>", "password": ...}` → `200 Me` with `mfa_required: true` (and `mfa_enrollment: true` on first login). Second step: `POST /api/auth/mfa/verify {"code": "123456"}` (or `{"recovery_code": ...}`) → `204`; then `GET /api/me` returns the operator. First-login enrollment: `POST /api/auth/mfa/enroll/start` (QR) and `/api/auth/mfa/enroll/confirm {"code"}`. Accounts come from invitations; there is no shared password | | Sessions | Access cookie lives 10 min and is renewed with `POST /api/auth/refresh` (`204`); on `401` try one refresh, then show the login screen. Idle timeout 30 min and absolute lifetime 12 h are enforced by the server (`idle_timeout` revocation) | | Actor | Always the authenticated user's display name; never taken from a request body | | Scope | Everything is limited to the user's unit (tenant). Patrol users only see alerts assigned to them. Auditors cannot read alerts | | Media | `keyframe_url`, `clip_url`, `video_url` look like `/api/media/<uuid>?exp=…&sig=…`: decrypted per request, bound to the user, valid 15 min (refetch the event to get fresh links). Use them directly in `<img>`/`<video>` from the same origin | | `Event.redaction` | Additive: `"heads_only"` means the pipeline blurred only people's heads; **plates are visible** (show a badge). `"full"` = faces and plates blurred | | `Camera` | `id` is the slug; additive `uuid`, `latitude`, `longitude`, `is_active` (for the map) | | `GET /api/audit` | Alert history of the unit only (`login`, `detected`, `viewed`, `confirmed`, `rejected`, `vlm_*`). The full tamper-evident chain is `GET /api/audit/chain` (auditors) and `GET /api/audit/verify` | | `Event` (additive) | `redaction`: `full` (heuristic blur of faces + plates), `heads_only` (plates visible), `off` (**no redaction**, show FĂRĂ REDACTARE) or `unknown`; `has_original`: `false` = one stored copy only (pipeline evidence), unblur/export of an original is refused with `409 no_original`; `evidence_purged`: retention deleted the files (`410` on media). `details.confidence = "low"` marks alerts computed from sparse frames, `details.speed_calibration` is `validated` or `unvalidated` (speed then "orientativ"), `details.synthetic` marks seeded demo data | | Camera status | `GET /api/cameras` items carry `status_info` from the pipeline heartbeat: measured `fps`, rule capabilities, source state/dimensions/reconnects, traffic line counts and rolling flow. No source URL is accepted in status | | `GET /api/stats` | `vlm_available` is always `false` here: VLM runs on the pipeline machine | | `GET /api/stream` | Same events; the session is re-checked every second and the stream ends when it is revoked or expired (reconnect → `401` → login) | | Search | Keyword parser only; the query text never leaves the server | | Ingestion auth | HMAC per service account instead of a bearer token: headers `X-RS-Key-Id`, `X-RS-Timestamp` (unix s, ±60 s), `X-RS-Nonce` (single use), `X-RS-Signature` = base64url(HMAC-SHA256(secret, `METHOD\nPATH?QUERY\nTIMESTAMP\nNONCE\nhex(sha256(body))`)), no padding. Create a key with `python -m app.cli create-service-account --tenant unit-a --name pipeline-1` (secret shown once) | | `IngestEvent` | Unknown fields → `422` (do not send `priority`); `camera_id` must be a camera registered in the unit (`python -m app.cli register-camera --tenant unit-a --slug demo-highway --name … --location …`) and inside the service account's camera scope; `occurred_at` is camera-local time without offset; `details` ≤ 4 KB, depth ≤ 3; keyframe must be JPEG, clip MP4 | | `DELETE /api/ingest/cameras/{id}` | Nothing is ever deleted: `403` in production; elsewhere undecided alerts of that camera are hidden (`superseded`), decisions and evidence are kept |
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0052 — API.md:159-174
+Added in release/ready (secure backend only): | Area | Endpoint | Notes | |---|---|---| | Ingestion | `POST /api/ingest/events` | optional `event_key` (`[A-Za-z0-9_.:-]{8,80}`): a retry with the same key returns the same `id` instead of a duplicate. New types `near_miss`, `object_on_roadway` (object class `object`) | | Ingestion | `POST /api/ingest/cameras/{id}/heartbeat` | optional JSON body `{"fps": 0.45, "rules": {"hard_braking": {"supported": false, "min_fps": 7.1, "reason": "…"}}}` (≤ 32 rules); stored as camera `status_info` | | Recovery | `POST /api/users/{id}/reset-requests` `{reset_mfa, justification, case_reference}` | tenant admin; creates an `account_reset` approval that a **different** admin approves in `/api/approvals/{id}/approve` | | Recovery | `POST /api/users/reset-requests/{approval_id}/issue` | the requester only, after approval: returns `{token, accept_path, expires_at}` once (1 h, single use) | | Recovery | `POST /api/auth/reset/inspect` `{token}`, `POST /api/auth/reset/accept` `{token, password}` | public; revokes all sessions; `reset_mfa` removes TOTP + recovery codes (re-enrollment at next login) | | Account | `POST /api/auth/password` `{current_password, new_password}` | fresh MFA; signs out the other devices | | Sessions | `POST /api/sessions/revoke-others`, `POST /api/users/{id}/sessions/revoke-all` | own other devices / admin (fresh MFA) | | Patrol | `GET /api/patrols` (operator/admin), `POST /api/alerts/{id}/assign`, `POST /api/alerts/{id}/patrol-status {"status": "en_route"\|"on_scene"\|"done"}` | assignee only, forward only; no positions/ETAs | | Stats | `GET /api/stats/response?since_hours=24&tz=Europe/Bucharest` | operator/admin; median + p90 + n of creation→first view and creation→decision, rejection rate with n, by type/camera/local hour | | Retention | `GET/PUT /api/retention`, `POST /api/retention/purge {dry_run, confirm}`, `POST/DELETE /api/retention/holds/{alert_id}` | tenant admin; purge is dry-run by default, real purge needs `confirm:"PURGE"` + fresh MFA; held alerts are never purged | | Cameras | `POST /api/cameras {slug?, name, location, timezone?, latitude?, longitude?}` | tenant camera manager, fresh MFA; explicit slug can be matched to a local pipeline profile; response includes generated/provided `slug` | | Cameras | `PATCH /api/cameras/{uuid}` | tenant admin, fresh MFA, audited before/after; slug immutable. Operator UI can edit name, location, coordinates, and timezone; source URLs, rules, zones, and calibration remain outside this endpoint | | Camera workers | `GET /api/cameras/{uuid}/worker`; `POST .../worker/start`, `/stop`, `/restart` | tenant camera manager, fresh MFA for mutations; launches/stops a supervised local `roadsentinel.pipeline --live` child from an allowlisted `cameras/*.yaml` profile whose `id` matches the camera slug. Requires localhost `RS_API_URL` and camera-scoped `RS_INGEST_KEY_ID`/`RS_INGEST_SECRET`. Desired/actual state is reported separately; `RUNNING` requires a fresh post-start pipeline heartbeat. | | Ops | `GET /api/ready`, `GET /api/metrics` (bearer `RS_METRICS_TOKEN`, 404 if unset), `GET /api/ops/status` (tenant admin) | see docs/OPERATIONS.md |
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0053 — API.md:176-176
+Added in release/ready (secure backend only): Evidence rule: `POST /api/evidence/{id}/access {"variant":"original"}`, `/export` and `POST /api/approvals` return `409 no_original` when `has_original` is false, `410 evidence_purged` after retention.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0054 — HANDOFF.md:3-3
+RoadSentinel: handoff (state of `release/ready`): Read next: `docs/IMPLEMENTATION_PROGRESS.md` (what was done and how it was verified), `docs/FINAL_STATUS.md` (real gate numbers and what is unverified), `docs/LIMITS.md` (what the system is not). The old Romanian handoff of 2026-10-18 is archived in `docs/archive/` and is **outdated** (it described a password-only demo).
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0055 — HANDOFF.md:6-16
+What is where: | Folder | What | |---|---| | `backend/` | The product API (FastAPI, PostgreSQL with row-level security, MFA, signed ingestion, encrypted evidence, hash-chained audit, four-eyes, retention, patrol workflow). Contract: `API.md`. Tests need PostgreSQL | | `frontend/` | Operator UI (Vite, React 19). Speaks the `/api/login`, `/api/events`, `/api/stream` dialect. `VITE_USE_MOCKS=1` = labelled demo data | | `secure-pwa/` | Patrol / auditor / admin app (PWA): MFA enrollment, approvals, audit chain, sessions, retention, account recovery, patrol status | | `roadsentinel/` | Detection pipeline: rules, tracking, alert gate, live reader/supervisor, model registry, evaluation harness. `server.py` + `web/` are the **deprecated** legacy demo | | `cameras/*.yaml` | Per camera: video, calibration, zones, rules, thresholds, alert gate, model, `source_consent` | | `training/` | Fine-tune scripts, `eval.py`, `make_manifest.py`, `check_dataset.py`. Weights and data are git-ignored | | `models/` | `registry.json` (tracked), weights (ignored), reports, change log | | `scripts/` | demo, backup/restore, model tools, calibration, secret scan, latency measurement | | `deploy/` | compose + Caddy (local), `railway-web/` gateway. **Docker was not available** when this branch was built: nothing here was built or run |
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0056 — HANDOFF.md:19-24
+Decisions in force: * MFA is mandatory. `RS_MFA_EXEMPTION_ENABLED` exists for local demos only and is refused in production. * Deploys are manual (`workflow_dispatch`, type `DEPLOY`) and need a green CI run for the commit. Confirm persistent evidence storage first (`docs/OPERATIONS.md`). * `frontend/` = operators, `secure-pwa/` = patrol/auditor/admin. `web/` and `roadsentinel/server.py` are frozen. * Public webcam streams stay off until `source_consent` is filled in the camera file. * Redaction is on by default and a heuristic; `off` needs `RS_ALLOW_UNREDACTED=1` and shows FĂRĂ REDACTARE. * Only numbers produced by `training/eval.py` may appear in docs or UI.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0057 — HANDOFF.md:27-27
+Run it: `docs/SETUP.md` (Linux, macOS, Windows). One command for a local demo with synthetic data: `python scripts/demo.py`.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0058 — HANDOFF.md:30-30
+Integrating the teammate's model: `docs/MODEL_INTEGRATION.md`.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0059 — HANDOFF.md:33-36
+Open questions for the owners: 1. Written permission from the webcam owner (WebcamRomania / Grand Hotel Traian) and the dataset licences (`docs/DATA_CARD_TEMPLATE.md`). 2. Where the production secrets, master keys, Railway access and the fine-tuned weights are stored besides one laptop. 3. Whether a second tenant admin exists in each unit (account recovery is four-eyes). 4. Legal basis, retention periods and DPIA: none has been decided by this repository.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0060 — docs/ARCHITECTURE_TARGET.md:3-5
+RoadSentinel – Production target architecture (roadmap): > **Everything on this page is NOT implemented.** It describes how the hackathon foundation > should evolve before any operational use. What is implemented today is documented in > [SECURITY.md](../SECURITY.md).
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0061 — docs/ARCHITECTURE_TARGET.md:9-16
+Key management – NOT IMPLEMENTED: * Replace `EnvKeyProvider` with a `KeyProvider` backed by a KMS or HSM (HashiCorp Vault Transit,   AWS KMS / CloudHSM, Azure Key Vault Managed HSM, or a national-police HSM). The interface   (`wrap`, `unwrap`, `current_version`) is already in place. * Automatic master-key rotation with scheduled re-wrap jobs; DEK rotation per tenant on a   schedule plus lazy re-encryption of evidence files. * Separate keys per purpose and data class (evidence, PII fields, blind index), with dual   control (two-person rule) on key administration. * Crypto-shredding: destroying a tenant's DEK renders retained ciphertext unreadable.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0062 — docs/ARCHITECTURE_TARGET.md:20-26
+Identity – NOT IMPLEMENTED: * SSO via OpenID Connect against the police identity provider (Keycloak, Entra ID, national IdP),   with phishing-resistant MFA (FIDO2/passkeys, smart cards) and SCIM provisioning. * Service accounts for the detection pipeline: mTLS client certificates or workload identity,   scoped to "create alert / ingest evidence" for one tenant. * Adaptive (risk-based) authentication: new device, impossible travel, unusual hours, anomalous   evidence access → step-up or block. * Device binding of sessions (DPoP / token binding).
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0063 — docs/ARCHITECTURE_TARGET.md:30-32
+Authorization – NOT IMPLEMENTED: * Externalize policies to OPA (Rego) or AWS Cedar, versioned and tested in CI; ABAC attributes   such as case assignment, shift, jurisdiction and clearance. * Just-in-time elevation for administrators with automatic expiry.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0064 — docs/ARCHITECTURE_TARGET.md:36-41
+Network and platform – NOT IMPLEMENTED: * WAF and DDoS protection in front of Caddy; private connectivity (VPN / police network) for   patrol devices; mTLS between services; separate DB host with encrypted volumes. * Kubernetes or hardened VMs with signed images (cosign), SBOM generation, admission policies,   read-only filesystems and seccomp profiles everywhere (including the proxy). * Redis-backed distributed rate limiting; horizontal scaling of the API. * Encrypted, immutable backups with tested restore procedures.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0065 — docs/ARCHITECTURE_TARGET.md:45-50
+Monitoring and audit – NOT IMPLEMENTED: * SIEM export of audit and security events (syslog/CEF or OpenTelemetry), with alert rules for   cross-tenant probes, refresh-token reuse, lockouts and mass evidence access. * Periodic anchoring of each tenant's audit head hash to WORM storage or an external timestamping   authority (RFC 3161), closing the tail-truncation gap. * Ed25519 signatures over evidence hashes at ingestion (chain of custody) with a verification   endpoint.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0066 — docs/ARCHITECTURE_TARGET.md:54-64
+GDPR and Directive (EU) 2016/680 – NOT IMPLEMENTED (organizational + technical): * Documented legal basis and purpose limitation per processing activity; Data Protection   Impact Assessment before deployment; DPO sign-off. * Retention: automatic deletion of video without an incident after a short period (e.g. 72 h),   configurable per tenant; legal holds for case evidence. * Logging obligations of Art. 25 of the Directive (collection, alteration, consultation,   disclosure, combination, erasure) mapped to audit actions; log retention policy. * Data-subject rights handling and disclosure workflows; records of processing activities. * Faces and plates blurred by default in all general searches (implemented for evidence views   today; must extend to natural-language archive search when it exists). * Field validation of detection accuracy (night, rain, dense traffic) before operational use;   human decision for every enforcement action; no automated fines.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0067 — docs/LIMITS.md:3-3
+Limits (what this system is not, today): Written to be read by someone deciding whether to trust it. Items marked **measured** have a number from this repository's own tooling; everything else is a statement about what is *not* known.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0068 — docs/LIMITS.md:6-9
+Product: * It alerts and prepares evidence; **a human decides**. It issues no fines. "Dispatch patrol / warning sign / enforcement" is a recorded decision label; only *patrol assignment with status* (assigned → en route → on scene → done) has a real workflow. Nothing is connected to signs or to an enforcement system. * Not implemented: road-condition detection (fog/ice), tram class, automatic licence-plate reading, rules management and zone editing from the UI (zones, rules and thresholds are YAML per camera), camera creation from the UI (`register-camera` CLI), four-eyes approval of camera changes, saved searches/archive export. * Natural-language search is a **keyword parser** (Romanian/English), not language understanding. * The VLM check exists in code but is **off** (needs `RS_EXTERNAL_AI=frames` and an API key; frames then leave the server). No UI text claims an AI confirmation.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0069 — docs/LIMITS.md:12-17
+Detection accuracy: nothing is validated: * No accuracy figure for any model on real footage exists in this repo. Earlier metrics in `training/RESULTS*.md` compare a student model with a teacher model's pseudo-labels (agreement, not accuracy) on frames from the same scenes. * `training/eval.py` is the only sanctioned source of numbers; it has been tested with fake predictors, **never run on real weights here**. No false-alarm rate per hour exists. * Rules are validated only on synthetic tracks. Night, rain, fog, dense traffic: **not evaluated**. * Speed is **orientativ**: calibrations are unvalidated (`docs/CALIBRATION.md`), lens distortion is not corrected, and the demo thresholds are tuned to produce alerts. Video speed is for triage, never for fines. * A camera processed at ~0.5 fps (the live Piața Unirii webcam on the dev laptop) can only run rules that work at that rate; the Cameras page lists what it cannot do. Alerts from sparse frames are marked lower confidence. * `pipeline.py` was changed and wired to the new modules but was **not executed end to end** in this environment (no torch/ultralytics): live behaviour, stall recovery and upload spooling are tested through their parts with fakes only.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0070 — docs/LIMITS.md:20-25
+Privacy and compliance (not legal advice): * **No claim of GDPR / Directive 2016/680 compliance is made.** No DPIA, legal basis or retention schedule has been approved by anyone. * Redaction is a **heuristic** (head = top third of a person box; plate = lower band of a vehicle box; windshield region for large vehicles). It misses small, distant, night and unusual cases. It can be switched off only with an explicit confirmation, and then the evidence is labelled FĂRĂ REDACTARE. * Pipeline evidence has a single stored copy: there is no unredacted original to unblur (`has_original=false`). * Retention deletes evidence files on a schedule you configure and run; it does not delete alerts, hashes or the audit log. The audit log keeps IP, user agent and operator notes for the life of the chain; erasing a person's data from it is not implemented. * Training/test frames: licences and consent per source must be recorded in a data card (`docs/DATA_CARD_TEMPLATE.md`); the live Iași webcam is **off** until written permission is recorded in its camera file. Public availability is not permission. * The repository has no LICENSE; `ultralytics` is AGPL-3.0.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0071 — docs/LIMITS.md:28-31
+Security: * MFA mandatory (TOTP + recovery codes). Demo exemption exists, is off by default and refused in production. * One API process: the rate limiter is in memory and SSE polls the database once per second per connected client. **Measured** (local, loopback, one uvicorn worker, PostgreSQL 18.6, dev laptop): ingest request p50 42 ms / p95 56 ms; event-to-screen over SSE p50 567 ms / p95 989 ms with 21 connected viewers, p50 512 / p95 930 ms with 51 (30 events each, 1.37 s apart); API process 113 MB RSS. These describe the poll interval (1 s) and this machine, not a production deployment, not WAN latency and not many events per second. * Master keys come from the environment (no KMS); DEK rotation does not re-encrypt existing evidence files. The audit chain has no external anchor: someone with owner-level database access can rewrite it consistently. * Pentest, dependency pinning policy review and a threat-model refresh have not been done. CI, Docker builds, the compose stack and Railway were **not run** for this branch.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0072 — docs/LIMITS.md:34-34
+Process: * Bus factor: see docs/IMPLEMENTATION_PROGRESS.md and the audit report; weights, Railway access and prod credentials are held by individuals.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0073 — docs/MODEL_INTEGRATION.md:5-11
+Runtime choice and licenses: The supported local inference path is Megvii YOLOX-S in ONNX format, ONNX Runtime's CPU execution provider, and Supervision ByteTrack. Ultralytics and its weights are excluded from the default runtime because the official terms describe AGPL-3.0 obligations for private R&D; RoadSentinel remains private and the owner has not authorized publication. The alternate YOLOX repository is Apache-2.0. Its official release publishes the YOLOX-S ONNX artifact in the project model zoo. The checkpoint was trained for COCO; retain the source, hash and any applicable dataset/model notices. This is provenance documentation, not a legal opinion.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0074 — docs/MODEL_INTEGRATION.md:13-14
+Runtime choice and licenses: No automatic download occurs at application startup. The expected local weight file is `models/yolox_s.onnx` (git-ignored); its SHA-256 is recorded in `models/registry.json`.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0075 — docs/MODEL_INTEGRATION.md:18-28
+Current local artifact: | Item | Value | |---|---| | Model | Megvii YOLOX-S, COCO, ONNX | | Source | [Official Megvii release](https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_s.onnx) | | Local path | `models/yolox_s.onnx` (not committed) | | SHA-256 | `c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063` | | Model input/output | `1×3×640×640` BGR, 0–255; output `1×8400×85` | | Runtime | ONNX Runtime 1.23.2, `CPUExecutionProvider` | | Tracker | Supervision 0.30.7 `ByteTrack` (`update_with_detections`) | | Inference target | CPU; no functioning NVIDIA driver was detected | | Activation/evaluation | Candidate only; no labeled-set metrics and no camera activation |
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0076 — docs/MODEL_INTEGRATION.md:30-32
+Current local artifact: Supervision 0.30.7 is pinned because 0.31 removed `sv.ByteTrack`. PyTorch and Ultralytics are not needed for this ONNX inference path. Training and model-kit scripts that import Ultralytics remain unavailable unless their separate license and dependency path is explicitly approved.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0077 — docs/MODEL_INTEGRATION.md:36-36
+Install: The dependencies are pinned in root `requirements.txt`. To install into this repository's venv:
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0078 — docs/MODEL_INTEGRATION.md:42-44
+Install: For another machine, acquire the ONNX file from the official release URL above, verify that its SHA-256 matches the registry entry, and place it at `models/yolox_s.onnx`. Do not silently fetch weights from arbitrary mirrors or use fallback downloads during a camera run.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0079 — docs/MODEL_INTEGRATION.md:53-56
+Run an authorized local video: The pipeline emits annotated video, optional JSONL detection records, per-class track counts, line-crossing counts, incident candidates, p50/p95/p99 inference latency, process peak RSS and the model hash. The camera source and its video license/authorization must be recorded before processing. These values describe that run; they are not accuracy measurements.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0080 — docs/MODEL_INTEGRATION.md:58-61
+Run an authorized local video: For secure ingestion, set `RS_API_URL`, `RS_INGEST_KEY_ID` and `RS_INGEST_SECRET` for a local RoadSentinel backend service account scoped to the camera. The sender signs the exact multipart body and uploads redacted keyframes/clips. A model inference alone is not end-to-end acceptance: verify the event in PostgreSQL and the supported operator client.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0081 — docs/MODEL_INTEGRATION.md:65-69
+Registry and training status: `models/registry.json` records the stock YOLOX-S checksum and provenance as a `candidate`. It is not active for any camera. Existing `model_install.py`, `model_activate.py`, rollback and training evaluation scripts were written for Ultralytics `.pt` files. Do not use those commands for ONNX until the registry loader, ONNX class-map validation, smoke test and evaluator are extended. This does not prevent local inference through the explicit ONNX adapter.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0082 — docs/MODEL_INTEGRATION.md:71-74
+Registry and training status: No mAP, precision/recall, false-alert/hour or count-accuracy metric should be reported until an authorized, labeled evaluation split with leakage checks has been run. Incident rules are candidate generators that require human review; the sample traffic video does not validate rule accuracy or legal conclusions.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0083 — docs/RULES.md:3-7
+Rule definitions: Events come from `roadsentinel/rules.py`; whether an event becomes an **alert** is decided by `roadsentinel/alerts.py` (dedupe, cooldown, per-minute cap). All rules are tested on **synthetic** tracks only (`tests/test_rules*.py`). **None is validated on real footage** until `training/eval.py` reports on a labelled set; until then treat them as heuristics. Speeds are *indicative* until a camera's calibration is validated against a known-speed reference (`docs/CALIBRATION.md`).
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0084 — docs/RULES.md:9-22
+Rule definitions: | Type | Priority | Definition (thresholds in `cameras/<id>.yaml`, `thresholds:`) | Needs | |---|---|---|---| | `very_high_speed` | high | median speed over `sustain_s` above `very_high_speed_kmh`, with `sustain_samples` samples | speed | | `stopped_on_road` / `stopped_emergency_lane` | high | speed < `stopped_speed_kmh` for `stopped_seconds` inside a road / emergency-lane zone | speed | | `wrong_way` | critical | steady motion against the zone `direction` over `wrong_way_window_s` (> `wrong_way_min_px`) | ≥ ~10 fps | | `pedestrian_on_road` | critical | a person inside a carriageway/emergency-lane zone (no crosswalk exemption yet: do not enable on crossings) | none | | `probable_crash` | critical | hard braking (> `hard_brake_mps2`, from > 30 km/h) → full stop on the road within `crash_window_s` → stays stationary `crash_stationary_s` (default 2 s). **No contact detection**; `crash_ignore_classes` for trams | speed, ≥ ~7 fps | | `near_miss` | high | two moving vehicles (> `near_miss_min_kmh`) closer than `near_miss_max_m` (15) whose distance shrinks so that time-to-collision < `near_miss_ttc_s` (1.5 s); once per pair | speed | | `object_on_roadway` | critical | a detected non-vehicle, non-person object (COCO backpack/handbag/suitcase only) inside a road zone, moving ≤ `object_max_drift_m` (0.5) for `object_seconds` (5). A generic detector misses most debris; needs a trained class for real use | none | | `hard_braking` | medium | deceleration > `hard_brake_mps2` | speed, ≥ ~7 fps | | `tailgating` | medium | time headway to the vehicle ahead in the same lane < `headway_seconds` for 1 s | speed, calibration | | `dangerous_lane_change` | medium | lateral move > `lane_change_m` within `lane_change_window_s` with a vehicle < 15 m away | calibration | | `congestion` | info | ≥ `congestion_vehicles` vehicles, mean speed < `congestion_avg_speed_kmh` for `congestion_seconds` | speed | | fog / ice / road conditions | – | **not implemented**: no measurable method here; roadmap | – |
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0085 — docs/RULES.md:25-41
+Low-frame-rate sources: The defaults need ~5 samples per second. A slow live stream (e.g. 0.4–0.5 processed fps) never produces speeds with them. Per-camera overrides (in `thresholds:`) switch to a time-window mode: ```yaml thresholds:   speed_window_s: 12        # default 1.0   speed_min_samples: 3      # default 5   speed_min_span_s: 4       # default 0.5 * speed_window_s   sustain_s: 12             # very_high_speed: window the speed must stay above the threshold   sustain_samples: 2        # default 5   min_track_age_s: 4        # default 1.0 ``` Alerts produced this way carry `details.confidence = "low"` / `rate_mode = "low_fps"` and are shown as *lower confidence*. At 0.5 fps this still cannot support `hard_braking`, `probable_crash` or `wrong_way`: the pipeline measures its real fps (`rates.RateTracker`), computes with `rule_capabilities()` which rules cannot work at that rate, switches them off, and reports them in the heartbeat (`cameras.status_info`), which the Cameras page shows ("Nu poate produce la acest ritm: …"). The result depends on the measured rate, not on a hard-coded list.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0086 — docs/SECURITY.md:3-6
+RoadSentinel – Security: This document describes the security controls that are **implemented and tested** in this repository, how each one works, how to run the tests, and the known limitations. Production items that are *not* implemented are listed in [ARCHITECTURE_TARGET.md](../ARCHITECTURE_TARGET.md); the threat model is in [THREAT_MODEL.md](../THREAT_MODEL.md).
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0087 — docs/SECURITY.md:10-28
+Overview: | Area | Control | Where | Tests | |---|---|---|---| | Accounts | Invitation-only (no public sign-up), single-use hashed token, 24 h expiry | `app/services/auth.py`, `app/api/users.py` | `test_auth.py::TestInvitations` | | Passwords | Argon2id (argon2-cffi), ≥ 12 chars, common-password deny list | `app/core/security.py` | `test_auth.py` | | MFA | Mandatory TOTP, QR enrollment on first login, 8 hashed recovery codes, replay-safe | `app/services/auth.py` | `test_auth.py::TestEnrollment`, `TestLogin` | | Sessions | 10 min access JWT + 7 day rotating refresh token, cookies only, family revocation on reuse, server-side session list | `app/services/auth.py`, `app/api/sessions.py` | `test_auth.py::TestSessions` | | Brute force | Per-IP and per-account rate limits, 5 failures → 15 min lockout, generic errors | `app/core/rate_limit.py` | `test_auth.py::TestBruteForce` | | CSRF | Double-submit token + Origin / `Sec-Fetch-Site` check on every unsafe `/api` request | `app/core/http.py` | `test_auth.py::TestCsrf` | | Step-up | Fresh MFA (≤ 5 min) for approvals, export, user/session management, key rotation | `app/deps.py::require_fresh_mfa` | `test_auth.py::TestReauth`, `test_approvals.py` | | RBAC | Central permission map + object rules (patrol: assigned alerts only) | `app/core/policy.py` | `test_isolation.py::TestRbac` | | Tenant isolation | PostgreSQL RLS (FORCE) + app-level tenant from token only; 404 on foreign ids; probes audited | `alembic/versions/0002_security.py`, `app/db.py`, `app/deps.py` | `test_isolation.py` | | Encryption | Envelope encryption (per-tenant DEK, versioned), AES-256-GCM fields, HMAC blind index, chunked AES-GCM evidence files | `app/core/crypto.py`, `app/services/keys.py` | `test_crypto.py`, `test_encryption_at_rest.py` | | Evidence access | 60 s HMAC-signed URLs bound to user + evidence + variant, plus session cookie | `app/api/evidence.py` | `test_encryption_at_rest.py::TestSignedEvidenceUrls` | | Four-eyes | Generic approval requests (unblur, export); approver ≠ requester; 30 min revocable grant | `app/services/approvals.py`, `app/api/unblur.py` | `test_approvals.py` | | Audit | Per-tenant SHA-256 hash chain, DB-enforced append-only, verify endpoint | `app/core/audit.py` | `test_audit.py` | | Logging | Redacting filter (passwords, tokens, JWTs, cookies, plates, keys); validation errors never echo input | `app/core/redaction.py`, `app/main.py` | `test_encryption_at_rest.py::TestLogRedaction` | | Transport & browser | Caddy TLS + HSTS; CSP without `unsafe-*`, COOP/CORP, `no-store` on API | `deploy/Caddyfile`, `app/core/http.py` | `test_headers_push.py`, CI `stack` job | | PWA | Static-shell-only service worker, no tokens in JS storage, logout wipes caches/IndexedDB, 5 min idle lock, generic push | `secure-pwa/src/` | `secure-pwa/src/security.test.ts` | | Supply chain | Locked deps, pip-audit, npm audit, CodeQL, gitleaks, Dependabot, SHA-pinned actions, non-root images | `.github/`, Dockerfiles | CI |
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0088 — docs/SECURITY.md:34-45
+Authentication: 1. `POST /api/auth/login` checks the password. Unknown accounts still run an Argon2 verification    against a dummy hash (constant-ish time) and always get the same `401 Invalid credentials`.    A correct password only yields a 5-minute, HttpOnly `rs_mfa` cookie scoped to `/api/auth`;    no session exists yet. 2. `POST /api/auth/mfa/verify` (TOTP or recovery code) or, for not-yet-enrolled users,    `mfa/enroll/start` → `mfa/enroll/confirm`. Only then is a session created. 3. TOTP secrets are encrypted with the tenant DEK. The last accepted time-step is stored, so a    code can never be used twice (±1 step drift allowed). Recovery codes are Argon2id hashes and    single-use. 4. Failures of either factor count towards the lockout (5 → 15 minutes). Rate limits:    login 30/5 min per IP and 10/5 min per account (also applied to non-existent accounts),    MFA 10/5 min per account, invitations 20/5 min per IP, refresh 120/5 min per IP.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0089 — docs/SECURITY.md:49-54
+Sessions and cookies: | Cookie | Content | Path | Lifetime | |---|---|---|---| | `__Secure-rs_access` | HS256 JWT `{sub, tid, sid, typ=access}` | `/api` | 10 min | | `__Secure-rs_refresh` | 256-bit random token (stored as SHA-256) | `/api/auth` | 7 days | | `__Secure-rs_mfa` | JWT `{typ=mfa_pending}` | `/api/auth` | 5 min | | `__Secure-rs_csrf` | random token, readable by JS (double submit) | `/` | 12 h |
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0090 — docs/SECURITY.md:56-59
+Sessions and cookies: All are `Secure`, `SameSite=Strict`, and all but CSRF are `HttpOnly`. Every request re-loads the session row, so revocation (user, admin, logout, refresh reuse, user disabled) takes effect immediately rather than when the JWT expires. Refresh tokens rotate on every use; presenting a used token revokes the whole session ("token family") and is audited.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0091 — docs/SECURITY.md:63-80
+Authorization and tenant isolation: * `app/core/policy.py` is the only place that maps roles → permissions. Routers depend on   `require(Permission.x)`; object rules (`scope_alerts`, `can_view_alert`) live there too. * The tenant id comes **only** from the verified access token and is re-checked against the   session and user rows. No endpoint accepts a tenant id. * Every transaction runs `set_config('app.tenant_id', <tid>, true)` (= `SET LOCAL`), applied by a   SQLAlchemy `after_begin` hook so it survives commits within a request. * Every tenant-scoped table has `ENABLE` + `FORCE ROW LEVEL SECURITY` and one policy   `tenant_id = rs_current_tenant()` for `USING` and `WITH CHECK`. A missing setting yields   `NULL` → zero rows (fail closed). * The API connects as `rs_app`: `NOSUPERUSER NOBYPASSRLS`, owns nothing, DML-only grants.   Migrations run as `rs_owner`. A guard test fails if any table with a `tenant_id` column lacks   a policy. * Composite foreign keys `(tenant_id, x_id)` stop cross-tenant references (FK checks bypass RLS). * Lookups that must happen before a tenant is known (login by e-mail, refresh by token hash,   invitation by token hash) use narrow `SECURITY DEFINER` functions that return identifiers only. * A lookup that finds nothing answers `404`. If the id exists in another tenant (checked with   `rs_resource_tenant`), the probe is written to **both** tenants' audit chains; the response is   byte-identical to a genuinely missing id.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0092 — docs/SECURITY.md:84-100
+Encryption: * **Master keys** (`RS_MASTER_KEYS`, versioned) live behind the `KeyProvider` interface   (`EnvKeyProvider` today, KMS/Vault later). They wrap per-tenant 256-bit keys with AES-256-GCM;   the AAD binds `tenant_id | purpose | version`, so a wrapped key copied to another tenant will   not unwrap. * **Per tenant**: a `data` DEK (versioned) and an `index` key (HMAC). * **Fields** (plates, TOTP secrets): `F1 | dek_version | 96-bit random nonce | AES-GCM(ct+tag)`   with AAD `rs-field | tenant_id | field name`. * **Blind index**: `HMAC-SHA256(index_key, field | normalized plate)` enables exact-match search. * **Evidence files**: `RSE1` header (DEK version, 32-byte salt, chunk size); per-file key   `HKDF-SHA256(DEK, salt, info=tenant|evidence|variant)`; 64 KiB chunks, counter nonces, AAD   includes the header, the chunk index and a final-chunk flag (detects tampering, reordering and   truncation). Both the redacted and the original variant are encrypted; neither is ever served   statically. * **Rotation**: `python -m app.cli rotate-tenant-key --tenant unit-a` (or   `POST /api/tenants/current/rotate-key`) creates DEK v+1, re-encrypts encrypted columns and   keeps old versions for existing evidence. `python -m app.cli rewrap-keys --tenant ...`   re-wraps all DEKs after adding a new master key version.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0093 — docs/SECURITY.md:104-110
+Audit log: `entry_hash = SHA-256(canonical JSON of tenant_id, seq, timestamp, actor_id, action, resource_type, resource_id, ip, user_agent, details, prev_hash)`; genesis `prev_hash` is 64 zeros. Writers take a per-tenant advisory lock so `seq` has no gaps. Entries are written in their own transaction, so denied or failed actions are still recorded. `rs_app` has only `SELECT, INSERT`; `BEFORE UPDATE OR DELETE` and `BEFORE TRUNCATE` triggers raise for every role, including the owner. `GET /api/audit/verify` walks the chain and returns the first broken entry. Details are redacted before hashing.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0094 — docs/SECURITY.md:112-116
+Audit log: Audited actions include: login success/failure/lockout, MFA success/failure/enrollment, recovery-code use, re-auth, logout, refresh-token reuse, session revocation, invitation create/revoke/accept/failure, user updates, tenant creation, alert create/confirm/reject/assign, plate search, evidence URL issued/viewed/exported, approval request/approve/deny/revoke/ self-approval blocked, key rotation/re-wrap, cross-tenant probes, access denials, verification runs.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0095 — docs/SECURITY.md:120-124
+Four-eyes approvals: `ApprovalRequest(kind = unblur | export)` needs a written justification (≥ 20 characters) and a case reference. Only a `tenant_admin` other than the requester can approve or deny, with fresh MFA. Approval creates a 30-minute grant for the requester and that evidence only; the grant is re-checked when each signed URL is redeemed, so revocation and expiry apply immediately. An unblur grant never authorizes export.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0096 — docs/SECURITY.md:128-139
+Frontend / PWA: * Cookies only; the SPA never sees a token. ESLint forbids `localStorage`,   `sessionStorage.setItem`, `eval`, `new Function` and `dangerouslySetInnerHTML`. * The service worker (`injectManifest`) precaches only the hashed static shell plus an offline   page; it ignores `/api/*`. The API sends `Cache-Control: no-store` everywhere. * Logout, session expiry and revocation call `clearClientState()`: Cache Storage, IndexedDB,   web storage and the push subscription are deleted. * After 5 minutes idle the UI is replaced by a lock screen that requires a TOTP code   (`POST /api/auth/reauth`). * Push payloads are generic (`New alert, priority: critical`); the server refuses any other   keys and the service worker replaces anything unexpected with a fixed text. * Invitation tokens are carried in the URL fragment (`/invite#token`), which is never sent to   servers or in `Referer`, and removed from the address bar immediately.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0097 — docs/SECURITY.md:145-149
+Backend (needs a PostgreSQL 16 superuser URL; a throwaway DB "rs_test" is created): cd backend python -m venv .venv && .venv/bin/pip install -r requirements.lock pytest httpx ruff black mypy export RS_TEST_ADMIN_DATABASE_URL=postgresql+psycopg://postgres:<pw>@localhost:5432/postgres .venv/bin/pytest                       # 171 tests .venv/bin/pytest tests/test_isolation.py tests/test_audit.py tests/test_encryption_at_rest.py
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0098 — docs/SECURITY.md:152-153
+Frontend: cd secure-pwa && npm ci && npm test && npm run lint && npm run build ```
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0099 — docs/SECURITY.md:155-155
+Frontend: Tests use dedicated roles (`rs_test_owner`, `rs_test_app`) so they never alter a dev database.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0100 — docs/SECURITY.md:159-184
+Known limitations (hackathon scope): * **Rate limiter is in-memory**: correct for one API process; use Redis when scaling out. * **Master keys come from an environment variable**; a KMS/HSM is the production answer. * **Tail truncation of the audit log** (deleting the newest entries) is not detectable from the   chain alone; anchoring the head hash externally (WORM storage / SIEM) is on the roadmap. * **Blind index** reveals equality of plates within a tenant (by design for search); the index   key is not rotated by `rotate-tenant-key` (rotating it requires recomputing all indexes). * **First-login enrollment**: someone who obtains a seeded user's password before that user   enrolls could enroll their own authenticator. Invitations reduce this (enrollment happens in   the same flow); seeded accounts are for development only. * **Caddy image runs as root** inside its container (to bind 80/443); all capabilities except   `NET_BIND_SERVICE` are dropped. Our own images run as non-root and read-only. * **Pipeline ingestion** is authenticated by per-service-account HMAC signatures (see API.md).   Its body is still read into memory before the signature is checked (capped by   `ingest_max_body_bytes`): put a body-size limit in front of it. * **Video-based speed** is for alerting/triage only (see README); fines need certified equipment. * **Redaction is a heuristic** (head = top third of a person box, plate = lower band of a vehicle box). It misses   small, night and unusual targets; it is not a guarantee and nothing here claims GDPR compliance. * **Pipeline evidence has no distinct original**: only the processed copy is stored (`has_original=false`), so   four-eyes unblur/export applies to manually created evidence only. * **Retention** deletes evidence files, not alerts, hashes or audit entries. The audit log keeps IP, user agent and   free-text notes for the life of the chain. * **MFA is mandatory.** The only exception is a demo switch (`RS_MFA_EXEMPTION_ENABLED`, off by default,   refused at start-up and ignored in production). * **Session limits**: idle timeout 30 min and absolute lifetime 12 h are enforced; the in-memory rate limiter and the   in-process SSE polling (1 s per connected client) limit a deployment to one API process. * Web Push delivery depends on the browser vendor's push service; payloads contain no data.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0101 — docs/SETUP.md:3-3
+Setup (Linux, macOS, Windows): **Verified on Linux (Ubuntu 24.04) only.** The macOS and Windows commands are the equivalent ones but were not run for this branch; the Python scripts (`scripts/demo.py`, `scripts/backup.sh` is bash and needs WSL/Git Bash on Windows) avoid shell-specific features where possible.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0102 — docs/SETUP.md:6-7
+Prerequisites: * Python 3.12 (`uv` recommended), Node.js 22 (>= 22.12), PostgreSQL 16+ (the suite passed on 18.6; CI is configured for 16.10), `ffmpeg` for the pipeline. * Docker is optional (the compose stack was not run for this branch).
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0103 — docs/SETUP.md:10-13
+PostgreSQL without Docker or root: | OS | How | |---|---| | Linux / macOS | `conda create -n rs-pg -c conda-forge postgresql -y`, then `initdb -D ~/.rs-pg-data -U postgres --auth=scram-sha-256 --pwfile=<file with a throwaway password>` and `pg_ctl -D ~/.rs-pg-data -o "-p 55432 -c listen_addresses=127.0.0.1" start` (exact commands used here: `docs/LOCAL_DEV_LINUX.md`). Or Homebrew `brew install postgresql@16` | | Windows | Installer from postgresql.org (or `choco install postgresql16`), or WSL2 with the Linux commands |
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0104 — docs/SETUP.md:15-15
+PostgreSQL without Docker or root: Use a **localhost-only** cluster with a throwaway password for development. Never reuse it.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0105 — docs/THREAT_MODEL.md:3-4
+RoadSentinel – Threat model (STRIDE): Scope: the security foundation in this repository (API, database, evidence store, PWA, reverse proxy). The detection pipeline is out of scope until it exists.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0106 — docs/THREAT_MODEL.md:8-16
+Assets: | Asset | Why it matters | |---|---| | Evidence (clips/keyframes, original and redacted) | Personal data (faces, plates), legal evidence | | Plate numbers | Personal data under GDPR / Directive (EU) 2016/680 | | Alerts and operator decisions | Operational police data; integrity matters for accountability | | Audit log | Proof of who accessed what; must be trustworthy | | Credentials, TOTP secrets, recovery codes, sessions | Account takeover enables everything else | | Tenant keys (DEKs) and master keys | Decrypt all protected data | | Availability of alerting | Delayed alerts delay emergency response |
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0107 — docs/THREAT_MODEL.md:20-25
+Actors: * **Operator / patrol / admin / auditor** of a police unit (tenant) – legitimate, partly trusted. * **Malicious or curious insider** in a tenant (e.g. wants to unblur a neighbour's car). * **User of another tenant** (Unit B probing Unit A). * **External attacker** on the Internet / police network. * **Privileged infrastructure insider** (DBA, host admin). * **Stolen or shared device** holder.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0108 — docs/THREAT_MODEL.md:36-38
+Trust boundaries: 1. Internet ↔ Caddy (TLS termination). 2. Caddy ↔ API (internal network). 3. API ↔ DB (internal `db` network, restricted role). 4. API ↔ evidence volume. 5. API ↔ third-party push services. 6. Device storage (Cache Storage, IndexedDB) ↔ other users of the same device.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0109 — docs/THREAT_MODEL.md:42-43
+Threats and mitigations: Phase numbers refer to the implementation phases (0 skeleton, 1 authentication, 2 authorization & isolation, 3 encryption, 4 audit, 5 four-eyes, 6 PWA, 7 supply chain).
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0110 — docs/THREAT_MODEL.md:47-55
+S – Spoofing: | Threat | Mitigation | Phase | |---|---|---| | Password guessing / credential stuffing | Argon2id, min length + common list, per-IP & per-account rate limits, lockout, generic errors | 1 | | Stolen password | Mandatory TOTP before any session; recovery codes hashed & single use | 1 | | TOTP code replay / phishing relay | Time-step replay protection; short MFA-pending window; SameSite=Strict cookies | 1 | | Account enumeration | Same response and timing for unknown/locked/wrong password; per-account limits on unknown e-mails | 1 | | Forged tokens | HS256 with server secret, typed tokens (`access` vs `mfa_pending`), issuer + exp checks, session row lookup | 1 | | Rogue sign-up | No registration endpoint; invitation-only, single-use hashed token, 24 h | 1 | | Spoofed push notifications | VAPID-signed sends; SW shows only whitelisted generic text | 6 |
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0111 — docs/THREAT_MODEL.md:59-68
+T – Tampering: | Threat | Mitigation | Phase | |---|---|---| | CSRF on state-changing endpoints | SameSite=Strict + double-submit token + Origin/Sec-Fetch-Site check (also on login) | 1 | | Writing into another tenant | RLS `WITH CHECK`, composite tenant FKs, tenant only from token | 2 | | Modifying ciphertext / evidence files | AES-GCM authentication; file header/chunk index/final flag in AAD | 3 | | Swapping redacted/original or files between evidence | Per-variant, per-evidence HKDF keys | 3 | | Editing/deleting audit entries | Hash chain; no UPDATE/DELETE grants; triggers block all roles; verify endpoint | 4 | | Self-approving an unblur | Server-side requester ≠ approver; admin-only; fresh MFA | 5 | | Tampered signed URL (e.g. redacted → original) | HMAC over purpose, evidence, variant, user, expiry; grant re-check | 3, 5 | | Malicious dependency / action | Lock files, audits, CodeQL, Dependabot, SHA-pinned actions | 7 |
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0112 — docs/THREAT_MODEL.md:72-77
+R – Repudiation: | Threat | Mitigation | Phase | |---|---|---| | "I never viewed that evidence" | Every signed URL issuance and every view/export audited with actor, IP, UA | 3, 4 | | "I never approved that" | Approvals record approver, time, note; audited; MFA-fresh | 4, 5 | | Insider rewrites history | Hash chain detects edits, deletions, reorders; tamper demo | 4 | | Failed actions disappear on rollback | Audit entries committed in their own transaction | 4 |
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0113 — docs/THREAT_MODEL.md:81-93
+I – Information disclosure: | Threat | Mitigation | Phase | |---|---|---| | Cross-tenant data access (IDOR) | RLS FORCE + restricted role; 404 for foreign ids; probes audited; tested on every endpoint | 2 | | Missing tenant context → leak | Fail closed: NULL setting matches no rows (tested) | 2 | | DB dump / backup theft | Plates, TOTP secrets: AES-256-GCM; evidence encrypted on disk; DEKs wrapped by master key | 3 | | Unblurred faces/plates by default | Redacted variant default; original only with four-eyes grant | 5 | | Evidence URL leakage (history, logs, Referer) | 60 s expiry, bound to user, still requires session; `Referrer-Policy: no-referrer` | 3, 6 | | Secrets in logs | Redacting log filter; Caddy log filter drops cookies/authorization; validation errors don't echo input | 3 | | Data left on shared device | No tokens in JS storage; no API caching; logout wipes caches/IndexedDB; idle lock | 6 | | Push service sees personal data | Generic payload only, enforced server- and client-side | 6 | | XSS steals data | Strict CSP (no inline/eval), React escaping, lint bans raw HTML, HttpOnly cookies | 6 | | Clickjacking | `frame-ancestors 'none'`, `X-Frame-Options: DENY` | 6 | | Secrets committed to git | `.env` ignored, generated by script; gitleaks in CI | 7 |
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0114 — docs/THREAT_MODEL.md:97-102
+D – Denial of service: | Threat | Mitigation | Phase | |---|---|---| | Login/MFA flooding | Rate limits (429 + Retry-After) | 1 | | Lockout abuse against a known user | Lockout is time-bounded (15 min); per-IP limits slow attackers; admin can still act | 1 | | Large uploads | Caddy `request_body max_size 10MB` | 0 | | Resource exhaustion | Container hardening; healthchecks + restart policies | 0 |
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0115 — docs/THREAT_MODEL.md:104-104
+D – Denial of service: Residual: no WAF / global DDoS protection (see roadmap).
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0116 — docs/THREAT_MODEL.md:108-115
+E – Elevation of privilege: | Threat | Mitigation | Phase | |---|---|---| | Operator performs admin actions | Central permission map; denials audited; RBAC matrix tested | 2 | | Patrol reads unassigned alerts | Object-level scope in policy layer; 404 | 2 | | Admin invites a system admin / changes own role | Assignable-role allow-list; self-modification blocked | 2 | | Stale session used for sensitive action | Step-up MFA within 5 minutes | 1 | | App process compromised → DB-wide access | `rs_app` has no BYPASSRLS, owns no tables, cannot ALTER; superuser creds only in one-shot migrate | 2 | | Container escape helpers | Non-root, read-only rootfs, `cap_drop: ALL`, `no-new-privileges` | 7 |
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0117 — docs/THREAT_MODEL.md:119-120
+Residual risks: See "Known limitations" in [SECURITY.md](../SECURITY.md) and the roadmap in [ARCHITECTURE_TARGET.md](../ARCHITECTURE_TARGET.md).
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0118 — docs/YOLO_REAL_INFERENCE_REPORT.md:5-11
+Romanian HLS adapter status — 2026-11-07: The configured-source layer now recognizes HLS master playlists, selects variants within configured resolution/bandwidth limits, rejects cross-host resource references by default, and opens the selected transport through OpenCV/FFmpeg with bounded timeouts. A generated local MPEG-TS playlist decoded in the 24-test source suite. No third-party Romanian playlist or segment was decoded; this is not an additional YOLO run and provides no Romanian FPS, detection, tracking, counting, or authorization evidence. Existing model measurements below remain CPU recorded-replay measurements.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0119 — docs/YOLO_REAL_INFERENCE_REPORT.md:15-22
+2026-11-07 physical camera availability update: The code now accepts explicit `device:N` UVC input through the existing YOLOX-S ONNX/ByteTrack pipeline. `cameras/local-uvc.yaml` contains no replay fallback and no invented calibration; rules are disabled until configured. The bounded probe command `timeout 15s .venv/bin/python -m scripts.probe_uvc_camera --device-index 0 --seconds 3` exited 2 with `/dev/video0` missing. Zero physical frames were captured; consequently physical-live detection, boxes, FPS, tracking, persistence and browser evidence are unavailable. The measurements below remain recorded-video replay results. No NVIDIA driver, global package or system setting was changed.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0120 — docs/YOLO_REAL_INFERENCE_REPORT.md:24-24
+2026-11-07 physical camera availability update: Last verified: 2026-11-06 (local CPU run)
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0121 — docs/YOLO_REAL_INFERENCE_REPORT.md:28-32
+Runtime and provenance: - Detector: Megvii YOLOX-S COCO, ONNX; official release artifact from the [Megvii YOLOX release](https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_s.onnx). - Model SHA-256: `c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063`. - Runtime: Python 3.12.3 project `.venv`, ONNX Runtime 1.23.2 `CPUExecutionProvider`, Supervision 0.30.7 ByteTrack. No PyTorch/Ultralytics is needed by this path. - Device: Intel i7-13650HX CPU; NVIDIA driver/GPU unavailable. Peak process RSS was 447.2 MB. - License: YOLOX repository Apache-2.0. The model is a COCO-trained upstream artifact; retain its provenance and review applicable notices before redistribution. Ultralytics was avoided because its AGPL obligations do not fit the private-development constraint as currently understood. This is not legal advice.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0122 — docs/YOLO_REAL_INFERENCE_REPORT.md:36-36
+Input and rights: Input was the recorded Wikimedia Commons file [Street traffic.webm](https://commons.wikimedia.org/wiki/File:Street_traffic.webm), credited there to Editor and marked CC BY 3.0. It depicts a San Francisco street, not a Romanian camera. Local downloaded source SHA-256: `e5facb24baf755f0c1193999d823e99f6032661ad2bdef5cc28cc1cbbfde03e2`. Attribution is required if the footage is redistributed. This was recorded-video replay, not external LIVE or locally captured live simulation.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0123 — docs/YOLO_REAL_INFERENCE_REPORT.md:40-40
+Reproduction and observed results: Command (camera config was a local temporary test config; no source URL or credentials):
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0124 — docs/YOLO_REAL_INFERENCE_REPORT.md:48-48
+Reproduction and observed results: The command completed with exit code 0. It processed 105 sampled frames across 34.9 seconds (source cadence about 30 FPS; inference sampling about 3 FPS). Model inference latency: p50 84.57 ms, p95 93.07 ms, p99 106.22 ms. Overall pipeline throughput was 1.84 sampled frames/s including tracking, annotation, and output. No decode failures or reconnects were reported.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0125 — docs/YOLO_REAL_INFERENCE_REPORT.md:50-54
+Reproduction and observed results: - 1,085 tracked observations and 67 unique tracks. - Track counts by class: bus 13, car 32, truck 16, bicycle 1, person 5. - Counting-line crossings: 9 total (bus 4, car 4, truck 1; 5 negative and 4 positive direction). - Per-frame boxes/classes/confidences/track IDs are in ignored local artifact `data/vision/yolo-commons-smoke-1793938099.jsonl` (1,103 JSONL records, including frame records); annotated output is `data/media/yolo-commons-smoke/annotated.mp4` (redaction enabled before rendering). - Model file and output artifacts are local; no footage or detections were committed.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0126 — docs/YOLO_REAL_INFERENCE_REPORT.md:56-56
+Reproduction and observed results: The tracker/class totals and line-crossing measurements are pipeline outputs, not labeled ground truth. No precision/recall, mAP, tracking quality, count accuracy, or incident accuracy was measured. Congestion rule evaluation ran and produced zero candidates on this clip; that negative result does not validate the rule. No incident event was emitted, so this run did not exercise secure event upload, PostgreSQL persistence, operator review, or dashboard rendering.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0127 — docs/YOLO_REAL_INFERENCE_REPORT.md:60-60
+Current acceptance boundary: Verified: actual official weights loaded; real vehicle boxes/classes/confidences produced; ByteTrack IDs and configured line counts produced; measured runtime and memory recorded. A local live-replay → signed API → PostgreSQL → authenticated React telemetry path is also verified below. Still unverified: authorized external Romanian live source, model-generated incident, and incident review using the same live detector output.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0128 — docs/YOLO_REAL_INFERENCE_REPORT.md:64-69
+Local live-replay vertical slice (2026-11-06): The integration test served the licensed clip continuously from a loopback-only MJPEG server (`roadsentinel.replay`) and consumed it through the supervised network capture adapter. It is marked `source_replay: true`; this is **not** an external Romanian feed. YOLOX-S/ByteTrack sent signed heartbeats using a camera-scoped HMAC service account to a real localhost FastAPI server. PostgreSQL stored telemetry under the camera tenant. The authenticated React app fetched the actual `/api/cameras` response and rendered camera detail while inference was active.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0129 — docs/YOLO_REAL_INFERENCE_REPORT.md:71-72
+Local live-replay vertical slice (2026-11-06): Run from `backend/` (requires the locally approved sample/model, `.venv`, Node 22, Playwright browser, and disposable PostgreSQL test cluster on port 55438):
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0130 — docs/YOLO_REAL_INFERENCE_REPORT.md:80-83
+Local live-replay vertical slice (2026-11-06): Latest result: **1 passed** (2026-11-06). The loopback source served 10 FPS; the CPU pipeline processed 1.587 FPS. The persisted snapshot reported 65 frames, 342 tracked observations, 26 tracks (bus 11, car 6, truck 9), and two line crossings (bus). Source health was healthy at 1920×1080 with zero reconnects/failures. Real YOLO emitted no incident candidate (`events: 0`).
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0131 — docs/YOLO_REAL_INFERENCE_REPORT.md:85-89
+Local live-replay vertical slice (2026-11-06): At persistence, latency p50/p95/p99 was 84.49/99.41/103.85 ms and peak RSS was 346.8 MB. Playwright saw the next backend heartbeat update reflected in camera detail within 2,387 ms, with 147 cumulative observations and two crossings. A separate signed `SYNTHETIC TEST` candidate was rejected in the authenticated browser; the test then asserted PostgreSQL status and audit persistence. This is heartbeat-change-to-UI-refresh delay, not frame-to-alert latency.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0132 — docs/YOLO_REAL_INFERENCE_REPORT.md:93-97
+Authenticated annotated frame evidence (2026-11-06): The preview path now publishes redacted, annotated JPEG frames through the existing camera-scoped HMAC identity. The backend keeps only the newest frame per `(tenant, camera)` in memory, with a four-second freshness TTL and 2 MiB per-frame limit; it does not persist frame JPEGs to PostgreSQL. The browser retrieves the frame via the authenticated camera detail endpoint, not from the source URL. UI labels remain `RECORDED REPLAY` for the loopback video source.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0133 — docs/YOLO_REAL_INFERENCE_REPORT.md:99-99
+Authenticated annotated frame evidence (2026-11-06): Bounded real-model E2E command and result:
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0134 — docs/YOLO_REAL_INFERENCE_REPORT.md:108-114
+Authenticated annotated frame evidence (2026-11-06): Result: **1 passed**. The browser test waited for successful natural image dimensions and a changed captured-frame timestamp/sequence, then saved `camera-live-overlay.png` in the pytest temporary directory; the test output printed the absolute path. The frame annotations include model class, confidence, tracker ID, count-line labels and an ISO UTC timestamp. This verifies actual changing annotated YOLO frames in authenticated Chromium during the loopback replay test, alongside real API and PostgreSQL telemetry. The preview is transient and tenant/camera scoped. It does not prove a physical camera, external Romanian feed, or persistent image-evidence storage.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0135 — docs/YOLO_REAL_INFERENCE_REPORT.md:116-119
+Authenticated annotated frame evidence (2026-11-06): At the E2E telemetry snapshot for this run: 63 processed frames, 315 detections, 25 observed tracks, 2 line crossings, ~1.54 CPU pipeline FPS; inference p50/p95/p99 ~86.8/107.2/117.8 ms; process RSS ~344.5 MB. These are a short run on the recorded San Francisco CC BY 3.0 clip and one CPU machine, not a sustained stability or accuracy benchmark. The source generated no incident candidate.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0136 — docs/YOLO_REAL_INFERENCE_REPORT.md:121-127
+Authenticated annotated frame evidence (2026-11-06): This is one recorded San Francisco scene on one CPU machine. It does not validate accuracy, tracking quality, count error against ground truth, multiple-camera capacity, adverse conditions, or incident precision. Per-camera summaries (class tracks, observation totals, FPS/latency/memory, source health, model/hash and crossings) use existing tenant-scoped `cameras.status_info` JSONB and `/api/cameras`. Per-frame boxes/confidences remain in the optional local JSONL detection log; they are not persisted in PostgreSQL. The integration run enabled only the wrong-way rule and emitted no incident. Synthetic rule regression coverage is in `tests/test_rules.py` and `tests/test_rules_rates.py`.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0137 — docs/YOLO_REAL_INFERENCE_REPORT.md:131-131
+Repeat after camera-catalog UI change (2026-11-06): The actual-model full E2E was run again after adding the Romanian read-only discovery panel:
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0138 — docs/YOLO_REAL_INFERENCE_REPORT.md:140-145
+Repeat after camera-catalog UI change (2026-11-06): Exit code 0, **1 passed**. The persisted telemetry snapshot reported 64 processed frames, 326 detections, 25 observed track IDs, 2 line crossings (bus), sampled pipeline FPS 1.566, inference p50/p95/p99 88.61/102.62/105.40 ms, and peak process RSS 369.8 MB. Source health was healthy, 1920×1080, with 0 failures and 0 reconnects; the source was explicitly marked replay. The worker continued after the browser assertion and later reported 69 frames, 29 tracks and 3 crossings; these are later cumulative totals, not the same fixed-interval snapshot.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0139 — docs/YOLO_REAL_INFERENCE_REPORT.md:147-151
+Repeat after camera-catalog UI change (2026-11-06): The browser image and overlays are preserved locally at `data/vision/evidence/real-yolox-loopback-replay-2026-11-06.png` (SHA-256 `d32e7c04d4326a8626dd1ed9a1e101ffb8bc8b6041d80554dbcfddb933f268c7`). It visibly shows model boxes/labels, ByteTrack IDs, the configured count line, UTC capture timestamp, and replay label. The screenshot is redacted and local-only. It does not establish detection accuracy.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0140 — docs/YOLO_REAL_INFERENCE_REPORT.md:153-158
+Repeat after camera-catalog UI change (2026-11-06): The final catalog-inclusive browser run passed after correcting its expected candidate-row count to 26. Browser output included `REAL_ROMANIAN_CATALOG_OK entries=26 enabled=0`. Persisted snapshot: 65 frames, 329 detections, 26 tracks, 2 line crossings, 1.592 FPS, p50/p95/p99 inference 87.39/106.24/125.74 ms, RSS 347.1 MB. The final screenshot is `data/vision/evidence/real-yolox-loopback-replay-catalog-e2e-2026-11-06.png` (SHA-256 `6241f4ab2274e5ecac0d12d7e84e41ef824731d17fb579866fa36a756665111f`).
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0141 — docs/YOLO_REAL_INFERENCE_REPORT.md:160-166
+Repeat after camera-catalog UI change (2026-11-06): After moving the catalog module out of the repository's ignored `data/` path, the full E2E was run once more against the final source tree and passed (exit 0). The browser confirmed 26 candidate rows with zero feeds enabled. Latest persisted test interval: 66 frames, 336 detections, 26 tracks, 2 crossings; 1.617 FPS, latency p50/p95/p99 86.88/103.95/108.11 ms, peak RSS 344.7 MB; camera-detail heartbeat refresh was 1,256 ms. The final local screenshot is `data/vision/evidence/real-yolox-loopback-replay-final-e2e-2026-11-06.png` (SHA-256 `7389edd0a2fc9eb0ccd5618a7578044c628628ae09bb4ac469bd651bad886e6d`).
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0142 — scripts/demo_security.md:3-3
+5-minute security demo (for judges): Preparation (before the demo):
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0143 — scripts/demo_security.md:11-14
+5-minute security demo (for judges): Open https://localhost (trust Caddy's local certificate). The dev password for every seeded account is `RS_SEED_PASSWORD` in `.env`. Log in once beforehand with `operator.a`, `admin.a`, `auditor.a` and `operator.b` to enroll TOTP (QR on first login), and keep the authenticator app at hand. Use two browser profiles (Unit A / Unit B).
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0144 — scripts/demo_security.md:16-16
+5-minute security demo (for judges): Shortcut for the terminal: `alias dc='docker compose --env-file .env -f deploy/docker-compose.yml'`.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0145 — scripts/demo_security.md:18-18
+5-minute security demo (for judges): ---
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0146 — scripts/demo_security.md:22-29
+1. Unit B cannot see Unit A (≈ 1 min): 1. Browser A (`operator.a@roadsentinel.local`): open any alert, copy its URL (`/alerts/<id>`). 2. Browser B (`operator.b@roadsentinel.local`): paste the URL → **"Alert not found"** (HTTP 404,    the same answer as for an id that does not exist). 3. Browser B as `auditor.b`, Audit page → entry `security.cross_tenant_access`. Unit A's audit    log records the probe too. 4. Say: *isolation is enforced twice – the API derives the tenant only from the session, and    PostgreSQL Row-Level Security (forced, restricted role, fail-closed) filters every query.*    Optional proof: `dc exec postgres psql -U postgres -d roadsentinel -c "SET ROLE rs_app; SELECT count(*) FROM alerts;"` → `0`.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0147 — scripts/demo_security.md:33-38
+2. Audit tampering is detected (≈ 1 min): 1. `auditor.a` → Audit → **Verify integrity** → ✔ chain intact. 2. Terminal: `dc run --rm migrate python scripts/audit_tamper_demo.py --tenant unit-a --keep`    (a superuser disables triggers and rewrites one entry). 3. Click **Verify integrity** again → ✖ *Tampering detected at entry #N*; the row is highlighted. 4. Say: *the app role cannot UPDATE/DELETE the audit table at all, triggers block even the owner,    and the hash chain catches a superuser.* (Run the script without `--keep` to restore.)
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0148 — scripts/demo_security.md:42-50
+3. Unblur needs a second person, and it is audited (≈ 1.5 min): 1. `operator.a`: open a critical alert → evidence is **blurred**, plate shown as `B****Z`. 2. Request access → kind *Unblur*, case `CASE-2026-0042`, justification → submitted. 3. Show that the operator cannot approve it, and that an admin cannot approve **their own** request    (button replaced by "Needs another admin"; server returns 403). 4. `admin.a` → Approvals → **Approve** → MFA step-up prompt → enter code. 5. `operator.a`: refresh the alert → "Unblur granted until …", full plate visible,    **Show original** works for 30 minutes and can be revoked. 6. `auditor.a` → Audit: `approval.requested`, `approval.approved`, `evidence.url_issued`,    `evidence.viewed`.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0149 — scripts/demo_security.md:60-62
+4. The database only holds ciphertext (≈ 45 s): Point out the `F1` (field) and `RSE1` (file) headers followed by random bytes: AES-256-GCM with a per-tenant key wrapped by the master key. Optional: `dc exec backend python -m app.cli rotate-tenant-key --tenant unit-a` → new key version, data still readable.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+### REQ-0150 — scripts/demo_security.md:66-73
+5. Installable PWA with generic push (≈ 45 s): 1. In Chrome/Edge: install icon in the address bar → RoadSentinel opens as a standalone app. 2. Sessions page → **Enable alert notifications on this device**. 3. Terminal: `dc exec backend python -m app.cli demo-alert --tenant unit-a --priority critical`    (dev-only helper; operators can also create alerts with `POST /api/alerts`). The notification    reads only **"New alert, priority: critical"**: no plate, place or image. Details appear only    after login. 4. DevTools → Application → Cache Storage: only the static shell (no API responses).    Click **Sign out** → caches and IndexedDB are emptied. Leave the app idle for 5 minutes → it locks.
+
+Status: IMPLEMENTED UNVERIFIED. Next: Execute concrete acceptance behavior; historical documentation is not current-run evidence.
+
+
+## Post-work category supplement (A01–A35; not the initial baseline)
+The initial paragraph inventory above records source promises. This category supplement was written after implementation and identifies concrete owners and acceptance limits; it must not be mistaken for an earlier execution result. These statuses are conservative and are not a claim that every linked promise was functionally verified.
+
+### A01 Product/interfaces
+- Code: `frontend/src/App.tsx;secure-pwa/src;backend/app/main.py`. Test owner: `backend/tests/test_contract_api.py`.
+- Baseline/current limit: Secure backend authoritative; legacy architecture table contradicts current architecture. PWA browser not exercised.
+- Final conservative category: PARTIAL; priority P1.
+
+### A02 Detection/tracking
+- Code: `roadsentinel/detector.py;roadsentinel/pipeline.py;models/registry.json`. Test owner: `backend/tests/test_mission_vertical.py`.
+- Baseline/current limit: Actual inference on licensed-derived synthetic frozen fixture; no incident accuracy measurement.
+- Final conservative category: VERIFIED REAL INPUT PARTIAL; priority P0.
+
+### A03 Adapters/rights
+- Code: `roadsentinel/sources.py;roadsentinel/consent.py;roadsentinel/replay.py`. Test owner: `tests/test_sources.py;tests/test_consent.py`.
+- Baseline/current limit: Local adapters tested. External rights not established; no remote media fetched.
+- Final conservative category: TESTED SYNTHETIC ONLY; priority P0.
+
+### A04 Geometry/calibration
+- Code: `roadsentinel/geometry.py;backend/app/services/camera_config.py`. Test owner: `tests/test_rules_rates.py`.
+- Baseline/current limit: Synthetic geometry is not a calibrated real road. No speed certification.
+- Final conservative category: TESTED SYNTHETIC ONLY; priority P1.
+
+### A05 Rule thresholds
+- Code: `roadsentinel/rules.py;backend/app/services/offline_analysis.py`. Test owner: `tests/test_rules.py;tests/test_mission_vertical.py`.
+- Baseline/current limit: Frozen-frame model tracks produce nine candidates; this is not street incident validation.
+- Final conservative category: VERIFIED REAL INPUT PARTIAL; priority P0.
+
+### A06 Critical event types
+- Code: `roadsentinel/rules.py;backend/app/core/catalog.py`. Test owner: `tests/test_rules.py`.
+- Baseline/current limit: Wrong way/pedestrian/crash/object production precision and recall remain unverified.
+- Final conservative category: TESTED SYNTHETIC ONLY; priority P1.
+
+### A07 High event types
+- Code: `roadsentinel/rules.py`. Test owner: `tests/test_rules.py`.
+- Baseline/current limit: Stopped/offline candidate bridge implemented. Physical speed and near miss remain unvalidated.
+- Final conservative category: TESTED SYNTHETIC ONLY; priority P1.
+
+### A08 Medium event types
+- Code: `roadsentinel/rules.py;roadsentinel/rates.py`. Test owner: `tests/test_rules_rates.py`.
+- Baseline/current limit: Sampling constraints matter; no operational validation.
+- Final conservative category: TESTED SYNTHETIC ONLY; priority P2.
+
+### A09 Information/offline rules
+- Code: `backend/app/services/offline_analysis.py`. Test owner: `backend/tests/test_mission_vertical.py`.
+- Baseline/current limit: Line counts stay analytics; only obstruction/queue eligible for explicit recorded review.
+- Final conservative category: VERIFIED REAL INPUT PARTIAL; priority P0.
+
+### A10 Evidence assembly
+- Code: `backend/app/services/offline_promotion.py;backend/app/services/evidence.py;roadsentinel/pipeline.py`. Test owner: `backend/tests/test_mission_vertical.py;backend/tests/test_evidence_integrity.py`.
+- Baseline/current limit: HTTP media + encryption verified for recorded fixture; crash orphan cleanup remains open.
+- Final conservative category: VERIFIED REAL INPUT PARTIAL; priority P0.
+
+### A11 Signed ingestion
+- Code: `roadsentinel/sink.py;backend/app/api/ingest.py;backend/app/services/ingest_auth.py`. Test owner: `backend/tests/test_ingest_auth.py;backend/tests/test_ingest_idempotency.py`.
+- Baseline/current limit: Use final execution ledger for test-level outcomes; managed fencing newly added.
+- Final conservative category: IMPLEMENTED UNVERIFIED; priority P0.
+
+### A12 Operator queue
+- Code: `frontend/src/store/data.ts;backend/app/api/contract.py`. Test owner: `backend/tests/test_contract_api.py`.
+- Baseline/current limit: API exercised; new UI source labels compile. Full candidate promotion browser journey not verified.
+- Final conservative category: PARTIAL; priority P0.
+
+### A13 Decisions/patrol
+- Code: `backend/app/api/contract.py;backend/app/api/patrol.py`. Test owner: `backend/tests/test_mission_vertical.py;backend/tests/test_patrol_stats.py`.
+- Baseline/current limit: Actual HTTP reject tested for recorded fixture. Signs/enforcement remain action labels.
+- Final conservative category: VERIFIED REAL INPUT PARTIAL; priority P0.
+
+### A14 Archive/saved searches
+- Code: `backend/app/services/search.py;backend/app/api/contract.py`. Test owner: `backend/tests/test_pagination.py`.
+- Baseline/current limit: Tenant-filtered parser and keyset paging exist; browser retrieval of new candidate not yet demonstrated.
+- Final conservative category: IMPLEMENTED UNVERIFIED; priority P1.
+
+### A15 Investigation/export
+- Code: `backend/app/api/investigation.py;backend/app/api/casework.py;backend/app/services/package_verify.py`. Test owner: `backend/tests/test_evidence_integrity.py`.
+- Baseline/current limit: Imported API/UI exist. Approval-to-export manifest verification of promoted incident not proven in this mission.
+- Final conservative category: PARTIAL; priority P0.
+
+### A16 Camera administration
+- Code: `backend/app/api/camera_control.py;backend/app/services/camera_config.py;frontend/src/components/CameraControlPanel.tsx`. Test owner: `backend/tests/test_managed_live_runtime.py`.
+- Baseline/current limit: Managed runtime fixture tests do not prove two-admin UI approval workflow.
+- Final conservative category: PARTIAL; priority P0.
+
+### A17 Clients/accessibility
+- Code: `frontend/src;secure-pwa/src`. Test owner: `frontend/src/store/auth.test.ts`.
+- Baseline/current limit: Frontend build and 15 tests pass. PWA browser and accessibility acceptance remain unverified.
+- Final conservative category: PARTIAL; priority P2.
+
+### A18 Authentication/MFA/RLS
+- Code: `backend/app/services/auth.py;backend/app/db.py;backend/app/bootstrap.py;backend/app/services/seed.py`. Test owner: `backend/tests/test_auth.py;backend/tests/test_seed.py;backend/tests/test_isolation.py`.
+- Baseline/current limit: Disposable DB authenticates with mandatory MFA. Existing integration owner BYPASSRLS=false remains blocker; existing DB untouched.
+- Final conservative category: PARTIAL; priority P0.
+
+### A19 Keys/audit
+- Code: `backend/app/core/crypto.py;backend/app/core/audit.py;backend/app/core/audit_anchor.py`. Test owner: `backend/tests/test_crypto.py;backend/tests/test_audit.py`.
+- Baseline/current limit: AES-GCM and hash chain exist. Local checkpoint is not independent external custody.
+- Final conservative category: IMPLEMENTED UNVERIFIED; priority P1.
+
+### A20 Privacy/legal
+- Code: `roadsentinel/redaction.py;roadsentinel/consent.py;backend/app/services/retention.py`. Test owner: `tests/test_privacy_defaults.py;backend/tests/test_retention.py`.
+- Baseline/current limit: Heuristic redaction is not anonymization. No legal/DPIA sign-off or enforcement integration.
+- Final conservative category: PARTIAL; priority P0.
+
+### A21 Model governance
+- Code: `roadsentinel/models.py;models/registry.json;training`. Test owner: `tests/test_models.py`.
+- Baseline/current limit: Stock model hash known; external configurable model path added. No representative evaluated activation.
+- Final conservative category: PARTIAL; priority P1.
+
+### A22 Real accuracy
+- Code: `docs/LIMITS.md;models/reports`. Test owner: `tests/test_evaluation.py`.
+- Baseline/current limit: No labeled representative data/approved target metrics. Counts not ground truth.
+- Final conservative category: EXTERNALLY BLOCKED; priority P1.
+
+### A23 Offline jobs
+- Code: `backend/app/api/offline_video.py;backend/app/services/offline_analysis.py;backend/app/models/offline_video.py`. Test owner: `backend/tests/test_mission_vertical.py;backend/tests/test_offline_video_authz.py`.
+- Baseline/current limit: Upload/crop/job/candidates/media/review tested over HTTP. Restart/browser/retention matrix incomplete.
+- Final conservative category: VERIFIED REAL INPUT PARTIAL; priority P0.
+
+### A24 Live worker
+- Code: `roadsentinel/remote_config.py;roadsentinel/live.py;roadsentinel/pipeline.py;backend/app/api/camera_worker.py`. Test owner: `backend/tests/test_managed_live_runtime.py;tests/test_remote_config.py`.
+- Baseline/current limit: Actual latest outcomes in managed-live and backend-final logs. Do not treat test-owned approval rows as admin acceptance.
+- Final conservative category: PARTIAL; priority P0.
+
+### A25 Contracts
+- Code: `backend/app/schemas/contract.py;frontend/src/lib/adapters.ts;API.md`. Test owner: `backend/tests/test_contract_api.py`.
+- Baseline/current limit: Legacy/secure contract coexist. New origin stored in details; labels added conservatively, unknown source disclosed.
+- Final conservative category: PARTIAL; priority P0.
+
+### A26 Migrations/seed
+- Code: `backend/alembic;backend/app/services/seed.py`. Test owner: `backend/tests/test_isolation.py;backend/tests/test_seed.py`.
+- Baseline/current limit: Fresh cluster tested through 0021. Existing integration not migrated or backed up during mission.
+- Final conservative category: PARTIAL; priority P0.
+
+### A27 Install/readiness
+- Code: `deploy/docker-compose.yml;frontend/vite.config.ts;backend/app/api/health.py`. Test owner: `backend/tests/test_ops_and_authz.py`.
+- Baseline/current limit: Current proxy correct. Compose not executed. Readiness does not mean a camera is online.
+- Final conservative category: PARTIAL; priority P1.
+
+### A28 Testing/CI
+- Code: `backend/tests;tests;frontend/e2e;.github/workflows/ci.yml`. Test owner: `TEST_EXECUTION_LEDGER.md`.
+- Baseline/current limit: Local execution evidence only; no GitHub CI execution or push.
+- Final conservative category: PARTIAL; priority P1.
+
+### A29 Legacy boundaries
+- Code: `roadsentinel/server.py;web;README.md`. Test owner: `tests/test_api.py`.
+- Baseline/current limit: Legacy batch destructive semantics remain isolated; not used for mission E2E.
+- Final conservative category: PARTIAL; priority P1.
+
+### A30 Optional AI/telemetry
+- Code: `roadsentinel/vlm.py;roadsentinel/tracking.py`. Test owner: `tests/test_privacy_defaults.py`.
+- Baseline/current limit: External VLM and W&B not enabled in mission; no external data transmission test.
+- Final conservative category: IMPLEMENTED UNVERIFIED; priority P2.
+
+### A31 Romanian source catalog
+- Code: `cameras/romanian-source-registry.json;backend/app/services/camera_discovery.py`. Test owner: `backend/tests/test_camera_discovery.py`.
+- Baseline/current limit: Catalog restored from original source. Candidates remain ingestion-disabled; no rights or availability claim.
+- Final conservative category: PARTIAL; priority P1.
+
+### A32 Optional scope
+- Code: `docs/LIMITS.md;README.md`. Test owner: `not applicable`.
+- Baseline/current limit: Fog/ice/plate/facial/enforcement/SSO not added. No automatic sanctions.
+- Final conservative category: NOT APPLICABLE / OPTIONAL; priority P3.
+
+### A33 Reliability/backpressure
+- Code: `roadsentinel/live.py;backend/app/services/camera_control.py`. Test owner: `tests/test_live.py;backend/tests/test_managed_heartbeat.py`.
+- Baseline/current limit: Critical queue overflow bounded; stale sequences no longer extend lease. Long soak/multi-camera absent.
+- Final conservative category: PARTIAL; priority P0.
+
+### A34 Honest presentation
+- Code: `frontend/src/lib/adapters.ts;frontend/src/pages/VideoAnalysisPage.tsx`. Test owner: `frontend/src/store/auth.test.ts`.
+- Baseline/current limit: RECORDED/LOCAL REPLAY/SYNTHETIC source prefixes. No external live or accuracy badge inferred.
+- Final conservative category: PARTIAL; priority P1.
+
+### A35 Integrated guarantees
+- Code: `backend/app/models/camera_control.py;backend/app/models/casework.py;backend/app/models/investigation.py`. Test owner: `backend/tests/test_isolation.py`.
+- Baseline/current limit: Tenant table inventory now derived after all models imported. Imported case/control paths need more end-to-end coverage.
+- Final conservative category: PARTIAL; priority P0.

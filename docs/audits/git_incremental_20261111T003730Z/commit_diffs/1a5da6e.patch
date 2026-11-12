@@ -1,0 +1,2400 @@
+diff --git a/frontend/scripts/e2e-investigation.mjs b/frontend/scripts/e2e-investigation.mjs
+index 5c47350..017f29b 100644
+--- a/frontend/scripts/e2e-investigation.mjs
++++ b/frontend/scripts/e2e-investigation.mjs
+@@ -76,7 +76,7 @@ try {
+   await op.getByTestId('case-workspace').waitFor()
+   assert.equal(await op.getByTestId('evidence-clip').getByTestId('storage-state').innerText(), 'Disponibilă')
+   assert.match(await op.getByTestId('source-kind').innerText(), /Necunoscută/)
+-  assert.match(await op.getByTestId('model-status').innerText(), /nevalidat/)
++  assert.match(await op.getByTestId('model-status').innerText(), /nu a fost măsurată/)
+   assert.match(await op.getByTestId('speed').innerText(), /necalibrată/)
+   step('case opened from the archive: evidence available, source/model/speed shown honestly')
+ 
+diff --git a/frontend/src/App.tsx b/frontend/src/App.tsx
+index 2df012a..205484d 100644
+--- a/frontend/src/App.tsx
++++ b/frontend/src/App.tsx
+@@ -1,6 +1,7 @@
+ import { createBrowserRouter, Navigate, RouterProvider, useParams } from 'react-router'
+ import { GuestOnly, RequireAuth, RequirePermission } from '@/components/guards'
+ import AppLayout from '@/layouts/AppLayout'
++import LandingPage from '@/pages/LandingPage'
+ import LoginPage from '@/pages/LoginPage'
+ import DashboardPage from '@/pages/DashboardPage'
+ import AlertDetailPage from '@/pages/AlertDetailPage'
+@@ -20,7 +21,7 @@ const router = createBrowserRouter([
+     element: <GuestOnly />,
+     errorElement: <RouteErrorPage />,
+     children: [
+-      { path: '/', element: <Navigate to="/login" replace /> },
++      { path: '/', element: <LandingPage /> },
+       { path: '/login', element: <LoginPage /> },
+     ],
+   },
+diff --git a/frontend/src/components/ActivityReport.tsx b/frontend/src/components/ActivityReport.tsx
+new file mode 100644
+index 0000000..b89635c
+--- /dev/null
++++ b/frontend/src/components/ActivityReport.tsx
+@@ -0,0 +1,80 @@
++interface Row { label: string; count: number }
++
++export interface ActivityReportProps {
++  period: string
++  generatedAt: string
++  totals: Row[]
++  cameras: Row[]
++  types: Row[]
++  /** Alert count per hour of day, 24 entries. */
++  hours: number[]
++}
++
++const heading = 'text-[9pt] font-bold uppercase tracking-wider border-b border-black pb-1 mb-1.5'
++
++function CountTable({ title, rows }: { title: string; rows: Row[] }) {
++  return (
++    <div>
++      <h2 className={heading}>{title}</h2>
++      {rows.length === 0 ? <p className="text-[9pt]">Nicio alertă.</p> : (
++        <table className="w-full border-collapse text-[9pt]">
++          <tbody>
++            {rows.map((row) => (
++              <tr key={row.label} className="border-b border-neutral-300">
++                <td className="py-[3px] pr-2">{row.label}</td>
++                <td className="py-[3px] text-right font-mono font-semibold w-12">{row.count}</td>
++              </tr>
++            ))}
++          </tbody>
++        </table>
++      )}
++    </div>
++  )
++}
++
++/** One A4 page shown only in print (see the print block in index.css). */
++export function ActivityReport({ period, generatedAt, totals, cameras, types, hours }: ActivityReportProps) {
++  const maxHour = Math.max(1, ...hours)
++  return (
++    <section className="rs-print-report hidden print:block bg-white text-black font-sans text-[10pt] leading-snug">
++      <h1 className="text-[18pt] font-bold tracking-tight">RoadSentinel – raport de activitate</h1>
++      <p className="mt-1 text-[10pt]">Perioada acoperită de date: <strong>{period}</strong></p>
++      <p className="text-[8.5pt] text-neutral-600">Raport generat la {generatedAt}</p>
++
++      <div className="mt-4 grid grid-cols-4 gap-2">
++        {totals.map((total) => (
++          <div key={total.label} className="border border-neutral-400 rounded px-2.5 py-2">
++            <div className="text-[8pt] uppercase tracking-wider text-neutral-600">{total.label}</div>
++            <div className="text-[18pt] font-bold font-mono leading-tight">{total.count}</div>
++          </div>
++        ))}
++      </div>
++
++      <div className="mt-5 grid grid-cols-2 gap-6">
++        <CountTable title="Alerte pe cameră" rows={cameras} />
++        <CountTable title="Alerte pe tip" rows={types} />
++      </div>
++
++      <div className="mt-5">
++        <h2 className={heading}>Alerte pe oră (ora din zi, 00–23)</h2>
++        <div className="flex items-end gap-[3px] h-[30mm] mt-2">
++          {hours.map((count, hour) => (
++            <div key={hour} className="flex-1 h-full flex flex-col justify-end items-center">
++              <span className="text-[7pt] font-mono">{count || ''}</span>
++              <div className="w-full bg-neutral-700" style={{ height: `${(count / maxHour) * 80}%` }} />
++            </div>
++          ))}
++        </div>
++        <div className="flex gap-[3px] border-t border-black pt-0.5">
++          {hours.map((_, hour) => (
++            <span key={hour} className="flex-1 text-center text-[7pt] font-mono">{String(hour).padStart(2, '0')}</span>
++          ))}
++        </div>
++      </div>
++
++      <p className="mt-6 pt-2 border-t border-neutral-400 text-[8.5pt] text-neutral-700">
++        Date demonstrative dintr-un prototip. Nu reprezintă statistici oficiale de trafic.
++      </p>
++    </section>
++  )
++}
+diff --git a/frontend/src/components/AuditVerification.tsx b/frontend/src/components/AuditVerification.tsx
+index 0114f93..6a30b39 100644
+--- a/frontend/src/components/AuditVerification.tsx
++++ b/frontend/src/components/AuditVerification.tsx
+@@ -4,6 +4,7 @@ import { useState } from 'react'
+ import { Link } from 'react-router'
+ import { Loader2, ShieldAlert, ShieldCheck } from 'lucide-react'
+ import { ApiError } from '@/lib/api'
++import { useDataStore } from '@/store/data'
+ import { auditVerify, errorMessage, evidenceIntegrity, type AuditVerify, type IntegrityItem, type IntegrityState } from '@/lib/cases'
+ 
+ const INTEGRITY: Record<IntegrityState, { label: string; cls: string }> = {
+@@ -13,23 +14,29 @@ const INTEGRITY: Record<IntegrityState, { label: string; cls: string }> = {
+   missing: { label: 'Fișier lipsă din stocare', cls: 'text-amber-400' },
+   purged: { label: 'Purjat deliberat', cls: 'text-text-secondary' },
+   unavailable: { label: 'Stocare indisponibilă (necunoscut)', cls: 'text-sky-400' },
+-  no_hash: { label: 'Fără amprentă SHA-256 la preluare', cls: 'text-amber-400' },
++  no_hash: { label: 'Fără amprentă digitală la preluare', cls: 'text-amber-400' },
+   not_checked: { label: 'Neverificat încă', cls: 'text-text-secondary' },
+ }
+ const KIND: Record<string, string> = { keyframe: 'Cadru cheie', clip: 'Clip', camera_video: 'Înregistrare cameră' }
+ const fail = (e: unknown) => e instanceof ApiError && e.status === 403 ? 'Acces refuzat: verificarea este rezervată rolurilor de audit.' : errorMessage(e)
+ 
++const CHAIN_REASON: Record<string, string> = {
++  'prev_hash mismatch': 'legătura cu intrarea anterioară nu corespunde',
++  'entry_hash mismatch': 'conținutul intrării a fost modificat',
++}
++
+ function ChainResult({ r }: { r: AuditVerify }) {
+   if (r.ok && r.checked === 0) return <p className="text-amber-400" data-testid="chain-state">Lanț gol: nu există încă intrări de audit pentru această unitate.</p>
+   if (r.ok) return <p className="text-emerald-400" data-testid="chain-state">Lanț intact: {r.checked} intrări verificate.</p>
+   return (
+     <p className="text-rose-400 font-semibold" data-testid="chain-state">
+-      Lanț rupt la intrarea #{r.first_broken_seq} ({r.reason}). Au fost parcurse {r.checked} intrări; ce urmează nu poate fi considerat intact.
++      Lanț rupt la intrarea #{r.first_broken_seq} ({CHAIN_REASON[r.reason ?? ''] ?? r.reason}). Au fost parcurse {r.checked} intrări; ce urmează nu poate fi considerat intact.
+     </p>
+   )
+ }
+ 
+ export function AuditVerificationPanel() {
++  const cameras = useDataStore((s) => s.cameras)
+   const [chain, setChain] = useState<AuditVerify | null>(null)
+   const [items, setItems] = useState<IntegrityItem[] | null>(null)
+   const [total, setTotal] = useState(0)
+@@ -73,7 +80,7 @@ export function AuditVerificationPanel() {
+       {chain && (
+         <div className="mb-2 space-y-0.5" role="status">
+           <ChainResult r={chain} />
+-          {chain.head_hash && <p className="text-text-secondary break-all">Hash curent (capul lanțului): <code className="text-text-primary" data-testid="chain-head">{chain.head_hash}</code></p>}
++          {chain.head_hash && <p className="text-text-secondary break-all">Amprentă digitală curentă a jurnalului: <code className="text-[10px]" data-testid="chain-head">{chain.head_hash}</code></p>}
+           <p className="text-[10px] text-text-secondary">Lanțul este verificat pe același sistem care îl scrie: dovadă de modificare, nu ancoră independentă.</p>
+         </div>
+       )}
+@@ -84,13 +91,13 @@ export function AuditVerificationPanel() {
+           </p>
+           {items.length === 0 ? <p className="text-text-secondary">Nicio probă stocată.</p> : (
+             <table className="w-full text-left border-collapse">
+-              <thead className="text-[10px] uppercase text-text-secondary"><tr><th className="py-1 pr-2">Probă</th><th className="py-1 pr-2">Caz / cameră</th><th className="py-1 pr-2">SHA-256</th><th className="py-1">Stare</th></tr></thead>
++              <thead className="text-[10px] uppercase text-text-secondary"><tr><th className="py-1 pr-2">Probă</th><th className="py-1 pr-2">Caz / cameră</th><th className="py-1 pr-2">Amprentă digitală</th><th className="py-1">Stare</th></tr></thead>
+               <tbody className="divide-y divide-border/60">
+                 {items.map((i) => (
+                   <tr key={i.id} data-testid="integrity-row" data-integrity={i.integrity}>
+-                    <td className="py-1 pr-2 font-mono">{KIND[i.kind] ?? i.kind} {i.id.slice(0, 8)}</td>
+-                    <td className="py-1 pr-2">{i.event_id ? <Link to={`/app/alerte/${i.event_id}`} className="text-accent hover:underline">#{i.event_id}</Link> : '—'}{i.camera_id ? ` · ${i.camera_id}` : ''}</td>
+-                    <td className="py-1 pr-2">{i.sha256_recorded ? 'înregistrat' : 'lipsă'}{i.distinct_original ? ' · original separat' : ''}</td>
++                    <td className="py-1 pr-2 font-mono">{KIND[i.kind] ?? i.kind} <span className="text-[10px] text-text-secondary/70" title="Identificator intern al probei">{i.id.slice(0, 8)}</span></td>
++                    <td className="py-1 pr-2">{i.event_id ? <Link to={`/app/alerte/${i.event_id}`} className="text-accent hover:underline">#{i.event_id}</Link> : '—'}{i.camera_id ? ` · ${cameras.find((c) => c.id === i.camera_id)?.name ?? i.camera_id}` : ''}</td>
++                    <td className="py-1 pr-2">{i.sha256_recorded ? 'înregistrată' : 'lipsă'}{i.distinct_original ? ' · original separat' : ''}</td>
+                     <td className={`py-1 ${INTEGRITY[i.integrity].cls}`}>{i.integrity === 'mismatch' || i.integrity === 'unreadable' ? <ShieldAlert className="w-3.5 h-3.5 inline mr-1" /> : null}{INTEGRITY[i.integrity].label}</td>
+                   </tr>
+                 ))}
+diff --git a/frontend/src/components/CasePanels.tsx b/frontend/src/components/CasePanels.tsx
+index 9668b65..2e5603d 100644
+--- a/frontend/src/components/CasePanels.tsx
++++ b/frontend/src/components/CasePanels.tsx
+@@ -6,9 +6,11 @@ import { CheckCircle2, FileCheck2, GitBranch, ListTodo, Loader2, Scale, Trash2,
+ import { ApiError } from '@/lib/api'
+ import {
+   addFollowup, addLink, errorMessage, followupAssignees, MAX_VERIFY_BYTES, placeHold, releaseHold, removeLink,
+-  updateFollowup, verifyPackage,
++  updateFollowup, verifyErrorRo, verifyPackage,
+   type CaseDossier, type ContextEvent, type Followup, type FollowupStatus, type PackageVerifyResult, type Person,
+ } from '@/lib/cases'
++import { HIDDEN_IDS } from '@/lib/demo'
++import { HIDDEN_TYPES } from '@/store/data'
+ 
+ const card = 'bg-[#111821] border border-[#1E2A36] rounded-md p-3.5'
+ const title = 'font-sans font-bold text-xs uppercase tracking-wider text-[#7D8A9B] mb-2 flex items-center gap-1.5'
+@@ -25,6 +27,9 @@ function Status({ error }: { error: string | null }) {
+   return error ? <p role="alert" className="text-[11px] text-[#FF3B3B] mt-1.5">{error}</p> : null
+ }
+ 
++// Alerts hidden everywhere else in the demo (lib/demo.ts) stay hidden in these panels too.
++const shownCase = (c: { number: number; type: string }) => !HIDDEN_TYPES.has(c.type) && !HIDDEN_IDS.has(String(c.number))
++
+ interface PanelProps { number: string; dossier: CaseDossier; reload: () => Promise<void> }
+ 
+ // --------------------------------------------------------------------------- legal hold
+@@ -34,10 +39,12 @@ export function LegalHoldPanel({ number, dossier, reload }: PanelProps) {
+   const [reason, setReason] = useState('')
+   const [busy, setBusy] = useState(false)
+   const [error, setError] = useState<string | null>(null)
++  const [armed, setArmed] = useState(false)
+   if (!state) return null
+   const active = state.active
+   const submit = async () => {
+-    setBusy(true); setError(null)
++    if (active && !armed) { setArmed(true); return }  // releasing a hold takes a second, explicit click
++    setArmed(false); setBusy(true); setError(null)
+     try { await (active ? releaseHold(number, reason.trim()) : placeHold(number, reason.trim())); setReason(''); await reload() }
+     catch (e) { setError(denied(e)) } finally { setBusy(false) }
+   }
+@@ -52,11 +59,11 @@ export function LegalHoldPanel({ number, dossier, reload }: PanelProps) {
+       <p className="text-[10px] text-[#536070] mb-2">{state.effect}</p>
+       {state.can_manage ? (
+         <form onSubmit={(e) => { e.preventDefault(); void submit() }} className="space-y-1.5" aria-label={active ? 'Ridicare reținere' : 'Plasare reținere'}>
+-          <input value={reason} maxLength={500} onChange={(e) => setReason(e.target.value)} className={input}
++          <input value={reason} maxLength={500} onChange={(e) => { setReason(e.target.value); setArmed(false) }} className={input}
+             placeholder={active ? 'Motivul ridicării (minimum 10 caractere)' : 'Temeiul reținerii (minimum 10 caractere)'}
+             aria-label={active ? 'Motivul ridicării reținerii' : 'Temeiul reținerii legale'} />
+           <button type="submit" disabled={busy || reason.trim().length < 10} className={active ? ghost : primary}>
+-            {active ? 'Ridică reținerea' : 'Plasează reținerea'}
++            {active ? (armed ? 'Confirmă ridicarea reținerii' : 'Ridică reținerea') : 'Plasează reținerea'}
+           </button>
+         </form>
+       ) : <p className="text-[11px] text-[#7D8A9B]">Doar un administrator al unității poate plasa sau ridica reținerea.</p>}
+@@ -78,7 +85,7 @@ export function LegalHoldPanel({ number, dossier, reload }: PanelProps) {
+ // --------------------------------------------------------------------------- related cases
+ 
+ export function RelatedPanel({ number, dossier, reload }: PanelProps) {
+-  const related = dossier.related ?? []
++  const related = (dossier.related ?? []).filter(shownCase)
+   const [other, setOther] = useState('')
+   const [reason, setReason] = useState('')
+   const [busy, setBusy] = useState(false)
+@@ -88,8 +95,12 @@ export function RelatedPanel({ number, dossier, reload }: PanelProps) {
+     try { await addLink(number, Number(other), reason.trim()); setOther(''); setReason(''); await reload() }
+     catch (e) { setError(denied(e)) } finally { setBusy(false) }
+   }
++  const [confirming, setConfirming] = useState<string | null>(null)
++  const armedAt = useRef(0)
+   const remove = async (id: string) => {
+-    setError(null)
++    if (confirming !== id) { setConfirming(id); armedAt.current = Date.now(); return }  // first click only asks
++    if (Date.now() - armedAt.current < 400) return  // a double-click is not a confirmation
++    setConfirming(null); setError(null)
+     try { await removeLink(number, id); await reload() } catch (e) { setError(denied(e)) }
+   }
+   return (
+@@ -110,7 +121,7 @@ export function RelatedPanel({ number, dossier, reload }: PanelProps) {
+                     {why.label}{why.reason ? ` — „${why.reason}”` : ''}{why.created_by ? ` · ${why.created_by}` : ''}
+                   </span>
+                   {why.can_remove && why.link_id && (
+-                    <button type="button" onClick={() => void remove(why.link_id!)} className="text-[#7D8A9B] hover:text-[#FF3B3B] cursor-pointer" aria-label={`Elimină legătura cu cazul #${r.number}`}><Trash2 size={12} /></button>
++                    <button type="button" onClick={() => void remove(why.link_id!)} onBlur={() => setConfirming(null)} className="text-[#7D8A9B] hover:text-[#FF3B3B] cursor-pointer" aria-label={confirming === why.link_id ? `Confirmă eliminarea legăturii cu cazul #${r.number}` : `Elimină legătura cu cazul #${r.number}`}>{confirming === why.link_id ? <span className="text-[#FF3B3B] font-semibold">Confirmă eliminarea</span> : <Trash2 size={12} />}</button>
+                   )}
+                 </li>
+               ))}
+@@ -143,7 +154,7 @@ const fmtDelta = (s: number) => {
+ export function ContextStrip({ dossier }: { dossier: CaseDossier }) {
+   const ctx = dossier.context
+   if (!ctx) return null
+-  const events: ContextEvent[] = [...ctx.before, ...ctx.after]
++  const events: ContextEvent[] = [...ctx.before, ...ctx.after].filter(shownCase)
+   const pos = (d: number) => `${50 + (d / ctx.window_s) * 50}%`
+   return (
+     <section className={card} aria-labelledby="ctx-title" data-testid="timeline-context">
+@@ -301,7 +312,7 @@ export function VerifyPackageForm() {
+   const run = async () => {
+     if (!file) return
+     setResult(null); setError(null)
+-    if (file.size > MAX_VERIFY_BYTES) { setError('Fișierul depășește dimensiunea maximă a unui pachet.'); return }
++    if (file.size > MAX_VERIFY_BYTES) { setError('Pachetul depășește 60 MB. Verificați-l pe calculator cu: python -m app.cli verify-package <fișier>.'); return }
+     setBusy(true)
+     try { setResult(await verifyPackage(file, digest.trim() || undefined)) }
+     catch (e) { setError(e instanceof ApiError && e.status === 429 ? 'Prea multe verificări; reîncercați peste câteva minute.' : errorMessage(e)) }
+@@ -320,7 +331,7 @@ export function VerifyPackageForm() {
+           <div className="font-semibold">{result.ok ? `Integritate confirmată: ${result.files_checked} fișiere verificate.` : 'Verificarea a eșuat.'}</div>
+           {result.manifest_sha256 && <div className="text-[#7D8A9B] break-all">Manifest SHA-256: <code>{result.manifest_sha256}</code></div>}
+           {result.server_record && <div className="text-[#7D8A9B]">Corespunde exportului {result.server_record.export_id.slice(0, 8)} al cazului #{result.server_record.event_id}.</div>}
+-          {result.errors.length > 0 && <ul className="list-disc ml-4">{result.errors.map((e) => <li key={e} className="break-all">{e}</li>)}</ul>}
++          {result.errors.length > 0 && <ul className="list-disc ml-4">{result.errors.map((e, i) => <li key={`${i}-${e}`} className="break-all">{verifyErrorRo(e)}</li>)}</ul>}
+           <div className="text-[10px] text-[#536070] mt-1">{result.note}</div>
+         </div>
+       )}
+diff --git a/frontend/src/components/CaseWorkspace.tsx b/frontend/src/components/CaseWorkspace.tsx
+index 5006d9a..17da925 100644
+--- a/frontend/src/components/CaseWorkspace.tsx
++++ b/frontend/src/components/CaseWorkspace.tsx
+@@ -34,7 +34,7 @@ const EXPORT_STATE: Record<ExportJob['state'], string> = {
+ }
+ export const HISTORY_LABEL: Record<string, string> = {
+   detected: 'Detecție automată', viewed: 'Vizualizat', confirmed: 'Confirmat', rejected: 'Respins', assigned: 'Asignat patrulei',
+-  vlm_verdict: 'Verificare VLM', decision_conflict: 'Decizie concurentă refuzată', note_created: 'Notă adăugată',
++  vlm_verdict: 'Verificare AI', decision_conflict: 'Decizie concurentă refuzată', note_created: 'Notă adăugată',
+   note_revised: 'Notă revizuită', note_retracted: 'Notă retrasă', bookmark_created: 'Marcaj adăugat', bookmark_removed: 'Marcaj șters',
+   evidence_missing: 'Probă lipsă la acces', export_requested: 'Export solicitat', export_approved: 'Export aprobat',
+   export_denied: 'Export respins', export_canceled: 'Export anulat', export_generated: 'Pachet generat',
+@@ -71,10 +71,9 @@ export function EvidencePanel({ dossier }: { dossier: CaseDossier }) {
+                 {STATE[ev.storage_state].label}{ev.purged_at ? ` · ${fmtTime(ev.purged_at)}` : ''}
+               </span>
+             </div>
+-            <div className="text-[#7D8A9B] mt-1">Mascare: {ev.redaction_label}</div>
+             <div className="text-[#7D8A9B]">
+-              {ev.original_exists ? 'Există original nemascat (acces doar cu aprobare)' : 'Nu există original nemascat stocat'}
+-              {' · '}{ev.sha256_recorded ? 'SHA-256 înregistrat la preluare' : 'fără amprentă SHA-256'}
++              {ev.original_exists ? 'Există original nemascat (acces doar cu aprobare) · ' : ev.redaction === 'full' ? 'Nu există original nemascat stocat · ' : ''}
++              {ev.sha256_recorded ? <>Amprentă digitală înregistrată la preluare <span className="text-[10px] text-[#7D8A9B]">(SHA-256)</span></> : 'Fără amprentă digitală'}
+               {ev.duration_s ? ` · ${ev.duration_s.toFixed(2)} s` : ''}
+             </div>
+             {ev.storage_state !== 'available' && (
+@@ -321,7 +320,7 @@ export function ExportPanel({ number, dossier }: { number: string; dossier: Case
+     <section className={card} aria-labelledby="export-title">
+       <h2 id="export-title" className={title}><Archive size={13} /> Pachet de probe (export controlat)</h2>
+       <p className="text-[11px] text-[#7D8A9B] mb-2">
+-        Pachetul conține probele mascate ale cazului, manifestul cu amprente SHA-256 și instrucțiuni de verificare. Necesită aprobarea unui al doilea administrator; linkul de descărcare este de unică folosință pe termen scurt.
++        Pachetul conține probele stocate ale cazului, manifestul cu amprentele digitale ale fișierelor și instrucțiuni de verificare. Necesită aprobarea unui al doilea administrator; linkul de descărcare este de unică folosință pe termen scurt.
+       </p>
+       {jobs === null && <div className="text-xs text-[#7D8A9B] flex items-center gap-1"><Loader2 size={12} className="animate-spin" /> Se încarcă…</div>}
+       <ul className="space-y-2 mb-2">
+@@ -331,7 +330,7 @@ export function ExportPanel({ number, dossier }: { number: string; dossier: Case
+               <span className="font-semibold text-[#E6EDF3]">{EXPORT_STATE[j.state]}</span>
+               <span className="text-[#536070]">{j.requester} · {fmtTime(j.created_at)}</span>
+             </div>
+-            <div className="text-[#7D8A9B]">{j.include_original ? 'Include originale nemascate (aprobate)' : 'Doar variante mascate'}{j.approved_by ? ` · aprobat de ${j.approved_by}` : ''}{j.error ? ` · cod: ${j.error}` : ''}</div>
++            <div className="text-[#7D8A9B]">{j.include_original ? 'Include originale nemascate (aprobate)' : 'Doar variantele stocate'}{j.approved_by ? ` · aprobat de ${j.approved_by}` : ''}{j.error ? ` · cod: ${j.error}` : ''}</div>
+             {j.state === 'processing' && j.error === 'storage_unavailable' && (
+               <div className="text-[#FFC23D]">Stocarea nu a răspuns; generarea se reia automat (încercări de stocare: {j.storage_retries ?? 0}). Nu s-a consumat nicio încercare.</div>
+             )}
+@@ -340,7 +339,7 @@ export function ExportPanel({ number, dossier }: { number: string; dossier: Case
+             )}
+             {j.state === 'completed' && (
+               <div className="mt-1 text-[#7D8A9B] break-all">
+-                Manifest SHA-256: <code className="text-[#E6EDF3]" data-testid="manifest-sha256">{j.manifest_sha256}</code>
++                Amprentă digitală a pachetului: <code className="text-[10px] text-[#536070]" data-testid="manifest-sha256">{j.manifest_sha256}</code>
+                 <div>{j.file_count} fișiere · {((j.package_size ?? 0) / 1024).toFixed(1)} KiB · nesemnat (verificare prin amprente) · expiră {j.expires_at ? fmtTime(j.expires_at) : '—'}</div>
+               </div>
+             )}
+diff --git a/frontend/src/components/IasiMap.tsx b/frontend/src/components/IasiMap.tsx
+index b39c73f..38fe75c 100644
+--- a/frontend/src/components/IasiMap.tsx
++++ b/frontend/src/components/IasiMap.tsx
+@@ -12,20 +12,19 @@ import L from 'leaflet';
+ import 'leaflet/dist/leaflet.css';
+ import { Video } from 'lucide-react';
+ import {
++  DEMO_LEGEND,
+   IASI_MAP_CONFIG,
++  isDemoCamera,
+   type MapCamera,
+-  type MapPatrol,
+   type MapAlert,
+   type Severity,
+ } from '@/lib/iasi';
+ 
+ export interface IasiMapProps {
+   cameras: MapCamera[];
+-  patrols?: MapPatrol[];
+   alerts?: MapAlert[];
+   focusCameraId?: string;
+   onCameraClick?: (id: string) => void;
+-  onPatrolClick?: (id: string) => void;
+   /** Hide the overlay label and zoom buttons (background use). */
+   bare?: boolean;
+   className?: string;
+@@ -106,38 +105,11 @@ const createCameraIcon = (camera: MapCamera, isWorstAlert: boolean, alertLabel?:
+   });
+ };
+ 
+-// Icon generator for patrols
+-const createPatrolIcon = (patrol: MapPatrol) => {
+-  const color =
+-    patrol.status === 'available'
+-      ? '#2ED47A'
+-      : patrol.status === 'busy'
+-      ? '#FF8A1F'
+-      : '#7D8A9B';
+-
+-  const label = patrol.status === 'available' ? 'DISP' : patrol.status === 'busy' ? 'MISIUNE' : 'PAUZĂ';
+-
+-  return L.divIcon({
+-    className: 'iasi-custom-patrol-marker',
+-    html: `
+-      <div class="iasi-patrol-badge font-mono" style="border-color: ${color}66; box-shadow: 0 0 12px ${color}33;">
+-        <span class="iasi-patrol-dot" style="background-color: ${color};"></span>
+-        <span class="iasi-patrol-callsign font-bold text-[#E6EDF3]">${patrol.callsign}</span>
+-        <span class="iasi-patrol-pill" style="color: ${color}; background-color: ${color}1A;">${label}</span>
+-      </div>
+-    `,
+-    iconSize: [115, 26],
+-    iconAnchor: [57, 13],
+-  });
+-};
+-
+ export function IasiMap({
+   cameras,
+-  patrols = [],
+   alerts = [],
+   focusCameraId,
+   onCameraClick,
+-  onPatrolClick,
+   bare = false,
+   className = '',
+ }: IasiMapProps) {
+@@ -184,6 +156,13 @@ export function IasiMap({
+ 
+       </div>
+ 
++      {/* Legend: most markers are stock footage placed on the map for illustration */}
++      {!bare && cameras.some((c) => isDemoCamera(c.id)) && (
++        <div className="absolute bottom-3 left-3 z-[1000] px-2.5 py-1 rounded-md bg-[#111821]/90 border border-[#FFC23D]/40 text-[11px] text-[#E6EDF3] shadow-lg" data-testid="map-demo-legend">
++          <span className="font-bold text-[#FFC23D]">DEMO</span> · {DEMO_LEGEND}
++        </div>
++      )}
++
+       {/* Leaflet Map Container */}
+       <MapContainer
+         center={bare ? [47.1625, 27.5885] : IASI_MAP_CONFIG.center}
+@@ -221,36 +200,6 @@ export function IasiMap({
+           />
+         )}
+ 
+-        {/* Patrol Markers */}
+-        {patrols.map((patrol) => (
+-          <Marker
+-            key={`patrol-${patrol.id}`}
+-            position={[patrol.lat, patrol.lng]}
+-            icon={createPatrolIcon(patrol)}
+-            eventHandlers={{ click: () => onPatrolClick?.(patrol.id) }}
+-          >
+-            <Popup className="iasi-custom-popup">
+-              <div className="p-3 bg-[#111821] text-[#E6EDF3] rounded-md border border-[#1E2A36] text-xs font-sans min-w-[180px]">
+-                <div className="flex items-center justify-between pb-1.5 border-b border-[#1E2A36] mb-2 font-mono">
+-                  <span className="font-bold text-[#3DA5FF]">{patrol.callsign}</span>
+-                  <span className={`text-[10px] px-1.5 py-0.5 rounded ${
+-                    patrol.status === 'available'
+-                      ? 'text-[#2ED47A] bg-[#2ED47A]/15'
+-                      : patrol.status === 'busy'
+-                      ? 'text-[#FF8A1F] bg-[#FF8A1F]/15'
+-                      : 'text-[#7D8A9B] bg-[#7D8A9B]/15'
+-                  }`}>
+-                    {patrol.status.toUpperCase()}
+-                  </span>
+-                </div>
+-                <div className="text-[11px] text-[#7D8A9B] mb-2">
+-                  Zonă: <strong className="text-[#E6EDF3]">{patrol.area || 'Centru'}</strong>
+-                </div>
+-              </div>
+-            </Popup>
+-          </Marker>
+-        ))}
+-
+         {/* Camera Markers */}
+         {cameras.map((camera) => {
+           const isTopAlertCamera = topAlert && topAlert.cameraId === camera.id;
+@@ -286,6 +235,9 @@ export function IasiMap({
+                   {/* Location & Details */}
+                   <div className="text-[11px] text-[#7D8A9B] mb-2.5">
+                     {camera.location}
++                    {isDemoCamera(camera.id) && (
++                      <div className="mt-1 text-[#FFC23D]">Filmare demonstrativă de arhivă, nu o cameră din Iași.</div>
++                    )}
+                   </div>
+ 
+                   <div className="flex items-center justify-between text-[11px] font-mono mb-3 bg-[#17202B] p-1.5 rounded border border-[#1E2A36]">
+diff --git a/frontend/src/components/TacticalMap.tsx b/frontend/src/components/TacticalMap.tsx
+index 6a6a3e9..c409be8 100644
+--- a/frontend/src/components/TacticalMap.tsx
++++ b/frontend/src/components/TacticalMap.tsx
+@@ -2,7 +2,7 @@ import { useMemo, Suspense, lazy } from 'react';
+ import { useDataStore } from '@/store/data';
+ import {
+   IASI_CAMERAS,
+-  IASI_PATROLS,
++  iasiCameraName,
+   type MapCamera,
+   type MapAlert,
+   type Severity,
+@@ -18,7 +18,6 @@ export interface TacticalMapProps {
+   bare?: boolean;
+   focusCameraId?: string;
+   onCameraClick?: (id: string) => void;
+-  onPatrolClick?: (id: string) => void;
+   criticalAlertLocation?: string;
+ }
+ 
+@@ -27,7 +26,6 @@ export function TacticalMap({
+   bare,
+   focusCameraId,
+   onCameraClick,
+-  onPatrolClick,
+ }: TacticalMapProps) {
+   const storeCameras = useDataStore((s) => s.cameras);
+   const alerts = useDataStore((s) => s.alerts);
+@@ -52,7 +50,7 @@ export function TacticalMap({
+         ? storeCameras
+         : Object.entries(IASI_CAMERAS).map(([id, def]) => ({
+             id,
+-            name: def.name,
++            name: iasiCameraName(id) ?? def.name,
+             road: def.location,
+             status: 'online' as const,
+           }));
+@@ -98,11 +96,9 @@ export function TacticalMap({
+       >
+         <IasiMapLazy
+           cameras={bare ? mapCameras.map((c) => ({ ...c, openAlerts: 0, worst: undefined })) : mapCameras}
+-          patrols={IASI_PATROLS}
+           alerts={bare ? [] : mapAlerts}
+           focusCameraId={focusCameraId}
+           onCameraClick={onCameraClick}
+-          onPatrolClick={onPatrolClick}
+           bare={bare}
+           className="w-full h-full"
+         />
+diff --git a/frontend/src/hooks/index.ts b/frontend/src/hooks/index.ts
+index 4700d69..5809d1d 100644
+--- a/frontend/src/hooks/index.ts
++++ b/frontend/src/hooks/index.ts
+@@ -7,7 +7,7 @@ import { useDataStore } from '@/store/data'
+ import { useAuthStore } from '@/store/auth'
+ import { can, type Permission } from '@/lib/permissions'
+ import { SEVERITY_ORDER } from '@/lib/constants'
+-import { assignDemoTimes, demoSort } from '@/lib/demo'
++import { demoSort } from '@/lib/demo'
+ import type { Alert, Severity } from '@/types'
+ 
+ const openModals: HTMLElement[] = []
+@@ -50,6 +50,10 @@ export function useCan(p: Permission) {
+ }
+ 
+ /** Simulated real-time feed: pushes a new alert every N seconds while enabled. */
++
++// A refresh nobody asked for must not raise the operator's error banner; the next one retries.
++const background = (error: unknown) => console.warn('background refresh failed', error)
++
+ export function useLiveFeed(onAlert?: (a: Alert) => void) {
+   const { liveFeed, liveIntervalSec } = useDataStore((s) => s.settings)
+   const push = useDataStore((s) => s.pushLiveAlert)
+@@ -60,23 +64,23 @@ export function useLiveFeed(onAlert?: (a: Alert) => void) {
+     if (!liveFeed) return
+     if (!USE_MOCKS) {
+       const stream = new EventSource(apiUrl('/api/stream'), { withCredentials: true })
+-      stream.onopen = () => { void reloadData().catch(reportError) }
++      stream.onopen = () => { void reloadData().catch(background) }
+       stream.addEventListener('alert', (message) => {
+-        try { const alert = adaptEvent(JSON.parse(message.data)); upsertAlert(alert); cb.current?.(alert); void reloadStats().catch(reportError) }
+-        catch (error) { reportError(error) }
++        try { const alert = adaptEvent(JSON.parse(message.data)); upsertAlert(alert); cb.current?.(alert); void reloadStats().catch(background) }
++        catch (error) { background(error) }
+       })
+       stream.addEventListener('audit', (message) => {
+         try {
+           const entry = adaptAudit(JSON.parse(message.data))
+           mergeAudit([entry])
+-          if (entry.target) void loadDetail(entry.target).catch(reportError)
+-          if (['confirmed', 'rejected'].includes(entry.action)) void reloadStats().catch(reportError)
++          if (entry.target) void loadDetail(entry.target).catch(background)
++          if (['confirmed', 'rejected'].includes(entry.action)) void reloadStats().catch(background)
+         }
+-        catch (error) { reportError(error) }
++        catch (error) { background(error) }
+       })
+       stream.onerror = () => { void api<Me>('/api/me').then((me) => {
+         if (!me.operator && me.auth_required) { stream.close(); location.assign('/login') }
+-      }).catch(reportError) }
++      }).catch(background) }
+       return () => stream.close()
+     }
+     const t = setInterval(() => cb.current?.(push()), liveIntervalSec * 1000)
+@@ -102,9 +106,7 @@ export function useQueue() {
+   const alerts = useDataStore((s) => s.alerts)
+   return useMemo(() => {
+     // Every shown alert stays in the list after a decision; its status is shown on the row.
+-    const queue = [...alerts].sort(demoSort)
+-    assignDemoTimes(queue)
+-    return queue
++    return [...alerts].sort(demoSort)
+   }, [alerts])
+ }
+ 
+@@ -138,7 +140,6 @@ export function useStats() {
+       open,
+       confirmed,
+       rejected,
+-      falseAlarmRate: confirmed + rejected ? rejected / (confirmed + rejected) : 0,
+       avgResponseMin: responseMin.length ? responseMin.reduce((s, x) => s + x, 0) / responseMin.length : 0,
+       bySeverity,
+       byType,
+diff --git a/frontend/src/index.css b/frontend/src/index.css
+index 5f95f60..5608c88 100644
+--- a/frontend/src/index.css
++++ b/frontend/src/index.css
+@@ -379,49 +379,6 @@ html, body {
+   z-index: 15;
+ }
+ 
+-/* Patrol Custom Marker */
+-.iasi-custom-patrol-marker {
+-  background: transparent !important;
+-  border: none !important;
+-}
+-
+-.iasi-patrol-badge {
+-  display: flex;
+-  align-items: center;
+-  gap: 5px;
+-  padding: 3px 8px;
+-  border-radius: 6px;
+-  background: #111821;
+-  border: 1px solid #1E2A36;
+-  font-size: 11px;
+-  cursor: pointer;
+-  white-space: nowrap;
+-  transition: all 0.3s ease;
+-}
+-
+-.iasi-patrol-badge:hover {
+-  transform: translateY(-2px);
+-}
+-
+-.iasi-patrol-dot {
+-  width: 7px;
+-  height: 7px;
+-  border-radius: 50%;
+-  flex-shrink: 0;
+-}
+-
+-.iasi-patrol-callsign {
+-  font-size: 11px;
+-}
+-
+-.iasi-patrol-pill {
+-  padding: 1px 4px;
+-  border-radius: 4px;
+-  font-size: 8px;
+-  font-weight: 700;
+-  letter-spacing: 0.5px;
+-}
+-
+ /* OSM standard tiles turned into a dark tactical basemap */
+ .rs-dark-tiles {
+   filter: invert(1) hue-rotate(195deg) brightness(0.78) contrast(0.95) saturate(0.35);
+@@ -431,3 +388,41 @@ html, body {
+ .rs-dark-tiles {
+   filter: invert(1) hue-rotate(195deg) brightness(0.78) contrast(0.95) saturate(0.35);
+ }
++
++/* Printable activity report (StatsPage -> components/ActivityReport). When the report is in the
++   page, print keeps only the report: everything under #root that is neither the report nor one
++   of its ancestors is removed, and the ancestors lose the app-shell sizing and dark backgrounds.
++   No AppLayout class name is involved, so the sidebar and header go whatever they are called. */
++@media print {
++  @page {
++    size: A4 portrait;
++    margin: 14mm;
++  }
++  html:has(.rs-print-report),
++  html:has(.rs-print-report) body,
++  html:has(.rs-print-report) #root {
++    height: auto !important;
++    overflow: visible !important;
++    background: #fff !important;
++    color: #000 !important;
++  }
++  #root:has(.rs-print-report) *:not(.rs-print-report):not(.rs-print-report *):not(:has(.rs-print-report)) {
++    display: none !important;
++  }
++  #root *:has(.rs-print-report) {
++    display: block !important;
++    position: static !important;
++    width: auto !important;
++    height: auto !important;
++    min-height: 0 !important;
++    overflow: visible !important;
++    margin: 0 !important;
++    padding: 0 !important;
++    border: 0 !important;
++    background: #fff !important;
++  }
++  .rs-print-report {
++    -webkit-print-color-adjust: exact;
++    print-color-adjust: exact;
++  }
++}
+diff --git a/frontend/src/layouts/AppLayout.tsx b/frontend/src/layouts/AppLayout.tsx
+index f3bc8ab..169e1ed 100644
+--- a/frontend/src/layouts/AppLayout.tsx
++++ b/frontend/src/layouts/AppLayout.tsx
+@@ -1,4 +1,4 @@
+-import { preloadClips, preloadImages } from '@/lib/demo'
++import { PRELOAD_FIRST, PRELOAD_MAX_WAIT_MS, preloadClips, preloadReady } from '@/lib/demo'
+ import { useEffect, useState } from 'react'
+ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router'
+ import {
+@@ -14,11 +14,14 @@ import {
+   FileText,
+   X,
+   ArrowRight,
++  AlertTriangle,
+ } from 'lucide-react'
+ import type { LucideIcon } from 'lucide-react'
+ import { useAuthStore } from '@/store/auth'
+-import { useDataStore } from '@/store/data'
++import { cameraById, useDataStore } from '@/store/data'
++import { ALERT_TYPE, ROLE_LABEL } from '@/lib/constants'
+ import { can, type Permission } from '@/lib/permissions'
++import { USE_MOCKS } from '@/lib/api'
+ import { useLiveFeed, useQueue } from '@/hooks'
+ import type { Alert } from '@/types'
+ import { Logo } from '@/assets/brand/Logo'
+@@ -42,7 +45,7 @@ export const MAIN_NAV: NavItem[] = [
+ export const EXTRA_NAV: NavItem[] = [
+   { to: '/app/patrule', label: 'Patrule', icon: Car, permission: 'patrols.view' },
+   { to: '/app/reguli', label: 'Reguli & Zone', icon: Sliders, permission: 'rules.view' },
+-  { to: '/app/audit', label: 'Audit Log', icon: FileText, permission: 'audit.view' },
++  { to: '/app/audit', label: 'Jurnal de audit', icon: FileText, permission: 'audit.view' },
+ ]
+ 
+ function beep() {
+@@ -109,18 +112,26 @@ export default function AppLayout() {
+   }, [toast, navigate])
+ 
+   const openAlertsCount = queue.filter((a) => a.status === 'new' || a.status === 'in_review').length
+-  // Preload every alert's clip before showing the app, so no video ever buffers during the pitch.
+-  const allAlerts = useDataStore((s) => s.alerts)
+-  const [skipPreload, setSkipPreload] = useState(false)
+-  const [preload, setPreload] = useState<{ done: number; total: number; finished: boolean }>({ done: 0, total: 0, finished: false })
+-  const clipKey = allAlerts.map((a) => a.id).join(',')
++  // The first few clips are preloaded before the app is shown; the rest follow in the background.
++  // The overlay never waits for all of them, nor longer than PRELOAD_MAX_WAIT_MS.
++  const loaded = useDataStore((s) => USE_MOCKS || s.stats !== null)
++  const dataError = useDataStore((s) => s.error)
++  const loadFailed = dataError !== null
++  const [overlay, setOverlay] = useState(true)
++  const [timedOut, setTimedOut] = useState(false)
++  const [clipsDone, setClipsDone] = useState(0)
++  const clipTotal = new Set(queue.map((a) => a.clip?.src).filter(Boolean)).size
++  const clipKey = queue.map((a) => a.id).join(',')
+   useEffect(() => {
+-    if (!allAlerts.length) return
+-    const ordered = [...queue, ...allAlerts.filter((a) => !queue.includes(a))]
+-    preloadImages(ordered.map((a) => a.keyframeUrl))
+-    void preloadClips(ordered.map((a) => a.clip?.src), (done, total) => setPreload((p) => ({ ...p, done, total })))
+-      .then(() => setPreload((p) => ({ ...p, finished: true })))
++    const timer = setTimeout(() => setTimedOut(true), PRELOAD_MAX_WAIT_MS)
++    return () => clearTimeout(timer)
++  }, [])
++  useEffect(() => {
++    void preloadClips(queue.map((a) => a.clip?.src), (done) => setClipsDone(done))
+   }, [clipKey])
++  const ready = preloadReady({ loaded, failed: loadFailed, timedOut, total: clipTotal, done: clipsDone })
++  useEffect(() => { if (ready) setOverlay(false) }, [ready])
++  const clipTarget = Math.min(clipTotal, PRELOAD_FIRST)
+   const initials = user?.fullName
+     ? user.fullName
+         .split(' ')
+@@ -158,7 +169,7 @@ export default function AppLayout() {
+       return { title: 'Configurare / Reguli și zone de trafic', hasLiveDot: false }
+     }
+     if (p === '/app/audit') {
+-      return { title: 'Securitate / Jurnal de audit (Directiva 2016/680)', hasLiveDot: false }
++      return { title: 'Securitate / Jurnal de audit', hasLiveDot: false }
+     }
+     if (p === '/app/setari') {
+       return { title: 'Sistem / Setări operaționale', hasLiveDot: false }
+@@ -179,21 +190,34 @@ export default function AppLayout() {
+ 
+   return (
+     <div className="flex h-screen w-screen overflow-hidden bg-[#0A0E14] text-[#E6EDF3] font-sans selection:bg-[#3DA5FF]/30 selection:text-white">
+-      {!preload.finished && !skipPreload && (
++      {overlay && (
+         <div className="fixed inset-0 z-[100] bg-[#0A0E14] flex flex-col items-center justify-center gap-5">
+           <Logo variant="full" className="h-10" />
+           <div className="font-sans text-xl font-bold uppercase tracking-wider text-[#E6EDF3]">Pregătire dosare video</div>
+           <div className="w-80 h-2 rounded-full bg-[#17202B] overflow-hidden">
+-            <div className="h-full bg-[#3DA5FF] transition-all duration-300" style={{ width: `${preload.total ? (preload.done / preload.total) * 100 : 0}%` }} />
++            <div className="h-full bg-[#3DA5FF] transition-all duration-300" style={{ width: `${clipTarget ? Math.min(1, clipsDone / clipTarget) * 100 : 0}%` }} />
+           </div>
+           <div className="text-xs font-mono text-[#7D8A9B]">
+-            {preload.total ? `${preload.done} / ${preload.total} clipuri încărcate` : 'Se conectează la server…'}
++            {clipTarget ? `${Math.min(clipsDone, clipTarget)} / ${clipTarget} clipuri pregătite` : 'Se conectează la server…'}
+           </div>
+-          <button type="button" onClick={() => setSkipPreload(true)} className="text-[11px] text-[#536070] hover:text-[#7D8A9B] underline cursor-pointer">
++          <button type="button" onClick={() => setOverlay(false)} className="text-[11px] text-[#7D8A9B] hover:text-[#E6EDF3] underline cursor-pointer">
+             Continuă oricum (restul se încarcă în fundal)
+           </button>
+         </div>
+       )}
++      {/* Errors from loading or from an operator action (a failed "Confirmă") are shown, not swallowed */}
++      {dataError && (
++        <div role="alert" data-testid="error-banner" className="fixed top-3 left-1/2 -translate-x-1/2 z-[90] w-[min(92vw,640px)] flex items-start gap-3 rounded-md border border-[#FF3B3B] bg-[#2A1215] px-4 py-3 shadow-2xl">
++          <AlertTriangle size={18} className="text-[#FF3B3B] shrink-0 mt-0.5" aria-hidden />
++          <div className="flex-1 min-w-0">
++            <div className="text-sm font-bold text-[#E6EDF3]">Operațiunea nu a reușit. Reîncercați.</div>
++            <div className="text-xs text-[#C9D1D9] mt-0.5 break-words">{dataError}</div>
++          </div>
++          <button type="button" onClick={() => useDataStore.setState({ error: null })} aria-label="Închide mesajul de eroare" className="text-[#C9D1D9] hover:text-white cursor-pointer shrink-0">
++            <X size={16} />
++          </button>
++        </div>
++      )}
+       {/* 1. Left Narrow Vertical Sidebar */}
+       <aside className="w-16 sm:w-20 bg-[#111821] border-r border-[#1E2A36] flex flex-col justify-between items-center py-4 shrink-0 z-30 select-none">
+         {/* Top: Logo */}
+@@ -329,22 +353,22 @@ export default function AppLayout() {
+                   <div className="absolute right-0 mt-2 w-56 bg-[#111821] border border-[#1E2A36] rounded-md p-2 shadow-2xl z-50">
+                     <div className="p-2 border-b border-[#1E2A36] mb-1">
+                       <div className="font-semibold text-xs text-[#E6EDF3]">{user?.fullName || 'Operator Dispecerat'}</div>
+-                      <div className="text-[10px] text-[#7D8A9B]">{user?.unit || 'Brigada Rutieră'}</div>
+-                      <div className="text-[9px] font-mono text-[#3DA5FF] mt-1 uppercase">
+-                        ROL: {user?.role || 'operator'}
+-                      </div>
++                      {user?.unit && <div className="text-[10px] text-[#7D8A9B]">{user.unit}</div>}
++                      {user && <div className="text-[10px] text-[#3DA5FF] mt-1">{ROLE_LABEL[user.role]}</div>}
+                     </div>
+ 
+-                    <button
+-                      onClick={() => {
+-                        setUserDropdown(false)
+-                        navigate('/app/setari')
+-                      }}
+-                      className="w-full text-left px-2.5 py-1.5 text-xs text-[#7D8A9B] hover:text-[#E6EDF3] hover:bg-[#17202B] rounded-md transition-colors flex items-center gap-2 cursor-pointer"
+-                    >
+-                      <Settings size={14} />
+-                      <span>Setări platformă</span>
+-                    </button>
++                    {can(user?.role, 'settings.admin') && (
++                      <button
++                        onClick={() => {
++                          setUserDropdown(false)
++                          navigate('/app/setari')
++                        }}
++                        className="w-full text-left px-2.5 py-1.5 text-xs text-[#7D8A9B] hover:text-[#E6EDF3] hover:bg-[#17202B] rounded-md transition-colors flex items-center gap-2 cursor-pointer"
++                      >
++                        <Settings size={14} />
++                        <span>Setări platformă</span>
++                      </button>
++                    )}
+ 
+                     <button
+                       onClick={() => {
+@@ -389,10 +413,10 @@ export default function AppLayout() {
+ 
+           <div className="mt-2">
+             <div className="font-bold text-sm text-[#E6EDF3]">
+-              {toast.ruleSummary || toast.type}
++              {toast.ruleSummary || ALERT_TYPE[toast.type].label}
+             </div>
+             <div className="text-xs text-[#7D8A9B] mt-0.5">
+-              Cameră: {toast.cameraId} · {toast.metrics?.speedKmh ? `${toast.metrics.speedKmh} km/h` : 'Eveniment rutier'}
++              Cameră: {cameraById(toast.cameraId)?.name ?? toast.cameraId} · {toast.metrics?.speedKmh ? `${toast.metrics.speedKmh} km/h` : 'Eveniment rutier'}
+             </div>
+           </div>
+ 
+diff --git a/frontend/src/lib/adapters.ts b/frontend/src/lib/adapters.ts
+index ef9a4d6..4af0e7d 100644
+--- a/frontend/src/lib/adapters.ts
++++ b/frontend/src/lib/adapters.ts
+@@ -1,6 +1,6 @@
+ import type { VehicleClass, Alert, AlertType, AuditEntry, Camera, Severity, VlmVerdict, ArchiveClip } from '@/types'
+ import { mediaUrl } from './api'
+-import { IASI_CAMERAS } from './iasi'
++import { IASI_CAMERAS, iasiCameraName } from './iasi'
+ 
+ export interface ApiAudit { id: number; event_id: number | null; actor: string; action: AuditEntry['action']; note: string | null; at: string; type?: string }
+ export interface ApiEvent {
+@@ -15,8 +15,9 @@ export interface ApiCamera { id: string; name: string; location: string | null;
+ export interface ApiStats { total: number; by_priority: Record<Severity, number>; by_status: Record<string, number>; by_type: Record<string, number>; vlm_available: boolean }
+ export interface ApiMeta { event_types: Record<string, { label: string; priority: Severity }>; actions: Record<string, string> }
+ 
++// The audit API sends the actor's name but not their role, so no role is shown ('anonim' renders as none).
+ export const adaptAudit = (entry: ApiAudit): AuditEntry => ({
+-  id: String(entry.id), at: entry.at, username: entry.actor, role: 'operator', action: entry.action,
++  id: String(entry.id), at: entry.at, username: entry.actor, role: 'anonim', action: entry.action,
+   target: entry.event_id === null ? undefined : String(entry.event_id), details: entry.note ?? undefined,
+ })
+ const OBJECT_CLASS_RO: Record<string, VehicleClass | undefined> = { car: 'autoturism', truck: 'camion', bus: 'autobuz', motorcycle: 'motocicleta', person: 'pieton' }
+@@ -44,7 +45,7 @@ export const adaptCamera = (camera: ApiCamera): Camera => {
+   // A heartbeat proves the worker runs, not what it reads: LIVE needs a declared live source.
+   const live = heartbeat && LIVE_SOURCE_KINDS.has(camera.source_kind ?? '')
+   return {
+-    id: camera.id, name: IASI_CAMERAS[camera.id]?.name ?? camera.name, road: IASI_CAMERAS[camera.id]?.location ?? camera.location ?? '', direction: '',
++    id: camera.id, name: iasiCameraName(camera.id) ?? camera.name, road: IASI_CAMERAS[camera.id]?.location ?? camera.location ?? '', direction: '',
+     lat: camera.latitude ?? IASI_CAMERAS[camera.id]?.lat ?? NaN, lng: camera.longitude ?? IASI_CAMERAS[camera.id]?.lng ?? NaN, status: camera.is_active === false ? 'offline' : heartbeat || camera.video_url ? 'online' : 'degraded', fps: 0, calibrated: false, unit: '', videoUrl: mediaUrl(camera.video_url),
+     liveUrl: IASI_CAMERAS[camera.id]?.liveUrl, heartbeat, live,
+   }
+diff --git a/frontend/src/lib/alertSummary.test.ts b/frontend/src/lib/alertSummary.test.ts
+new file mode 100644
+index 0000000..b988ace
+--- /dev/null
++++ b/frontend/src/lib/alertSummary.test.ts
+@@ -0,0 +1,123 @@
++import { describe, expect, it } from 'vitest'
++import type { AlertType } from '@/types'
++import { summarizeAlert, whenPhrase, type AlertSummaryInput } from './alertSummary'
++
++// Local-time dates keep the expected clock text independent of the machine's time zone.
++const NOW = new Date(2026, 10, 13, 15, 0)
++const iso = (d: number, h: number, m: number) => new Date(2026, 10, d, h, m).toISOString()
++const base: AlertSummaryInput = {
++  type: 'very_high_speed', cameraName: 'Pasaj Mihai Eminescu', at: iso(13, 14, 32),
++  objectClass: 'autoturism', status: 'new',
++}
++const what = (patch: Partial<AlertSummaryInput>) => summarizeAlert({ ...base, ...patch }, NOW).what
++const TAIL = ', la camera Pasaj Mihai Eminescu, azi la 14:32.'
++
++describe('summarizeAlert: what happened, per type', () => {
++  const cases: Record<AlertType, [Partial<AlertSummaryInput>, string]> = {
++    very_high_speed: [{ speedKmh: 116.4, limitKmh: 50 }, 'Sistemul a semnalat un autoturism care circula cu o viteză estimată la 116 km/h pe un tronson cu limita de 50 km/h'],
++    high_speed: [{ speedKmh: 180, limitKmh: 130, objectClass: 'motocicleta' }, 'Sistemul a semnalat o motocicletă care circula cu o viteză estimată la 180 km/h pe un tronson cu limita de 130 km/h'],
++    probable_crash: [{}, 'Sistemul a semnalat un autoturism care a frânat brusc și apoi s-a oprit pe carosabil, ceea ce poate însemna un accident'],
++    pedestrian_on_road: [{ objectClass: 'pieton' }, 'Sistemul a semnalat o persoană pe carosabil'],
++    pedestrian_highway: [{ objectClass: 'pieton' }, 'Sistemul a semnalat o persoană pe autostradă'],
++    wrong_way: [{ objectClass: 'camion' }, 'Sistemul a semnalat un camion care se deplasa pe contrasens'],
++    stopped_on_road: [{ objectClass: 'autobuz' }, 'Sistemul a semnalat un autobuz care staționa pe carosabil'],
++    stopped_emergency_lane: [{}, 'Sistemul a semnalat un autoturism care staționa pe banda de urgență'],
++    emergency_lane_stop: [{}, 'Sistemul a semnalat un autoturism care staționa pe banda de urgență'],
++    road_object: [{ objectClass: 'obiect' }, 'Sistemul a semnalat un obiect pe carosabil'],
++    near_miss: [{}, 'Sistemul a semnalat un autoturism care a trecut foarte aproape de un alt participant la trafic'],
++    hard_braking: [{ speedKmh: 80 }, 'Sistemul a semnalat un autoturism care a frânat brusc'],
++    tailgating: [{ speedKmh: 92 }, 'Sistemul a semnalat un autoturism care circula prea aproape de vehiculul din față, cu o viteză estimată la 92 km/h'],
++    dangerous_lane_change: [{}, 'Sistemul a semnalat un autoturism care a schimbat brusc banda, cu un alt vehicul foarte aproape'],
++    congestion: [{ objectClass: undefined, speedKmh: 11.6 }, 'Sistemul a semnalat trafic aglomerat, cu o viteză medie estimată la 12 km/h'],
++    road_conditions: [{}, 'Sistemul a semnalat condiții de drum care pot îngreuna circulația'],
++  }
++  for (const [type, [patch, expected]] of Object.entries(cases)) {
++    it(type, () => {
++      const summary = summarizeAlert({ ...base, ...patch, type }, NOW)
++      expect(summary.what).toBe(expected + TAIL)
++      expect(summary.why).toMatch(/^[A-ZĂÂÎȘȚ].+\.$/)
++      expect(summary.next).toContain('confirmați sau respingeți')
++    })
++  }
++
++  it('reads the older type names like the current ones', () => {
++    expect(what({ type: 'excessive_speed', speedKmh: 116, limitKmh: 50 })).toBe(what({ speedKmh: 116, limitKmh: 50 }))
++    expect(what({ type: 'pedestrian_on_highway' })).toBe(what({ type: 'pedestrian_highway' }))
++  })
++})
++
++describe('summarizeAlert: missing or odd data', () => {
++  const clean = (text: string) => expect(text).not.toMatch(/undefined|NaN|null|,\s*,|\s{2}/)
++
++  it('speed without a limit', () => {
++    expect(what({ speedKmh: 116 })).toBe('Sistemul a semnalat un autoturism care circula cu o viteză estimată la 116 km/h, peste pragul stabilit pentru această cameră' + TAIL)
++  })
++  it('no speed at all', () => {
++    for (const speedKmh of [undefined, null, Number.NaN, 0]) {
++      expect(what({ speedKmh, limitKmh: 50 })).toBe('Sistemul a semnalat un autoturism care circula cu o viteză peste pragul stabilit pentru această cameră' + TAIL)
++    }
++  })
++  it('drops a limit that is not below the estimated speed', () => {
++    expect(what({ speedKmh: 129, limitKmh: 130 })).not.toContain('limita')
++  })
++  it('tailgating and congestion without a speed print no unit', () => {
++    expect(what({ type: 'tailgating' })).toBe('Sistemul a semnalat un autoturism care circula prea aproape de vehiculul din față' + TAIL)
++    expect(what({ type: 'congestion', speedKmh: null })).toBe('Sistemul a semnalat trafic aglomerat' + TAIL)
++  })
++  it('unknown object class, camera and time', () => {
++    const summary = summarizeAlert({ type: 'wrong_way', status: 'new', at: 'not a date', cameraName: '  ' }, NOW)
++    expect(summary.what).toBe('Sistemul a semnalat un vehicul care se deplasa pe contrasens.')
++    Object.values(summary).forEach(clean)
++  })
++  it('unknown type falls back to its label and the rule text', () => {
++    const summary = summarizeAlert({ ...base, type: 'red_light', typeLabel: 'Trecere pe roșu', rule: 'Vehicul în intersecție pe roșu.' }, NOW)
++    expect(summary.what).toBe('Sistemul a semnalat un eveniment de tip „Trecere pe roșu”' + TAIL)
++    expect(summary.why).toBe('Regula care a declanșat alerta: Vehicul în intersecție pe roșu.')
++  })
++  it('unknown type with nothing else known', () => {
++    const summary = summarizeAlert({ type: '', status: 'new' }, NOW)
++    expect(summary.what).toBe('Sistemul a semnalat un eveniment rutier.')
++    expect(summary.why).toBe('S-a îndeplinit o regulă configurată pentru această cameră.')
++    expect(summarizeAlert({ type: 'red_light', status: 'new' }, NOW).what).toBe('Sistemul a semnalat un eveniment de tip „red light”.')
++    Object.values(summary).forEach(clean)
++  })
++})
++
++describe('summarizeAlert: next step', () => {
++  it('undecided alerts ask for a human decision', () => {
++    for (const status of ['new', 'in_review']) {
++      expect(summarizeAlert({ ...base, status }, NOW).next)
++        .toBe('Verificați clipul și confirmați sau respingeți alerta. Sistemul nu trimite singur echipaje și nu dă amenzi; decizia este a omului.')
++    }
++  })
++  it('says who decided and when', () => {
++    expect(summarizeAlert({ ...base, status: 'confirmed', decidedBy: 'operator', decidedAt: iso(13, 14, 40) }, NOW).next)
++      .toBe('Alerta a fost confirmată de operator, azi la 14:40. Decizia a fost luată de un om. Sistemul nu trimite singur echipaje și nu dă amenzi.')
++    expect(summarizeAlert({ ...base, status: 'rejected', decidedBy: 'admin', decidedAt: iso(12, 9, 5) }, NOW).next)
++      .toMatch(/^Alerta a fost respinsă de admin, ieri la 09:05\./)
++  })
++  it('a decision without author or time stays a clean sentence', () => {
++    expect(summarizeAlert({ ...base, status: 'closed' }, NOW).next).toMatch(/^Dosarul alertei a fost închis\. /)
++    expect(summarizeAlert({ ...base, status: 'confirmed', decidedAt: 'x' }, NOW).next).toMatch(/^Alerta a fost confirmată\. /)
++  })
++})
++
++describe('whenPhrase', () => {
++  it('today, yesterday, older, invalid', () => {
++    expect(whenPhrase(iso(13, 0, 7), NOW)).toBe('azi la 00:07')
++    expect(whenPhrase(iso(12, 23, 59), NOW)).toBe('ieri la 23:59')
++    expect(whenPhrase(iso(2, 8, 30), NOW)).toBe('pe 02.11.2026 la 08:30')
++    expect(whenPhrase(undefined, NOW)).toBeNull()
++    expect(whenPhrase('', NOW)).toBeNull()
++  })
++})
++
++describe('summarizeAlert: honesty edge cases', () => {
++  it('does not claim a threshold was exceeded when the speed is under the limit', () => {
++    expect(what({ speedKmh: 120, limitKmh: 130 })).toBe('Sistemul a semnalat un autoturism care circula cu o viteză estimată la 120 km/h' + TAIL)
++  })
++  it('says a person reclassified the alert instead of naming a rule that never fired', () => {
++    const s = summarizeAlert({ ...base, type: 'tailgating', typeLabel: 'Distanță prea mică', reclassifiedByHuman: true }, NOW)
++    expect(s.why).toBe('Sistemul a încadrat inițial altfel acest eveniment; un om a verificat clipul și l-a reîncadrat manual ca „distanță prea mică”.')
++  })
++})
+diff --git a/frontend/src/lib/alertSummary.ts b/frontend/src/lib/alertSummary.ts
+new file mode 100644
+index 0000000..90050d9
+--- /dev/null
++++ b/frontend/src/lib/alertSummary.ts
+@@ -0,0 +1,168 @@
++// Plain-Romanian summary of an alert for the "Pe scurt" card: what happened, why the alarm
++// fired and what the dispatcher can do. Pure: everything comes in through the input.
++
++export interface AlertSummaryInput {
++  type: string
++  /** Label of the type, used only for a type this file does not know. */
++  typeLabel?: string
++  cameraName?: string
++  /** ISO timestamp of the event. */
++  at?: string
++  /** UI object class (autoturism, camion, autobuz, motocicleta, pieton, obiect). */
++  objectClass?: string
++  speedKmh?: number | null
++  limitKmh?: number | null
++  /** Technical rule text from the pipeline; quoted only for an unknown type. */
++  rule?: string
++  status: string
++  decidedBy?: string
++  decidedAt?: string
++  /** A person changed the type after watching the clip (demo curation). */
++  reclassifiedByHuman?: boolean
++}
++
++export interface AlertSummary {
++  what: string
++  why: string
++  next: string
++}
++
++const ALIASES: Record<string, string> = {
++  excessive_speed: 'very_high_speed',
++  high_speed: 'very_high_speed',
++  pedestrian_on_highway: 'pedestrian_highway',
++  emergency_lane_stop: 'stopped_emergency_lane',
++}
++
++// Accusative, indefinite: fits after "Sistemul a semnalat".
++const OBJECT: Record<string, string> = {
++  autoturism: 'un autoturism',
++  camion: 'un camion',
++  autobuz: 'un autobuz',
++  motocicleta: 'o motocicletă',
++}
++
++const kmh = (value?: number | null) =>
++  typeof value === 'number' && Number.isFinite(value) && value > 0 ? `${Math.round(value)} km/h` : null
++
++const sameDay = (a: Date, b: Date) =>
++  a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
++const two = (n: number) => String(n).padStart(2, '0')
++
++/** "azi la 14:32", "ieri la 14:32" or "pe 18.10.2026 la 14:32"; null for a missing or invalid date. */
++export function whenPhrase(iso: string | undefined, now: Date): string | null {
++  if (!iso) return null
++  const at = new Date(iso)
++  if (Number.isNaN(at.getTime())) return null
++  const time = `${two(at.getHours())}:${two(at.getMinutes())}`
++  if (sameDay(at, now)) return `azi la ${time}`
++  if (sameDay(at, new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1))) return `ieri la ${time}`
++  return `pe ${two(at.getDate())}.${two(at.getMonth() + 1)}.${at.getFullYear()} la ${time}`
++}
++
++interface Wording {
++  /** What the system flagged, without place and time. */
++  what: (vehicle: string, speed: string | null, limit: string | null, underLimit: boolean) => string
++  why: string
++}
++
++const WORDING: Record<string, Wording> = {
++  very_high_speed: {
++    what: (v, speed, limit, underLimit) =>
++      speed && limit ? `${v} care circula cu o viteză estimată la ${speed} pe un tronson cu limita de ${limit}`
++        : speed && underLimit ? `${v} care circula cu o viteză estimată la ${speed}`
++        : speed ? `${v} care circula cu o viteză estimată la ${speed}, peste pragul stabilit pentru această cameră`
++          : `${v} care circula cu o viteză peste pragul stabilit pentru această cameră`,
++    why: 'Viteza estimată a depășit pragul stabilit pentru această cameră.',
++  },
++  probable_crash: {
++    what: (v) => `${v} care a frânat brusc și apoi s-a oprit pe carosabil, ceea ce poate însemna un accident`,
++    why: 'O frânare bruscă urmată de o oprire completă pe carosabil seamănă cu un accident și trebuie verificată de un om.',
++  },
++  pedestrian_on_road: {
++    what: () => 'o persoană pe carosabil',
++    why: 'O persoană a fost detectată într-o zonă destinată vehiculelor.',
++  },
++  pedestrian_highway: {
++    what: () => 'o persoană pe autostradă',
++    why: 'O persoană a fost detectată pe autostradă, unde pietonii nu au voie.',
++  },
++  wrong_way: {
++    what: (v) => `${v} care se deplasa pe contrasens`,
++    why: 'Vehiculul s-a deplasat câteva secunde împotriva sensului de mers stabilit pentru această bandă.',
++  },
++  stopped_on_road: {
++    what: (v) => `${v} care staționa pe carosabil`,
++    why: 'Vehiculul a stat pe loc, pe carosabil, mai mult decât timpul stabilit pentru această cameră.',
++  },
++  stopped_emergency_lane: {
++    what: (v) => `${v} care staționa pe banda de urgență`,
++    why: 'Vehiculul a stat pe loc, pe banda de urgență, mai mult decât timpul stabilit pentru această cameră.',
++  },
++  road_object: {
++    what: () => 'un obiect pe carosabil',
++    why: 'Un obiect nemișcat a fost detectat pe partea carosabilă.',
++  },
++  near_miss: {
++    what: (v) => `${v} care a trecut foarte aproape de un alt participant la trafic`,
++    why: 'Doi participanți la trafic au ajuns la o distanță foarte mică unul de celălalt.',
++  },
++  hard_braking: {
++    what: (v) => `${v} care a frânat brusc`,
++    why: 'Viteza vehiculului a scăzut mult într-un timp foarte scurt.',
++  },
++  tailgating: {
++    what: (v, speed) => `${v} care circula prea aproape de vehiculul din față${speed ? `, cu o viteză estimată la ${speed}` : ''}`,
++    why: 'Distanța față de vehiculul din față a rămas sub pragul de siguranță stabilit pentru această cameră.',
++  },
++  dangerous_lane_change: {
++    what: (v) => `${v} care a schimbat brusc banda, cu un alt vehicul foarte aproape`,
++    why: 'Vehiculul s-a mutat rapid pe altă bandă în timp ce un alt vehicul se afla foarte aproape.',
++  },
++  congestion: {
++    what: (_v, speed) => `trafic aglomerat${speed ? `, cu o viteză medie estimată la ${speed}` : ''}`,
++    why: 'Multe vehicule au circulat încet pe aceeași porțiune de drum, mai mult timp decât pragul stabilit.',
++  },
++  road_conditions: {
++    what: () => 'condiții de drum care pot îngreuna circulația',
++    why: 'Imaginile indică vizibilitate redusă sau carosabil alunecos.',
++  },
++}
++
++const NO_AUTOMATION = 'Sistemul nu trimite singur echipaje și nu dă amenzi'
++
++export function summarizeAlert(input: AlertSummaryInput, now: Date = new Date()): AlertSummary {
++  const wording = WORDING[ALIASES[input.type] ?? input.type]
++  const vehicle = OBJECT[input.objectClass ?? ''] ?? 'un vehicul'
++  const speed = kmh(input.speedKmh)
++  const limitValue = kmh(input.limitKmh)
++  // A limit at or above the estimated speed would contradict the sentence; leave it out.
++  const underLimit = !!(speed && limitValue && (input.speedKmh ?? 0) <= (input.limitKmh ?? 0))
++  const limit = speed && limitValue && !underLimit ? limitValue : null
++
++  const label = (input.typeLabel || input.type || '').replace(/_/g, ' ').trim()
++  const subject = wording ? wording.what(vehicle, speed, limit, underLimit)
++    : label ? `un eveniment de tip „${label}”` : 'un eveniment rutier'
++  const camera = input.cameraName?.trim()
++  const at = whenPhrase(input.at, now)
++  const what = `Sistemul a semnalat ${subject}${camera ? `, la camera ${camera}` : ''}${at ? `, ${at}` : ''}.`
++
++  const rule = input.rule?.trim()
++  const why = input.reclassifiedByHuman
++    ? `Sistemul a încadrat inițial altfel acest eveniment; un om a verificat clipul și l-a reîncadrat manual${label ? ` ca „${label.toLowerCase()}”` : ''}.`
++    : wording?.why
++    ?? (rule ? `Regula care a declanșat alerta: ${rule.replace(/\.$/, '')}.` : 'S-a îndeplinit o regulă configurată pentru această cameră.')
++
++  const decision = input.status === 'confirmed' ? 'Alerta a fost confirmată'
++    : input.status === 'rejected' ? 'Alerta a fost respinsă'
++      : input.status === 'closed' ? 'Dosarul alertei a fost închis' : null
++  if (!decision) {
++    return { what, why, next: `Verificați clipul și confirmați sau respingeți alerta. ${NO_AUTOMATION}; decizia este a omului.` }
++  }
++  const by = input.decidedBy?.trim()
++  const decidedAt = whenPhrase(input.decidedAt, now)
++  return {
++    what, why,
++    next: `${decision}${by ? ` de ${by}` : ''}${decidedAt ? `, ${decidedAt}` : ''}. Decizia a fost luată de un om. ${NO_AUTOMATION}.`,
++  }
++}
+diff --git a/frontend/src/lib/cases.test.ts b/frontend/src/lib/cases.test.ts
+index 13276f1..a01ae52 100644
+--- a/frontend/src/lib/cases.test.ts
++++ b/frontend/src/lib/cases.test.ts
+@@ -1,6 +1,6 @@
+ import { afterEach, describe, expect, it, vi } from 'vitest'
+ import { DEMO_CURATION, HIDDEN_IDS } from './demo'
+-import { archiveBody, archiveRequest, fmtOffset, newIdempotencyKey, saveSearch, searchArchive, updateFollowup, verifyPackage, type ArchiveRun } from './cases'
++import { archiveBody, archiveRequest, fmtOffset, newIdempotencyKey, saveSearch, searchArchive, updateFollowup, verifyErrorRo, verifyPackage, type ArchiveRun } from './cases'
+ 
+ afterEach(() => vi.unstubAllGlobals())
+ 
+@@ -86,3 +86,13 @@ describe('investigation completion client', () => {
+     expect(request.headers.get('Content-Type')).toBe('application/json')
+   })
+ })
++
++describe('verifyErrorRo', () => {
++  it('translates known verifier errors and keeps the file name', () => {
++    expect(verifyErrorRo('sha256 mismatch: evidence/a.mp4')).toBe('Conținut modificat (amprenta nu corespunde): evidence/a.mp4')
++    expect(verifyErrorRo('not a readable zip file: BadZipFile')).toBe('Fișierul nu este o arhivă ZIP care poate fi citită.')
++  })
++  it('shows an unknown error as received', () => {
++    expect(verifyErrorRo('something new')).toBe('something new')
++  })
++})
+diff --git a/frontend/src/lib/cases.ts b/frontend/src/lib/cases.ts
+index 83ef68d..9d31e7f 100644
+--- a/frontend/src/lib/cases.ts
++++ b/frontend/src/lib/cases.ts
+@@ -120,7 +120,35 @@ export const verifyPackage = (file: Blob, expectedSha256?: string) =>
+   api<PackageVerifyResult>(`/api/exports/verify${expectedSha256 ? `?manifest_sha256=${enc(expectedSha256)}` : ''}`, {
+     method: 'POST', body: file, headers: { 'Content-Type': 'application/zip' },
+   })
+-export const MAX_VERIFY_BYTES = 528 * 1024 * 1024
++// The web gateway refuses request bodies over 64 MB; larger packages are verified with the CLI.
++export const MAX_VERIFY_BYTES = 60 * 1024 * 1024
++
++const VERIFY_ERRORS: [string, string][] = [
++  ['sha256 mismatch: ', 'Conținut modificat (amprenta nu corespunde): '],
++  ['size mismatch: ', 'Dimensiune diferită față de manifest: '],
++  ['listed file missing: ', 'Fișier din manifest care lipsește din pachet: '],
++  ['file not listed in manifest: ', 'Fișier care nu apare în manifest: '],
++  ['file listed more than once: ', 'Fișier trecut de mai multe ori în manifest: '],
++  ['unsafe entry name: ', 'Nume de fișier nepermis: '],
++  ['not a readable zip file', 'Fișierul nu este o arhivă ZIP care poate fi citită.'],
++  ['unreadable zip content', 'Conținutul arhivei nu poate fi citit (date corupte sau arhivă protejată).'],
++  ['manifest digest differs', 'Amprenta manifestului diferă de cea oficială introdusă.'],
++  ['manifest.json missing', 'Pachetul nu conține manifestul (manifest.json).'],
++  ['manifest.json is not', 'Manifestul nu are forma așteptată.'],
++  ['manifest has an invalid file path', 'Manifestul conține o cale de fișier nevalidă.'],
++  ['manifest lists no files', 'Manifestul nu enumeră niciun fișier.'],
++  ['unknown manifest schema', 'Manifestul are un format necunoscut.'],
++  ['duplicate entry names', 'Arhiva conține două fișiere cu același nume.'],
++  ['too many entries', 'Arhiva conține prea multe fișiere.'],
++  ['declared uncompressed size', 'Pachetul depășește dimensiunea maximă care poate fi verificată aici.'],
++]
++/** Romanian text for a verifier error; an unknown one is shown as received. */
++export function verifyErrorRo(error: string): string {
++  for (const [prefix, text] of VERIFY_ERRORS) {
++    if (error.startsWith(prefix)) return text.endsWith(': ') ? text + error.slice(prefix.length) : text
++  }
++  return error
++}
+ 
+ export const listExports = (n: string) => api<ExportJob[]>(`/api/events/${enc(n)}/exports`)
+ export const requestExport = (n: string, body: { justification: string; case_reference: string; include_original: boolean; idempotency_key: string }) =>
+diff --git a/frontend/src/lib/constants.ts b/frontend/src/lib/constants.ts
+index 6dd58b4..859e871 100644
+--- a/frontend/src/lib/constants.ts
++++ b/frontend/src/lib/constants.ts
+@@ -64,9 +64,9 @@ export const STATUS_LABEL: Record<AlertStatus, string> = {
+ export const VLM_LABEL: Record<VlmVerdict, string> = {
+   pending: 'În așteptare',
+   skipped: 'Neverificat',
+-  confirmed: 'VLM: confirmat',
+-  rejected: 'VLM: infirmat',
+-  uncertain: 'VLM: incert',
++  confirmed: 'Verificare AI: confirmat',
++  rejected: 'Verificare AI: infirmat',
++  uncertain: 'Verificare AI: incert',
+ }
+ 
+ export const ACTION_LABEL: Record<ActionType, string> = {
+diff --git a/frontend/src/lib/demo.test.ts b/frontend/src/lib/demo.test.ts
+new file mode 100644
+index 0000000..515a13e
+--- /dev/null
++++ b/frontend/src/lib/demo.test.ts
+@@ -0,0 +1,91 @@
++import { afterEach, describe, expect, it, vi } from 'vitest'
++import type { Alert } from '@/types'
++import { PRELOAD_FIRST, preloadClips, preloadReady } from './demo'
++
++describe('preloadReady (post-login overlay)', () => {
++  const waiting = { loaded: true, failed: false, timedOut: false, total: 42, done: 0 }
++
++  it('stays open while the first clips are still loading', () => {
++    expect(preloadReady(waiting)).toBe(false)
++    expect(preloadReady({ ...waiting, done: PRELOAD_FIRST - 1 })).toBe(false)
++  })
++  it('closes once the first few clips are ready, not all of them', () => {
++    expect(preloadReady({ ...waiting, done: PRELOAD_FIRST })).toBe(true)
++  })
++  it('needs only as many clips as exist', () => {
++    expect(preloadReady({ ...waiting, total: 2, done: 2 })).toBe(true)
++    expect(preloadReady({ ...waiting, total: 2, done: 1 })).toBe(false)
++  })
++  it('closes at once when there is nothing to preload', () => {
++    expect(preloadReady({ ...waiting, total: 0 })).toBe(true)
++  })
++  it('stays open until the alert list has arrived', () => {
++    expect(preloadReady({ ...waiting, loaded: false, total: 0 })).toBe(false)
++  })
++  it('closes when loading failed or the wait ran out, whatever the progress', () => {
++    expect(preloadReady({ ...waiting, loaded: false, failed: true })).toBe(true)
++    expect(preloadReady({ ...waiting, loaded: false, timedOut: true })).toBe(true)
++  })
++})
++
++describe('preloadClips', () => {
++  afterEach(() => vi.unstubAllGlobals())
++
++  it('downloads two clips at a time, with a timeout signal, and skips failures', async () => {
++    let inFlight = 0
++    let peak = 0
++    const signals: unknown[] = []
++    vi.stubGlobal('fetch', vi.fn(async (url: string, init?: RequestInit) => {
++      signals.push(init?.signal)
++      peak = Math.max(peak, ++inFlight)
++      await new Promise((r) => setTimeout(r, 5))
++      inFlight--
++      return url.includes('broken') ? new Response('', { status: 500 }) : new Response('clip')
++    }))
++    const progress: [number, number][] = []
++    const srcs = ['/m/a.mp4', '/m/broken.mp4', '/m/c.mp4', undefined, '/m/d.mp4', '/m/e.mp4', '/m/a.mp4']
++
++    await preloadClips(srcs, (done, total) => progress.push([done, total]))
++
++    expect(peak).toBe(2)
++    expect(signals).toHaveLength(5)
++    expect(signals.every((s) => s instanceof AbortSignal)).toBe(true)
++    expect(progress[0]).toEqual([0, 5])
++    expect(progress.at(-1)).toEqual([5, 5])
++  })
++})
++
++describe('pitch staging and rejected alerts', () => {
++  afterEach(() => { vi.unstubAllEnvs(); vi.resetModules() })
++  const alert = (id: string, status: Alert['status'], type: Alert['type'], createdAt: string) =>
++    ({ id, status, type, createdAt, severity: 'critical', ruleSummary: '' }) as Alert
++  const staged = async () => {
++    vi.stubEnv('VITE_DEMO_CURATION', '1')
++    vi.resetModules()
++    return import('./demo')
++  }
++
++  it('puts rejected alerts after every other alert, with or without staging', async () => {
++    const list = [
++      alert('200', 'rejected', 'probable_crash', '2026-11-09T10:00:00Z'),
++      alert('201', 'new', 'congestion', '2026-11-01T10:00:00Z'),
++      alert('202', 'confirmed', 'tailgating', '2026-11-02T10:00:00Z'),
++    ]
++    const plain = await import('./demo')
++    expect([...list].sort(plain.demoSort).map((a) => a.id)).toEqual(['202', '201', '200'])
++    const demo = await staged()
++    expect([...list].sort(demo.demoSort).map((a) => a.id)).toEqual(['202', '201', '200'])
++  })
++  it('replays a confirmed alert as new, but never a rejected one', async () => {
++    const demo = await staged()
++    expect(demo.curate(alert('99', 'confirmed', 'very_high_speed', '2026-11-01T10:00:00Z')).status).toBe('new')
++    expect(demo.curate(alert('107', 'rejected', 'very_high_speed', '2026-11-01T10:00:00Z')).status).toBe('rejected')
++    const decision = { id: '5', at: '', username: 'op', role: 'operator', action: 'rejected' } as const
++    expect(demo.keepAudit({ ...decision, target: '107' })).toBe(true)
++    expect(demo.keepAudit({ ...decision, target: '99' })).toBe(false)
++  })
++  it('shows the real age of an alert, never a staged one', async () => {
++    const demo = await staged()
++    expect(demo.demoAgo(alert('301', 'new', 'congestion', '2020-01-01T10:00:00Z'))).not.toMatch(/ s$/)
++  })
++})
+diff --git a/frontend/src/lib/demo.ts b/frontend/src/lib/demo.ts
+index 4bc7bc5..85fb554 100644
+--- a/frontend/src/lib/demo.ts
++++ b/frontend/src/lib/demo.ts
+@@ -6,13 +6,20 @@ import type { Alert, AuditEntry } from '@/types'
+ // Every evidence clip is downloaded once into memory and played from a blob URL,
+ // so playback never waits on the network (the media endpoint has no Range support).
+ // Signed media URLs change on every reload, so the cache key drops the query string.
++const CLIP_IDLE_MS = 20_000
+ type Entry = { promise: Promise<string>; url?: string; progress: number; listeners: Set<(p: number) => void> }
+ const cache = new Map<string, Entry>()
+ const keyOf = (src: string) => src.split('?')[0]
+ 
+ function download(src: string, entry: Entry) {
+   return (async () => {
+-    const res = await fetch(src, { credentials: 'include' })
++    // A stalled request must not hold a preload slot (or the player) forever, but a slow one that
++    // keeps sending must finish: the timer restarts with every chunk.
++    const stall = new AbortController()
++    let timer = setTimeout(() => stall.abort(), CLIP_IDLE_MS)
++    const alive = () => { clearTimeout(timer); timer = setTimeout(() => stall.abort(), CLIP_IDLE_MS) }
++    try {
++    const res = await fetch(src, { credentials: 'include', signal: stall.signal })
+     if (!res.ok || !res.body) throw new Error(String(res.status))
+     const total = Number(res.headers.get('content-length')) || 0
+     const reader = res.body.getReader()
+@@ -21,6 +28,7 @@ function download(src: string, entry: Entry) {
+     for (;;) {
+       const { done, value } = await reader.read()
+       if (done) break
++      alive()
+       chunks.push(value)
+       got += value.length
+       if (total) { entry.progress = got / total; entry.listeners.forEach((l) => l(entry.progress)) }
+@@ -28,6 +36,7 @@ function download(src: string, entry: Entry) {
+     entry.url = URL.createObjectURL(new Blob(chunks, { type: res.headers.get('content-type') || 'video/mp4' }))
+     entry.progress = 1
+     return entry.url
++    } finally { clearTimeout(timer) }
+   })()
+ }
+ 
+@@ -46,23 +55,47 @@ export function getClip(src: string, onProgress?: (p: number) => void): Promise<
+ export const cachedClip = (src?: string) => (src ? cache.get(keyOf(src))?.url : undefined)
+ export const unsubscribeClip = (src: string, onProgress: (p: number) => void) => cache.get(keyOf(src))?.listeners.delete(onProgress)
+ 
+-/** Preloads clips in order, a few at a time. */
+-export async function preloadClips(srcs: (string | undefined)[], onEach?: (done: number, total: number) => void, parallel = 4) {
++// The media endpoint shares the API's database pool, so preloading stays at two downloads at
++// once across every call; a newer call (the alert list changed) takes over from an older one.
++const PRELOAD_PARALLEL = 2
++let preloadRun = 0
++let preloadActive = 0
++const preloadWaiting: (() => void)[] = []
++
++/** Preloads clips in order, two at a time. Failed clips are skipped; the player retries on demand. */
++export async function preloadClips(srcs: (string | undefined)[], onEach?: (done: number, total: number) => void) {
++  const run = ++preloadRun
+   const todo = [...new Set(srcs.filter((s): s is string => !!s))]
+   let i = 0
+   let done = 0
+   onEach?.(0, todo.length)
+   const worker = async () => {
+-    while (i < todo.length) {
++    while (i < todo.length && run === preloadRun) {
+       const s = todo[i++]
+-      await getClip(s).catch(() => {})
+-      onEach?.(++done, todo.length)
++      if (!cachedClip(s)) {
++        while (preloadActive >= PRELOAD_PARALLEL) await new Promise<void>((free) => preloadWaiting.push(free))
++        preloadActive++
++        await getClip(s).catch(() => {})
++        preloadActive--
++        preloadWaiting.shift()?.()
++      }
++      done++
++      if (run === preloadRun) onEach?.(done, todo.length)
+     }
+   }
+-  await Promise.all(Array.from({ length: parallel }, worker))
++  await Promise.all(Array.from({ length: PRELOAD_PARALLEL }, worker))
++}
++
++// ---------------------------------------------------------------- post-login overlay
++// The overlay only waits for the first few clips, and never longer than a few seconds:
++// everything else keeps loading in the background while the operator already works.
++export const PRELOAD_FIRST = 4
++export const PRELOAD_MAX_WAIT_MS = 6000
++/** Whether the "preparing clips" overlay may close. `total`/`done` count clips to preload. */
++export function preloadReady(s: { loaded: boolean; failed: boolean; timedOut: boolean; total: number; done: number }) {
++  if (s.failed || s.timedOut) return true
++  return s.loaded && s.done >= Math.min(s.total, PRELOAD_FIRST)
+ }
+-/** Warms the browser cache for still images (keyframes). */
+-export const preloadImages = (srcs: (string | undefined)[]) => srcs.forEach((s) => { if (s) new Image().src = s })
+ 
+ // ---------------------------------------------------------------- pitch staging switch
+ // Everything marked (MOCK) below stages the production demo tenant for the pitch. It changes
+@@ -77,22 +110,17 @@ const DEMO_RANK: Record<string, number> = {
+   probable_crash: 0, wrong_way: 1, tailgating: 2, dangerous_lane_change: 3, hard_braking: 4,
+   stopped_on_road: 5, stopped_emergency_lane: 6, very_high_speed: 7, congestion: 8,
+ }
++// A rejected alert never leads the queue, whatever its type or age.
++const rejectedLast = (a: Alert) => Number(a.status === 'rejected')
+ export const demoSort = (a: Alert, b: Alert) =>
++  rejectedLast(a) - rejectedLast(b) ||
+   (DEMO_CURATION ? (DEMO_RANK[a.type] ?? 6) - (DEMO_RANK[b.type] ?? 6) : 0) ||
+   b.createdAt.localeCompare(a.createdAt)
+ 
+-// ---------------------------------------------------------------- "acum X" (MOCK)
+-// Relative times are faked from the queue position so the pitch shows fresh alerts:
+-// the first one a few seconds ago, then growing. Fixed at first sight, then they tick.
+-const fakeCreated = new Map<string, number>()
+-const ageFor = (i: number) => Math.round(4 + i * 23 + i * i * 6) // s: 4s, 33s, 1m14s, 2m7s, ...
+-export function assignDemoTimes(queue: Alert[]) {
+-  if (!DEMO_CURATION) return
+-  const now = Date.now()
+-  queue.forEach((a, i) => { if (!fakeCreated.has(a.id)) fakeCreated.set(a.id, now - ageFor(i) * 1000) })
+-}
++// ---------------------------------------------------------------- "acum X"
++// The real age of the alert: a staged "acum 4 s" would present old footage as live detection.
+ export function demoAgo(alert: Alert) {
+-  const at = fakeCreated.get(alert.id) ?? new Date(alert.createdAt).getTime()
++  const at = new Date(alert.createdAt).getTime()
+   const sec = Math.max(1, Math.round((Date.now() - at) / 1000))
+   if (sec < 60) return `acum ${sec} s`
+   return formatDistanceToNowStrict(at, { locale: ro, addSuffix: true })
+@@ -135,13 +163,15 @@ export const DEMO_UNDECIDED = new Set<string>(DEMO_CURATION ? ['99', '107', '118
+ type LocalDecision = { status: 'confirmed' | 'rejected'; by: string; at: string; note?: string }
+ export const localDecisions = new Map<string, LocalDecision>()
+ 
++const reallyRejected = new Set<string>()
+ function replay(alert: Alert): Alert {
+   if (!DEMO_UNDECIDED.has(alert.id)) return alert
+   const d = localDecisions.get(alert.id)
+-  return d
+-    ? { ...alert, status: d.status, decidedBy: d.by, decidedAt: d.at, decisionNote: d.note }
+-    : { ...alert, status: 'new', decidedBy: undefined, decidedAt: undefined, decisionNote: undefined }
++  if (d) return { ...alert, status: d.status, decidedBy: d.by, decidedAt: d.at, decisionNote: d.note }
++  // An alert the operator really rejected is never replayed as new; it keeps its history too.
++  if (alert.status === 'rejected') { reallyRejected.add(alert.id); return alert }
++  return { ...alert, status: 'new', decidedBy: undefined, decidedAt: undefined, decisionNote: undefined }
+ }
+ /** Hides the backend's earlier decision on replayed alerts from the history. */
+ export const keepAudit = (e: AuditEntry) =>
+-  !(e.target && DEMO_UNDECIDED.has(e.target) && !e.id.startsWith('local-') && ['confirmed', 'rejected'].includes(e.action))
++  !(e.target && DEMO_UNDECIDED.has(e.target) && !reallyRejected.has(e.target) && !e.id.startsWith('local-') && ['confirmed', 'rejected'].includes(e.action))
+diff --git a/frontend/src/lib/iasi.test.ts b/frontend/src/lib/iasi.test.ts
+new file mode 100644
+index 0000000..7a25ecc
+--- /dev/null
++++ b/frontend/src/lib/iasi.test.ts
+@@ -0,0 +1,16 @@
++import { describe, expect, it } from 'vitest'
++import { IASI_CAMERAS, iasiCameraName, isDemoCamera } from './iasi'
++
++describe('stock footage marking', () => {
++  it('marks every mapped camera except the real public stream', () => {
++    for (const id of Object.keys(IASI_CAMERAS)) {
++      expect(isDemoCamera(id)).toBe(id !== 'iasi-piata-unirii')
++      expect(iasiCameraName(id)?.startsWith('DEMO · ')).toBe(id !== 'iasi-piata-unirii')
++    }
++  })
++  it('leaves cameras outside the map list alone (their names are real places)', () => {
++    expect(isDemoCamera('cam-7b2f1aea')).toBe(false)
++    expect(iasiCameraName('cam-7b2f1aea')).toBeUndefined()
++    expect(isDemoCamera('toString')).toBe(false)
++  })
++})
+diff --git a/frontend/src/lib/iasi.ts b/frontend/src/lib/iasi.ts
+index d1d5eb3..84f1bd6 100644
+--- a/frontend/src/lib/iasi.ts
++++ b/frontend/src/lib/iasi.ts
+@@ -11,15 +11,6 @@ export interface MapCamera {
+   worst?: Severity;
+ }
+ 
+-export interface MapPatrol {
+-  id: string;
+-  callsign: string;
+-  lat: number;
+-  lng: number;
+-  status: 'available' | 'busy' | 'break';
+-  area?: string;
+-}
+-
+ export interface MapAlert {
+   id: string;
+   cameraId: string;
+@@ -73,12 +64,14 @@ export const IASI_CAMERAS: Record<string, { name: string; location: string; lat:
+   },
+ };
+ 
+-export const IASI_PATROLS: MapPatrol[] = [
+-  { id: 'IS-21', callsign: 'IS-21-POL', lat: 47.1800, lng: 27.5680, status: 'available', area: 'Copou' },
+-  { id: 'IS-14', callsign: 'IS-14-POL', lat: 47.1545, lng: 27.5900, status: 'busy',      area: 'Podu Roș' },
+-  { id: 'IS-07', callsign: 'IS-07-POL', lat: 47.1610, lng: 27.6080, status: 'available', area: 'Tătărași' },
+-  { id: 'IS-33', callsign: 'IS-33-POL', lat: 47.1370, lng: 27.5770, status: 'break',     area: 'Nicolina' },
+-];
++// Every mapped camera except the public Piața Unirii stream plays licensed stock footage filmed
++// elsewhere; it sits on the Iași map for illustration only, and the UI has to say so.
++export const REAL_STREAM_ID = 'iasi-piata-unirii';
++export const DEMO_LEGEND = 'Locații demonstrative; filmări de arhivă';
++export const isDemoCamera = (id: string) => id !== REAL_STREAM_ID && Object.hasOwn(IASI_CAMERAS, id);
++/** Display name of a mapped camera, marked DEMO for stock footage; undefined for other cameras. */
++export const iasiCameraName = (id: string): string | undefined =>
++  Object.hasOwn(IASI_CAMERAS, id) ? `${isDemoCamera(id) ? 'DEMO · ' : ''}${IASI_CAMERAS[id].name}` : undefined;
+ 
+ export const IASI_MAP_CONFIG = {
+   center: [47.1585, 27.6014] as [number, number],
+diff --git a/frontend/src/pages/AlertDetailPage.tsx b/frontend/src/pages/AlertDetailPage.tsx
+index d4e788b..4728dad 100644
+--- a/frontend/src/pages/AlertDetailPage.tsx
++++ b/frontend/src/pages/AlertDetailPage.tsx
+@@ -8,7 +8,9 @@ import { ContextStrip, FollowupsPanel, LegalHoldPanel, RelatedPanel } from '@/co
+ import { useDataStore, decide, loadDetail, reportError, cameraById } from '@/store/data'
+ import { useCan } from '@/hooks'
+ import { useAuditStore } from '@/store/audit'
+-import { AUDIT_ACTION_LABEL } from '@/lib/constants'
++import { ALERT_TYPE, AUDIT_ACTION_LABEL } from '@/lib/constants'
++import { summarizeAlert } from '@/lib/alertSummary'
++import { RECLASSIFY } from '@/lib/demo'
+ import { SeverityBadge } from '@/components/SeverityBadge'
+ import { StatusBadge } from '@/components/ui'
+ import { EvidencePlayer } from '@/components/EvidencePlayer'
+@@ -127,6 +129,13 @@ export default function AlertDetailPage() {
+   const prov = dossier?.provenance
+   const card = 'bg-[#111821] border border-[#1E2A36] rounded-md p-3.5'
+   const cardTitle = "font-sans font-bold text-xs uppercase tracking-wider text-[#7D8A9B] mb-2"
++  const summary = summarizeAlert({
++    type: alert.type, typeLabel: ALERT_TYPE[alert.type].label, cameraName: cam?.name, at: alert.createdAt,
++    objectClass: alert.metrics.vehicleClass, speedKmh: alert.metrics.speedKmh, limitKmh: alert.metrics.speedLimitKmh,
++    rule: alert.ruleSummary, status: alert.status, decidedBy: alert.decidedBy, decidedAt: alert.decidedAt,
++    reclassifiedByHuman: alert.id in RECLASSIFY,
++  })
++  const viewers = [...new Set(alert.viewedBy)]
+ 
+   return (
+     <div className="h-full flex flex-col p-4 gap-3 overflow-y-auto bg-[#0A0E14] text-[#E6EDF3]">
+@@ -171,8 +180,25 @@ export default function AlertDetailPage() {
+         </div>
+ 
+         {/* Human decision, context, history */}
+-        <div className="col-span-12 md:col-span-4 flex flex-col gap-3 min-h-0 overflow-hidden">
+-          <div className={card}>
++        <div className="col-span-12 md:col-span-4 flex flex-col gap-3 min-h-0 overflow-y-auto">
++          <section className={`${card} border-l-2 border-l-[#3DA5FF] shrink-0`} data-testid="plain-summary" aria-label="Pe scurt">
++            <h2 className={cardTitle}>Pe scurt</h2>
++            <dl className="space-y-2 text-[13px] leading-snug">
++              {([['Ce s-a întâmplat', summary.what], ['De ce a apărut alerta', summary.why], ['Ce poate face dispecerul', summary.next]] as const).map(([label, text]) => (
++                <div key={label}>
++                  <dt className="text-[11px] font-semibold text-[#3DA5FF]">{label}</dt>
++                  <dd className="text-[#E6EDF3]">{text}</dd>
++                </div>
++              ))}
++            </dl>
++            {viewers.length > 0 && (
++              <p className="mt-2.5 pt-2 border-t border-[#1E2A36] text-[11px] text-[#7D8A9B]" data-testid="evidence-viewers">
++                Cine a văzut clipul: <span className="text-[#E6EDF3]">{viewers.join(', ')}</span>
++              </p>
++            )}
++          </section>
++
++          <div className={`${card} shrink-0`}>
+             <div className={`${cardTitle} flex items-center gap-1.5`}><UserCheck size={13} /> Verificare umană</div>
+             {decided ? (
+               <div className="text-xs">
+@@ -235,7 +261,7 @@ export default function AlertDetailPage() {
+             )}
+           </div>
+ 
+-          <div className={card}>
++          <div className={`${card} shrink-0`}>
+             <div className={cardTitle}>Context</div>
+             <dl className="grid grid-cols-3 gap-y-1.5 text-xs">
+               <dt className="text-[#7D8A9B]">Cameră</dt>
+@@ -259,11 +285,11 @@ export default function AlertDetailPage() {
+                 <>
+                   <dt className="text-[#7D8A9B]">Sursă</dt>
+                   <dd className="col-span-2" title={prov.source_basis} data-testid="source-kind">
+-                    {prov.source_kind === 'live' ? 'Flux live' : prov.source_kind === 'recorded_replay' ? 'Înregistrare redată (replay)' : 'Necunoscută (live sau replay nu este raportat)'}
++                    {prov.source_kind === 'live' ? 'Flux în direct' : prov.source_kind === 'recorded_replay' ? 'Înregistrare, nu flux în direct' : 'Necunoscută (nu se știe dacă este înregistrare sau flux în direct)'}
+                   </dd>
+                   <dt className="text-[#7D8A9B]">Model</dt>
+                   <dd className="col-span-2" data-testid="model-status">
+-                    {prov.model_status === 'recorded' ? `${prov.model_id ?? ''} ${prov.model_hash ? `· ${prov.model_hash.slice(0, 12)}` : ''}` : 'Neînregistrat · model nevalidat pentru acest caz'}
++                    {prov.model_status === 'recorded' ? `${prov.model_id ?? ''} ${prov.model_hash ? `· ${prov.model_hash.slice(0, 12)}` : ''}` : 'Model neînregistrat pentru acest caz; precizia nu a fost măsurată'}
+                   </dd>
+                 </>
+               )}
+@@ -277,7 +303,7 @@ export default function AlertDetailPage() {
+           </div>
+ 
+           {dossier ? <HistoryPanel dossier={dossier} /> : (
+-          <div className={`${card} flex-1 min-h-0 overflow-hidden`}>
++          <div className={`${card} shrink-0`}>
+             <div className={cardTitle}>Istoric · audit</div>
+             <ol className="relative border-l border-[#1E2A36] ml-1.5 space-y-2">
+               {timeline.map((step, idx) => (
+diff --git a/frontend/src/pages/ArchivePage.tsx b/frontend/src/pages/ArchivePage.tsx
+index f8cc43c..c186f85 100644
+--- a/frontend/src/pages/ArchivePage.tsx
++++ b/frontend/src/pages/ArchivePage.tsx
+@@ -6,6 +6,7 @@ import { mediaUrl, USE_MOCKS } from "@/lib/api";
+ import { ALERT_TYPE, STATUS_LABEL } from "@/lib/constants";
+ import { archiveAssignees, archiveRequest, deleteSaved, errorMessage, listSaved, saveSearch, searchArchive, type ArchiveFilters, type ArchiveRun, type FilterChip, type Person, type SavedSearch, type TokenInterpretation } from "@/lib/cases";
+ import { RECLASSIFY } from "@/lib/demo";
++import { iasiCameraName } from "@/lib/iasi";
+ import type { ApiEvent } from "@/lib/adapters";
+ import { useDataStore } from "@/store/data";
+ import { ClipModal } from "@/components/ClipModal";
+@@ -35,8 +36,8 @@ const PRESETS: { label: string; q?: string; filters?: ArchiveFilters }[] = [
+   { label: "Frânări bruște", filters: { types: ["hard_braking"] } },
+   { label: "Accidente probabile", filters: { types: ["probable_crash"] } },
+   { label: "Camioane implicate", q: "camioane" },
+-  { label: "Pasaj Mihai Eminescu, noaptea", filters: { camera_id: "mx-bridge-night" } },
+-  { label: "Centura Iași", filters: { camera_id: "demo-highway" } },
++  { label: iasiCameraName("mx-bridge-night") ?? "mx-bridge-night", filters: { camera_id: "mx-bridge-night" } },
++  { label: iasiCameraName("demo-highway") ?? "demo-highway", filters: { camera_id: "demo-highway" } },
+ ];
+ 
+ function Chip({ t }: { t: TokenInterpretation }) {
+@@ -51,9 +52,14 @@ function Chip({ t }: { t: TokenInterpretation }) {
+ 
+ export default function ArchivePage() {
+   const cameras = useDataStore((s) => s.cameras);
+-  const initialQ = (useLocation().state as { q?: string } | null)?.q ?? "";
++  const location = useLocation();
++  const initialQ = (location.state as { q?: string } | null)?.q ?? "";
++  // "Istoric" on a camera tile links here with ?camera=<id>: the archive opens filtered to that camera.
++  const initialCamera = new URLSearchParams(location.search).get("camera") || undefined;
++  const initialFilters: ArchiveFilters = initialCamera ? { ...DEFAULT_FILTERS, camera_id: initialCamera } : DEFAULT_FILTERS;
++  const cameraName = (ev: ApiEvent) => cameras.find((c) => c.id === ev.camera_id)?.name ?? ev.camera_name ?? ev.camera_id;
+   const [query, setQuery] = useState(initialQ);
+-  const [filters, setFilters] = useState<ArchiveFilters>(DEFAULT_FILTERS);
++  const [filters, setFilters] = useState<ArchiveFilters>(initialFilters);
+   const [days, setDays] = useState<{ from: string; to: string }>({ from: "", to: "" });
+   const [results, setResults] = useState<ApiEvent[]>([]);
+   const [total, setTotal] = useState<number | null>(null);
+@@ -96,7 +102,7 @@ export default function ArchivePage() {
+   };
+   useEffect(() => {
+     if (USE_MOCKS) return;
+-    void run(false, DEFAULT_FILTERS, initialQ);
++    void run(false, initialFilters, initialQ);
+     listSaved().then(setSaved).catch(() => setSaved([]));
+     archiveAssignees().then(setAssignees).catch(() => setAssignees(null));
+   }, []);
+@@ -208,7 +214,7 @@ export default function ArchivePage() {
+                   <span className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-black/70 text-[10px] font-mono text-text-primary">{shownType(ev)}</span>
+                 </div>
+                 <div className="p-2.5 flex flex-col gap-1 border-t border-border/80">
+-                  <div className="text-xs font-semibold text-text-primary truncate">#{ev.id} · {ev.camera_name ?? ev.camera_id}</div>
++                  <div className="text-xs font-semibold text-text-primary truncate">#{ev.id} · {cameraName(ev)}</div>
+                   <div className="flex items-center justify-between text-[11px] font-mono text-text-secondary">
+                     <span>{fmtWhen(ev.occurred_at)}</span>
+                     <span>{STATUS_LABEL[ev.status] ?? ev.status}</span>
+@@ -291,7 +297,7 @@ export default function ArchivePage() {
+       </aside>
+       {playing !== null && (
+         <ClipModal
+-          clips={results.map((c) => ({ id: String(c.id), title: `${shownType(c)} · ${c.camera_name ?? c.camera_id}`, subtitle: fmtWhen(c.occurred_at), src: mediaUrl(c.clip_url), poster: mediaUrl(c.keyframe_url), at: c.occurred_at }))}
++          clips={results.map((c) => ({ id: String(c.id), title: `${shownType(c)} · ${cameraName(c)}`, subtitle: fmtWhen(c.occurred_at), src: mediaUrl(c.clip_url), poster: mediaUrl(c.keyframe_url), at: c.occurred_at }))}
+           start={playing}
+           onClose={() => setPlaying(null)}
+         />
+diff --git a/frontend/src/pages/AuditPage.tsx b/frontend/src/pages/AuditPage.tsx
+index 7b78997..95422e9 100644
+--- a/frontend/src/pages/AuditPage.tsx
++++ b/frontend/src/pages/AuditPage.tsx
+@@ -16,12 +16,14 @@ export default function AuditPage() {
+   const [action, setAction] = useState<AuditAction | "">("");
+ 
+   const users = useMemo(() => [...new Set(entries.map((e) => e.username))], [entries]);
++  // The real API gives no role per entry; the column appears only when some entry has one.
++  const showRole = entries.some((e) => e.role !== "anonim");
+   const filtered = entries.filter((e) => (!user || e.username === user) && (!action || e.action === action));
+ 
+   function exportCsv() {
+     const rows = [
+       ["data", "utilizator", "rol", "actiune", "tinta", "detalii"],
+-      ...filtered.map((e) => [e.at, e.username, e.role, e.action, e.target ?? "", e.details ?? ""]),
++      ...filtered.map((e) => [e.at, e.username, e.role === "anonim" ? "" : e.role, e.action, e.target ?? "", e.details ?? ""]),
+     ];
+     const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+@@ -80,7 +82,7 @@ export default function AuditPage() {
+ 
+       {/* Main Audit Table */}
+       <BadgePanel
+-        title={`Jurnal de Audit Legal (Directiva UE 2016/680) — ${filtered.length} Înregistrări`}
++        title={`Jurnal de audit — ${filtered.length} înregistrări`}
+         icon={<ShieldCheck className="w-4 h-4 text-emerald-400" />}
+         className="flex-1 min-h-0"
+         contentClassName="p-0 overflow-y-auto"
+@@ -88,9 +90,9 @@ export default function AuditPage() {
+         <table className="w-full text-left text-xs border-collapse">
+           <thead className="sticky top-0 bg-elevation border-b border-border z-10 font-mono text-text-secondary uppercase text-[11px]">
+             <tr>
+-              <th className="py-2.5 px-4">TIMESTAMP</th>
++              <th className="py-2.5 px-4">DATA ȘI ORA</th>
+               <th className="py-2.5 px-4">UTILIZATOR</th>
+-              <th className="py-2.5 px-4">ROL</th>
++              {showRole && <th className="py-2.5 px-4">ROL</th>}
+               <th className="py-2.5 px-4">ACȚIUNE EXECUTATĂ</th>
+               <th className="py-2.5 px-4">ȚINTĂ / DOSAR</th>
+               <th className="py-2.5 px-4">DETALII OPERAȚIUNE</th>
+@@ -105,9 +107,11 @@ export default function AuditPage() {
+                 <td className="py-3 px-4 font-semibold text-text-primary">
+                   {e.username}
+                 </td>
+-                <td className="py-3 px-4 font-mono text-[11px] text-accent">
+-                  {e.role === "anonim" ? "—" : ROLE_LABEL[e.role].toUpperCase()}
+-                </td>
++                {showRole && (
++                  <td className="py-3 px-4 font-mono text-[11px] text-accent">
++                    {e.role === "anonim" ? "—" : ROLE_LABEL[e.role].toUpperCase()}
++                  </td>
++                )}
+                 <td className="py-3 px-4 text-text-primary font-medium">
+                   {AUDIT_ACTION_LABEL[e.action]}
+                 </td>
+diff --git a/frontend/src/pages/CamerasPage.tsx b/frontend/src/pages/CamerasPage.tsx
+index c8b3c9e..4380d7b 100644
+--- a/frontend/src/pages/CamerasPage.tsx
++++ b/frontend/src/pages/CamerasPage.tsx
+@@ -1,6 +1,6 @@
+ import { useState, useMemo, useEffect } from "react";
+ import { Link } from "react-router";
+-import { Grid, Map as MapIcon, AlertTriangle, Eye, History, Radio, X, SlidersHorizontal } from "lucide-react";
++import { Grid, Map as MapIcon, AlertTriangle, Eye, History, Radio, Video, X, SlidersHorizontal } from "lucide-react";
+ import { useDataStore } from "@/store/data";
+ import { useAuthStore } from "@/store/auth";
+ import { USE_MOCKS } from "@/lib/api";
+@@ -10,6 +10,7 @@ import TacticalMap from "@/components/TacticalMap";
+ import { ClipModal, type ModalClip } from "@/components/ClipModal";
+ import { ALERT_TYPE } from "@/lib/constants";
+ import { LiveBadge, LivePlayer } from "@/components/LivePlayer";
++import { isDemoCamera } from "@/lib/iasi";
+ 
+ // MOCK: Supplementary telemetry, thumbnails, coordinates, and offline state
+ interface CameraExtended {
+@@ -28,6 +29,29 @@ interface CameraExtended {
+   live?: boolean;
+ }
+ 
++/** Latest key frame, then the bundled still; a neutral placeholder when neither loads. */
++function CameraThumb({ cam }: { cam: CameraExtended }) {
++  const [failed, setFailed] = useState<string[]>([]);
++  const src = [cam.image_url, `/cams/${cam.id}.jpg`].find((u) => u && !failed.includes(u));
++  if (!src) {
++    return (
++      <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 px-3 text-center bg-elevation text-text-secondary" data-testid="camera-placeholder">
++        <Video className="w-7 h-7" aria-hidden />
++        <span className="text-[11px] font-semibold text-text-primary line-clamp-2">{cam.name}</span>
++        <span className="text-[10px]">Fără imagine disponibilă</span>
++      </div>
++    );
++  }
++  return (
++    <img
++      src={src}
++      alt={cam.name}
++      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
++      onError={() => setFailed((f) => [...f, src])}
++    />
++  );
++}
++
+ export default function CamerasPage() {
+   const realCameras = useDataStore((st) => st.cameras);
+   const alerts = useDataStore((st) => st.alerts);
+@@ -104,7 +128,7 @@ export default function CamerasPage() {
+               }`}
+             >
+               <Grid className="w-3.5 h-3.5" />
+-              <span>[Grilă]</span>
++              <span>Grilă</span>
+             </button>
+             <span className="text-border px-1">/</span>
+             <button
+@@ -169,14 +193,7 @@ export default function CamerasPage() {
+                         {cam.heartbeat && cam.live_url ? (
+                           <LivePlayer src={cam.live_url} className="w-full h-full" />
+                         ) : (
+-                          <img
+-                            src={cam.image_url || `/cams/${cam.id}.jpg`}
+-                            alt={cam.name}
+-                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+-                            onError={(e) => {
+-                              const img = e.currentTarget as HTMLImageElement; if (!img.src.endsWith(`/cams/${cam.id}.jpg`)) img.src = `/cams/${cam.id}.jpg`;
+-                            }}
+-                          />
++                          <CameraThumb cam={cam} />
+                         )}
+ 
+                         {/* Top-left status badge: server-computed state when the control plane knows
+@@ -211,6 +228,12 @@ export default function CamerasPage() {
+                           )}
+                         </div>
+ 
++                        {isDemoCamera(cam.id) && (
++                          <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/70 border border-amber-500/50 text-[10px] font-semibold text-amber-400" data-testid="demo-footage">
++                            Filmare demonstrativă
++                          </span>
++                        )}
++
+                         {/* Hover Overlay Action Buttons */}
+                         {isHovered && (
+                           <div className="absolute inset-0 bg-deep-void/70 backdrop-blur-sm flex items-center justify-center gap-2 p-3 transition-opacity">
+@@ -233,7 +256,7 @@ export default function CamerasPage() {
+                               <span>Redă clipuri</span>
+                             </button>
+                             <Link
+-                              to={`/app/arhiva?camera=${cam.id}`}
++                              to={`/app/arhiva?camera=${encodeURIComponent(cam.id)}`}
+                               className="flex-1 flex items-center justify-center gap-1.5 py-1.5 bg-elevation hover:bg-border text-text-primary text-xs font-medium rounded border border-border transition-colors"
+                             >
+                               <History className="w-3.5 h-3.5" />
+@@ -257,7 +280,7 @@ export default function CamerasPage() {
+                       <div className="flex items-center justify-between gap-2 text-[10px] font-mono text-text-secondary" data-testid={`control-${cam.id}`}>
+                         <span className="truncate" title={control.source_display ?? undefined}>
+                           {control.source_kind ? SOURCE_LABEL[control.source_kind] : "Sursă nedeclarată"}
+-                          {control.runtime.applied_revision != null && ` · r${control.runtime.applied_revision} aplicată`}
++                          {control.runtime.applied_revision != null && ` · configurația nr. ${control.runtime.applied_revision} aplicată`}
+                         </span>
+                         <button
+                           type="button"
+diff --git a/frontend/src/pages/DashboardPage.tsx b/frontend/src/pages/DashboardPage.tsx
+index de15bc4..1cc531f 100644
+--- a/frontend/src/pages/DashboardPage.tsx
++++ b/frontend/src/pages/DashboardPage.tsx
+@@ -11,13 +11,6 @@ import { StatusBadge } from '@/components/ui'
+ import { TacticalMap } from '@/components/TacticalMap'
+ import { ClipModal } from '@/components/ClipModal'
+ 
+-// MOCK: the backend has no patrols yet.
+-const PATROLS = [
+-  { callsign: 'IS-21-POL', status: 'Disponibilă', color: '#2ED47A', area: 'Copou' },
+-  { callsign: 'IS-14-POL', status: 'În misiune', color: '#FF8A1F', area: 'Podu Roș' },
+-  { callsign: 'IS-07-POL', status: 'Disponibilă', color: '#2ED47A', area: 'Tătărași' },
+-  { callsign: 'IS-33-POL', status: 'Pauză', color: '#7D8A9B', area: 'Nicolina' },
+-]
+ const ROW_H = 68 // px per queue row incl. gap; the queue shows as many rows as fit, no scrolling
+ 
+ const ACCENT: Record<string, string> = { critical: '#FF3B3B', high: '#FF8A1F', medium: '#FFC23D', info: '#3DA5FF' }
+@@ -44,8 +37,6 @@ export default function DashboardPage() {
+   useEffect(() => { if (page > pages - 1) setPage(pages - 1) }, [page, pages])
+   const visible = queue.slice(page * perPage, page * perPage + perPage)
+ 
+-  const camerasOnline = cameras.filter((c) => c.status !== 'offline').length
+-  const availablePatrols = PATROLS.filter((p) => p.status === 'Disponibilă').length
+   const kpi = 'bg-[#111821] border border-[#1E2A36] rounded-md px-3.5 py-2.5'
+ 
+   return (
+@@ -56,18 +47,16 @@ export default function DashboardPage() {
+           <div className="font-sans text-3xl font-bold text-[#E6EDF3] leading-none mt-1">{openCount}</div>
+         </div>
+         <div className={kpi}>
+-          <div className="text-xs text-[#7D8A9B] font-medium">Camere online</div>
+-          <div className="font-sans text-3xl font-bold text-[#E6EDF3] leading-none mt-1">{camerasOnline}/{cameras.length}</div>
++          <div className="text-xs text-[#7D8A9B] font-medium">Camere configurate</div>
++          <div className="font-sans text-3xl font-bold text-[#E6EDF3] leading-none mt-1">{cameras.length}</div>
+         </div>
+         <div className={kpi}>
+-          <div className="text-xs text-[#7D8A9B] font-medium">Patrule disponibile</div>
+-          <div className="font-sans text-3xl font-bold text-[#E6EDF3] leading-none mt-1">{availablePatrols}/{PATROLS.length}</div>
++          <div className="text-xs text-[#7D8A9B] font-medium">Alerte confirmate</div>
++          <div className="font-sans text-3xl font-bold text-[#E6EDF3] leading-none mt-1">{stats.confirmed}</div>
+         </div>
+         <div className={kpi}>
+-          <div className="text-xs text-[#7D8A9B] font-medium">Rată alarme false</div>
+-          <div className="font-sans text-3xl font-bold text-[#E6EDF3] leading-none mt-1">
+-            {stats.falseAlarmRate ? `${Math.round(stats.falseAlarmRate * 100)}%` : '—'}
+-          </div>
++          <div className="text-xs text-[#7D8A9B] font-medium">Decizii luate de dispecer</div>
++          <div className="font-sans text-3xl font-bold text-[#E6EDF3] leading-none mt-1">{stats.confirmed + stats.rejected}</div>
+         </div>
+       </div>
+ 
+@@ -130,22 +119,6 @@ export default function DashboardPage() {
+           <div className="flex-1 min-h-0">
+             <TacticalMap className="w-full h-full" />
+           </div>
+-          <div className="bg-[#111821] border border-[#1E2A36] rounded-md px-3.5 py-2.5 shrink-0">
+-            <div className="flex items-center justify-between mb-1.5">
+-              <h3 className="font-sans text-sm font-bold uppercase tracking-wider text-[#E6EDF3]">Patrule pe teren</h3>
+-              <span className="text-[10px] text-[#536070] font-mono">DEMO</span>
+-            </div>
+-            <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+-              {PATROLS.map((p) => (
+-                <div key={p.callsign} className="flex items-center gap-2 text-xs">
+-                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />
+-                  <span className="font-mono font-bold text-[#E6EDF3]">{p.callsign}</span>
+-                  <span className="text-[11px] truncate" style={{ color: p.color }}>{p.status}</span>
+-                  <span className="text-[11px] text-[#7D8A9B] ml-auto">{p.area}</span>
+-                </div>
+-              ))}
+-            </div>
+-          </div>
+         </div>
+       </div>
+ 
+diff --git a/frontend/src/pages/LandingPage.tsx b/frontend/src/pages/LandingPage.tsx
+new file mode 100644
+index 0000000..00475de
+--- /dev/null
++++ b/frontend/src/pages/LandingPage.tsx
+@@ -0,0 +1,93 @@
++import { Link } from 'react-router'
++import { ArrowRight, BellRing, Cctv, ChevronRight, ScanSearch, UserCheck } from 'lucide-react'
++import { Logo } from '@/assets/brand/Logo'
++
++const POINTS = [
++  {
++    title: 'Ce este',
++    text: 'Programul urmărește imaginile camerelor rutiere existente și îl anunță pe dispecer când pe drum pare să apară un pericol.',
++  },
++  {
++    title: 'Cine decide',
++    text: 'Omul confirmă sau respinge fiecare alertă, după ce vede clipul; sistemul doar semnalează.',
++  },
++  {
++    title: 'Viața privată',
++    text: 'Fără recunoaștere facială. Estomparea fețelor și a numerelor de înmatriculare există, dar nu este încă aplicată pe toate clipurile. Fiecare vizualizare rămâne în jurnal.',
++  },
++]
++
++const STEPS = [
++  { icon: Cctv, title: 'Cameră', text: 'O cameră rutieră existentă filmează drumul.' },
++  { icon: ScanSearch, title: 'Detecție automată', text: 'Programul urmărește vehiculele și observă situațiile periculoase.' },
++  { icon: BellRing, title: 'Alertă cu clip', text: 'Dispecerul primește alerta împreună cu un clip scurt.' },
++  { icon: UserCheck, title: 'Decizia dispecerului', text: 'Omul vede clipul și confirmă sau respinge alerta.' },
++]
++
++/** Public first screen: what the product is, in plain words, before the login form. */
++export default function LandingPage() {
++  return (
++    <div className="h-full overflow-y-auto bg-[#0A0E14] text-[#E6EDF3] font-sans select-text">
++      <div className="min-h-full max-w-6xl mx-auto px-6 lg:px-10 py-5 flex flex-col gap-5">
++        <header className="flex items-center justify-between gap-4 shrink-0">
++          <Logo variant="full" size={36} />
++          <span className="px-2.5 py-1 rounded border border-[#FFC23D]/50 text-[#FFC23D] font-mono text-[11px] uppercase tracking-wider">
++            Prototip demonstrativ
++          </span>
++        </header>
++
++        <main className="flex-1 flex flex-col justify-center gap-7">
++          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
++            <div className="lg:col-span-5">
++              <p className="font-mono text-xs uppercase tracking-widest text-[#7D8A9B] mb-3">Dispecerat rutier asistat de inteligență artificială</p>
++              <h1 className="text-4xl xl:text-5xl font-bold tracking-tight leading-[1.1]">
++                Camerele observă drumul. <span className="text-[#3DA5FF]">Omul decide.</span>
++              </h1>
++              <Link
++                to="/login"
++                className="mt-7 inline-flex items-center gap-2 px-6 py-3 rounded-md bg-[#3DA5FF] text-[#0A0E14] font-bold text-base tracking-wider uppercase hover:bg-[#2C94F0] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E6EDF3]"
++              >
++                Intră în aplicație <ArrowRight size={18} />
++              </Link>
++            </div>
++
++            <dl className="lg:col-span-7 flex flex-col gap-2.5">
++              {POINTS.map((point) => (
++                <div key={point.title} className="bg-[#111821] border border-[#1E2A36] border-l-2 border-l-[#3DA5FF] rounded-md px-4 py-3">
++                  <dt className="text-xs font-bold uppercase tracking-wider text-[#3DA5FF]">{point.title}</dt>
++                  <dd className="mt-1 text-[15px] leading-snug">{point.text}</dd>
++                </div>
++              ))}
++            </dl>
++          </div>
++
++          <section aria-labelledby="landing-steps">
++            <h2 id="landing-steps" className="font-bold text-xs uppercase tracking-wider text-[#7D8A9B] mb-2.5">Cum funcționează, în patru pași</h2>
++            <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
++              {STEPS.map((step, index) => (
++                <li key={step.title} className="relative bg-[#17202B] border border-[#1E2A36] rounded-md p-4">
++                  <div className="flex items-center gap-3">
++                    <span className="w-10 h-10 rounded-md bg-[#0A0E14] border border-[#1E2A36] flex items-center justify-center text-[#3DA5FF] shrink-0">
++                      <step.icon size={20} />
++                    </span>
++                    <span className="font-mono text-xs text-[#7D8A9B]">Pasul {index + 1}</span>
++                  </div>
++                  <div className="mt-3 font-bold text-base">{step.title}</div>
++                  <p className="mt-1 text-[13px] leading-snug text-[#7D8A9B]">{step.text}</p>
++                  {index < STEPS.length - 1 && (
++                    <ChevronRight size={22} aria-hidden="true" className="hidden lg:block absolute -right-[23px] top-1/2 -translate-y-1/2 text-[#3DA5FF]" />
++                  )}
++                </li>
++              ))}
++            </ol>
++          </section>
++        </main>
++
++        <footer className="shrink-0 border-t border-[#1E2A36] pt-3 text-[13px] text-[#7D8A9B]">
++          <span className="text-[#FFC23D] font-semibold">Prototip demonstrativ.</span>{' '}
++          Majoritatea filmărilor sunt imagini de stoc filmate în alte țări, așezate pe harta Iașului doar ca exemplu; un singur flux este real (Piața Unirii). Precizia detecției nu a fost încă măsurată.
++        </footer>
++      </div>
++    </div>
++  )
++}
+diff --git a/frontend/src/pages/LoginPage.tsx b/frontend/src/pages/LoginPage.tsx
+index 42f7ba6..aa8dfcf 100644
+--- a/frontend/src/pages/LoginPage.tsx
++++ b/frontend/src/pages/LoginPage.tsx
+@@ -18,7 +18,6 @@ export default function LoginPage() {
+ 
+   const [username, setUsername] = useState('')
+   const [password, setPassword] = useState('')
+-  const [remember, setRemember] = useState(true)
+   const [error, setError] = useState<string | null>(null)
+   const [loading, setLoading] = useState(false)
+   // Second factor for accounts that are not MFA-exempt (exempt demo accounts skip it).
+@@ -65,7 +64,7 @@ export default function LoginPage() {
+     }
+     if (!username.trim() || !password) return setError('Completați utilizatorul și parola.')
+     setLoading(true)
+-    const res = await login(username, password, remember)
++    const res = await login(username, password, false)
+     if (res.ok && res.mfaRequired) {
+       setMfa(true)
+       if (res.enrollment) {
+@@ -93,7 +92,7 @@ export default function LoginPage() {
+             Autentificare dispecerat
+           </h1>
+           <p className="text-[12px] text-[#9AA1A8]">
+-            Poliția Rutieră Iași · Sistem operativ
++            Dispecerat rutier asistat de AI · prototip demonstrativ
+           </p>
+         </div>
+ 
+@@ -129,16 +128,6 @@ export default function LoginPage() {
+                 placeholder="••••••••"
+               />
+             </div>
+-
+-            <label className="flex items-center gap-2 text-[12px] text-[#9AA1A8] cursor-pointer select-none">
+-              <input
+-                type="checkbox"
+-                checked={remember}
+-                onChange={(e) => setRemember(e.target.checked)}
+-                className="w-3.5 h-3.5 rounded-[2px] border-[#2A2F34] bg-surface-2 text-accent focus:ring-0 cursor-pointer"
+-              />
+-              <span>Ține-mă minte</span>
+-            </label>
+             </>
+           )}
+ 
+@@ -234,9 +223,9 @@ export default function LoginPage() {
+           </div>
+         </div>}
+ 
+-        {/* Discrete bottom legal text */}
++        {/* Discrete bottom note */}
+         <div className="text-[11px] text-text-faint text-center pt-1">
+-          Acces auditat · Directiva UE 2016/680
++          Acces auditat
+         </div>
+       </div>
+     </div>
+diff --git a/frontend/src/pages/SettingsPage.tsx b/frontend/src/pages/SettingsPage.tsx
+index 8f9519f..f23a2a3 100644
+--- a/frontend/src/pages/SettingsPage.tsx
++++ b/frontend/src/pages/SettingsPage.tsx
+@@ -35,10 +35,10 @@ export default function SettingsPage() {
+         contentClassName="space-y-3"
+       >
+         <div className="p-3.5 rounded-md bg-elevation/70 border border-border text-xs text-text-secondary space-y-2">
+-          <p className="font-semibold text-text-primary">Garanții arhitecturale de conformitate:</p>
++          <p className="font-semibold text-text-primary">Principii de proiectare:</p>
+           <ul className="space-y-1.5 list-disc pl-4 text-[11px]">
+             <li>Fără recunoaștere facială și fără urmărirea biometrică a persoanelor.</li>
+-            <li>Directiva UE 2016/680 privind protecția datelor în domeniul aplicării legii.</li>
++            <li>Acces pe roluri și aprobare de către a doua persoană pentru exporturi.</li>
+             <li>Decizia finală aparține exclusiv operatorului uman atestat.</li>
+             <li>Jurnal de audit criptografic nemodificabil pentru toate deciziile.</li>
+           </ul>
+diff --git a/frontend/src/pages/StatsPage.tsx b/frontend/src/pages/StatsPage.tsx
+index d220b9d..4ee3c57 100644
+--- a/frontend/src/pages/StatsPage.tsx
++++ b/frontend/src/pages/StatsPage.tsx
+@@ -1,8 +1,10 @@
+ import { useMemo } from "react";
+-import { Download, ArrowUpRight, ArrowDownRight } from "lucide-react";
++import { Download, Printer } from "lucide-react";
+ import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
+ import { useDataStore, cameraById } from "@/store/data";
+ import { ALERT_TYPE } from "@/lib/constants";
++import { fmtDateTime } from "@/lib/format";
++import { ActivityReport } from "@/components/ActivityReport";
+ 
+ const DAYS = ["Lun", "Mar", "Mie", "Joi", "Vin", "Sâm", "Dum"];
+ const HOURS = Array.from({ length: 24 }, (_, i) => i);
+@@ -14,9 +16,7 @@ export default function StatsPage() {
+     const total = alerts.length;
+     const confirmed = alerts.filter((a) => a.status === "confirmed" || a.status === "closed").length;
+     const rejected = alerts.filter((a) => a.status === "rejected").length;
+-    const decided = confirmed + rejected;
+-    const reaction = alerts.filter((a) => a.decidedAt).map((a) => (new Date(a.decidedAt!).getTime() - new Date(a.createdAt).getTime()) / 1000).filter((x) => x >= 0);
+-    const avg = reaction.length ? reaction.reduce((x, y) => x + y, 0) / reaction.length : null;
++    const pending = total - confirmed - rejected;
+     const sev = { critical: 0, high: 0, medium: 0, info: 0 } as Record<string, number>;
+     const byType: Record<string, number> = {};
+     const byCam: Record<string, { count: number; worst: number }> = {};
+@@ -30,27 +30,37 @@ export default function StatsPage() {
+       const d = new Date(a.createdAt);
+       heat[(d.getDay() + 6) % 7][d.getHours()]++;
+     }
+-    const pct = (n: number) => (total ? Math.round((n / total) * 100) : 0);
+     const gravity = [
+-      { name: "Critic", value: sev.critical, color: "#FF3B3B", label: `Critic (${pct(sev.critical)}%)` },
+-      { name: "Ridicat", value: sev.high, color: "#FF8A1F", label: `Ridicat (${pct(sev.high)}%)` },
+-      { name: "Mediu", value: sev.medium, color: "#FFC23D", label: `Mediu (${pct(sev.medium)}%)` },
+-      { name: "Info", value: sev.info, color: "#3DA5FF", label: `Info (${pct(sev.info)}%)` },
++      { name: "Critic", value: sev.critical, color: "#FF3B3B", label: `Critic · ${sev.critical}` },
++      { name: "Ridicat", value: sev.high, color: "#FF8A1F", label: `Ridicat · ${sev.high}` },
++      { name: "Mediu", value: sev.medium, color: "#FFC23D", label: `Mediu · ${sev.medium}` },
++      { name: "Info", value: sev.info, color: "#3DA5FF", label: `Info · ${sev.info}` },
+     ].filter((g) => g.value > 0);
+     const sevColor: Record<string, string> = { critical: "#FF3B3B", high: "#FF8A1F", medium: "#FFC23D", info: "#3DA5FF" };
+     const maxType = Math.max(1, ...Object.values(byType));
+-    const types = Object.entries(byType).sort((x, y) => y[1] - x[1]).slice(0, 6).map(([t, n]) => ({
++    const allTypes = Object.entries(byType).sort((x, y) => y[1] - x[1]).map(([t, n]) => ({
+       label: ALERT_TYPE[t as keyof typeof ALERT_TYPE]?.label ?? t, count: n, percentage: Math.round((n / maxType) * 100),
+       color: sevColor[ALERT_TYPE[t as keyof typeof ALERT_TYPE]?.severity ?? "info"],
+     }));
++    const types = allTypes.slice(0, 6);
+     const camColors = ["#3DA5FF", "#FFC23D", "#FF8A1F", "#FF3B3B"];
+     const cams = Object.entries(byCam).sort((x, y) => y[1].count - x[1].count).map(([id, v]) => ({
+-      camera: cameraById(id)?.name?.split(" – ")[0] ?? id, count: v.count, color: camColors[v.worst],
++      camera: cameraById(id)?.name?.split(" – ")[0] ?? id, fullName: cameraById(id)?.name ?? id, count: v.count, color: camColors[v.worst],
+     }));
+     const maxHeat = Math.max(1, ...heat.flat());
+-    return { total, confirmedPct: decided ? Math.round((confirmed / decided) * 100) : null, falsePct: decided ? Math.round((rejected / decided) * 100) : null, avg, gravity, types, cams, heat, maxHeat, decided };
++    const hours = HOURS.map((h) => heat.reduce((sum, day) => sum + day[h], 0));
++    const times = alerts.map((a) => new Date(a.createdAt).getTime()).filter((t) => Number.isFinite(t)).sort((x, y) => x - y);
++    const day = (t: number) => fmtDateTime(new Date(t).toISOString()).slice(0, 10);
++    const period = !times.length ? "nu există alerte în datele încărcate"
++      : day(times[0]) === day(times[times.length - 1]) ? day(times[0]) : `${day(times[0])} – ${day(times[times.length - 1])}`;
++    return { total, confirmed, rejected, pending, gravity, types, allTypes, cams, heat, maxHeat, hours, period };
+   }, [alerts]);
+-  const fmtAvg = (sec: number | null) => sec === null ? "—" : sec < 60 ? `${Math.round(sec)} s` : `${Math.floor(sec / 60)} min ${Math.round(sec % 60)} s`;
++  const totals = [
++    { label: "Total alerte", count: data.total, note: `din ${data.cams.length} camere` },
++    { label: "Alerte confirmate", count: data.confirmed, note: "decizia dispecerului" },
++    { label: "Alerte respinse", count: data.rejected, note: "decizia dispecerului" },
++    { label: "În așteptare", count: data.pending, note: "fără decizie încă" },
++  ];
+   const GRAVITY_DATA = data.gravity;
+   const ALERT_TYPES_DATA = data.types;
+   const CAMERAS_BAR_DATA = data.cams;
+@@ -59,11 +69,8 @@ export default function StatsPage() {
+   const handleExportCSV = () => {
+     const rows = [
+       ["Indicator", "Valoare"],
+-      ["Total alerte", String(data.total)],
+-      ["Alerte confirmate", data.confirmedPct === null ? "—" : `${data.confirmedPct}%`],
+-      ["Timp mediu reactie", fmtAvg(data.avg)],
+-      ["Alarme false", data.falsePct === null ? "—" : `${data.falsePct}%`],
+-      ...data.types.map((t) => [t.label, String(t.count)]),
++      ...totals.map((t) => [t.label, String(t.count)]),
++      ...data.allTypes.map((t) => [t.label, String(t.count)]),
+       ...data.cams.map((c) => [`Camera ${c.camera}`, String(c.count)]),
+     ];
+     const csvContent = "data:text/csv;charset=utf-8," + rows.map((r) => r.map((v) => `"${v}"`).join(",")).join("\n");
+@@ -96,76 +103,37 @@ export default function StatsPage() {
+         </div>
+ 
+         <div className="flex items-center gap-3">
++          <button
++            onClick={() => window.print()}
++            className="flex items-center gap-2 px-3.5 py-1.5 rounded-md bg-[#3DA5FF] hover:bg-[#2C94F0] text-xs text-[#0A0E14] font-bold transition-colors cursor-pointer"
++          >
++            <span>Tipărește raportul</span>
++            <Printer className="w-3.5 h-3.5" />
++          </button>
+           {/* Export Report button */}
+           <button
+             onClick={handleExportCSV}
+             className="flex items-center gap-2 px-3.5 py-1.5 rounded-md bg-elevation hover:bg-border text-xs text-text-primary border border-border transition-colors font-medium"
+           >
+-            <span>Exportă raport</span>
++            <span>Exportă CSV</span>
+             <Download className="w-3.5 h-3.5 text-text-secondary" />
+           </button>
+         </div>
+       </div>
+ 
+-      {/* Row 1: 4 Top KPI Cards */}
++      {/* Row 1: plain counts; no percentage that could read as an accuracy figure */}
+       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+-        {/* KPI 1: TOTAL ALERTE */}
+-        <div className="rounded-md bg-panel border border-border p-4 flex flex-col justify-between">
+-          <div className="flex items-center justify-between text-xs font-mono text-text-secondary uppercase">
+-            <span>TOTAL ALERTE</span>
+-            <ArrowUpRight className="w-4 h-4 text-accent" />
+-          </div>
+-          <div className="mt-2 flex items-baseline gap-2">
+-            <span className="font-heading text-4xl font-bold text-text-primary tracking-tight">
+-              {data.total.toLocaleString("ro-RO")}
+-            </span>
+-            <span className="text-[11px] font-mono text-text-secondary">
+-              din {data.cams.length} camere
+-            </span>
+-          </div>
+-        </div>
+-
+-        {/* KPI 2: ALERTĂ CONFIRMATE */}
+-        <div className="rounded-md bg-panel border border-border p-4 flex flex-col justify-between">
+-          <div className="flex items-center justify-between text-xs font-mono text-text-secondary uppercase">
+-            <span>ALERTĂ CONFIRMATE</span>
+-            <ArrowUpRight className="w-4 h-4 text-emerald-400" />
+-          </div>
+-          <div className="mt-2 flex items-baseline gap-3">
+-            <span className="font-heading text-4xl font-bold text-text-primary tracking-tight">
+-              {data.confirmedPct === null ? "—" : `${data.confirmedPct}%`}
+-            </span>
+-            <span className="text-[11px] font-mono text-text-secondary">
+-              din {data.decided} decise
+-            </span>
+-          </div>
+-        </div>
+-
+-        {/* KPI 3: TIMP MEDIU REACȚIE */}
+-        <div className="rounded-md bg-panel border border-border p-4 flex flex-col justify-between">
+-          <div className="flex items-center justify-between text-xs font-mono text-text-secondary uppercase">
+-            <span>TIMP MEDIU REACȚIE</span>
+-            <ArrowUpRight className="w-4 h-4 text-emerald-400" />
+-          </div>
+-          <div className="mt-2">
+-            <span className="font-heading text-4xl font-bold text-text-primary tracking-tight">
+-              {fmtAvg(data.avg)}
+-            </span>
+-          </div>
+-        </div>
+-
+-        {/* KPI 4: ALARME FALSE */}
+-        <div className="rounded-md bg-panel border border-border p-4 flex flex-col justify-between">
+-          <div className="flex items-center justify-between text-xs font-mono text-text-secondary uppercase">
+-            <span>ALARME FALSE</span>
+-            <ArrowDownRight className="w-4 h-4 text-emerald-400" />
+-          </div>
+-          <div className="mt-2">
+-            <span className="font-heading text-4xl font-bold text-text-primary tracking-tight">
+-              {data.falsePct === null ? "—" : `${data.falsePct}%`}
+-            </span>
++        {totals.map((kpi) => (
++          <div key={kpi.label} className="rounded-md bg-panel border border-border p-4 flex flex-col justify-between">
++            <div className="text-xs font-mono text-text-secondary uppercase">{kpi.label}</div>
++            <div className="mt-2 flex items-baseline gap-2">
++              <span className="font-heading text-4xl font-bold text-text-primary tracking-tight">
++                {kpi.count.toLocaleString("ro-RO")}
++              </span>
++              <span className="text-[11px] font-mono text-text-secondary">{kpi.note}</span>
++            </div>
+           </div>
+-        </div>
++        ))}
+       </div>
+ 
+       {/* Row 2: Middle Charts */}
+@@ -280,24 +248,16 @@ export default function StatsPage() {
+         <div className="rounded-md bg-panel border border-border p-4 flex flex-col justify-between overflow-x-auto">
+           <div className="flex items-center justify-between text-xs font-mono uppercase text-text-secondary font-semibold mb-2">
+             <span>Distribuție oră × zi</span>
+-            <span className="text-[10px] text-text-secondary">Inter 00–23</span>
++            <span className="text-[10px] text-text-secondary">Interval orar 00–23</span>
+           </div>
+ 
+           <div className="min-w-[500px]">
+             <div className="flex items-center pl-8 mb-1 gap-1">
+-              {HOURS.map((h) => {
+-                const isHighlight = h === 17 || h === 18;
+-                return (
+-                  <div
+-                    key={h}
+-                    className={`flex-1 text-center text-[9px] font-mono ${
+-                      isHighlight ? "text-amber-400 font-bold" : "text-text-secondary"
+-                    }`}
+-                  >
+-                    {h < 10 ? `0${h}` : h}
+-                  </div>
+-                );
+-              })}
++              {HOURS.map((h) => (
++                <div key={h} className="flex-1 text-center text-[9px] font-mono text-text-secondary">
++                  {h < 10 ? `0${h}` : h}
++                </div>
++              ))}
+             </div>
+ 
+             <div className="space-y-1">
+@@ -330,6 +290,15 @@ export default function StatsPage() {
+           </div>
+         </div>
+       </div>
++
++      <ActivityReport
++        period={data.period}
++        generatedAt={fmtDateTime(new Date().toISOString()).slice(0, 16)}
++        totals={totals}
++        cameras={data.cams.map((c) => ({ label: c.fullName, count: c.count }))}
++        types={data.allTypes}
++        hours={data.hours}
++      />
+     </div>
+   );
+ }

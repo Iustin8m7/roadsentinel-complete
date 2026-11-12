@@ -1,0 +1,165 @@
+E501 Line too long (126 > 100)
+   --> backend/app/api/offline_analytics.py:442:101
+    |
+440 |                     item.get(
+441 |                         "limitations",
+442 |                         "Candidate observation; requires human verification and does not establish an enforcement violation.",
+    |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+443 |                     )
+444 |                 )[:500],
+    |
+
+S603 `subprocess` call: check for execution of untrusted input
+  --> backend/app/services/offline_promotion.py:94:17
+   |
+92 |             clip = Path(folder) / "clip.mp4"
+93 |             try:
+94 |                 subprocess.run(
+   |                 ^^^^^^^^^^^^^^
+95 |                     [
+96 |                         "ffmpeg",
+   |
+
+S607 Starting a process with a partial executable path
+   --> backend/app/services/offline_promotion.py:95:21
+    |
+ 93 |               try:
+ 94 |                   subprocess.run(
+ 95 | /                     [
+ 96 | |                         "ffmpeg",
+ 97 | |                         "-nostdin",
+ 98 | |                         "-loglevel",
+ 99 | |                         "error",
+100 | |                         "-ss",
+101 | |                         str(start),
+102 | |                         "-i",
+103 | |                         str(source),
+104 | |                         "-t",
+105 | |                         str(duration),
+106 | |                         "-an",
+107 | |                         "-c:v",
+108 | |                         "libx264",
+109 | |                         "-preset",
+110 | |                         "veryfast",
+111 | |                         "-pix_fmt",
+112 | |                         "yuv420p",
+113 | |                         "-movflags",
+114 | |                         "+faststart",
+115 | |                         str(clip),
+116 | |                     ],
+    | |_____________________^
+117 |                       check=True,
+118 |                       timeout=30,
+    |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> backend/tests/test_managed_heartbeat.py:1:1
+  |
+1 | / import json
+2 | | from tests.test_contract_ingest import add_camera
+3 | | from tests.test_ingest_auth import make_pipeline
+  | |________________________________________________^
+help: Organize imports
+  |
+1 | import json
+2 +
+3 | from tests.test_contract_ingest import add_camera
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> backend/tests/test_managed_live_runtime.py:29:5
+   |
+27 |   @pytest.mark.skipif(os.getenv("RS_MISSION_REAL") != "1", reason="licensed model/media opt-in")
+28 |   def test_managed_replay_ack_preview_and_revocation(world, tmp_path, monkeypatch, login):
+29 | /     from app.db import tenant_session
+30 | |     from app.main import create_app
+31 | |     from app.config import get_settings
+32 | |     from app.models import Camera, CameraConfigVersion, CameraSourceGrant, CameraWorkerStatus
+33 | |     from app.services import camera_config as cc, camera_control as ctl, ingest_auth
+34 | |     from app.services.keys import load_keyring
+35 | |     from roadsentinel.replay import make_server
+   | |_______________________________________________^
+36 |
+37 |       root = Path(__file__).resolve().parents[2]
+   |
+help: Organize imports
+   |
+28 | def test_managed_replay_ack_preview_and_revocation(world, tmp_path, monkeypatch, login):
+29 +     from roadsentinel.replay import make_server
+30 +
+31 +     from app.config import get_settings
+32 |     from app.db import tenant_session
+33 |     from app.main import create_app
+   -     from app.config import get_settings
+34 |     from app.models import Camera, CameraConfigVersion, CameraSourceGrant, CameraWorkerStatus
+   -     from app.services import camera_config as cc, camera_control as ctl, ingest_auth
+35 +     from app.services import camera_config as cc
+36 +     from app.services import camera_control as ctl
+37 +     from app.services import ingest_auth
+38 |     from app.services.keys import load_keyring
+   -     from roadsentinel.replay import make_server
+39 |
+   |
+
+S603 `subprocess` call: check for execution of untrusted input
+   --> backend/tests/test_managed_live_runtime.py:150:16
+    |
+148 |             time.sleep(0.05)
+149 |         log = (tmp_path / "worker.log").open("w+")
+150 |         proc = subprocess.Popen(
+    |                ^^^^^^^^^^^^^^^^
+151 |             [
+152 |                 sys.executable,
+    |
+
+E501 Line too long (146 > 100)
+   --> backend/tests/test_managed_live_runtime.py:198:101
+    |
+196 | …tart; restart cannot acquire after disable
+197 | …
+198 | …k -> managed lease + ACK revision 1 -> changing authenticated preview -> stop on disable"
+    |                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+199 | …
+200 | …
+    |
+
+E501 Line too long (159 > 100)
+   --> backend/tests/test_mission_vertical.py:146:101
+    |
+144 | …
+145 | …
+146 | …e fixture -> candidate -> encrypted media -> idempotent recorded review -> rejection; frames=",
+    |                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+147 | …
+148 | …
+    |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> roadsentinel/remote_config.py:7:1
+   |
+ 5 |   """
+ 6 |
+ 7 | / import ipaddress
+ 8 | | import hashlib
+ 9 | | import posixpath
+10 | | import secrets
+11 | | import time
+12 | | import threading
+13 | | from urllib.parse import urlsplit
+   | |_________________________________^
+help: Organize imports
+   |
+6  |
+7  + import hashlib
+8  | import ipaddress
+   - import hashlib
+9  | import posixpath
+10 | import secrets
+11 + import threading
+12 | import time
+   - import threading
+13 | from urllib.parse import urlsplit
+   |
+
+Found 9 errors.
+[*] 3 fixable with `--fix`.

@@ -1,0 +1,313 @@
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001, Initial schema: tenants, users, auth state, cameras, alerts, evidence, approvals, audit.
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 0002, Security layer: Row-Level Security, app-role grants, append-only audit log, auth lookups.
+INFO  [alembic.runtime.migration] Running upgrade 0002 -> 0003, Service accounts for signed pipeline ingestion; tighter grants on tenants.
+INFO  [alembic.runtime.migration] Running upgrade 0003 -> 0004, Fields of the API.md contract: camera slugs and timezones, public alert numbers, detection
+details, VLM verdicts, operator actions, and camera-level evidence (annotated recordings).
+INFO  [alembic.runtime.migration] Running upgrade 0004 -> 0005, Per-user MFA exemption (demo accounts): users.mfa_exempt, default false.
+INFO  [alembic.runtime.migration] Running upgrade 0005 -> 0006, Camera heartbeat: cameras.last_seen_at, set by the live pipeline.
+INFO  [alembic.runtime.migration] Running upgrade 0006 -> 0007, Evidence integrity: record whether a distinct original exists.
+INFO  [alembic.runtime.migration] Running upgrade 0007 -> 0008, New rule types, idempotent ingestion, camera rate status.
+INFO  [alembic.runtime.migration] Running upgrade 0008 -> 0009, Account recovery: four-eyes reset requests and single-use reset tokens.
+INFO  [alembic.runtime.migration] Running upgrade 0009 -> 0010, Retention: per-tenant policy per evidence kind, legal hold on alerts, purge marker on evidence.
+INFO  [alembic.runtime.migration] Running upgrade 0010 -> 0011, Patrol workflow status and first-view timestamp (for response-time statistics).
+INFO  [alembic.runtime.migration] Running upgrade 0011 -> 0012, Let the runtime role read alembic_version so /api/ready can tell whether the schema is migrated.
+INFO  [alembic.runtime.migration] Running upgrade 0012 -> 0013, User-owned saved archive searches with tenant RLS.
+INFO  [alembic.runtime.migration] Running upgrade 0013 -> 0014, Tenant-scoped offline recordings and durable analysis runs.
+INFO  [alembic.runtime.migration] Running upgrade 0014 -> 0015, Persist structured vehicle-observation artifact metadata.
+INFO  [alembic.runtime.migration] Running upgrade 0015 -> rsint_cam1, Camera control plane: lifecycle/source columns on cameras, processing grants, immutable
+config versions, worker status (lease) and a bounded health-event history.
+INFO  [alembic.runtime.migration] Running upgrade rsint_cam1 -> rsint_case1, Investigation workspace (Workstream B): case notes with append-only revisions, timeline
+bookmarks, evidence-package export jobs, user-owned saved archive filters; evidence gets
+``duration_s`` (from the MP4 header) and ``purged_at``/``purge_reason`` (explicit purge state).
+INFO  [alembic.runtime.migration] Running upgrade rsint_case1 -> rsint_run1, Camera runtime telemetry (Workstream D): bounded latency/memory/frozen-image metrics on the
+worker status row, a source identity fingerprint on cameras (what the backend registered) and on
+the worker status (what the lease holder reports it opened), and the per-camera, per-state
+failure-notification throttle marks.
+INFO  [alembic.runtime.migration] Running upgrade rsint_run1 -> rsint_case2, Investigation completion (Workstream B, lane E): explicit case links, structured follow-up
+items with an append-only history, manual legal holds; note revisions may carry the recorded
+detection box; export jobs count storage outages separately from attempts. The cross-tenant
+probe allow-list (``rs_resource_tenant``) is extended to every tenant table that the API looks
+up by id, including those of 0007, 0008 and this revision.
+INFO  [alembic.runtime.migration] Running upgrade rsint_case2 -> 0020, Require an RLS-bypassing owner for pre-tenant lookup functions.
+INFO  [alembic.runtime.migration] Running upgrade 0020 -> 0021, Align offline tenant indexes with ORM; additive only.
+INFO  [alembic.runtime.migration] Running upgrade 0021 -> 0022, Identifier-only lookup functions get a dedicated NOLOGIN column-limited owner.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-26og_d5k is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-26og_d5k is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-26og_d5k is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-26og_d5k is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+Disposable test PostgreSQL identity: ('postgres', '127.0.0.1', 42281, 'rsverify_root') target: rsmission_verify_f2a16c2f09
+PASS actual camera browser register
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-26og_d5k is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+PASS actual camera browser onboard
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-26og_d5k is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+editor-layout {"rect":{"x":0,"y":0,"width":1440,"height":1000,"top":0,"right":1440,"bottom":1000,"left":0},"children":[{"tag":"BUTTON","rect":{"x":144,"y":73.5,"width":150,"height":26,"top":73.5,"right":294,"bottom":99.5,"left":144}},{"tag":"ASIDE","rect":{"x":1040,"y":61.5,"width":400,"height":938.5,"top":61.5,"right":1440,"bottom":1000,"left":1040}}]}
+PASS actual camera browser visual
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-26og_d5k is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+PASS actual camera browser approve
+WARNI [app] EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-26og_d5k is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+PASS actual camera browser start
+F
+=================================== FAILURES ===================================
+________________ test_managed_replay_ack_preview_and_revocation ________________
+
+world = World(platform=Unit(id=UUID('647e1975-81bc-46f1-b304-30a10c555389'), users={<Role.system_admin: 'system_admin'>: TUser...6-912fcb493ce8'), 'evidence': UUID('2ca280c5-aa48-41e2-981e-b2eb982ed382'), 'plates': ['B00XYZ', 'B10XYZ', 'B20XYZ']}})
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-211/test_managed_replay_ack_previe0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7161684f7380>
+login = <function login.<locals>._login at 0x7161684eafc0>
+
+    @pytest.mark.skipif(os.getenv("RS_MISSION_REAL") != "1", reason="licensed model/media opt-in")
+    def test_managed_replay_ack_preview_and_revocation(world, tmp_path, monkeypatch, login):
+        from roadsentinel.replay import make_server
+    
+        from app.config import get_settings
+        from app.db import tenant_session
+        from app.main import create_app
+        from app.models import CameraWorkerStatus
+        from app.services import camera_config as cc
+        from app.services import ingest_auth
+        from app.services.keys import load_keyring
+    
+        root = Path(__file__).resolve().parents[2]
+        # A moving licensed excerpt contains actual person detections. The road zone below is
+        # deliberately SYNTHETIC TEST geometry, not a claim those pedestrians violated a rule.
+        import shutil
+    
+        excerpt = tmp_path / "SYNTHETIC_TEST_geometry_licensed_moving_excerpt.mp4"
+        subprocess.run(  # noqa: S603 - fixed encoder and test-owned local output, no shell
+            [
+                shutil.which("ffmpeg"),
+                "-nostdin",
+                "-loglevel",
+                "error",
+                "-ss",
+                "32",
+                "-i",
+                "/tmp/Street_traffic.webm",
+                "-t",
+                "3",
+                "-vf",
+                "fps=10",
+                "-an",
+                "-c:v",
+                "libx264",
+                "-preset",
+                "ultrafast",
+                "-pix_fmt",
+                "yuv420p",
+                str(excerpt),
+            ],
+            check=True,
+            timeout=30,
+            capture_output=True,
+        )
+        replay = make_server(excerpt, "127.0.0.1", free_port(), 10)
+        disconnect = threading.Event()
+        connections = []
+        original_get_request = replay.get_request
+    
+        def tracked_request():
+            connection, address = original_get_request()
+            connections.append(connection)
+            del connections[:-32]
+            return connection, address
+    
+        replay.get_request = tracked_request
+        replay.verify_request = lambda *_: not disconnect.is_set()
+        rt = threading.Thread(target=replay.serve_forever, daemon=True)
+        rt.start()
+        source = f"http://127.0.0.1:{replay.server_port}/stream.mjpg"
+        model = os.environ["RS_YOLOX_MODEL_PATH"]
+        digest = __import__("hashlib").sha256(Path(model).read_bytes()).hexdigest()
+        cfg = yaml.safe_load((root / "cameras/demo-highway.yaml").read_text())
+        config = dict(
+            schema_version=1,
+            reference_frame=dict(width=1920, height=1080),
+            calibration=None,
+            counting_lines=[dict(id="crossing", points=[[100, 650], [1800, 650]], lane="test")],
+            min_y=0,
+            zones=[
+                dict(
+                    id="scene",
+                    name="Synthetic scene geometry",
+                    kind="carriageway",
+                    direction=[0, 1],
+                    polygon=[[0, 0], [1919, 0], [1919, 1079], [0, 1079]],
+                )
+            ],
+            rules=["pedestrian_on_road"],
+            thresholds=cfg["thresholds"],
+            acquisition=dict(
+                target_fps=10, reconnect_backoff_s=1, read_timeout_s=3, max_reconnect_attempts=20
+            ),
+            model=dict(id="stock-yolox-s", sha256=digest),
+        )
+        assert cc.validate(config) == []
+        # Control state is created through authenticated APIs, never preapproved DB rows.
+        from uuid import UUID
+    
+        from app.models import Role
+        from tests.conftest import make_user
+    
+        monkeypatch.setenv("RS_COOKIE_SECURE", "false")
+        get_settings.cache_clear()
+        administrator = login(world.a.admin)
+        reviewer_user = make_user(world.a.id, Role.tenant_admin, "reviewer@mission.local")
+        reviewer = login(reviewer_user)
+        from tests.camera_browser import camera_browser
+    
+        created = camera_browser(world.a.admin, tmp_path, monkeypatch, "register")
+        cid = UUID(created["id"])
+        base = f"/api/camera-control/cameras/{cid}"
+    
+        def revision():
+            response = administrator.get(base)
+            assert response.status_code == 200, response.text
+            return response.json()["revision"]
+    
+        camera_browser(world.a.admin, tmp_path, monkeypatch, "onboard")
+        grants = administrator.get(base + "/grants").json()
+        assert grants and grants[0]["media_scope"] == "events_and_recordings"
+    
+        def publish_configuration(value):
+            drafted = camera_browser(
+                world.a.admin,
+                tmp_path,
+                monkeypatch,
+                "visual" if not administrator.get(base + "/versions").json() else "draft",
+                config=value,
+                revision=len(administrator.get(base + "/versions").json()) + 1,
+            )
+            vid = drafted["id"]
+            assert (
+                administrator.post(
+                    base + f"/versions/{vid}/approve", {"note": "Self approval must be refused"}
+                ).status_code
+                == 403
+            )
+            return camera_browser(
+                reviewer_user, tmp_path, monkeypatch, "approve", revision=drafted["revision"]
+            )
+    
+        publish_configuration(config)
+        with tenant_session(world.a.id) as db:
+            account = ingest_auth.create_account(db, world.a.id, "mission-runtime", camera_ids=[cid])
+            key = ingest_auth.issue_key(db, load_keyring(db, world.a.id), account)
+            db.commit()
+        cfg.update(
+            id="mission-replay",
+            video=source,
+            enabled=True,
+            source_replay=True,
+            source_fps=10,
+            synthetic_test=True,
+            test_disclosure=(
+                "SYNTHETIC TEST whole-scene road zone on lawful moving replay; "
+                "no real traffic violation"
+            ),
+            source_provenance={
+                "title": "Licensed moving excerpt with SYNTHETIC TEST road zone",
+                "url": "https://commons.wikimedia.org/wiki/File:Street_traffic.webm",
+                "author": "Editor",
+                "license": "CC BY 3.0",
+            },
+            control_source_reference="replay://mission-fixture",
+            model="models/yolox_s.onnx",
+            source_consent=dict(
+                granted=True,
+                by="Editor / CC BY 3.0",
+                date="2026-11-10",
+                scope="Local test replay and inference",
+                evidence="https://commons.wikimedia.org/wiki/File:Street_traffic.webm",
+                licence="CC BY 3.0",
+            ),
+        )
+        from app.services import camera_workers
+    
+        profile = root / "cameras" / f"mission-{cid.hex}.yaml"
+        with profile.open("x") as handle:
+            handle.write(yaml.safe_dump(cfg))
+        profile.chmod(0o600)
+        monkeypatch.setattr(camera_workers, "STATE_DIR", tmp_path / "supervisor")
+        # Worker needs only scoped HMAC credentials, never DB/admin/master keys. Relative
+        # pipeline scratch output lives inside this unique test directory as well.
+        worker_env = {
+            k: v
+            for k, v in os.environ.items()
+            if not k.startswith(("RS_", "S3_", "WANDB_", "DATABASE_URL"))
+        }
+        worker_env.update(PYTHONPATH=str(root), PYTHONDONTWRITEBYTECODE="1")
+    
+        port = free_port()
+        monkeypatch.setenv("RS_API_URL", f"http://127.0.0.1:{port}")
+        monkeypatch.setenv("RS_INGEST_KEY_ID", key.key_id)
+        monkeypatch.setenv("RS_INGEST_SECRET", key.secret)
+        monkeypatch.setenv("RS_COOKIE_SECURE", "false")
+        get_settings.cache_clear()
+        server = uvicorn.Server(
+            uvicorn.Config(create_app(), host="127.0.0.1", port=port, log_level="error")
+        )
+        thread = threading.Thread(target=server.run, daemon=True)
+        thread.start()
+        proc = None
+        try:
+            deadline = time.monotonic() + 10
+            while not server.started and time.monotonic() < deadline:
+                time.sleep(0.05)
+            log = (tmp_path / "worker.log").open("w+")
+    
+            def launch_worker():
+                started = camera_browser(
+                    world.a.admin, tmp_path, monkeypatch, "start", api_port=port,
+                    config={"profile": profile.name},
+                )
+                child = camera_workers._children[f"{world.a.id}-{cid}"]
+                assert started["pid"] == child.pid
+                child_env = dict(
+                    item.split("=", 1)
+                    for item in Path(f"/proc/{child.pid}/environ").read_text().split("\0")
+                    if "=" in item
+                )
+                assert not any(name in child_env for name in (
+                    "RS_DATABASE_URL", "RS_ADMIN_DATABASE_URL", "RS_MASTER_KEY",
+                    "RS_TEST_ADMIN_DATABASE_URL",
+                ))
+                return child
+    
+            proc = launch_worker()
+            deadline = time.monotonic() + 35
+            ack = False
+            operator = login(world.a.operator)
+            previews = []
+            while time.monotonic() < deadline and proc.poll() is None:
+                with tenant_session(world.a.id) as db:
+                    row = db.scalar(
+                        select(CameraWorkerStatus).where(CameraWorkerStatus.camera_id == cid)
+                    )
+                    ack = bool(row and row.applied_revision == 1 and row.health == "healthy")
+                response = operator.get(f"/api/cameras/{cid}/preview")
+                if response.status_code == 200:
+                    previews.append(__import__("hashlib").sha256(response.content).hexdigest())
+                if ack and len(set(previews)) >= 2:
+                    break
+                time.sleep(1)
+            log.flush()
+            log.seek(0)
+>           assert ack, log.read()[-2000:]
+E           AssertionError: 
+E           assert False
+
+tests/test_managed_live_runtime.py:265: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app:main.py:65 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-26og_d5k is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNING  app:main.py:65 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-26og_d5k is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNING  app:main.py:65 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-26og_d5k is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNING  app:main.py:65 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-26og_d5k is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNING  app:main.py:65 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-26og_d5k is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNING  app:main.py:65 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-26og_d5k is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNING  app:main.py:65 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-26og_d5k is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+WARNING  app:main.py:65 EVIDENCE STORAGE: evidence storage /tmp/rs-evidence-26og_d5k is ephemeral (container /tmp): every redeploy DELETES evidence files while the alerts remain. Use RS_EVIDENCE_S3_BUCKET or a persistent volume.
+=========================== short test summary info ============================
+FAILED tests/test_managed_live_runtime.py::test_managed_replay_ack_preview_and_revocation
+1 failed in 29.74s

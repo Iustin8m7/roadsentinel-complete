@@ -1,0 +1,363 @@
+diff --git a/frontend/src/components/ActivityReport.tsx b/frontend/src/components/ActivityReport.tsx
+new file mode 100644
+index 0000000..b89635c
+--- /dev/null
++++ b/frontend/src/components/ActivityReport.tsx
+@@ -0,0 +1,80 @@
++interface Row { label: string; count: number }
++
++export interface ActivityReportProps {
++  period: string
++  generatedAt: string
++  totals: Row[]
++  cameras: Row[]
++  types: Row[]
++  /** Alert count per hour of day, 24 entries. */
++  hours: number[]
++}
++
++const heading = 'text-[9pt] font-bold uppercase tracking-wider border-b border-black pb-1 mb-1.5'
++
++function CountTable({ title, rows }: { title: string; rows: Row[] }) {
++  return (
++    <div>
++      <h2 className={heading}>{title}</h2>
++      {rows.length === 0 ? <p className="text-[9pt]">Nicio alertă.</p> : (
++        <table className="w-full border-collapse text-[9pt]">
++          <tbody>
++            {rows.map((row) => (
++              <tr key={row.label} className="border-b border-neutral-300">
++                <td className="py-[3px] pr-2">{row.label}</td>
++                <td className="py-[3px] text-right font-mono font-semibold w-12">{row.count}</td>
++              </tr>
++            ))}
++          </tbody>
++        </table>
++      )}
++    </div>
++  )
++}
++
++/** One A4 page shown only in print (see the print block in index.css). */
++export function ActivityReport({ period, generatedAt, totals, cameras, types, hours }: ActivityReportProps) {
++  const maxHour = Math.max(1, ...hours)
++  return (
++    <section className="rs-print-report hidden print:block bg-white text-black font-sans text-[10pt] leading-snug">
++      <h1 className="text-[18pt] font-bold tracking-tight">RoadSentinel – raport de activitate</h1>
++      <p className="mt-1 text-[10pt]">Perioada acoperită de date: <strong>{period}</strong></p>
++      <p className="text-[8.5pt] text-neutral-600">Raport generat la {generatedAt}</p>
++
++      <div className="mt-4 grid grid-cols-4 gap-2">
++        {totals.map((total) => (
++          <div key={total.label} className="border border-neutral-400 rounded px-2.5 py-2">
++            <div className="text-[8pt] uppercase tracking-wider text-neutral-600">{total.label}</div>
++            <div className="text-[18pt] font-bold font-mono leading-tight">{total.count}</div>
++          </div>
++        ))}
++      </div>
++
++      <div className="mt-5 grid grid-cols-2 gap-6">
++        <CountTable title="Alerte pe cameră" rows={cameras} />
++        <CountTable title="Alerte pe tip" rows={types} />
++      </div>
++
++      <div className="mt-5">
++        <h2 className={heading}>Alerte pe oră (ora din zi, 00–23)</h2>
++        <div className="flex items-end gap-[3px] h-[30mm] mt-2">
++          {hours.map((count, hour) => (
++            <div key={hour} className="flex-1 h-full flex flex-col justify-end items-center">
++              <span className="text-[7pt] font-mono">{count || ''}</span>
++              <div className="w-full bg-neutral-700" style={{ height: `${(count / maxHour) * 80}%` }} />
++            </div>
++          ))}
++        </div>
++        <div className="flex gap-[3px] border-t border-black pt-0.5">
++          {hours.map((_, hour) => (
++            <span key={hour} className="flex-1 text-center text-[7pt] font-mono">{String(hour).padStart(2, '0')}</span>
++          ))}
++        </div>
++      </div>
++
++      <p className="mt-6 pt-2 border-t border-neutral-400 text-[8.5pt] text-neutral-700">
++        Date demonstrative dintr-un prototip. Nu reprezintă statistici oficiale de trafic.
++      </p>
++    </section>
++  )
++}
+diff --git a/frontend/src/index.css b/frontend/src/index.css
+index 5f95f60..e3fbfbb 100644
+--- a/frontend/src/index.css
++++ b/frontend/src/index.css
+@@ -431,3 +431,41 @@ html, body {
+ .rs-dark-tiles {
+   filter: invert(1) hue-rotate(195deg) brightness(0.78) contrast(0.95) saturate(0.35);
+ }
++
++/* Printable activity report (StatsPage -> components/ActivityReport). When the report is in the
++   page, print keeps only the report: everything under #root that is neither the report nor one
++   of its ancestors is removed, and the ancestors lose the app-shell sizing and dark backgrounds.
++   No AppLayout class name is involved, so the sidebar and header go whatever they are called. */
++@media print {
++  @page {
++    size: A4 portrait;
++    margin: 14mm;
++  }
++  html:has(.rs-print-report),
++  html:has(.rs-print-report) body,
++  html:has(.rs-print-report) #root {
++    height: auto !important;
++    overflow: visible !important;
++    background: #fff !important;
++    color: #000 !important;
++  }
++  #root:has(.rs-print-report) *:not(.rs-print-report):not(.rs-print-report *):not(:has(.rs-print-report)) {
++    display: none !important;
++  }
++  #root *:has(.rs-print-report) {
++    display: block !important;
++    position: static !important;
++    width: auto !important;
++    height: auto !important;
++    min-height: 0 !important;
++    overflow: visible !important;
++    margin: 0 !important;
++    padding: 0 !important;
++    border: 0 !important;
++    background: #fff !important;
++  }
++  .rs-print-report {
++    -webkit-print-color-adjust: exact;
++    print-color-adjust: exact;
++  }
++}
+diff --git a/frontend/src/pages/StatsPage.tsx b/frontend/src/pages/StatsPage.tsx
+index d220b9d..4ee3c57 100644
+--- a/frontend/src/pages/StatsPage.tsx
++++ b/frontend/src/pages/StatsPage.tsx
+@@ -1,8 +1,10 @@
+ import { useMemo } from "react";
+-import { Download, ArrowUpRight, ArrowDownRight } from "lucide-react";
++import { Download, Printer } from "lucide-react";
+ import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
+ import { useDataStore, cameraById } from "@/store/data";
+ import { ALERT_TYPE } from "@/lib/constants";
++import { fmtDateTime } from "@/lib/format";
++import { ActivityReport } from "@/components/ActivityReport";
+ 
+ const DAYS = ["Lun", "Mar", "Mie", "Joi", "Vin", "Sâm", "Dum"];
+ const HOURS = Array.from({ length: 24 }, (_, i) => i);
+@@ -14,9 +16,7 @@ export default function StatsPage() {
+     const total = alerts.length;
+     const confirmed = alerts.filter((a) => a.status === "confirmed" || a.status === "closed").length;
+     const rejected = alerts.filter((a) => a.status === "rejected").length;
+-    const decided = confirmed + rejected;
+-    const reaction = alerts.filter((a) => a.decidedAt).map((a) => (new Date(a.decidedAt!).getTime() - new Date(a.createdAt).getTime()) / 1000).filter((x) => x >= 0);
+-    const avg = reaction.length ? reaction.reduce((x, y) => x + y, 0) / reaction.length : null;
++    const pending = total - confirmed - rejected;
+     const sev = { critical: 0, high: 0, medium: 0, info: 0 } as Record<string, number>;
+     const byType: Record<string, number> = {};
+     const byCam: Record<string, { count: number; worst: number }> = {};
+@@ -30,27 +30,37 @@ export default function StatsPage() {
+       const d = new Date(a.createdAt);
+       heat[(d.getDay() + 6) % 7][d.getHours()]++;
+     }
+-    const pct = (n: number) => (total ? Math.round((n / total) * 100) : 0);
+     const gravity = [
+-      { name: "Critic", value: sev.critical, color: "#FF3B3B", label: `Critic (${pct(sev.critical)}%)` },
+-      { name: "Ridicat", value: sev.high, color: "#FF8A1F", label: `Ridicat (${pct(sev.high)}%)` },
+-      { name: "Mediu", value: sev.medium, color: "#FFC23D", label: `Mediu (${pct(sev.medium)}%)` },
+-      { name: "Info", value: sev.info, color: "#3DA5FF", label: `Info (${pct(sev.info)}%)` },
++      { name: "Critic", value: sev.critical, color: "#FF3B3B", label: `Critic · ${sev.critical}` },
++      { name: "Ridicat", value: sev.high, color: "#FF8A1F", label: `Ridicat · ${sev.high}` },
++      { name: "Mediu", value: sev.medium, color: "#FFC23D", label: `Mediu · ${sev.medium}` },
++      { name: "Info", value: sev.info, color: "#3DA5FF", label: `Info · ${sev.info}` },
+     ].filter((g) => g.value > 0);
+     const sevColor: Record<string, string> = { critical: "#FF3B3B", high: "#FF8A1F", medium: "#FFC23D", info: "#3DA5FF" };
+     const maxType = Math.max(1, ...Object.values(byType));
+-    const types = Object.entries(byType).sort((x, y) => y[1] - x[1]).slice(0, 6).map(([t, n]) => ({
++    const allTypes = Object.entries(byType).sort((x, y) => y[1] - x[1]).map(([t, n]) => ({
+       label: ALERT_TYPE[t as keyof typeof ALERT_TYPE]?.label ?? t, count: n, percentage: Math.round((n / maxType) * 100),
+       color: sevColor[ALERT_TYPE[t as keyof typeof ALERT_TYPE]?.severity ?? "info"],
+     }));
++    const types = allTypes.slice(0, 6);
+     const camColors = ["#3DA5FF", "#FFC23D", "#FF8A1F", "#FF3B3B"];
+     const cams = Object.entries(byCam).sort((x, y) => y[1].count - x[1].count).map(([id, v]) => ({
+-      camera: cameraById(id)?.name?.split(" – ")[0] ?? id, count: v.count, color: camColors[v.worst],
++      camera: cameraById(id)?.name?.split(" – ")[0] ?? id, fullName: cameraById(id)?.name ?? id, count: v.count, color: camColors[v.worst],
+     }));
+     const maxHeat = Math.max(1, ...heat.flat());
+-    return { total, confirmedPct: decided ? Math.round((confirmed / decided) * 100) : null, falsePct: decided ? Math.round((rejected / decided) * 100) : null, avg, gravity, types, cams, heat, maxHeat, decided };
++    const hours = HOURS.map((h) => heat.reduce((sum, day) => sum + day[h], 0));
++    const times = alerts.map((a) => new Date(a.createdAt).getTime()).filter((t) => Number.isFinite(t)).sort((x, y) => x - y);
++    const day = (t: number) => fmtDateTime(new Date(t).toISOString()).slice(0, 10);
++    const period = !times.length ? "nu există alerte în datele încărcate"
++      : day(times[0]) === day(times[times.length - 1]) ? day(times[0]) : `${day(times[0])} – ${day(times[times.length - 1])}`;
++    return { total, confirmed, rejected, pending, gravity, types, allTypes, cams, heat, maxHeat, hours, period };
+   }, [alerts]);
+-  const fmtAvg = (sec: number | null) => sec === null ? "—" : sec < 60 ? `${Math.round(sec)} s` : `${Math.floor(sec / 60)} min ${Math.round(sec % 60)} s`;
++  const totals = [
++    { label: "Total alerte", count: data.total, note: `din ${data.cams.length} camere` },
++    { label: "Alerte confirmate", count: data.confirmed, note: "decizia dispecerului" },
++    { label: "Alerte respinse", count: data.rejected, note: "decizia dispecerului" },
++    { label: "În așteptare", count: data.pending, note: "fără decizie încă" },
++  ];
+   const GRAVITY_DATA = data.gravity;
+   const ALERT_TYPES_DATA = data.types;
+   const CAMERAS_BAR_DATA = data.cams;
+@@ -59,11 +69,8 @@ export default function StatsPage() {
+   const handleExportCSV = () => {
+     const rows = [
+       ["Indicator", "Valoare"],
+-      ["Total alerte", String(data.total)],
+-      ["Alerte confirmate", data.confirmedPct === null ? "—" : `${data.confirmedPct}%`],
+-      ["Timp mediu reactie", fmtAvg(data.avg)],
+-      ["Alarme false", data.falsePct === null ? "—" : `${data.falsePct}%`],
+-      ...data.types.map((t) => [t.label, String(t.count)]),
++      ...totals.map((t) => [t.label, String(t.count)]),
++      ...data.allTypes.map((t) => [t.label, String(t.count)]),
+       ...data.cams.map((c) => [`Camera ${c.camera}`, String(c.count)]),
+     ];
+     const csvContent = "data:text/csv;charset=utf-8," + rows.map((r) => r.map((v) => `"${v}"`).join(",")).join("\n");
+@@ -96,76 +103,37 @@ export default function StatsPage() {
+         </div>
+ 
+         <div className="flex items-center gap-3">
++          <button
++            onClick={() => window.print()}
++            className="flex items-center gap-2 px-3.5 py-1.5 rounded-md bg-[#3DA5FF] hover:bg-[#2C94F0] text-xs text-[#0A0E14] font-bold transition-colors cursor-pointer"
++          >
++            <span>Tipărește raportul</span>
++            <Printer className="w-3.5 h-3.5" />
++          </button>
+           {/* Export Report button */}
+           <button
+             onClick={handleExportCSV}
+             className="flex items-center gap-2 px-3.5 py-1.5 rounded-md bg-elevation hover:bg-border text-xs text-text-primary border border-border transition-colors font-medium"
+           >
+-            <span>Exportă raport</span>
++            <span>Exportă CSV</span>
+             <Download className="w-3.5 h-3.5 text-text-secondary" />
+           </button>
+         </div>
+       </div>
+ 
+-      {/* Row 1: 4 Top KPI Cards */}
++      {/* Row 1: plain counts; no percentage that could read as an accuracy figure */}
+       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+-        {/* KPI 1: TOTAL ALERTE */}
+-        <div className="rounded-md bg-panel border border-border p-4 flex flex-col justify-between">
+-          <div className="flex items-center justify-between text-xs font-mono text-text-secondary uppercase">
+-            <span>TOTAL ALERTE</span>
+-            <ArrowUpRight className="w-4 h-4 text-accent" />
+-          </div>
+-          <div className="mt-2 flex items-baseline gap-2">
+-            <span className="font-heading text-4xl font-bold text-text-primary tracking-tight">
+-              {data.total.toLocaleString("ro-RO")}
+-            </span>
+-            <span className="text-[11px] font-mono text-text-secondary">
+-              din {data.cams.length} camere
+-            </span>
+-          </div>
+-        </div>
+-
+-        {/* KPI 2: ALERTĂ CONFIRMATE */}
+-        <div className="rounded-md bg-panel border border-border p-4 flex flex-col justify-between">
+-          <div className="flex items-center justify-between text-xs font-mono text-text-secondary uppercase">
+-            <span>ALERTĂ CONFIRMATE</span>
+-            <ArrowUpRight className="w-4 h-4 text-emerald-400" />
+-          </div>
+-          <div className="mt-2 flex items-baseline gap-3">
+-            <span className="font-heading text-4xl font-bold text-text-primary tracking-tight">
+-              {data.confirmedPct === null ? "—" : `${data.confirmedPct}%`}
+-            </span>
+-            <span className="text-[11px] font-mono text-text-secondary">
+-              din {data.decided} decise
+-            </span>
+-          </div>
+-        </div>
+-
+-        {/* KPI 3: TIMP MEDIU REACȚIE */}
+-        <div className="rounded-md bg-panel border border-border p-4 flex flex-col justify-between">
+-          <div className="flex items-center justify-between text-xs font-mono text-text-secondary uppercase">
+-            <span>TIMP MEDIU REACȚIE</span>
+-            <ArrowUpRight className="w-4 h-4 text-emerald-400" />
+-          </div>
+-          <div className="mt-2">
+-            <span className="font-heading text-4xl font-bold text-text-primary tracking-tight">
+-              {fmtAvg(data.avg)}
+-            </span>
+-          </div>
+-        </div>
+-
+-        {/* KPI 4: ALARME FALSE */}
+-        <div className="rounded-md bg-panel border border-border p-4 flex flex-col justify-between">
+-          <div className="flex items-center justify-between text-xs font-mono text-text-secondary uppercase">
+-            <span>ALARME FALSE</span>
+-            <ArrowDownRight className="w-4 h-4 text-emerald-400" />
+-          </div>
+-          <div className="mt-2">
+-            <span className="font-heading text-4xl font-bold text-text-primary tracking-tight">
+-              {data.falsePct === null ? "—" : `${data.falsePct}%`}
+-            </span>
++        {totals.map((kpi) => (
++          <div key={kpi.label} className="rounded-md bg-panel border border-border p-4 flex flex-col justify-between">
++            <div className="text-xs font-mono text-text-secondary uppercase">{kpi.label}</div>
++            <div className="mt-2 flex items-baseline gap-2">
++              <span className="font-heading text-4xl font-bold text-text-primary tracking-tight">
++                {kpi.count.toLocaleString("ro-RO")}
++              </span>
++              <span className="text-[11px] font-mono text-text-secondary">{kpi.note}</span>
++            </div>
+           </div>
+-        </div>
++        ))}
+       </div>
+ 
+       {/* Row 2: Middle Charts */}
+@@ -280,24 +248,16 @@ export default function StatsPage() {
+         <div className="rounded-md bg-panel border border-border p-4 flex flex-col justify-between overflow-x-auto">
+           <div className="flex items-center justify-between text-xs font-mono uppercase text-text-secondary font-semibold mb-2">
+             <span>Distribuție oră × zi</span>
+-            <span className="text-[10px] text-text-secondary">Inter 00–23</span>
++            <span className="text-[10px] text-text-secondary">Interval orar 00–23</span>
+           </div>
+ 
+           <div className="min-w-[500px]">
+             <div className="flex items-center pl-8 mb-1 gap-1">
+-              {HOURS.map((h) => {
+-                const isHighlight = h === 17 || h === 18;
+-                return (
+-                  <div
+-                    key={h}
+-                    className={`flex-1 text-center text-[9px] font-mono ${
+-                      isHighlight ? "text-amber-400 font-bold" : "text-text-secondary"
+-                    }`}
+-                  >
+-                    {h < 10 ? `0${h}` : h}
+-                  </div>
+-                );
+-              })}
++              {HOURS.map((h) => (
++                <div key={h} className="flex-1 text-center text-[9px] font-mono text-text-secondary">
++                  {h < 10 ? `0${h}` : h}
++                </div>
++              ))}
+             </div>
+ 
+             <div className="space-y-1">
+@@ -330,6 +290,15 @@ export default function StatsPage() {
+           </div>
+         </div>
+       </div>
++
++      <ActivityReport
++        period={data.period}
++        generatedAt={fmtDateTime(new Date().toISOString()).slice(0, 16)}
++        totals={totals}
++        cameras={data.cams.map((c) => ({ label: c.fullName, count: c.count }))}
++        types={data.allTypes}
++        hours={data.hours}
++      />
+     </div>
+   );
+ }

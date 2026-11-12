@@ -1,0 +1,66 @@
+[project]
+name = "roadsentinel-backend"
+version = "0.1.0"
+description = "RoadSentinel API: multi-tenant, security-first backend for police traffic-camera alerts"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi>=0.140",
+    "uvicorn[standard]>=0.30",
+    "sqlalchemy>=2.0",
+    "alembic>=1.13",
+    "psycopg[binary]>=3.2",
+    "pydantic-settings>=2.4",
+    "argon2-cffi>=23.1",
+    "pyotp>=2.9",
+    "qrcode>=8.0",
+    "pyjwt>=2.9",
+    "cryptography>=43",
+    "pywebpush>=2.0",
+    "python-multipart>=0.0.20",
+    "boto3>=1.35",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "httpx>=0.27",
+    "ruff>=0.6",
+    "black>=24",
+    "mypy>=1.11",
+    "pip-audit>=2.7",
+]
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "N", "SIM", "RUF"]
+ignore = [
+    "S101",   # assert is fine in tests
+    "B008",   # FastAPI Depends() in defaults is idiomatic
+    "RUF012", # SQLAlchemy/Pydantic class attrs
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S105", "S106", "S108", "S311", "S608"]
+"alembic/**" = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+check_untyped_defs = true
+warn_unused_ignores = true
+files = ["app"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = [
+    "ignore::DeprecationWarning:pywebpush.*",
+    "ignore:Using `httpx` with `starlette.testclient`",
+]

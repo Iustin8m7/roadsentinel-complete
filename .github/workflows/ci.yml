@@ -1,0 +1,183 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "feature/**", "release/**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (lint, types, tests, pip-audit)
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16.10-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 3s --health-retries 20
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      RS_TEST_ADMIN_DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.lock
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.lock
+          pip install pytest httpx ruff black mypy pip-audit
+      - name: Ruff
+        run: ruff check app alembic tests
+      - name: Black
+        run: black --check app alembic tests
+      - name: Mypy
+        run: mypy
+      - name: Tests (real PostgreSQL 16, RLS + triggers)
+        run: pytest -q
+      - name: pip-audit
+        run: pip-audit -r requirements.lock --strict
+
+  secure-pwa:
+    name: Secure PWA (lint, types, tests, build, npm audit)
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: secure-pwa
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: secure-pwa/package-lock.json
+      - run: npm ci --no-fund
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: No inline scripts in the built shell (CSP)
+        run: test "$(grep -o '<script' dist/index.html | wc -l)" -eq "$(grep -o '<script[^>]*src=' dist/index.html | wc -l)"
+      - run: npm audit --audit-level=high
+
+  police-ui:
+    name: Police UI frontend/ (types, lint, tests, build, npm audit)
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci --no-fund
+      - run: npx tsc -b
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      - name: No inline scripts in the built shell (CSP)
+        run: test "$(grep -o '<script' dist/index.html | wc -l)" -eq "$(grep -o '<script[^>]*src=' dist/index.html | wc -l)"
+      - run: npm audit --omit=dev --audit-level=high
+
+  pipeline:
+    name: Pipeline and legacy API tests (rules, sink, redaction, catalog sync)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Install (torch-free subset)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-api.txt opencv-python-headless pyyaml numpy pytest ruff
+      - run: ruff check roadsentinel tests
+      - run: pytest tests -q
+
+  repo-checks:
+    name: Repo checks (local secret scan, docs links)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - run: python3 scripts/scan_secrets.py
+      - run: python3 scripts/check_docs.py
+
+  secrets:
+    name: Secret scan (gitleaks)
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      pull-requests: read  # the action lists the PR's commits on pull_request events
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: false
+
+  stack:
+    name: Docker stack smoke test (compose up, TLS, seed, tamper demo)
+    runs-on: ubuntu-24.04
+    needs: [backend, secure-pwa, police-ui, pipeline, repo-checks]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Generate dev secrets
+        run: python3 scripts/gen_dev_secrets.py
+      - name: Start stack
+        run: docker compose --env-file .env -f deploy/docker-compose.yml up --build --detach --wait --wait-timeout 300
+      - name: HTTPS, headers and redirect
+        run: |
+          set -euo pipefail
+          curl -skf https://localhost/api/health | grep -q '"ok"'
+          headers=$(curl -skI https://localhost/)
+          echo "$headers"
+          echo "$headers" | grep -qi '^strict-transport-security: max-age=63072000'
+          echo "$headers" | grep -qi "^content-security-policy: default-src 'self'"
+          echo "$headers" | grep -qi '^x-content-type-options: nosniff'
+          ! echo "$headers" | grep -qi "unsafe-inline"
+          curl -skI https://localhost/api/auth/me | grep -qi '^cache-control: no-store'
+          curl -sk https://localhost/manifest.webmanifest | grep -q '"display":"standalone"'
+          curl -sk -o /dev/null -w '%{http_code}' http://localhost/ | grep -qE '30[18]'
+      - name: Containers run as non-root
+        run: |
+          set -euo pipefail
+          for svc in backend frontend; do
+            uid=$(docker compose --env-file .env -f deploy/docker-compose.yml exec -T $svc id -u)
+            echo "$svc uid=$uid"; test "$uid" != "0"
+          done
+      - name: Seed and login prerequisites
+        run: docker compose --env-file .env -f deploy/docker-compose.yml exec -T backend python scripts/seed.py
+      - name: Audit tamper demo detects modification
+        run: docker compose --env-file .env -f deploy/docker-compose.yml run --rm -T migrate python scripts/audit_tamper_demo.py --tenant unit-a
+      - name: Database holds only ciphertext for plates
+        run: |
+          set -euo pipefail
+          docker compose --env-file .env -f deploy/docker-compose.yml exec -T postgres \
+            psql -U postgres -d roadsentinel -Atc "SELECT encode(substring(plate_enc from 1 for 2), 'escape') FROM alerts LIMIT 1" | grep -qx F1
+      - name: Logs on failure
+        if: failure()
+        run: docker compose --env-file .env -f deploy/docker-compose.yml logs --no-color | tail -300
+      - name: Tear down
+        if: always()
+        run: docker compose --env-file .env -f deploy/docker-compose.yml down -v

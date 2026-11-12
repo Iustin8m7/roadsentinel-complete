@@ -1,0 +1,3 @@
+test exit 0 log /home/justin7m8/Documents/roadsentinel-integration/docs/audits/runtime_verification/runs/20261110T232408Z-c6fd661f/test.log
+lint exit 0 log /home/justin7m8/Documents/roadsentinel-integration/docs/audits/runtime_verification/runs/20261110T232408Z-c6fd661f/lint.log
+build exit 0 log /home/justin7m8/Documents/roadsentinel-integration/docs/audits/runtime_verification/runs/20261110T232408Z-c6fd661f/build.log

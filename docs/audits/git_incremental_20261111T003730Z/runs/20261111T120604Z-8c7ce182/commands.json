@@ -1,0 +1,44 @@
+[
+  {
+    "name": "test",
+    "command": [
+      "npm",
+      "run",
+      "test"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration/frontend",
+    "start": "2026-11-11T12:06:04.853437+00:00",
+    "end": "2026-11-11T12:06:07.122252+00:00",
+    "duration_s": 2.269,
+    "exit_code": 0
+  },
+  {
+    "name": "lint",
+    "command": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration/frontend",
+    "start": "2026-11-11T12:06:07.122562+00:00",
+    "end": "2026-11-11T12:06:09.392670+00:00",
+    "duration_s": 2.27,
+    "exit_code": 0
+  },
+  {
+    "name": "build",
+    "command": [
+      "npm",
+      "run",
+      "build",
+      "--",
+      "--outDir",
+      "/home/justin7m8/Documents/roadsentinel-integration/docs/audits/git_incremental_20261111T003730Z/runs/20261111T120604Z-8c7ce182/build"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration/frontend",
+    "start": "2026-11-11T12:06:09.392996+00:00",
+    "end": "2026-11-11T12:06:15.892354+00:00",
+    "duration_s": 6.499,
+    "exit_code": 2
+  }
+]

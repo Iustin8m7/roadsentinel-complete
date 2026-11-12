@@ -1,0 +1,120 @@
+diff --git a/frontend/src/App.tsx b/frontend/src/App.tsx
+index 2df012a..205484d 100644
+--- a/frontend/src/App.tsx
++++ b/frontend/src/App.tsx
+@@ -1,6 +1,7 @@
+ import { createBrowserRouter, Navigate, RouterProvider, useParams } from 'react-router'
+ import { GuestOnly, RequireAuth, RequirePermission } from '@/components/guards'
+ import AppLayout from '@/layouts/AppLayout'
++import LandingPage from '@/pages/LandingPage'
+ import LoginPage from '@/pages/LoginPage'
+ import DashboardPage from '@/pages/DashboardPage'
+ import AlertDetailPage from '@/pages/AlertDetailPage'
+@@ -20,7 +21,7 @@ const router = createBrowserRouter([
+     element: <GuestOnly />,
+     errorElement: <RouteErrorPage />,
+     children: [
+-      { path: '/', element: <Navigate to="/login" replace /> },
++      { path: '/', element: <LandingPage /> },
+       { path: '/login', element: <LoginPage /> },
+     ],
+   },
+diff --git a/frontend/src/pages/LandingPage.tsx b/frontend/src/pages/LandingPage.tsx
+new file mode 100644
+index 0000000..8b947a2
+--- /dev/null
++++ b/frontend/src/pages/LandingPage.tsx
+@@ -0,0 +1,93 @@
++import { Link } from 'react-router'
++import { ArrowRight, BellRing, Cctv, ChevronRight, ScanSearch, UserCheck } from 'lucide-react'
++import { Logo } from '@/assets/brand/Logo'
++
++const POINTS = [
++  {
++    title: 'Ce este',
++    text: 'Camerele rutiere existente devin ochi care anunță dispecerul în câteva secunde atunci când pe drum apare un pericol.',
++  },
++  {
++    title: 'Cine decide',
++    text: 'Omul confirmă sau respinge fiecare alertă, după ce vede clipul; sistemul doar semnalează.',
++  },
++  {
++    title: 'Viața privată',
++    text: 'Fără recunoaștere facială; fețele și numerele de înmatriculare pot fi estompate, iar fiecare vizualizare rămâne în jurnal.',
++  },
++]
++
++const STEPS = [
++  { icon: Cctv, title: 'Cameră', text: 'O cameră rutieră existentă filmează drumul.' },
++  { icon: ScanSearch, title: 'Detecție automată', text: 'Programul urmărește vehiculele și observă situațiile periculoase.' },
++  { icon: BellRing, title: 'Alertă cu clip', text: 'Dispecerul primește alerta împreună cu un clip scurt.' },
++  { icon: UserCheck, title: 'Decizia dispecerului', text: 'Omul vede clipul și confirmă sau respinge alerta.' },
++]
++
++/** Public first screen: what the product is, in plain words, before the login form. */
++export default function LandingPage() {
++  return (
++    <div className="h-full overflow-y-auto bg-[#0A0E14] text-[#E6EDF3] font-sans select-text">
++      <div className="min-h-full max-w-6xl mx-auto px-6 lg:px-10 py-5 flex flex-col gap-5">
++        <header className="flex items-center justify-between gap-4 shrink-0">
++          <Logo variant="full" size={36} />
++          <span className="px-2.5 py-1 rounded border border-[#FFC23D]/50 text-[#FFC23D] font-mono text-[11px] uppercase tracking-wider">
++            Prototip demonstrativ
++          </span>
++        </header>
++
++        <main className="flex-1 flex flex-col justify-center gap-7">
++          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
++            <div className="lg:col-span-5">
++              <p className="font-mono text-xs uppercase tracking-widest text-[#7D8A9B] mb-3">Dispecerat rutier asistat de inteligență artificială</p>
++              <h1 className="text-4xl xl:text-5xl font-bold tracking-tight leading-[1.1]">
++                Camerele observă drumul. <span className="text-[#3DA5FF]">Omul decide.</span>
++              </h1>
++              <Link
++                to="/login"
++                className="mt-7 inline-flex items-center gap-2 px-6 py-3 rounded-md bg-[#3DA5FF] text-[#0A0E14] font-bold text-base tracking-wider uppercase hover:bg-[#2C94F0] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E6EDF3]"
++              >
++                Intră în aplicație <ArrowRight size={18} />
++              </Link>
++            </div>
++
++            <dl className="lg:col-span-7 flex flex-col gap-2.5">
++              {POINTS.map((point) => (
++                <div key={point.title} className="bg-[#111821] border border-[#1E2A36] border-l-2 border-l-[#3DA5FF] rounded-md px-4 py-3">
++                  <dt className="text-xs font-bold uppercase tracking-wider text-[#3DA5FF]">{point.title}</dt>
++                  <dd className="mt-1 text-[15px] leading-snug">{point.text}</dd>
++                </div>
++              ))}
++            </dl>
++          </div>
++
++          <section aria-labelledby="landing-steps">
++            <h2 id="landing-steps" className="font-bold text-xs uppercase tracking-wider text-[#7D8A9B] mb-2.5">Cum funcționează, în patru pași</h2>
++            <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
++              {STEPS.map((step, index) => (
++                <li key={step.title} className="relative bg-[#17202B] border border-[#1E2A36] rounded-md p-4">
++                  <div className="flex items-center gap-3">
++                    <span className="w-10 h-10 rounded-md bg-[#0A0E14] border border-[#1E2A36] flex items-center justify-center text-[#3DA5FF] shrink-0">
++                      <step.icon size={20} />
++                    </span>
++                    <span className="font-mono text-xs text-[#7D8A9B]">Pasul {index + 1}</span>
++                  </div>
++                  <div className="mt-3 font-bold text-base">{step.title}</div>
++                  <p className="mt-1 text-[13px] leading-snug text-[#7D8A9B]">{step.text}</p>
++                  {index < STEPS.length - 1 && (
++                    <ChevronRight size={22} aria-hidden="true" className="hidden lg:block absolute -right-[23px] top-1/2 -translate-y-1/2 text-[#3DA5FF]" />
++                  )}
++                </li>
++              ))}
++            </ol>
++          </section>
++        </main>
++
++        <footer className="shrink-0 border-t border-[#1E2A36] pt-3 text-[13px] text-[#7D8A9B]">
++          <span className="text-[#FFC23D] font-semibold">Prototip demonstrativ.</span>{' '}
++          Filmările sunt înregistrări de arhivă și fluxuri publice; precizia nu a fost încă măsurată pe date etichetate de om.
++        </footer>
++      </div>
++    </div>
++  )
++}

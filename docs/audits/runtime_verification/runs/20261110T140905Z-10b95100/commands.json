@@ -1,0 +1,78 @@
+[
+  {
+    "name": "initdb",
+    "command": [
+      "/home/justin7m8/miniconda3/envs/rs-pg/bin/initdb",
+      "-D",
+      "/tmp/rsverify-yk1pgjdy/pg",
+      "-U",
+      "rsverify_root",
+      "-A",
+      "trust",
+      "--encoding=UTF8",
+      "--no-locale"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration",
+    "start": "2026-11-10T14:09:05.773869+00:00",
+    "end": "2026-11-10T14:09:07.091358+00:00",
+    "duration_s": 1.317,
+    "exit_code": 0
+  },
+  {
+    "name": "start",
+    "command": [
+      "/home/justin7m8/miniconda3/envs/rs-pg/bin/pg_ctl",
+      "-D",
+      "/tmp/rsverify-yk1pgjdy/pg",
+      "-l",
+      "/tmp/rsverify-yk1pgjdy/postgres.log",
+      "-o",
+      "-h 127.0.0.1 -p 44355 -k /tmp/rsverify-yk1pgjdy",
+      "start"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration",
+    "start": "2026-11-10T14:09:07.091690+00:00",
+    "end": "2026-11-10T14:09:07.206286+00:00",
+    "duration_s": 0.115,
+    "exit_code": 0
+  },
+  {
+    "name": "flows",
+    "command": [
+      "/home/justin7m8/Documents/roadsentinel-integration/.venv.integration/bin/python",
+      "-m",
+      "pytest",
+      "tests/test_lookup_ownership.py",
+      "tests/test_seed.py",
+      "tests/test_auth.py",
+      "tests/test_mission_vertical.py",
+      "tests/test_managed_live_runtime.py",
+      "tests/test_browser_complete_journey.py",
+      "-o",
+      "addopts=",
+      "-q",
+      "-s"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration/backend",
+    "start": "2026-11-10T14:09:07.207012+00:00",
+    "end": "2026-11-10T14:11:02.300904+00:00",
+    "duration_s": 115.094,
+    "exit_code": 0
+  },
+  {
+    "name": "stop",
+    "command": [
+      "/home/justin7m8/miniconda3/envs/rs-pg/bin/pg_ctl",
+      "-D",
+      "/tmp/rsverify-yk1pgjdy/pg",
+      "stop",
+      "-m",
+      "fast"
+    ],
+    "cwd": "/home/justin7m8/Documents/roadsentinel-integration",
+    "start": "2026-11-10T14:11:02.304734+00:00",
+    "end": "2026-11-10T14:11:09.134880+00:00",
+    "duration_s": 6.83,
+    "exit_code": 0
+  }
+]

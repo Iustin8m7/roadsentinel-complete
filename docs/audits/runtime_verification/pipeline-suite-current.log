@@ -1,0 +1,162 @@
+...............................................FF.F..................... [ 33%]
+........................................................................ [ 67%]
+.....................................................................    [100%]
+=================================== FAILURES ===================================
+_____________________ test_profile_is_local_and_slug_bound _____________________
+
+    def test_profile_is_local_and_slug_bound():
+        with pytest.raises(ValueError, match="local YAML filename"):
+            workers._profile("../README.md", "local-uvc-camera")
+        with pytest.raises(ValueError, match="slug"):
+            workers._profile("local-uvc.yaml", "another-camera")
+>       profile, config, digest = workers._profile("local-uvc.yaml", "local-uvc-camera")
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_camera_workers.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'local-uvc.yaml', slug = 'local-uvc-camera'
+
+    def _profile(name: str, slug: str) -> tuple[Path, dict[str, Any], str]:
+        if not PROFILE_NAME.fullmatch(name):
+            raise ValueError("config_ref must be a local YAML filename")
+        path = (CAMERA_DIR / name).resolve(strict=True)
+        if path.parent != CAMERA_DIR or not path.is_file():
+            raise ValueError("camera profile must be a regular file directly inside cameras/")
+        try:
+            config = yaml.safe_load(path.read_text(encoding="utf-8"))
+        except (OSError, yaml.YAMLError) as exc:
+            raise ValueError("camera profile could not be parsed") from exc
+        if not isinstance(config, dict) or config.get("id") != slug:
+            raise ValueError("camera profile id must match the tenant camera slug")
+        try:
+            spec = SourceSpec.from_camera(config)
+        except ConsentError:
+            raise ValueError(
+                "camera profile policy validation failed: source processing permission is not recorded"
+            ) from None
+        except (SourceError, KeyError, TypeError, ValueError) as exc:
+            raise ValueError(f"camera profile policy validation failed: {exc}") from None
+        if not spec.live_capture:
+            raise ValueError("worker controls accept only a configured live camera source")
+        model = config.get("model")
+        if not isinstance(model, str) or not model or ".." in Path(model).parts:
+            raise ValueError("camera profile must select a repository-local model")
+        configured = os.environ.get('RS_YOLOX_MODEL_PATH')
+        if model == 'models/yolox_s.onnx' and configured:
+            from roadsentinel.models import resolve_for_pipeline, ModelError
+            try:
+                resolve_for_pipeline(config)
+            except (OSError, ValueError, ModelError):
+                raise ValueError('configured stock model is missing or its checksum differs') from None
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            return path, config, digest
+        model_path = (ROOT / model).resolve()
+        if ROOT not in model_path.parents or not model_path.is_file():
+>           raise ValueError("configured model is missing or outside the repository")
+E           ValueError: configured model is missing or outside the repository
+
+backend/app/services/camera_workers.py:131: ValueError
+__________ test_supervisor_start_is_idempotent_and_stop_reaps_process __________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x6ffc847129f0>
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-170/test_supervisor_start_is_idemp0')
+
+    def test_supervisor_start_is_idempotent_and_stop_reaps_process(monkeypatch, tmp_path):
+        real_popen = subprocess.Popen
+        tenant_id, camera_id = str(uuid.uuid4()), str(uuid.uuid4())
+        key = f"{tenant_id}-{camera_id}"
+        monkeypatch.setattr(workers, "STATE_DIR", tmp_path)
+        monkeypatch.setattr(workers, "_children", {})
+        monkeypatch.setenv("RS_API_URL", "http://127.0.0.1:8000")
+        monkeypatch.setenv("RS_INGEST_KEY_ID", "test-key")
+        monkeypatch.setenv("RS_INGEST_SECRET", "test-secret")
+    
+        def launch(_command, **kwargs):
+            return real_popen(
+                [sys.executable, "-c", "import time; time.sleep(30)"], **kwargs
+            )
+    
+        monkeypatch.setattr(workers.subprocess, "Popen", launch)
+>       first = workers.start(tenant_id, camera_id, "local-uvc-camera", "local-uvc.yaml")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_camera_workers.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+backend/app/services/camera_workers.py:241: in start
+    profile, config, version = _profile(config_ref, slug)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'local-uvc.yaml', slug = 'local-uvc-camera'
+
+    def _profile(name: str, slug: str) -> tuple[Path, dict[str, Any], str]:
+        if not PROFILE_NAME.fullmatch(name):
+            raise ValueError("config_ref must be a local YAML filename")
+        path = (CAMERA_DIR / name).resolve(strict=True)
+        if path.parent != CAMERA_DIR or not path.is_file():
+            raise ValueError("camera profile must be a regular file directly inside cameras/")
+        try:
+            config = yaml.safe_load(path.read_text(encoding="utf-8"))
+        except (OSError, yaml.YAMLError) as exc:
+            raise ValueError("camera profile could not be parsed") from exc
+        if not isinstance(config, dict) or config.get("id") != slug:
+            raise ValueError("camera profile id must match the tenant camera slug")
+        try:
+            spec = SourceSpec.from_camera(config)
+        except ConsentError:
+            raise ValueError(
+                "camera profile policy validation failed: source processing permission is not recorded"
+            ) from None
+        except (SourceError, KeyError, TypeError, ValueError) as exc:
+            raise ValueError(f"camera profile policy validation failed: {exc}") from None
+        if not spec.live_capture:
+            raise ValueError("worker controls accept only a configured live camera source")
+        model = config.get("model")
+        if not isinstance(model, str) or not model or ".." in Path(model).parts:
+            raise ValueError("camera profile must select a repository-local model")
+        configured = os.environ.get('RS_YOLOX_MODEL_PATH')
+        if model == 'models/yolox_s.onnx' and configured:
+            from roadsentinel.models import resolve_for_pipeline, ModelError
+            try:
+                resolve_for_pipeline(config)
+            except (OSError, ValueError, ModelError):
+                raise ValueError('configured stock model is missing or its checksum differs') from None
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            return path, config, digest
+        model_path = (ROOT / model).resolve()
+        if ROOT not in model_path.parents or not model_path.is_file():
+>           raise ValueError("configured model is missing or outside the repository")
+E           ValueError: configured model is missing or outside the repository
+
+backend/app/services/camera_workers.py:131: ValueError
+___________ test_worker_refuses_to_start_without_local_signed_ingest ___________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x6ffc8596e270>
+tmp_path = PosixPath('/tmp/pytest-of-justin7m8/pytest-170/test_worker_refuses_to_start_w0')
+
+    def test_worker_refuses_to_start_without_local_signed_ingest(monkeypatch, tmp_path):
+        monkeypatch.setattr(workers, "STATE_DIR", tmp_path)
+        for key in ("RS_API_URL", "RS_INGEST_KEY_ID", "RS_INGEST_SECRET"):
+            monkeypatch.delenv(key, raising=False)
+>       with pytest.raises(ValueError, match="localhost RS_API_URL"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'localhost RS_API_URL'
+E         Actual message: 'configured model is missing or outside the repository'
+
+tests/test_camera_workers.py:65: AssertionError
+=============================== warnings summary ===============================
+.venv.integration/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/justin7m8/Documents/roadsentinel-integration/.venv.integration/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/test_detector.py::test_supervision_bytetrack_keeps_ids_for_a_moving_detection
+  /home/justin7m8/Documents/roadsentinel-integration/roadsentinel/detector.py:209: FutureWarning: The `ByteTrack` was deprecated since v0.28.0. It will be removed in v0.31.0.
+    return sv.ByteTrack(frame_rate=max(1, round(frame_rate)))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_camera_workers.py::test_profile_is_local_and_slug_bound - V...
+FAILED tests/test_camera_workers.py::test_supervisor_start_is_idempotent_and_stop_reaps_process
+FAILED tests/test_camera_workers.py::test_worker_refuses_to_start_without_local_signed_ingest
+3 failed, 210 passed, 2 warnings in 5.44s

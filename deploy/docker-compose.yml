@@ -94,7 +94,7 @@ services:
     networks: [web]
 
   caddy:
-    image: caddy:2.10.2-alpine
+    image: caddy:2.11-alpine
     ports:
       - "443:443"
       - "80:80"
